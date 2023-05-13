@@ -1,0 +1,25 @@
+name: Storybook
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  storybook:
+    runs-on: ubuntu-latest
+    name: Build Storybook
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        run: yarn --immutable
+      - name: Run build-storybook
+        run: yarn build-storybook
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages # The branch the action should deploy to.
+          FOLDER: docs # The folder that the build-storybook script generates files.
+          CLEAN: true # Automatically remove deleted files from the deploy branch
+          FORCE: true # Force-push new deployments to overwrite the previous version

@@ -1,0 +1,157 @@
+.grl-table {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  &__main {
+    position: relative;
+    outline: none !important;
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    overflow: auto;
+    line-height: 1.1em;
+  }
+
+  &__body {
+    .list {
+      overflow: auto !important;
+      &.ReactVirtualized__Grid__innerScrollContainer {
+        overflow: auto !important;
+        min-height: 100%;
+      }
+    }
+    &__row {
+      display: flex;
+      //font-family: theme.fonts.medium.fontFamily;
+      //font-size: theme.fonts.medium.fontSize,
+      //font-weight: theme.fonts.small.fontWeight,
+      &.dragging > div {
+        background: lightgreen; //'var(--decisionTable-head-background)',
+      }
+      &.active > div {
+        background: lightblue; //'var(--decisionTable-row-active)',
+      }
+
+      .cell {
+        display: flex;
+        align-items: center;
+        background: lightpink; // var(--decisionTable-background)',
+        padding: 6px 8px;
+        box-sizing: border-box;
+        border: 0.5px solid black; //var(--decisionTable-border)`,
+        white-space: nowrap;
+        user-select: none;
+        &.cursor {
+          background: lightcoral; // 'var(--decisionTable-row-cursor) !important',
+        }
+        &.index {
+          cursor: grab !important;
+        }
+        &.button {
+          padding: 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          cursor: pointer !important;
+        }
+        &.noAction {
+          cursor: not-allowed !important;
+        }
+      }
+    }
+
+    .add-row-above {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none !important;
+    }
+    &__cell {
+      position: relative;
+      overflow-x: auto;
+      &.selected {
+        outline-offset: -2px;
+        outline: 2px solid blue; // var(--decisionTable-primary)`,
+      }
+      &:not(.editing) {
+        cursor: cell;
+      }
+
+      .input {
+        position: absolute;
+        z-index: 5;
+        top: 2px;
+        left: 2px;
+        right: 2px;
+        bottom: 2px;
+        box-sizing: border-box;
+        border: none !important;
+        outline: none !important;
+        border-radius: 0 !important;
+        padding: 5px 6px 6px;
+        line-height: 1;
+      }
+    }
+  }
+
+  &__head {
+    overflow: hidden !important;
+
+    .cell {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      background: yellow; //'var(--decisionTable-head-background)',
+      border: 0.5px solid orange; //var(--decisionTable-border)`,
+      font-weight: 400;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+
+    &__cell {
+      position: relative;
+      overflow: visible;
+
+      .resizer {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: -8px;
+        width: 8px;
+        background: transparent;
+        z-index: 10;
+        cursor: col-resize;
+      }
+    }
+  }
+
+  &__fields-reorder {
+    &__item {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    &__handle {
+      background-color: #f0f2f5;
+      height: 32px;
+      width: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    &__card {
+      &--dragging {
+        background-color: #f0f2f5;
+        box-shadow: var(--box-shadow-4);
+        user-select: none;
+      }
+    }
+  }
+}

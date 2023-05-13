@@ -1,0 +1,14 @@
+name: Lint
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Lint code
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        run: yarn --immutable
+      - name: Run lint and prettier
+        run: yarn format

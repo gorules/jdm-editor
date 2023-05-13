@@ -1,0 +1,12 @@
+/*
+!/dist
+/dist/**/stories
+/dist/cjs/styles.css
+/dist/esm/styles.css
+/dist/**/setupTests.js
+/dist/**/*.test.*
+!/src
+/src/**/stories
+/src/tests
+/src/**/*.test.*
+/src/setupTests.js

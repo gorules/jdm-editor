@@ -1,0 +1,19 @@
+name: Unit tests
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Unit tests
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        run: yarn --immutable
+      - name: Run tests and collect coverage
+        run: yarn test --coverage --forceExit --detectOpenHandles
+      - name: Upload coverage reports to Codecov
+        run: |
+          curl -Os https://uploader.codecov.io/latest/linux/codecov
+          chmod +x codecov
+          ./codecov
