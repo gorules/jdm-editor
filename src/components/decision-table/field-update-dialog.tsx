@@ -1,7 +1,7 @@
 import { Form, Input, Modal } from 'antd'
 import React, { useEffect } from 'react'
 
-import { TableSchemaItem } from './table.context'
+import { TableSchemaItem } from './dt.context'
 
 export type FieldUpdateProps = {
   id?: string

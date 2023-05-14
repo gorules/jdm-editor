@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { ColumnType, TableSchemaItem } from './table.context'
+import { ColumnType, TableSchemaItem } from './dt.context'
 
 export type TableDialogType = 'add' | 'reorder' | 'edit'
 export type TableDialogState = {
@@ -19,7 +19,7 @@ export const TableDialogContext = React.createContext<TableDialogContextState>(
   {} as any
 )
 
-export const TableDialogProvider: React.FC<React.PropsWithChildren> = ({
+export const DecisionTableDialogProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
   const [dialog, setDialog] = useState<TableDialogState | undefined>(undefined)
@@ -40,4 +40,4 @@ export const TableDialogProvider: React.FC<React.PropsWithChildren> = ({
   )
 }
 
-export const useTableDialog = () => React.useContext(TableDialogContext)
+export const useDecisionTableDialog = () => React.useContext(TableDialogContext)

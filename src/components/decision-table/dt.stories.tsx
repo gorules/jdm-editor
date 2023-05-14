@@ -1,26 +1,37 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 
-import { Table } from './table'
+import { DecisionTable } from '../../index'
 
-const meta: Meta<typeof Table> = {
+const meta: Meta<typeof DecisionTable> = {
   /* 👇 The title prop is optional.
    * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
    * to learn how to generate automatic titles
    */
-  title: 'Table',
-  component: Table,
+  title: 'Decision Table Final',
+  component: DecisionTable,
 }
 
 export default meta
 
-type Story = StoryObj<typeof Table>
+type Story = StoryObj<typeof DecisionTable>
 
 /*
  *👇 Render functions are a framework specific feature to allow you control on how the component renders.
  * See https://storybook.js.org/docs/react/api/csf
  * to learn how to use render functions.
  */
+
+const rules: any[] = []
+for (let i = 0; i < 10000; i++) {
+  rules.push({
+    '_id': `${i}`,
+    '124': `${i} Hello`,
+    '333': `${i} Test Output`,
+    '123': `${i} Tesst Input`,
+    '_description': `${i} Some random description`,
+  })
+}
 export const Primary: Story = {
   render: () => (
     <div
@@ -28,7 +39,7 @@ export const Primary: Story = {
         height: 400,
       }}
     >
-      <Table
+      <DecisionTable
         configurable
         value={{
           hitPolicy: 'first',
@@ -54,29 +65,7 @@ export const Primary: Story = {
               type: 'expression',
             },
           ],
-          rules: [
-            {
-              '_id': '111',
-              '124': '1111',
-              '333': 'Test Output',
-              '123': 'Tesst Input',
-              '_description': 'Some random description',
-            },
-            {
-              '_id': '222',
-              '124': '2222',
-              '333': 'Test Output',
-              '123': 'Tesst Input',
-              '_description': 'Some random description',
-            },
-            {
-              '_id': '333',
-              '124': '3333',
-              '333': 'Test Output',
-              '123': 'Tesst Input',
-              '_description': 'Some random description',
-            },
-          ],
+          rules,
         }}
       />
     </div>

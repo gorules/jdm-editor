@@ -1,30 +1,13 @@
-import produce, {
-  Patch,
-  PatchListener,
-  applyPatches,
-  enablePatches,
-} from 'immer'
+import produce from 'immer'
 import { nanoid } from 'nanoid'
 import Papa from 'papaparse'
-import React, { SyntheticEvent, useEffect, useRef, useState } from 'react'
+import React, {useMemo, useRef, useState} from 'react'
 
 import { saveFile } from '../../helpers/file-helpers'
 
-enablePatches()
-
 export type TableCursor = {
-  x: number
+  x: string
   y: number
-}
-
-type TableAction = {
-  inversePatches: Patch[]
-  patches: Patch[]
-}
-
-type TableActionStack = {
-  past: TableAction[]
-  future: TableAction[]
 }
 
 export type TableSchemaItem = {
@@ -58,55 +41,38 @@ export type TableImportOptions = {
 export type HitPolicy = 'first' | 'collect'
 export type ColumnType = 'inputs' | 'outputs'
 
-export type TableState = {
+export type DecisionTableState = {
   id?: string
   name?: string
 
   cursor: TableCursor | null
   setCursor: (cursor: TableCursor | null) => void
-  trySetCursor: (cursor: TableCursor) => boolean
 
   inputs: TableSchemaItem[]
   outputs: TableSchemaItem[]
 
-  actionStack: TableActionStack
-
-  editing: boolean
-  setEditing: (editing: boolean) => void
-
   inputValue: string
   setInputValue: React.Dispatch<React.SetStateAction<string>>
 
-  getElementsFromEvent: (e: SyntheticEvent) => TableEventElements | null
-  isLastElementFromEvent: (e: SyntheticEvent) => boolean
-  isContentElementFromEvent: (e: SyntheticEvent) => boolean
-  getCursorFromEvent: (e: SyntheticEvent) => TableCursor | null
-  getCell: (cursor: TableCursor | null) => TableCell | null
+  value: DecisionTableProps
 
-  value: TableProps
-
+  // Actions
   commitData: (data: string, cursor: TableCursor) => void
   swapRows: (source: number, target: number) => void
-
   addRowAbove: (target: number) => void
   addRowBelow: (target: number) => void
   removeRow: (target: number) => void
-
   addColumn: (type: ColumnType, column: TableSchemaItem) => void
   updateColumn: (type: ColumnType, id: string, column: TableSchemaItem) => void
   removeColumn: (type: ColumnType, id: string) => void
   reorderColumns: (type: ColumnType, columns: TableSchemaItem[]) => void
-
   updateHitPolicy: (hitPolicy: HitPolicy) => void
 
-  getColumnId: (x: number) => string | null
+  getColumnId: (x: string) => TableSchemaItem | undefined
 
   cells: React.MutableRefObject<Record<string, TableCell | null>>
   table: React.MutableRefObject<HTMLTableElement | null>
   namespace: string
-
-  undo: () => void
-  redo: () => void
 
   importCsv: () => void
   exportCsv: (options: TableExportOptions) => Promise<void>
@@ -117,20 +83,22 @@ export type TableState = {
   configurable?: boolean
 }
 
-export type TableProps = {
+export type DecisionTableProps = {
   hitPolicy: HitPolicy
   inputs: TableSchemaItem[]
   outputs: TableSchemaItem[]
   rules: Record<string, string>[]
 }
 
-const TableContext = React.createContext<TableState>({} as any)
+export const DecisionTableContext = React.createContext<DecisionTableState>(
+  {} as any
+)
 
-export type TableContextProps = {
+export type DecisionTableContextProps = {
   id?: string
   name?: string
-  value?: TableProps
-  onChange?: (decisionTable: TableProps) => void
+  value?: DecisionTableProps
+  onChange?: (decisionTable: DecisionTableProps) => void
   namespace?: string
   activeRules?: string[]
   configurable?: boolean
@@ -143,9 +111,9 @@ const parserOptions = {
 
 const parserPipe = ' | '
 
-const TableProvider: React.FC<React.PropsWithChildren<TableContextProps>> = (
-  props
-) => {
+export const DecisionTableProvider: React.FC<
+  React.PropsWithChildren<DecisionTableContextProps>
+> = (props) => {
   const {
     id,
     name,
@@ -155,23 +123,29 @@ const TableProvider: React.FC<React.PropsWithChildren<TableContextProps>> = (
     configurable,
     disabled,
     onChange,
-    value: defaultDecisionTable,
+    value,
   } = props
 
   const fileInput = useRef<HTMLInputElement>(null)
   const [inputValue, setInputValue] = useState<string>('')
   const [cursor, setCursor] = useState<TableCursor | null>(null)
 
-  const [editing, setEditing] = useState<boolean>(false)
   const cells = useRef<Record<string, TableCell | null>>({})
   const table = useRef<HTMLTableElement | null>(null)
-  const actionStack = useRef<TableActionStack>({ future: [], past: [] })
 
-  const [decisionTable, setDecisionTable] = useState<TableProps>({
-    hitPolicy: defaultDecisionTable?.hitPolicy || 'first',
-    inputs: defaultDecisionTable?.inputs || [],
-    outputs: defaultDecisionTable?.outputs || [],
-    rules: defaultDecisionTable?.rules || [],
+  const updateDecisionTable = (decisionTable: DecisionTableProps) => {
+      if (onChange) {
+          onChange(decisionTable);
+      }
+
+      setDecisionTable(decisionTable);
+  }
+
+  const [decisionTable, setDecisionTable] = useState<DecisionTableProps>({
+    hitPolicy: value?.hitPolicy || 'first',
+    inputs: value?.inputs || [],
+    outputs: value?.outputs || [],
+    rules: value?.rules || [],
   })
 
   const inputs: TableSchemaItem[] =
@@ -211,7 +185,7 @@ const TableProvider: React.FC<React.PropsWithChildren<TableContextProps>> = (
   }
 
   const cleanupTableRules = (
-    decisionTable: TableProps
+    decisionTable: DecisionTableProps
   ): Record<string, string>[] => {
     const rules = decisionTable?.rules || []
     const schemaItems = [...decisionTable.inputs, ...decisionTable.outputs]
@@ -227,161 +201,27 @@ const TableProvider: React.FC<React.PropsWithChildren<TableContextProps>> = (
     })
   }
 
-  useEffect(() => {
-    onChange?.(decisionTable)
-  }, [decisionTable])
-
-  const getColumnId = (x: number) => [...inputs, ...outputs]?.[x]?.id || null
-
-  const patchListener: PatchListener = (patches, inversePatches) => {
-    actionStack.current.future = []
-    actionStack.current.past = actionStack.current.past
-      .reverse()
-      .slice(0, 10)
-      .reverse()
-    actionStack.current.past.push({ patches, inversePatches })
-  }
-
-  const undo = () => {
-    const action = actionStack.current.past.pop()
-    if (!action) return
-
-    actionStack.current.future.push(action)
-    setDecisionTable((data) => applyPatches(data, action.inversePatches))
-  }
-
-  const redo = () => {
-    const action = actionStack.current.future.pop()
-    if (!action) return
-
-    actionStack.current.past.push(action)
-    setDecisionTable((data) => applyPatches(data, action.patches))
-  }
-
-  const _setEditing = (value: boolean) => {
-    if (value === editing) return
-
-    if (value && cursor) {
-      const columnId = getColumnId(cursor.x)
-      setInputValue(
-        columnId ? decisionTable?.rules?.[cursor.y]?.[columnId] || '' : ''
-      )
-    }
-
-    setEditing(value)
-  }
-
-  const trySetCursor = (newCursor: TableCursor) => {
-    const { x, y } = newCursor
-    const columnId = getColumnId(x)
-
-    if (!columnId) return false
-
-    const rowExists = !!decisionTable?.rules?.[y]
-    if (!rowExists) return false
-
-    setCursor(newCursor)
-    return true
-  }
-
-  const getElementsFromEvent = (
-    e: SyntheticEvent
-  ): TableEventElements | null => {
-    const target = e.target as HTMLElement
-    const cell = target.hasAttribute('data-table-cell')
-      ? target
-      : target.closest('[data-table-cell]')
-
-    if (!cell) {
-      return null
-    }
-
-    return { cell: cell as HTMLDivElement }
-  }
-
-  const getCursorFromEvent = (e: SyntheticEvent): TableCursor | null => {
-    const elements = getElementsFromEvent(e)
-
-    if (!elements) {
-      return null
-    }
-
-    const { cell } = elements
-
-    const x = Number.parseInt(cell.getAttribute('data-x')!, 10)
-    const y = Number.parseInt(cell.getAttribute('data-y')!, 10)
-
-    return { x, y }
-  }
-
-  const isLastElementFromEvent = (e: SyntheticEvent): boolean => {
-    const elements = getElementsFromEvent(e)
-
-    if (!elements) {
-      return false
-    }
-
-    const { cell } = elements
-    const y = Number.parseInt(cell.getAttribute('data-y') || '', 10)
-    return y === decisionTable?.rules?.length
-  }
-
-  const isContentElementFromEvent = (e: SyntheticEvent): boolean => {
-    const elements = getElementsFromEvent(e)
-
-    if (!elements) {
-      return false
-    }
-
-    const { cell } = elements
-    return cell.getAttribute('data-type') === 'content'
-  }
-
-  const getCell = (cursor: TableCursor | null): TableCell | null => {
-    if (!cursor) return null
-
-    const { x, y } = cursor
-    const columnId = getColumnId(x)
-
-    if (!columnId) return null
-
-    const cell = cells.current?.[`${y}:${columnId}`]
-
-    if (!cell) return null
-
-    return cell
-  }
+  const getColumnId = (x: string) =>
+    [...inputs, ...outputs].find((c) => c.id === x)
 
   const commitData = (value: string, cursor: TableCursor) => {
     const { x, y } = cursor
-    const column = getColumnId(x)
-
-    if (!column) return
-
     setDecisionTable(
-      produce(
-        decisionTable,
-        (draft) => {
-          draft.rules[y][column] = value
-          return draft
-        },
-        patchListener
-      )
+      produce(decisionTable, (draft) => {
+        draft.rules[y][x] = value
+        return draft
+      })
     )
   }
 
   const swapRows = (source: number, target: number) => {
     setDecisionTable(
-      produce(
-        decisionTable,
-        (draft) => {
-          const input = draft?.rules?.[source]
-          draft.rules.splice(source, 1)
-          draft.rules.splice(target, 0, input)
-          return draft
-        },
-        patchListener
-      )
+      produce(decisionTable, (draft) => {
+        const input = draft?.rules?.[source]
+        draft.rules.splice(source, 1)
+        draft.rules.splice(target, 0, input)
+        return draft
+      })
     )
 
     setCursor(null)
@@ -389,83 +229,52 @@ const TableProvider: React.FC<React.PropsWithChildren<TableContextProps>> = (
 
   const addRowAbove = (target: number) => {
     setDecisionTable(
-      produce(
-        decisionTable,
-        (draft) => {
-          draft.rules.splice(
-            target,
-            0,
-            cleanupTableRule({
-              _id: nanoid(10),
-            })
-          )
-          return draft
-        },
-        patchListener
-      )
-    )
-
-    setCursor((cursor) =>
-      cursor
-        ? {
-            ...cursor,
-            y: cursor.y + 1,
-          }
-        : null
+      produce(decisionTable, (draft) => {
+        draft.rules.splice(
+          target,
+          0,
+          cleanupTableRule({
+            _id: nanoid(10),
+          })
+        )
+        return draft
+      })
     )
   }
 
   const addRowBelow = (target: number) => {
     target += 1
     setDecisionTable(
-      produce(
-        decisionTable,
-        (draft) => {
-          draft.rules.splice(
-            target,
-            0,
-            cleanupTableRule({
-              _id: nanoid(10),
-            })
-          )
-          return draft
-        },
-        patchListener
-      )
+      produce(decisionTable, (draft) => {
+        draft.rules.splice(
+          target,
+          0,
+          cleanupTableRule({
+            _id: nanoid(10),
+          })
+        )
+        return draft
+      })
     )
   }
 
   const removeRow = (target: number) => {
     setCursor(null)
     setDecisionTable(
-      produce(
-        decisionTable,
-        (draft) => {
-          draft.rules.splice(target, 1)
-          return draft
-        },
-        patchListener
-      )
+      produce(decisionTable, (draft) => {
+        draft.rules.splice(target, 1)
+        return draft
+      })
     )
-
-    if (cursor) {
-      if (!trySetCursor({ x: cursor.x, y: cursor.y - 1 })) {
-        trySetCursor({ x: cursor.x, y: cursor.y })
-      }
-    }
   }
 
   const addColumn = (type: ColumnType, column: TableSchemaItem) => {
     setDecisionTable(
-      produce(
-        decisionTable,
-        (draft) => {
-          draft[type].push(column)
-          draft.rules = cleanupTableRules(draft)
-          return draft
-        },
-        patchListener
-      )
+      produce(decisionTable, (draft) => {
+        draft[type].push(column)
+        draft.rules = cleanupTableRules(draft)
+        return draft
+      })
     )
   }
 
@@ -475,66 +284,50 @@ const TableProvider: React.FC<React.PropsWithChildren<TableContextProps>> = (
     data: TableSchemaItem
   ) => {
     setDecisionTable(
-      produce(
-        decisionTable,
-        (draft) => {
-          draft[type] = draft[type].map((item) => {
-            if (item.id === id) {
-              return {
-                ...item,
-                name: data?.name,
-                field: data?.field,
-              }
+      produce(decisionTable, (draft) => {
+        draft[type] = draft[type].map((item) => {
+          if (item.id === id) {
+            return {
+              ...item,
+              name: data?.name,
+              field: data?.field,
             }
-            return item
-          })
-          draft.rules = cleanupTableRules(draft)
-          return draft
-        },
-        patchListener
-      )
+          }
+          return item
+        })
+        draft.rules = cleanupTableRules(draft)
+        return draft
+      })
     )
   }
 
   const removeColumn = (type: ColumnType, id: string) => {
     setDecisionTable(
-      produce(
-        decisionTable,
-        (draft) => {
-          draft[type] = (draft?.[type] || []).filter((item) => item?.id !== id)
-          draft.rules = cleanupTableRules(draft)
-          return draft
-        },
-        patchListener
-      )
+      produce(decisionTable, (draft) => {
+        draft[type] = (draft?.[type] || []).filter((item) => item?.id !== id)
+        draft.rules = cleanupTableRules(draft)
+        return draft
+      })
     )
     setCursor(null)
   }
 
   const reorderColumns = (type: ColumnType, columns: TableSchemaItem[]) => {
     setDecisionTable(
-      produce(
-        decisionTable,
-        (draft) => {
-          draft[type] = columns
-          draft.rules = cleanupTableRules(draft)
-          return draft
-        },
-        patchListener
-      )
+      produce(decisionTable, (draft) => {
+        draft[type] = columns
+        draft.rules = cleanupTableRules(draft)
+        return draft
+      })
     )
   }
 
   const updateHitPolicy = (hitPolicy: HitPolicy) => {
     setDecisionTable(
-      produce(
-        decisionTable,
-        (draft) => {
-          draft.hitPolicy = hitPolicy
-          return draft
-        },
-        patchListener
-      )
+      produce(decisionTable, (draft) => {
+        draft.hitPolicy = hitPolicy
+        return draft
+      })
     )
   }
 
@@ -641,16 +434,12 @@ const TableProvider: React.FC<React.PropsWithChildren<TableContextProps>> = (
     })
 
     setDecisionTable(
-      produce(
-        decisionTable,
-        (draft) => {
-          draft.inputs = inputs
-          draft.outputs = outputs
-          draft.rules = rules
-          return draft
-        },
-        patchListener
-      )
+      produce(decisionTable, (draft) => {
+        draft.inputs = inputs
+        draft.outputs = outputs
+        draft.rules = rules
+        return draft
+      })
     )
   }
 
@@ -665,29 +454,19 @@ const TableProvider: React.FC<React.PropsWithChildren<TableContextProps>> = (
   }
 
   return (
-    <TableContext.Provider
+    <DecisionTableContext.Provider
       value={{
         id,
         name,
         cursor,
         setCursor,
-        trySetCursor,
 
         value: decisionTable,
-        actionStack: actionStack.current,
         inputs,
         outputs,
         namespace,
-
-        editing,
-        setEditing: _setEditing,
         inputValue,
         setInputValue,
-        getElementsFromEvent,
-        getCursorFromEvent,
-        isLastElementFromEvent,
-        isContentElementFromEvent,
-        getCell,
         cells,
         table,
 
@@ -707,9 +486,6 @@ const TableProvider: React.FC<React.PropsWithChildren<TableContextProps>> = (
         // end actions
 
         getColumnId,
-
-        undo,
-        redo,
 
         importCsv,
         exportCsv,
@@ -732,10 +508,10 @@ const TableProvider: React.FC<React.PropsWithChildren<TableContextProps>> = (
         }}
       />
       {children}
-    </TableContext.Provider>
+    </DecisionTableContext.Provider>
   )
 }
 
-export const useTable = () => React.useContext(TableContext)
+export const useDecisionTable = () => React.useContext(DecisionTableContext)
 
-export default TableProvider
+export default DecisionTableProvider

@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid'
 import React, { useEffect } from 'react'
 import slugify from 'slugify'
 
-import { ColumnType, TableSchemaItem } from './table.context'
+import { ColumnType, TableSchemaItem } from './dt.context'
 
 export type FieldAddProps = {
   id?: string

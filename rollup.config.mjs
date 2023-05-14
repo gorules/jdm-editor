@@ -2,9 +2,12 @@ import commonjs from '@rollup/plugin-commonjs'
 import resolve from '@rollup/plugin-node-resolve'
 import terser from '@rollup/plugin-terser'
 import typescript from '@rollup/plugin-typescript'
-import copy from 'rollup-plugin-copy'
 import dts from 'rollup-plugin-dts'
 import external from 'rollup-plugin-peer-deps-external'
+import scss from 'rollup-plugin-scss'
+import pkg from './package.json' assert { type: 'json' };
+
+import sassRuntime from 'sass';
 
 export default [
   {
@@ -29,14 +32,17 @@ export default [
         exclude: ['**/*.stories.*', '**/*.test.*'],
       }),
       terser(),
-      copy({
-        targets: [{ src: 'src/styles.css', dest: 'dist' }],
+      scss({
+        output: './dist/css/style.css',
+        failOnError: true,
+        runtime: sassRuntime,
       }),
     ],
   },
   {
     input: 'dist/esm/types/index.d.ts',
     output: [{ file: 'dist/index.d.ts', format: 'esm' }],
+    external: [/\.(sass|scss|css)$/] /* ignore style files */,
     plugins: [dts()],
   },
 ]

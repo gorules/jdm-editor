@@ -5,7 +5,6 @@ import {
   DraggableProvided,
   DraggableStateSnapshot,
   DropResult,
-  Droppable,
   DroppableProvided,
 } from '@hello-pangea/dnd'
 import { Card, Form, Modal, Typography } from 'antd'
@@ -13,8 +12,8 @@ import clsx from 'clsx'
 import React, { useEffect, useState } from 'react'
 
 import { Stack } from '../stack'
-import { TableSchemaItem } from './table.context'
-import {StrictModeDroppable} from "../strict-mode-droppable";
+import { StrictModeDroppable } from '../strict-mode-droppable'
+import { TableSchemaItem } from './dt.context'
 
 export type FieldsReorderProps = {
   fields?: TableSchemaItem[]

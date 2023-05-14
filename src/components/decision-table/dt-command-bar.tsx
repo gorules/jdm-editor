@@ -1,22 +1,20 @@
-import { ExportOutlined, ImportOutlined, UndoOutlined } from '@ant-design/icons'
+import { ExportOutlined, ImportOutlined, PlusOutlined } from '@ant-design/icons'
 import { Button, Select, Space } from 'antd'
 import React from 'react'
 
-import { useTable } from './table.context'
+import { useDecisionTable } from './dt.context'
 
-const TableCommandBar: React.FC = () => {
+export const DecisionTableCommandBar: React.FC = () => {
   const {
     name,
-    undo,
-    redo,
-    actionStack,
     value,
     updateHitPolicy,
     disabled,
     configurable,
     exportCsv,
     importCsv,
-  } = useTable()
+    addRowBelow,
+  } = useDecisionTable()
 
   return (
     <div
@@ -31,23 +29,18 @@ const TableCommandBar: React.FC = () => {
       <Space size={0} className='full-width'>
         <Button
           type='link'
-          icon={<UndoOutlined style={{ color: 'var(--ant-primary-color)' }} />}
-          disabled={!actionStack.past.length}
-          onClick={undo}
+          size={'small'}
+          icon={<PlusOutlined style={{ color: 'var(--ant-primary-color)' }} />}
+          disabled={disabled}
+          onClick={() => {
+            addRowBelow(value.rules.length - 1)
+          }}
         >
-          Undo
+          Add row
         </Button>
         <Button
           type='link'
-          color='secondary'
-          icon={<UndoOutlined style={{ color: 'var(--ant-primary-color)' }} />}
-          disabled={!actionStack.future.length}
-          onClick={redo}
-        >
-          Redo
-        </Button>
-        <Button
-          type='link'
+          size={'small'}
           color='secondary'
           icon={
             <ExportOutlined style={{ color: 'var(--ant-primary-color)' }} />
@@ -62,6 +55,7 @@ const TableCommandBar: React.FC = () => {
         </Button>
         <Button
           type='link'
+          size={'small'}
           color='secondary'
           icon={
             <ImportOutlined style={{ color: 'var(--ant-primary-color)' }} />
@@ -73,6 +67,7 @@ const TableCommandBar: React.FC = () => {
       </Space>
       <Select
         style={{ width: 140 }}
+        size={'small'}
         disabled={disabled || !configurable}
         value={value?.hitPolicy}
         options={[
@@ -92,5 +87,3 @@ const TableCommandBar: React.FC = () => {
     </div>
   )
 }
-
-export default TableCommandBar

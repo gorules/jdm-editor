@@ -1,14 +1,15 @@
 import React from 'react'
 
+import { useDecisionTableDialog } from './dt-dialog.context'
+import { ColumnType, TableSchemaItem, useDecisionTable } from './dt.context'
 import { FieldAdd } from './field-add-dialog'
 import { FieldUpdate } from './field-update-dialog'
 import { FieldsReorder } from './fields-reorder-dialog'
-import { useTableDialog } from './table-dialog.context'
-import { ColumnType, TableSchemaItem, useTable } from './table.context'
 
-export const TableDialogs: React.FC = () => {
-  const { id, addColumn, updateColumn, reorderColumns, value } = useTable()
-  const { dialog, setDialog, isDialogActive } = useTableDialog()
+export const DecisionTableDialogs: React.FC = () => {
+  const { id, addColumn, updateColumn, reorderColumns, value } =
+    useDecisionTable()
+  const { dialog, setDialog, isDialogActive } = useDecisionTableDialog()
 
   return (
     <>
