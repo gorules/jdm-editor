@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import React from 'react'
+import React, { useState } from 'react'
 
 import { DecisionTable } from '../../index'
+import { DecisionTableProps } from './dt.context'
 
 const meta: Meta<typeof DecisionTable> = {
   /* 👇 The title prop is optional.
@@ -32,16 +33,109 @@ for (let i = 0; i < 10000; i++) {
     '_description': `${i} Some random description`,
   })
 }
-export const Primary: Story = {
+export const Uncontrolled: Story = {
   render: () => (
     <div
       style={{
-        height: 400,
+        height: '500px',
       }}
     >
       <DecisionTable
         configurable
-        value={{
+        disableHitPolicy
+        onChange={(val) => {
+          console.log(val)
+        }}
+        defaultValue={{
+          hitPolicy: 'first',
+          inputs: [
+            {
+              id: '123',
+              name: 'Input',
+              field: 'input',
+              type: 'expression',
+            },
+            {
+              id: '124',
+              name: 'Input2',
+              field: 'input2',
+              type: 'expression',
+            },
+          ],
+          outputs: [
+            {
+              id: '333',
+              name: 'Output',
+              field: 'output',
+              type: 'expression',
+            },
+          ],
+          rules,
+        }}
+      />
+    </div>
+  ),
+}
+
+export const Controlled: Story = {
+  render: () => {
+    const [value, setValue] = useState<DecisionTableProps>({
+      hitPolicy: 'first',
+      inputs: [
+        {
+          id: '123',
+          name: 'Input',
+          field: 'input',
+          type: 'expression',
+        },
+        {
+          id: '124',
+          name: 'Input2',
+          field: 'input2',
+          type: 'expression',
+        },
+      ],
+      outputs: [
+        {
+          id: '333',
+          name: 'Output',
+          field: 'output',
+          type: 'expression',
+        },
+      ],
+      rules,
+    })
+    return (
+      <div
+        style={{
+          height: '500px',
+        }}
+      >
+        <DecisionTable
+          configurable
+          disableHitPolicy
+          value={value}
+          onChange={(val) => setValue(val)}
+        />
+      </div>
+    )
+  },
+}
+
+export const StressTest: Story = {
+  render: () => (
+    <div
+      style={{
+        height: '500px',
+      }}
+    >
+      <DecisionTable
+        configurable
+        disableHitPolicy
+        onChange={(val) => {
+          console.log(val)
+        }}
+        defaultValue={{
           hitPolicy: 'first',
           inputs: [
             {

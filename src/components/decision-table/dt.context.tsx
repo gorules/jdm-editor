@@ -1,7 +1,7 @@
 import produce from 'immer'
 import { nanoid } from 'nanoid'
 import Papa from 'papaparse'
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import { saveFile } from '../../helpers/file-helpers'
 
@@ -98,6 +98,7 @@ export const DecisionTableContext = React.createContext<DecisionTableState>(
 export type DecisionTableContextProps = {
   id?: string
   name?: string
+  defaultValue?: DecisionTableProps
   value?: DecisionTableProps
   onChange?: (decisionTable: DecisionTableProps) => void
   namespace?: string
@@ -113,6 +114,35 @@ const parserOptions = {
 
 const parserPipe = ' | '
 
+const parseDecisionTable = (decisionTable?: DecisionTableProps) => {
+  const dt: DecisionTableProps = {
+    hitPolicy: decisionTable?.hitPolicy || 'first',
+    inputs: decisionTable?.inputs || [],
+    outputs: decisionTable?.outputs || [],
+    rules: decisionTable?.rules || [],
+  }
+
+  if (dt.inputs?.length === 0) {
+    dt.inputs.push({
+      id: nanoid(10),
+      field: 'input',
+      name: 'Input',
+      type: 'expression',
+    })
+  }
+
+  if (dt.outputs?.length === 0) {
+    dt.outputs.push({
+      id: nanoid(10),
+      field: 'output',
+      name: 'Output',
+      type: 'expression',
+    })
+  }
+
+  return dt
+}
+
 export const DecisionTableProvider: React.FC<
   React.PropsWithChildren<DecisionTableContextProps>
 > = (props) => {
@@ -127,6 +157,7 @@ export const DecisionTableProvider: React.FC<
     disableHitPolicy,
     onChange,
     value,
+    defaultValue,
   } = props
 
   const fileInput = useRef<HTMLInputElement>(null)
@@ -136,42 +167,24 @@ export const DecisionTableProvider: React.FC<
   const cells = useRef<Record<string, TableCell | null>>({})
   const table = useRef<HTMLTableElement | null>(null)
 
+  const [decisionTable, setDecisionTable] = useState<DecisionTableProps>(
+    value ? parseDecisionTable(value) : parseDecisionTable(defaultValue)
+  )
   const updateDecisionTable = (decisionTable: DecisionTableProps) => {
-    if (onChange) {
-      onChange(decisionTable)
+    if (!value || !onChange) {
+      setDecisionTable(parseDecisionTable(decisionTable))
     }
-
-    setDecisionTable(decisionTable)
+    onChange?.(decisionTable)
   }
 
-  const [decisionTable, setDecisionTable] = useState<DecisionTableProps>({
-    hitPolicy: value?.hitPolicy || 'first',
-    inputs: value?.inputs || [],
-    outputs: value?.outputs || [],
-    rules: value?.rules || [],
-  })
+  useEffect(() => {
+    if (value) {
+      setDecisionTable(parseDecisionTable(value))
+    }
+  }, [value])
 
-  const inputs: TableSchemaItem[] =
-    decisionTable?.inputs?.length > 0
-      ? decisionTable?.inputs || []
-      : [
-          {
-            id: `${id}_input`,
-            name: 'No Inputs',
-            type: '',
-          },
-        ]
-
-  const outputs: TableSchemaItem[] =
-    decisionTable?.outputs?.length > 0
-      ? decisionTable?.outputs || []
-      : [
-          {
-            id: `${id}_output`,
-            name: 'No Outputs',
-            type: '',
-          },
-        ]
+  const inputs: TableSchemaItem[] = decisionTable?.inputs || []
+  const outputs: TableSchemaItem[] = decisionTable?.outputs || []
 
   const cleanupTableRule = (
     rule: Record<string, string>
@@ -209,7 +222,7 @@ export const DecisionTableProvider: React.FC<
 
   const commitData = (value: string, cursor: TableCursor) => {
     const { x, y } = cursor
-    setDecisionTable(
+    updateDecisionTable(
       produce(decisionTable, (draft) => {
         draft.rules[y][x] = value
         return draft
@@ -218,7 +231,7 @@ export const DecisionTableProvider: React.FC<
   }
 
   const swapRows = (source: number, target: number) => {
-    setDecisionTable(
+    updateDecisionTable(
       produce(decisionTable, (draft) => {
         const input = draft?.rules?.[source]
         draft.rules.splice(source, 1)
@@ -231,7 +244,7 @@ export const DecisionTableProvider: React.FC<
   }
 
   const addRowAbove = (target: number) => {
-    setDecisionTable(
+    updateDecisionTable(
       produce(decisionTable, (draft) => {
         draft.rules.splice(
           target,
@@ -247,7 +260,7 @@ export const DecisionTableProvider: React.FC<
 
   const addRowBelow = (target: number) => {
     target += 1
-    setDecisionTable(
+    updateDecisionTable(
       produce(decisionTable, (draft) => {
         draft.rules.splice(
           target,
@@ -263,7 +276,7 @@ export const DecisionTableProvider: React.FC<
 
   const removeRow = (target: number) => {
     setCursor(null)
-    setDecisionTable(
+    updateDecisionTable(
       produce(decisionTable, (draft) => {
         draft.rules.splice(target, 1)
         return draft
@@ -272,7 +285,7 @@ export const DecisionTableProvider: React.FC<
   }
 
   const addColumn = (type: ColumnType, column: TableSchemaItem) => {
-    setDecisionTable(
+    updateDecisionTable(
       produce(decisionTable, (draft) => {
         draft[type].push(column)
         draft.rules = cleanupTableRules(draft)
@@ -286,7 +299,7 @@ export const DecisionTableProvider: React.FC<
     id: string,
     data: TableSchemaItem
   ) => {
-    setDecisionTable(
+    updateDecisionTable(
       produce(decisionTable, (draft) => {
         draft[type] = draft[type].map((item) => {
           if (item.id === id) {
@@ -305,7 +318,7 @@ export const DecisionTableProvider: React.FC<
   }
 
   const removeColumn = (type: ColumnType, id: string) => {
-    setDecisionTable(
+    updateDecisionTable(
       produce(decisionTable, (draft) => {
         draft[type] = (draft?.[type] || []).filter((item) => item?.id !== id)
         draft.rules = cleanupTableRules(draft)
@@ -316,7 +329,7 @@ export const DecisionTableProvider: React.FC<
   }
 
   const reorderColumns = (type: ColumnType, columns: TableSchemaItem[]) => {
-    setDecisionTable(
+    updateDecisionTable(
       produce(decisionTable, (draft) => {
         draft[type] = columns
         draft.rules = cleanupTableRules(draft)
@@ -326,7 +339,7 @@ export const DecisionTableProvider: React.FC<
   }
 
   const updateHitPolicy = (hitPolicy: HitPolicy) => {
-    setDecisionTable(
+    updateDecisionTable(
       produce(decisionTable, (draft) => {
         draft.hitPolicy = hitPolicy
         return draft
@@ -436,7 +449,7 @@ export const DecisionTableProvider: React.FC<
       return dataPoint
     })
 
-    setDecisionTable(
+    updateDecisionTable(
       produce(decisionTable, (draft) => {
         draft.inputs = inputs
         draft.outputs = outputs

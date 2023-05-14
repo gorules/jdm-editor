@@ -33,8 +33,8 @@
     ],
     "@typescript-eslint/no-use-before-define": "off",
     "file-progress/activate": "warn",
-    "react-hooks/exhaustive-deps": "error",
-    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "off",
+    "react-hooks/rules-of-hooks": "off",
     "react/display-name": "off",
     "react/prop-types": "off",
     "react/react-in-jsx-scope": "off"

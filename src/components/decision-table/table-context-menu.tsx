@@ -1,4 +1,4 @@
-import { Dropdown, Menu } from 'antd'
+import { Dropdown } from 'antd'
 import React from 'react'
 
 import { platform } from '../../helpers/platform'

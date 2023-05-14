@@ -299,45 +299,45 @@ export const Table: React.FC = () => {
         ;(table.options.meta as any)?.setCursor?.(id, index)
       }
 
-      const keyboardEventHandler = (
-        e: React.KeyboardEvent<HTMLInputElement>
-      ) => {
-        // Minor Events - Ignore if input
-        const { key, preventDefault } = e
-        // if (e.code === 'ArrowUp') {
-        //   if ((e.metaKey || e.altKey)) {
-        //     addRowAbove(y)
-        //     return preventDefault();
-        //   }
-        //
-        //   trySetCursor({ x, y: y - 1 })
-        //   return preventDefault()
-        // }
-        // if (e.code === 'ArrowDown') {
-        //   if ((e.metaKey || e.altKey) && !disabled) {
-        //     addRowBelow(y)
-        //     return preventDefault()
-        //   }
-        //
-        //   trySetCursor({ x, y: y + 1 })
-        //   return preventDefault()
-        // }
-        // if (e.code === 'ArrowLeft') {
-        //   trySetCursor({ x: x - 1, y })
-        //   return preventDefault()
-        // }
-        // if (e.code === 'ArrowRight') {
-        //   trySetCursor({ x: x + 1, y })
-        //   return preventDefault()
-        // }
-        // if (e.code === 'Backspace') {
-        //   if (e.metaKey || e.altKey) {
-        //     removeRow(y)
-        //     return preventDefault()
-        //   }
-        //   return preventDefault()
-        // }
-      }
+      const keyboardEventHandler = () =>
+        // e: React.KeyboardEvent<HTMLInputElement>
+        {
+          // Minor Events - Ignore if input
+          // const { key, preventDefault } = e
+          // if (e.code === 'ArrowUp') {
+          //   if ((e.metaKey || e.altKey)) {
+          //     addRowAbove(y)
+          //     return preventDefault();
+          //   }
+          //
+          //   trySetCursor({ x, y: y - 1 })
+          //   return preventDefault()
+          // }
+          // if (e.code === 'ArrowDown') {
+          //   if ((e.metaKey || e.altKey) && !disabled) {
+          //     addRowBelow(y)
+          //     return preventDefault()
+          //   }
+          //
+          //   trySetCursor({ x, y: y + 1 })
+          //   return preventDefault()
+          // }
+          // if (e.code === 'ArrowLeft') {
+          //   trySetCursor({ x: x - 1, y })
+          //   return preventDefault()
+          // }
+          // if (e.code === 'ArrowRight') {
+          //   trySetCursor({ x: x + 1, y })
+          //   return preventDefault()
+          // }
+          // if (e.code === 'Backspace') {
+          //   if (e.metaKey || e.altKey) {
+          //     removeRow(y)
+          //     return preventDefault()
+          //   }
+          //   return preventDefault()
+          // }
+        }
 
       return (
         <input
@@ -408,7 +408,7 @@ export const Table: React.FC = () => {
               <th
                 style={{
                   width: 60,
-                  maxWidth: 60
+                  maxWidth: 60,
                 }}
               />
               {headerGroup.headers.map((header) => {
