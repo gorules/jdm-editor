@@ -1,7 +1,7 @@
 import produce from 'immer'
 import { nanoid } from 'nanoid'
 import Papa from 'papaparse'
-import React, {useMemo, useRef, useState} from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 
 import { saveFile } from '../../helpers/file-helpers'
 
@@ -81,6 +81,7 @@ export type DecisionTableState = {
 
   disabled?: boolean
   configurable?: boolean
+  disableHitPolicy?: boolean
 }
 
 export type DecisionTableProps = {
@@ -103,6 +104,7 @@ export type DecisionTableContextProps = {
   activeRules?: string[]
   configurable?: boolean
   disabled?: boolean
+  disableHitPolicy?: boolean
 }
 
 const parserOptions = {
@@ -122,6 +124,7 @@ export const DecisionTableProvider: React.FC<
     activeRules,
     configurable,
     disabled,
+    disableHitPolicy,
     onChange,
     value,
   } = props
@@ -134,11 +137,11 @@ export const DecisionTableProvider: React.FC<
   const table = useRef<HTMLTableElement | null>(null)
 
   const updateDecisionTable = (decisionTable: DecisionTableProps) => {
-      if (onChange) {
-          onChange(decisionTable);
-      }
+    if (onChange) {
+      onChange(decisionTable)
+    }
 
-      setDecisionTable(decisionTable);
+    setDecisionTable(decisionTable)
   }
 
   const [decisionTable, setDecisionTable] = useState<DecisionTableProps>({
@@ -494,6 +497,7 @@ export const DecisionTableProvider: React.FC<
 
         disabled,
         configurable,
+        disableHitPolicy,
       }}
     >
       <input

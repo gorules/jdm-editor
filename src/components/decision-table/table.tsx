@@ -19,6 +19,7 @@ import { TableRow } from './table-row'
 export const Table: React.FC = () => {
   const {
     configurable,
+    disabled,
     inputs,
     outputs,
     value,
@@ -45,6 +46,7 @@ export const Table: React.FC = () => {
                 <Button
                   size={'small'}
                   type={'link'}
+                  disabled={disabled}
                   onClick={() => {
                     setDialog({
                       type: 'add',
@@ -59,6 +61,7 @@ export const Table: React.FC = () => {
                   <Button
                     size={'small'}
                     type={'link'}
+                    disabled={disabled}
                     onClick={() => {
                       setDialog({
                         type: 'reorder',
@@ -95,6 +98,7 @@ export const Table: React.FC = () => {
                       <Dropdown
                         trigger={['click']}
                         overlayStyle={{ minWidth: 140 }}
+                        disabled={disabled}
                         menu={{
                           items: [
                             {
@@ -163,6 +167,7 @@ export const Table: React.FC = () => {
                 <Button
                   size={'small'}
                   type={'link'}
+                  disabled={disabled}
                   onClick={() => {
                     setDialog({
                       type: 'add',
@@ -177,6 +182,7 @@ export const Table: React.FC = () => {
                   <Button
                     size={'small'}
                     type={'link'}
+                    disabled={disabled}
                     onClick={() => {
                       setDialog({
                         type: 'reorder',
@@ -212,6 +218,7 @@ export const Table: React.FC = () => {
                       <Dropdown
                         trigger={['click']}
                         overlayStyle={{ minWidth: 140 }}
+                        disabled={disabled}
                         menu={{
                           items: [
                             {
@@ -282,6 +289,8 @@ export const Table: React.FC = () => {
   const defaultColumn: Partial<ColumnDef<Record<string, string>>> = {
     cell: ({ getValue, row: { index }, column: { id }, table }) => {
       const value = getValue()
+
+      const { disabled } = useDecisionTable()
       const update = (value: string) => {
         ;(table.options.meta as any)?.updateData?.(index, id, value)
       }
@@ -332,8 +341,10 @@ export const Table: React.FC = () => {
 
       return (
         <input
+          className={'grl-dt__cell__input'}
           data-x={id}
           data-y={index}
+          disabled={disabled}
           value={(value as string) || ''}
           onKeyDown={keyboardEventHandler}
           onChange={(e) => update(e.target.value)}
@@ -385,7 +396,7 @@ export const Table: React.FC = () => {
       : 0
 
   return (
-    <div ref={tableContainerRef} className='container'>
+    <div ref={tableContainerRef} className='grl-dt__container'>
       <table
         style={{
           width: table.getCenterTotalSize(),
@@ -397,6 +408,7 @@ export const Table: React.FC = () => {
               <th
                 style={{
                   width: 60,
+                  maxWidth: 60
                 }}
               />
               {headerGroup.headers.map((header) => {

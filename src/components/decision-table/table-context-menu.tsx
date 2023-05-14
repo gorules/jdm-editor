@@ -9,6 +9,7 @@ import { useDecisionTable } from './dt.context'
 const ContextMenu: React.FC<React.PropsWithChildren> = (props) => {
   const { children } = props
   const {
+    disabled,
     cursor,
     addRowBelow,
     addRowAbove,
@@ -22,6 +23,7 @@ const ContextMenu: React.FC<React.PropsWithChildren> = (props) => {
     <Dropdown
       destroyPopupOnHide
       transitionName=''
+      disabled={disabled}
       overlayStyle={{
         minWidth: 270,
       }}

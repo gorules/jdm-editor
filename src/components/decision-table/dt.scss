@@ -1,5 +1,8 @@
 .grl-dt {
   font-size: 14px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 
   table {
     border-collapse: collapse;
@@ -67,8 +70,8 @@
     }
   }
 
-  .container {
-    height: 500px;
+  .grl-dt__container {
+    flex: 1;
     overflow: auto;
   }
 
@@ -99,14 +102,12 @@
     }
   }
 
-  tbody {
-    input {
-      border: 0;
-      height: 100%;
-      width: 100%;
-      background-color: transparent;
-      padding-left: 0.5rem;
-      font-size: 14px;
-    }
+  &__cell__input {
+    border: 0;
+    height: 100%;
+    width: 100%;
+    background-color: transparent;
+    padding-left: 0.5rem;
+    font-size: 14px;
   }
 }

@@ -2,6 +2,7 @@ import { ExportOutlined, ImportOutlined, PlusOutlined } from '@ant-design/icons'
 import { Button, Select, Space } from 'antd'
 import React from 'react'
 
+import { Stack } from '../stack'
 import { useDecisionTable } from './dt.context'
 
 export const DecisionTableCommandBar: React.FC = () => {
@@ -9,6 +10,7 @@ export const DecisionTableCommandBar: React.FC = () => {
     name,
     value,
     updateHitPolicy,
+    disableHitPolicy,
     disabled,
     configurable,
     exportCsv,
@@ -17,13 +19,12 @@ export const DecisionTableCommandBar: React.FC = () => {
   } = useDecisionTable()
 
   return (
-    <div
+    <Stack
+      horizontal
+      horizontalAlign={'space-between'}
+      verticalAlign={'center'}
       style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        width: '100%',
         padding: '0.5rem',
-        borderBottom: '1px solid #f0f2f5',
       }}
     >
       <Space size={0} className='full-width'>
@@ -68,7 +69,7 @@ export const DecisionTableCommandBar: React.FC = () => {
       <Select
         style={{ width: 140 }}
         size={'small'}
-        disabled={disabled || !configurable}
+        disabled={disabled || !configurable || disableHitPolicy}
         value={value?.hitPolicy}
         options={[
           {
@@ -84,6 +85,6 @@ export const DecisionTableCommandBar: React.FC = () => {
         ]}
         onSelect={updateHitPolicy}
       />
-    </div>
+    </Stack>
   )
 }
