@@ -1,7 +1,7 @@
 import { Form, Input, Modal } from 'antd'
-import { nanoid } from 'nanoid'
 import React, { useEffect } from 'react'
 import slugify from 'slugify'
+import { v4 } from 'uuid'
 
 import { ColumnType, TableSchemaItem } from './dt.context'
 
@@ -58,7 +58,7 @@ export const FieldAdd: React.FC<FieldAddProps> = (props) => {
         initialValues={{ type: 'expression' }}
         onFinish={({ type, field, name }) => {
           onSuccess?.({
-            id: nanoid(10),
+            id: v4(),
             type: type || 'expression',
             field,
             name,

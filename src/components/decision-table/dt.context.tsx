@@ -1,7 +1,7 @@
 import produce from 'immer'
-import { nanoid } from 'nanoid'
 import Papa from 'papaparse'
 import React, { useEffect, useRef, useState } from 'react'
+import { v4 } from 'uuid'
 
 import { saveFile } from '../../helpers/file-helpers'
 
@@ -123,21 +123,25 @@ const parseDecisionTable = (decisionTable?: DecisionTableProps) => {
   }
 
   if (dt.inputs?.length === 0) {
-    dt.inputs.push({
-      id: nanoid(10),
-      field: 'input',
-      name: 'Input',
-      type: 'expression',
-    })
+    dt.inputs = [
+      {
+        id: v4(),
+        field: 'input',
+        name: 'Input',
+        type: 'expression',
+      },
+    ]
   }
 
   if (dt.outputs?.length === 0) {
-    dt.outputs.push({
-      id: nanoid(10),
-      field: 'output',
-      name: 'Output',
-      type: 'expression',
-    })
+    dt.outputs = [
+      {
+        id: v4(),
+        field: 'output',
+        name: 'Output',
+        type: 'expression',
+      },
+    ]
   }
 
   return dt
@@ -191,7 +195,7 @@ export const DecisionTableProvider: React.FC<
   ): Record<string, string> => {
     const schemaItems = [...decisionTable.inputs, ...decisionTable.outputs]
     const newRule: Record<string, string> = {
-      _id: rule._id || nanoid(10),
+      _id: rule._id || v4(),
       _description: rule._description,
     }
     schemaItems.forEach((schemaItem) => {
@@ -207,7 +211,7 @@ export const DecisionTableProvider: React.FC<
     const schemaItems = [...decisionTable.inputs, ...decisionTable.outputs]
     return rules.map((rule) => {
       const newRule: Record<string, string> = {
-        _id: rule._id || nanoid(10),
+        _id: rule._id || v4(),
         _description: rule._description,
       }
       schemaItems.forEach((schemaItem) => {
@@ -250,7 +254,7 @@ export const DecisionTableProvider: React.FC<
           target,
           0,
           cleanupTableRule({
-            _id: nanoid(10),
+            _id: v4(),
           })
         )
         return draft
@@ -266,7 +270,7 @@ export const DecisionTableProvider: React.FC<
           target,
           0,
           cleanupTableRule({
-            _id: nanoid(10),
+            _id: v4(),
           })
         )
         return draft
@@ -440,7 +444,7 @@ export const DecisionTableProvider: React.FC<
 
     const rules = spreadsheetData.map((data) => {
       const dataPoint: Record<string, string> = {
-        _id: nanoid(10),
+        _id: v4(),
       }
 
       columns.forEach((col, index) => {

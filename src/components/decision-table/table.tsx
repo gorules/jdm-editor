@@ -6,7 +6,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { Button, Dropdown, Modal, Typography } from 'antd'
+import {Button, Dropdown, Input, Modal, Typography} from 'antd'
 import React from 'react'
 import { useVirtual } from 'react-virtual'
 
@@ -40,7 +40,7 @@ export const Table: React.FC = () => {
             horizontalAlign='space-between'
             verticalAlign='center'
           >
-            <div>Inputs</div>
+            <Typography.Text strong>Inputs</Typography.Text>
             {configurable && (
               <div>
                 <Button
@@ -90,8 +90,10 @@ export const Table: React.FC = () => {
                   verticalAlign={'center'}
                 >
                   <Stack gap={2}>
-                    <span>{input.name}</span>
-                    <small>{input.field}</small>
+                    <Typography.Text strong>{input?.name}</Typography.Text>
+                    <Typography.Text type='secondary' style={{ fontSize: 12 }}>
+                      {input?.field}
+                    </Typography.Text>
                   </Stack>
                   {configurable && (
                     <div>
@@ -161,7 +163,7 @@ export const Table: React.FC = () => {
             horizontalAlign={'space-between'}
             verticalAlign={'center'}
           >
-            <div>Outputs</div>
+            <Typography.Text strong>Outputs</Typography.Text>
             {configurable && (
               <div>
                 <Button
@@ -210,8 +212,10 @@ export const Table: React.FC = () => {
                   verticalAlign={'center'}
                 >
                   <Stack gap={2} verticalAlign={'center'}>
-                    <span>{output.name}</span>
-                    <small>{output.field}</small>
+                    <Typography.Text strong>{output?.name}</Typography.Text>
+                    <Typography.Text type='secondary' style={{ fontSize: 12 }}>
+                      {output?.field}
+                    </Typography.Text>
                   </Stack>
                   {configurable && (
                     <div>
@@ -275,7 +279,7 @@ export const Table: React.FC = () => {
       {
         id: '_description',
         accessorKey: '_description',
-        header: 'Description',
+        header: () => <Typography.Text strong>Description</Typography.Text>,
         minSize: 200,
       },
     ],
@@ -340,7 +344,7 @@ export const Table: React.FC = () => {
         }
 
       return (
-        <input
+        <Input
           className={'grl-dt__cell__input'}
           data-x={id}
           data-y={index}

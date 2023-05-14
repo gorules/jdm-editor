@@ -1,18 +1,10 @@
 import { DeploymentUnitOutlined } from '@ant-design/icons'
-import {
-  DragDropContext,
-  Draggable,
-  DraggableProvided,
-  DraggableStateSnapshot,
-  DropResult,
-  DroppableProvided,
-} from '@hello-pangea/dnd'
 import { Card, Form, Modal, Typography } from 'antd'
 import clsx from 'clsx'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import { XYCoord, useDrag, useDrop } from 'react-dnd'
 
 import { Stack } from '../stack'
-import { StrictModeDroppable } from '../strict-mode-droppable'
 import { TableSchemaItem } from './dt.context'
 
 export type FieldsReorderProps = {
@@ -20,6 +12,109 @@ export type FieldsReorderProps = {
   onSuccess?: (columns: TableSchemaItem[]) => void
   onDismiss?: () => void
   isOpen?: boolean
+}
+
+interface DragItem {
+  index: number
+  id: string
+  type: string
+}
+
+const FieldCard: React.FC<{
+  col: TableSchemaItem
+  index: number
+  moveCard: (dragIndex: number, hoverIndex: number) => void
+}> = ({ col, index, moveCard }) => {
+  const ref = useRef<HTMLDivElement>(null)
+  const [, drop] = useDrop<DragItem, void>({
+    accept: 'col',
+    collect(monitor) {
+      return {
+        handlerId: monitor.getHandlerId(),
+      }
+    },
+    hover(item: DragItem, monitor) {
+      if (!ref.current) {
+        return
+      }
+      const dragIndex = item.index
+      const hoverIndex = index
+
+      // Don't replace items with themselves
+      if (dragIndex === hoverIndex) {
+        return
+      }
+
+      // Determine rectangle on screen
+      const hoverBoundingRect = ref.current?.getBoundingClientRect()
+
+      // Get vertical middle
+      const hoverMiddleY =
+        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
+
+      // Determine mouse position
+      const clientOffset = monitor.getClientOffset()
+
+      // Get pixels to the top
+      const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top
+
+      // Only perform the move when the mouse has crossed half of the items height
+      // When dragging downwards, only move when the cursor is below 50%
+      // When dragging upwards, only move when the cursor is above 50%
+
+      // Dragging downwards
+      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+        return
+      }
+
+      // Dragging upwards
+      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+        return
+      }
+
+      // Time to actually perform the action
+      moveCard(dragIndex, hoverIndex)
+
+      // Note: we're mutating the monitor item here!
+      // Generally it's better to avoid mutations,
+      // but it's good here for the sake of performance
+      // to avoid expensive index searches.
+      item.index = hoverIndex
+    },
+  })
+
+  const [{ isDragging }, drag] = useDrag({
+    type: 'col',
+    item: () => {
+      return { id: col.id, index }
+    },
+    collect: (monitor: any) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  })
+
+  const opacity = isDragging ? 0 : 1
+  drag(drop(ref))
+  return (
+    <Card
+      ref={ref}
+      style={{ opacity }}
+      bodyStyle={{ padding: '0.5rem' }}
+      className={clsx(false && 'grl-table__fields-reorder__card--dragging')}
+    >
+      <div className='grl-dt__fields-reorder__item'>
+        <Stack horizontal verticalAlign='center'>
+          <div className='grl-dt__fields-reorder__handle'>=</div>
+          <Stack grow gap={0}>
+            <Typography.Text>{col?.name}</Typography.Text>
+            <Typography.Text type='secondary' style={{ fontSize: 12 }}>
+              {col?.field}
+            </Typography.Text>
+          </Stack>
+        </Stack>
+      </div>
+    </Card>
+  )
 }
 
 export const FieldsReorder: React.VFC<FieldsReorderProps> = (props) => {
@@ -32,6 +127,18 @@ export const FieldsReorder: React.VFC<FieldsReorderProps> = (props) => {
       setColumns([...(fields || [])])
     }
   }, [isOpen, fields])
+
+  const moveCard = (from: number, to: number) => {
+    // dropped outside the list
+    if (!to) {
+      return
+    }
+    const tmpList = [...columns]
+
+    const element = tmpList.splice(from, 1)[0]
+    tmpList.splice(to, 0, element)
+    setColumns(tmpList)
+  }
 
   return (
     <Modal
@@ -55,74 +162,16 @@ export const FieldsReorder: React.VFC<FieldsReorderProps> = (props) => {
           onSuccess?.(columns)
         }}
       >
-        <DragDropContext
-          onDragEnd={(result: DropResult) => {
-            // dropped outside the list
-            if (!result.destination) {
-              return
-            }
-            const tmpList = [...columns]
-
-            const element = tmpList.splice(result.source.index, 1)[0]
-            tmpList.splice(result.destination.index, 0, element)
-            setColumns(tmpList)
-          }}
-        >
-          <StrictModeDroppable droppableId={`columns`}>
-            {(provided: DroppableProvided) => (
-              <div {...provided.droppableProps} ref={provided.innerRef}>
-                <Stack gap={8} horizontalAlign='stretch'>
-                  {columns.map((column, index) => (
-                    <Draggable
-                      key={column.id}
-                      draggableId={column.id}
-                      index={index}
-                    >
-                      {(
-                        provided: DraggableProvided,
-                        snapshot: DraggableStateSnapshot
-                      ) => (
-                        <Card
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          style={provided.draggableProps.style}
-                          bodyStyle={{ padding: '0.5rem' }}
-                          className={clsx(
-                            snapshot.isDragging &&
-                              'grl-table__fields-reorder__card--dragging'
-                          )}
-                        >
-                          <div className='grl-table__fields-reorder__item'>
-                            <Stack horizontal verticalAlign='center'>
-                              <div
-                                className='grl-table__fields-reorder__handle'
-                                {...provided.dragHandleProps}
-                              >
-                                <DeploymentUnitOutlined />
-                              </div>
-                              <Stack grow gap={0}>
-                                <Typography.Text>
-                                  {column?.name}
-                                </Typography.Text>
-                                <Typography.Text
-                                  type='secondary'
-                                  style={{ fontSize: 12 }}
-                                >
-                                  {column?.field}
-                                </Typography.Text>
-                              </Stack>
-                            </Stack>
-                          </div>
-                        </Card>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </Stack>
-              </div>
-            )}
-          </StrictModeDroppable>
-        </DragDropContext>
+        <Stack gap={8} horizontalAlign='stretch'>
+          {columns.map((column, index) => (
+            <FieldCard
+              key={column.id}
+              col={column}
+              index={index}
+              moveCard={moveCard}
+            />
+          ))}
+        </Stack>
       </Form>
     </Modal>
   )

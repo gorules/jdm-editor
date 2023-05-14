@@ -17,6 +17,7 @@
     margin: 0;
     position: sticky;
     top: 0;
+    z-index: 10;
   }
 
   tr {
@@ -29,11 +30,7 @@
     text-align: left;
     position: relative;
     min-width: 200px;
-    font-weight: 600;
-
-    small {
-      font-weight: normal;
-    }
+    font-weight: normal;
   }
 
   td {
@@ -109,5 +106,11 @@
     background-color: transparent;
     padding-left: 0.5rem;
     font-size: 14px;
+  }
+
+  &__fields-reorder__item {
+    &:hover {
+      cursor: grab;
+    }
   }
 }

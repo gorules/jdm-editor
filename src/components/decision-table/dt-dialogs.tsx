@@ -1,4 +1,6 @@
 import React from 'react'
+import { DndProvider } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
 
 import { useDecisionTableDialog } from './dt-dialog.context'
 import { ColumnType, TableSchemaItem, useDecisionTable } from './dt.context'
@@ -39,18 +41,20 @@ export const DecisionTableDialogs: React.FC = () => {
           setDialog(undefined)
         }}
       />
-      <FieldsReorder
-        isOpen={isDialogActive('reorder')}
-        onSuccess={(data) => {
-          if (!dialog) return
-          reorderColumns(dialog.columnType, data)
-          setDialog(undefined)
-        }}
-        fields={value?.[dialog?.columnType as ColumnType]}
-        onDismiss={() => {
-          setDialog(undefined)
-        }}
-      />
+      <DndProvider backend={HTML5Backend}>
+        <FieldsReorder
+          isOpen={isDialogActive('reorder')}
+          onSuccess={(data) => {
+            if (!dialog) return
+            reorderColumns(dialog.columnType, data)
+            setDialog(undefined)
+          }}
+          fields={value?.[dialog?.columnType as ColumnType]}
+          onDismiss={() => {
+            setDialog(undefined)
+          }}
+        />
+      </DndProvider>
     </>
   )
 }

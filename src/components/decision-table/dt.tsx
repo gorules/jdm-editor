@@ -1,3 +1,4 @@
+import { ConfigProvider } from 'antd'
 import React from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
@@ -12,15 +13,17 @@ import { Table } from './table'
 export const DecisionTable: React.FC<DecisionTableContextProps> = (props) => {
   return (
     <div className={'grl-dt'}>
-      <DecisionTableProvider {...props}>
-        <DecisionTableDialogProvider>
-          <DecisionTableCommandBar />
-          <DndProvider backend={HTML5Backend}>
-            <Table />
-          </DndProvider>
-          <DecisionTableDialogs />
-        </DecisionTableDialogProvider>
-      </DecisionTableProvider>
+      <ConfigProvider>
+        <DecisionTableProvider {...props}>
+          <DecisionTableDialogProvider>
+            <DecisionTableCommandBar />
+            <DndProvider backend={HTML5Backend}>
+              <Table />
+            </DndProvider>
+            <DecisionTableDialogs />
+          </DecisionTableDialogProvider>
+        </DecisionTableProvider>
+      </ConfigProvider>
     </div>
   )
 }
