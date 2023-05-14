@@ -122,6 +122,18 @@ export const Controlled: Story = {
   },
 }
 
+export const Empty: Story = {
+  render: () => (
+    <div
+      style={{
+        height: '500px',
+      }}
+    >
+      <DecisionTable configurable />
+    </div>
+  ),
+}
+
 export const StressTest: Story = {
   render: () => (
     <div
