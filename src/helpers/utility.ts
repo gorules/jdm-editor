@@ -12,7 +12,6 @@ export const chunk = <T = unknown>(arr: T[], size: number): T[][] =>
   )
 
 const unsecuredCopyToClipboard = (text: string) => {
-  console.log('Insecure copy to clipboard:', text)
   const textArea = document.createElement('textarea')
   textArea.value = text
   document.body.appendChild(textArea)

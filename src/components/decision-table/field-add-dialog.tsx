@@ -1,8 +1,9 @@
-import { Form, Input, Modal } from 'antd'
+import { Cascader, Form, Input, Modal } from 'antd'
 import React, { useEffect } from 'react'
 import slugify from 'slugify'
 import { v4 } from 'uuid'
 
+import { SchemaSelectProps, recursiveSelect } from '../../helpers/components'
 import { ColumnType, TableSchemaItem } from './dt.context'
 
 export type FieldAddProps = {
@@ -10,11 +11,12 @@ export type FieldAddProps = {
   onSuccess?: (column: TableSchemaItem) => void
   onDismiss?: () => void
   isOpen?: boolean
+  schema?: SchemaSelectProps[]
   columnType?: ColumnType
 }
 
 export const FieldAdd: React.FC<FieldAddProps> = (props) => {
-  const { isOpen, onDismiss, onSuccess } = props
+  const { isOpen, onDismiss, onSuccess, schema } = props
   const [form] = Form.useForm<TableSchemaItem>()
   const name = Form.useWatch('name', form)
   const type = Form.useWatch('type', form)
@@ -65,6 +67,23 @@ export const FieldAdd: React.FC<FieldAddProps> = (props) => {
           })
         }}
       >
+        {schema && (
+          <Form.Item label={'Chose from list'}>
+            <Cascader
+              fieldNames={{ label: 'name', value: 'field', children: 'items' }}
+              options={schema}
+              onChange={(val) => {
+                const field = recursiveSelect(val as string[], schema)
+                if (field) {
+                  form.setFieldsValue({
+                    name: field?.name,
+                    field: field?.field,
+                  })
+                }
+              }}
+            ></Cascader>
+          </Form.Item>
+        )}
         <Form.Item name='name' label='Label' rules={[{ required: true }]}>
           <Input autoComplete='off' />
         </Form.Item>

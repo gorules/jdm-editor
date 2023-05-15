@@ -37,7 +37,7 @@ export const DecisionTableCommandBar: React.FC = () => {
             addRowBelow(value.rules.length - 1)
           }}
         >
-          Add rule
+          Add row
         </Button>
         <Button
           type='link'

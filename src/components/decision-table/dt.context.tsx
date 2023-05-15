@@ -3,7 +3,9 @@ import Papa from 'papaparse'
 import React, { useEffect, useRef, useState } from 'react'
 import { v4 } from 'uuid'
 
+import { SchemaSelectProps } from '../../helpers/components'
 import { saveFile } from '../../helpers/file-helpers'
+import { CellProps } from './table-default-cell'
 
 export type TableCursor = {
   x: string
@@ -68,7 +70,9 @@ export type DecisionTableState = {
   reorderColumns: (type: ColumnType, columns: TableSchemaItem[]) => void
   updateHitPolicy: (hitPolicy: HitPolicy) => void
 
-  getColumnId: (x: string) => TableSchemaItem | undefined
+  getColumnId: (
+    x: string
+  ) => ({ colType: string } & TableSchemaItem) | undefined
 
   cells: React.MutableRefObject<Record<string, TableCell | null>>
   table: React.MutableRefObject<HTMLTableElement | null>
@@ -79,9 +83,14 @@ export type DecisionTableState = {
 
   activeRules?: string[]
 
+  inputsSchema?: SchemaSelectProps[]
+  outputsSchema?: SchemaSelectProps[]
+
   disabled?: boolean
   configurable?: boolean
   disableHitPolicy?: boolean
+
+  cellRenderer?: (props: CellProps) => JSX.Element | null | undefined
 }
 
 export type DecisionTableProps = {
@@ -106,6 +115,9 @@ export type DecisionTableContextProps = {
   configurable?: boolean
   disabled?: boolean
   disableHitPolicy?: boolean
+  inputsSchema?: SchemaSelectProps[]
+  outputsSchema?: SchemaSelectProps[]
+  cellRenderer?: (props: CellProps) => JSX.Element | null | undefined
 }
 
 const parserOptions = {
@@ -162,6 +174,9 @@ export const DecisionTableProvider: React.FC<
     onChange,
     value,
     defaultValue,
+    inputsSchema,
+    outputsSchema,
+    cellRenderer,
   } = props
 
   const fileInput = useRef<HTMLInputElement>(null)
@@ -222,7 +237,16 @@ export const DecisionTableProvider: React.FC<
   }
 
   const getColumnId = (x: string) =>
-    [...inputs, ...outputs].find((c) => c.id === x)
+    [
+      ...inputs.map((i) => ({
+        ...i,
+        colType: 'input',
+      })),
+      ...outputs.map((i) => ({
+        ...i,
+        colType: 'output',
+      })),
+    ].find((c) => c.id === x)
 
   const commitData = (value: string, cursor: TableCursor) => {
     const { x, y } = cursor
@@ -515,6 +539,10 @@ export const DecisionTableProvider: React.FC<
         disabled,
         configurable,
         disableHitPolicy,
+
+        inputsSchema,
+        outputsSchema,
+        cellRenderer,
       }}
     >
       <input

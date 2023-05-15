@@ -1,6 +1,7 @@
-import { Form, Input, Modal } from 'antd'
+import { Cascader, Form, Input, Modal } from 'antd'
 import React, { useEffect } from 'react'
 
+import { SchemaSelectProps, recursiveSelect } from '../../helpers/components'
 import { TableSchemaItem } from './dt.context'
 
 export type FieldUpdateProps = {
@@ -9,12 +10,13 @@ export type FieldUpdateProps = {
   onSuccess?: (column: TableSchemaItem) => void
   onDismiss?: () => void
   isOpen?: boolean
+  schema?: SchemaSelectProps[]
 }
 
 export const FieldUpdate: React.FC<
   React.PropsWithChildren<FieldUpdateProps>
 > = (props) => {
-  const { isOpen, onDismiss, onSuccess, field } = props
+  const { isOpen, onDismiss, onSuccess, field, schema } = props
   const [form] = Form.useForm()
 
   useEffect(() => {
@@ -44,7 +46,7 @@ export const FieldUpdate: React.FC<
         id='field-update-dialog'
         form={form}
         layout='vertical'
-        hideRequiredMark
+        requiredMark={false}
         initialValues={{
           name: field?.name,
           field: field?.field,
@@ -56,6 +58,23 @@ export const FieldUpdate: React.FC<
           })
         }}
       >
+        {schema && (
+          <Form.Item label={'Chose from list'}>
+            <Cascader
+              fieldNames={{ label: 'name', value: 'field', children: 'items' }}
+              options={schema}
+              onChange={(val) => {
+                const field = recursiveSelect(val as string[], schema)
+                if (field) {
+                  form.setFieldsValue({
+                    name: field?.name,
+                    field: field?.field,
+                  })
+                }
+              }}
+            ></Cascader>
+          </Form.Item>
+        )}
         <Form.Item name='name' label='Label' rules={[{ required: true }]}>
           <Input />
         </Form.Item>

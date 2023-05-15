@@ -1,4 +1,4 @@
-import { DownOutlined } from '@ant-design/icons'
+import { DownOutlined, PlusOutlined } from '@ant-design/icons'
 import {
   ColumnDef,
   Row,
@@ -6,7 +6,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { Button, Dropdown, Input, Modal, Typography } from 'antd'
+import { Button, Dropdown, Modal, Typography } from 'antd'
 import React from 'react'
 import { useVirtual } from 'react-virtual'
 
@@ -14,6 +14,7 @@ import { Stack } from '../stack'
 import { useDecisionTableDialog } from './dt-dialog.context'
 import { useDecisionTable } from './dt.context'
 import { TableContextMenu } from './table-context-menu'
+import { DefaultCell } from './table-default-cell'
 import { TableRow } from './table-row'
 
 export const Table: React.FC = () => {
@@ -27,6 +28,8 @@ export const Table: React.FC = () => {
     commitData,
     swapRows,
     setCursor,
+    addRowBelow,
+    cellRenderer,
   } = useDecisionTable()
   const { setDialog } = useDecisionTableDialog()
 
@@ -89,7 +92,7 @@ export const Table: React.FC = () => {
                   horizontalAlign={'space-between'}
                   verticalAlign={'center'}
                 >
-                  <Stack gap={2}>
+                  <Stack gap={0}>
                     <Typography.Text strong>{input?.name}</Typography.Text>
                     <Typography.Text type='secondary' style={{ fontSize: 12 }}>
                       {input?.field}
@@ -211,7 +214,7 @@ export const Table: React.FC = () => {
                   horizontalAlign='space-between'
                   verticalAlign={'center'}
                 >
-                  <Stack gap={2} verticalAlign={'center'}>
+                  <Stack gap={0} verticalAlign={'center'}>
                     <Typography.Text strong>{output?.name}</Typography.Text>
                     <Typography.Text type='secondary' style={{ fontSize: 12 }}>
                       {output?.field}
@@ -292,9 +295,10 @@ export const Table: React.FC = () => {
 
   const defaultColumn: Partial<ColumnDef<Record<string, string>>> = {
     cell: ({ getValue, row: { index }, column: { id }, table }) => {
-      const value = getValue()
+      const value = getValue() as string
 
-      const { disabled } = useDecisionTable()
+      const { disabled, getColumnId } = useDecisionTable()
+      const column = getColumnId(id)
       const update = (value: string) => {
         ;(table.options.meta as any)?.updateData?.(index, id, value)
       }
@@ -303,57 +307,62 @@ export const Table: React.FC = () => {
         ;(table.options.meta as any)?.setCursor?.(id, index)
       }
 
-      const keyboardEventHandler = () =>
-        // e: React.KeyboardEvent<HTMLInputElement>
-        {
-          // Minor Events - Ignore if input
-          // const { key, preventDefault } = e
-          // if (e.code === 'ArrowUp') {
-          //   if ((e.metaKey || e.altKey)) {
-          //     addRowAbove(y)
-          //     return preventDefault();
-          //   }
-          //
-          //   trySetCursor({ x, y: y - 1 })
-          //   return preventDefault()
-          // }
-          // if (e.code === 'ArrowDown') {
-          //   if ((e.metaKey || e.altKey) && !disabled) {
-          //     addRowBelow(y)
-          //     return preventDefault()
-          //   }
-          //
-          //   trySetCursor({ x, y: y + 1 })
-          //   return preventDefault()
-          // }
-          // if (e.code === 'ArrowLeft') {
-          //   trySetCursor({ x: x - 1, y })
-          //   return preventDefault()
-          // }
-          // if (e.code === 'ArrowRight') {
-          //   trySetCursor({ x: x + 1, y })
-          //   return preventDefault()
-          // }
-          // if (e.code === 'Backspace') {
-          //   if (e.metaKey || e.altKey) {
-          //     removeRow(y)
-          //     return preventDefault()
-          //   }
-          //   return preventDefault()
-          // }
-        }
+      // const keyboardEventHandler = () =>
+      //   // e: React.KeyboardEvent<HTMLInputElement>
+      //   {
+      //     // Minor Events - Ignore if input
+      //     // const { key, preventDefault } = e
+      //     // if (e.code === 'ArrowUp') {
+      //     //   if ((e.metaKey || e.altKey)) {
+      //     //     addRowAbove(y)
+      //     //     return preventDefault();
+      //     //   }
+      //     //
+      //     //   trySetCursor({ x, y: y - 1 })
+      //     //   return preventDefault()
+      //     // }
+      //     // if (e.code === 'ArrowDown') {
+      //     //   if ((e.metaKey || e.altKey) && !disabled) {
+      //     //     addRowBelow(y)
+      //     //     return preventDefault()
+      //     //   }
+      //     //
+      //     //   trySetCursor({ x, y: y + 1 })
+      //     //   return preventDefault()
+      //     // }
+      //     // if (e.code === 'ArrowLeft') {
+      //     //   trySetCursor({ x: x - 1, y })
+      //     //   return preventDefault()
+      //     // }
+      //     // if (e.code === 'ArrowRight') {
+      //     //   trySetCursor({ x: x + 1, y })
+      //     //   return preventDefault()
+      //     // }
+      //     // if (e.code === 'Backspace') {
+      //     //   if (e.metaKey || e.altKey) {
+      //     //     removeRow(y)
+      //     //     return preventDefault()
+      //     //   }
+      //     //   return preventDefault()
+      //     // }
+      //   }
 
       return (
-        <Input
-          className={'grl-dt__cell__input'}
-          data-x={id}
-          data-y={index}
-          disabled={disabled}
-          value={(value as string) || ''}
-          onKeyDown={keyboardEventHandler}
-          onChange={(e) => update(e.target.value)}
-          onFocus={setCursor}
-        />
+        (table.options.meta as any)?.getCell?.({
+          disabled,
+          column,
+          value,
+          onChange: update,
+          onFocus: setCursor,
+        }) || (
+          <DefaultCell
+            disabled={disabled}
+            column={column}
+            value={value}
+            onChange={update}
+            onFocus={setCursor}
+          />
+        )
       )
     },
   }
@@ -366,6 +375,7 @@ export const Table: React.FC = () => {
     columns,
     getCoreRowModel: getCoreRowModel(),
     meta: {
+      getCell: cellRenderer,
       updateData: (rowIndex: number, columnId: string, value: any) => {
         commitData(value, {
           x: columnId,
@@ -379,7 +389,6 @@ export const Table: React.FC = () => {
         })
       },
     },
-    debugTable: true,
   })
 
   const tableContainerRef = React.useRef<HTMLDivElement>(null)
@@ -473,6 +482,17 @@ export const Table: React.FC = () => {
           </tbody>
         </TableContextMenu>
       </table>
+      <Stack>
+        <Button
+          type={'link'}
+          icon={<PlusOutlined />}
+          onClick={() => {
+            addRowBelow(value.rules.length - 1)
+          }}
+        >
+          Add row
+        </Button>
+      </Stack>
     </div>
   )
 }

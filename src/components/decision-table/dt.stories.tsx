@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import { Checkbox, Select } from 'antd'
 import React, { useState } from 'react'
 
 import { DecisionTable } from '../../index'
@@ -129,7 +130,42 @@ export const Empty: Story = {
         height: '500px',
       }}
     >
-      <DecisionTable configurable />
+      <DecisionTable
+        cellRenderer={(props) => {
+          if (props?.column?.field === 'output') {
+            return (
+              <Checkbox
+                value={props.value}
+                onChange={(e) => {
+                  props.onChange(`${e?.target?.checked}`)
+                }}
+              >
+                Enabled
+              </Checkbox>
+            )
+          }
+          return null
+        }}
+        inputsSchema={[
+          {
+            field: 'vitals',
+            name: 'Vitals',
+            items: [
+              {
+                field: 'vitals.heart',
+                name: 'Heart beat',
+              },
+            ],
+          },
+        ]}
+        outputsSchema={[
+          {
+            field: 'isValid',
+            name: 'Is Valid',
+          },
+        ]}
+        configurable
+      />
     </div>
   ),
 }
@@ -144,6 +180,41 @@ export const StressTest: Story = {
       <DecisionTable
         configurable
         disableHitPolicy
+        cellRenderer={(props) => {
+          if (props?.column?.field === 'output') {
+            return (
+              <Checkbox
+                value={props.value}
+                onChange={(e) => {
+                  props.onChange(`${e?.target?.checked}`)
+                }}
+              >
+                Enabled
+              </Checkbox>
+            )
+          }
+          if (props?.column?.field === 'input') {
+            return (
+              <Select
+                onFocus={props.onFocus}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  border: 0,
+                }}
+                value={props.value}
+                onChange={(e) => {
+                  props.onChange(e)
+                }}
+              >
+                <Select.Option key={'first'}>First</Select.Option>
+                <Select.Option key={'second'}>Second</Select.Option>
+                <Select.Option key={'third'}>Third</Select.Option>
+              </Select>
+            )
+          }
+          return null
+        }}
         onChange={(val) => {
           console.log(val)
         }}
