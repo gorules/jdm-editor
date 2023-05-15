@@ -1,5 +1,6 @@
 import { Input } from 'antd'
-import React from 'react'
+import debounce from 'lodash.debounce'
+import React, { useCallback } from 'react'
 
 import { TableSchemaItem } from './dt.context'
 
@@ -17,14 +18,16 @@ export const DefaultCell: React.FC<CellProps> = ({
   disabled,
   onFocus,
 }) => {
+  const changeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(event.target.value)
+  }
+  const debouncedChangeHandler = useCallback(debounce(changeHandler, 300), [])
   return (
     <Input
       className={'grl-dt__cell__input'}
-      // data-x={id}
-      // data-y={index}
       disabled={disabled}
-      value={(value as string) || ''}
-      onChange={(e) => onChange(e.target.value)}
+      defaultValue={(value as string) || ''}
+      onChange={debouncedChangeHandler}
       onFocus={onFocus}
     />
   )

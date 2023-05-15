@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { Checkbox, Select } from 'antd'
-import React, { useState } from 'react'
+import debounce from 'lodash.debounce'
+import React, { useCallback, useState } from 'react'
 
 import { DecisionTable } from '../../index'
 import { DecisionTableProps } from './dt.context'
@@ -181,13 +182,27 @@ export const StressTest: Story = {
         configurable
         disableHitPolicy
         cellRenderer={(props) => {
+          const selectChangeHandler = (val: any) => {
+            props.onChange(val)
+          }
+          const debouncedSelectHandler = useCallback(
+            debounce(selectChangeHandler, 300),
+            []
+          )
+
+          const checkboxChangeHandler = (event: any) => {
+            props.onChange(`${event.target.checked}`)
+          }
+          const debouncedCheckboxHandler = useCallback(
+            debounce(checkboxChangeHandler, 300),
+            []
+          )
+
           if (props?.column?.field === 'output') {
             return (
               <Checkbox
-                value={props.value}
-                onChange={(e) => {
-                  props.onChange(`${e?.target?.checked}`)
-                }}
+                defaultChecked={props.value === 'true'}
+                onChange={debouncedCheckboxHandler}
               >
                 Enabled
               </Checkbox>
@@ -202,10 +217,8 @@ export const StressTest: Story = {
                   height: '100%',
                   border: 0,
                 }}
-                value={props.value}
-                onChange={(e) => {
-                  props.onChange(e)
-                }}
+                defaultValue={props.value}
+                onChange={debouncedSelectHandler}
               >
                 <Select.Option key={'first'}>First</Select.Option>
                 <Select.Option key={'second'}>Second</Select.Option>
