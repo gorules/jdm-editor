@@ -6,7 +6,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import {Button, Dropdown, Input, Modal, Typography} from 'antd'
+import { Button, Dropdown, Input, Modal, Typography } from 'antd'
 import React from 'react'
 import { useVirtual } from 'react-virtual'
 

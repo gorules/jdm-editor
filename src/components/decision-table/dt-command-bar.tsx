@@ -31,21 +31,19 @@ export const DecisionTableCommandBar: React.FC = () => {
         <Button
           type='link'
           size={'small'}
-          icon={<PlusOutlined style={{ color: 'var(--ant-primary-color)' }} />}
+          icon={<PlusOutlined />}
           disabled={disabled}
           onClick={() => {
             addRowBelow(value.rules.length - 1)
           }}
         >
-          Add row
+          Add rule
         </Button>
         <Button
           type='link'
           size={'small'}
           color='secondary'
-          icon={
-            <ExportOutlined style={{ color: 'var(--ant-primary-color)' }} />
-          }
+          icon={<ExportOutlined />}
           onClick={() =>
             exportCsv({
               name: name as string,
@@ -58,9 +56,7 @@ export const DecisionTableCommandBar: React.FC = () => {
           type='link'
           size={'small'}
           color='secondary'
-          icon={
-            <ImportOutlined style={{ color: 'var(--ant-primary-color)' }} />
-          }
+          icon={<ImportOutlined />}
           onClick={() => importCsv()}
         >
           Upload CSV
