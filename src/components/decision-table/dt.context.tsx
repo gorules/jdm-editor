@@ -1,4 +1,4 @@
-import produce from 'immer'
+import { produce } from 'immer'
 import Papa from 'papaparse'
 import React, { useEffect, useRef, useState } from 'react'
 import { v4 } from 'uuid'

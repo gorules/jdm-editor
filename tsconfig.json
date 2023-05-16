@@ -1,20 +1,22 @@
 {
   "compilerOptions": {
+    "target": "ESNext",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "noImplicitAny": true,
     "declaration": true,
-    "declarationDir": "types",
+    "declarationMap": true,
     "emitDeclarationOnly": true,
     "esModuleInterop": true,
+    "skipLibCheck": true,
     "jsx": "react-jsx",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "noImplicitAny": true,
     "outDir": "dist",
     "removeComments": true,
     "rootDir": "src",
-    "strictNullChecks": true,
-    "target": "es5"
+    "baseUrl": ".",
+    "strictNullChecks": true
   },
-  "include": ["./src/**/*"],
+  "include": ["src"],
   "exclude": ["node_modules"]
 }
