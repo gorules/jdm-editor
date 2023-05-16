@@ -4,42 +4,42 @@ Want to contribute to JDM Editor? There are a few things you need to know.
 
 ## Install
 
-This repository use yarn package manager, to install the dependencies run:
+This repository use pnpm package manager, to install the dependencies run:
 
-`yarn`
+`pnpm i`
 
 ## Storybook
 
 A storybook is available to check your changes.
 To dev with Storybook run:
 
-`yarn storybook`
+`pnpm storybook`
 
 ## Build
 
 To check the package output run:
 
-`yarn build`
+`pnpm build`
 
 ## Tests
 
 To check tests run:
 
-`yarn test`
+`pnpm test`
 
 Add tests to cover new code and be sure that coverage didn't decrease with:
 
-`yarn test:coverage`
+`pnpm test:coverage`
 
 ## Lint
 
 To check if your code don't have any lint or prettier problem run:
 
-`yarn format`
+`pnpm format`
 
 To fix problems run:
 
-`yarn format:fix`
+`pnpm format:fix`
 
 ## Git commits
 
