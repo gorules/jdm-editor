@@ -4,7 +4,7 @@ import {
   Row,
   flexRender,
   getCoreRowModel,
-  useReactTable,
+  useReactTable
 } from '@tanstack/react-table'
 import { Button, Dropdown, Modal, Typography } from 'antd'
 import React from 'react'
@@ -29,7 +29,7 @@ export const Table: React.FC = () => {
     swapRows,
     setCursor,
     addRowBelow,
-    cellRenderer,
+    cellRenderer
   } = useDecisionTable()
   const { setDialog } = useDecisionTableDialog()
 
@@ -43,23 +43,9 @@ export const Table: React.FC = () => {
             horizontalAlign='space-between'
             verticalAlign='center'
           >
-            <Typography.Text strong>Inputs</Typography.Text>
+            <Typography.Text>Inputs</Typography.Text>
             {configurable && (
               <div>
-                <Button
-                  size={'small'}
-                  type={'link'}
-                  disabled={disabled}
-                  onClick={() => {
-                    setDialog({
-                      type: 'add',
-                      columnType: 'inputs',
-                      item: null,
-                    })
-                  }}
-                >
-                  Add
-                </Button>
                 {inputs?.length > 1 && (
                   <Button
                     size={'small'}
@@ -69,13 +55,27 @@ export const Table: React.FC = () => {
                       setDialog({
                         type: 'reorder',
                         columnType: 'inputs',
-                        item: null,
+                        item: null
                       })
                     }}
                   >
                     Reorder
                   </Button>
                 )}
+                <Button
+                  size={'small'}
+                  type={'link'}
+                  disabled={disabled}
+                  onClick={() => {
+                    setDialog({
+                      type: 'add',
+                      columnType: 'inputs',
+                      item: null
+                    })
+                  }}
+                >
+                  Add
+                </Button>
               </div>
             )}
           </Stack>
@@ -93,7 +93,7 @@ export const Table: React.FC = () => {
                   verticalAlign={'center'}
                 >
                   <Stack gap={0}>
-                    <Typography.Text strong>{input?.name}</Typography.Text>
+                    <Typography.Text>{input?.name}</Typography.Text>
                     <Typography.Text type='secondary' style={{ fontSize: 12 }}>
                       {input?.field}
                     </Typography.Text>
@@ -113,9 +113,9 @@ export const Table: React.FC = () => {
                                 setDialog({
                                   type: 'edit',
                                   columnType: 'inputs',
-                                  item: input,
+                                  item: input
                                 })
-                              },
+                              }
                             },
                             {
                               key: 'remove',
@@ -132,15 +132,15 @@ export const Table: React.FC = () => {
                                   icon: false,
                                   okText: 'Remove',
                                   okButtonProps: {
-                                    danger: true,
+                                    danger: true
                                   },
                                   onOk: () => {
                                     removeColumn('inputs', input.id)
-                                  },
+                                  }
                                 })
-                              },
-                            },
-                          ],
+                              }
+                            }
+                          ]
                         }}
                       >
                         <Button
@@ -152,10 +152,10 @@ export const Table: React.FC = () => {
                     </div>
                   )}
                 </Stack>
-              ),
+              )
             }
-          }),
-        ],
+          })
+        ]
       },
       {
         id: 'outputs',
@@ -166,7 +166,7 @@ export const Table: React.FC = () => {
             horizontalAlign={'space-between'}
             verticalAlign={'center'}
           >
-            <Typography.Text strong>Outputs</Typography.Text>
+            <Typography.Text>Outputs</Typography.Text>
             {configurable && (
               <div>
                 <Button
@@ -177,7 +177,7 @@ export const Table: React.FC = () => {
                     setDialog({
                       type: 'add',
                       columnType: 'outputs',
-                      item: null,
+                      item: null
                     })
                   }}
                 >
@@ -192,7 +192,7 @@ export const Table: React.FC = () => {
                       setDialog({
                         type: 'reorder',
                         columnType: 'outputs',
-                        item: null,
+                        item: null
                       })
                     }}
                   >
@@ -215,7 +215,7 @@ export const Table: React.FC = () => {
                   verticalAlign={'center'}
                 >
                   <Stack gap={0} verticalAlign={'center'}>
-                    <Typography.Text strong>{output?.name}</Typography.Text>
+                    <Typography.Text>{output?.name}</Typography.Text>
                     <Typography.Text type='secondary' style={{ fontSize: 12 }}>
                       {output?.field}
                     </Typography.Text>
@@ -235,9 +235,9 @@ export const Table: React.FC = () => {
                                 setDialog({
                                   type: 'edit',
                                   columnType: 'outputs',
-                                  item: output,
+                                  item: output
                                 })
-                              },
+                              }
                             },
                             {
                               key: 'remove',
@@ -254,15 +254,15 @@ export const Table: React.FC = () => {
                                   icon: false,
                                   okText: 'Remove',
                                   okButtonProps: {
-                                    danger: true,
+                                    danger: true
                                   },
                                   onOk: () => {
                                     removeColumn('outputs', output.id)
-                                  },
+                                  }
                                 })
-                              },
-                            },
-                          ],
+                              }
+                            }
+                          ]
                         }}
                       >
                         <Button
@@ -274,17 +274,17 @@ export const Table: React.FC = () => {
                     </div>
                   )}
                 </Stack>
-              ),
+              )
             }
-          }),
-        ],
+          })
+        ]
       },
       {
         id: '_description',
         accessorKey: '_description',
-        header: () => <Typography.Text strong>Description</Typography.Text>,
-        minSize: 200,
-      },
+        header: () => <Typography.Text>Description</Typography.Text>,
+        minSize: 200
+      }
     ],
     [configurable, inputs, outputs]
   )
@@ -353,7 +353,7 @@ export const Table: React.FC = () => {
           column,
           value,
           onChange: update,
-          onFocus: setCursor,
+          onFocus: setCursor
         }) || (
           <DefaultCell
             disabled={disabled}
@@ -364,7 +364,7 @@ export const Table: React.FC = () => {
           />
         )
       )
-    },
+    }
   }
 
   const table = useReactTable({
@@ -379,16 +379,16 @@ export const Table: React.FC = () => {
       updateData: (rowIndex: number, columnId: string, value: any) => {
         commitData(value, {
           x: columnId,
-          y: rowIndex,
+          y: rowIndex
         })
       },
       setCursor: (x: string, y: number) => {
         setCursor({
           x,
-          y,
+          y
         })
-      },
-    },
+      }
+    }
   })
 
   const tableContainerRef = React.useRef<HTMLDivElement>(null)
@@ -397,7 +397,7 @@ export const Table: React.FC = () => {
   const rowVirtualizer = useVirtual({
     parentRef: tableContainerRef,
     size: rows.length,
-    overscan: 30,
+    overscan: 30
   })
 
   const { virtualItems: virtualRows, totalSize } = rowVirtualizer
@@ -410,89 +410,81 @@ export const Table: React.FC = () => {
 
   return (
     <div ref={tableContainerRef} className='grl-dt__container'>
-      <table
-        style={{
-          width: table.getCenterTotalSize(),
-        }}
-      >
+      <table style={{ width: table.getCenterTotalSize() }}>
         <thead>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id}>
-              <th
-                style={{
-                  width: 60,
-                  maxWidth: 60,
-                }}
-              />
-              {headerGroup.headers.map((header) => {
-                return (
-                  <th
-                    key={header.id}
+        {table.getHeaderGroups().map((headerGroup) => (
+          <tr key={headerGroup.id}>
+            <th
+              style={{
+                width: 48,
+                maxWidth: 48
+              }}
+            />
+            {headerGroup.headers.map((header) => {
+              return (
+                <th
+                  key={header.id}
+                  {...{
+                    colSpan: header.colSpan,
+                    style: {
+                      width: header.getSize()
+                    }
+                  }}
+                >
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
+                  <div
                     {...{
-                      colSpan: header.colSpan,
-                      style: {
-                        width: header.getSize(),
-                      },
+                      onMouseDown: header.getResizeHandler(),
+                      onTouchStart: header.getResizeHandler(),
+                      className: `resizer ${
+                        header.column.getIsResizing() ? 'isResizing' : ''
+                      }`
                     }}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                    <div
-                      {...{
-                        onMouseDown: header.getResizeHandler(),
-                        onTouchStart: header.getResizeHandler(),
-                        className: `resizer ${
-                          header.column.getIsResizing() ? 'isResizing' : ''
-                        }`,
-                      }}
-                    />
-                  </th>
-                )
-              })}
-            </tr>
-          ))}
+                  />
+                </th>
+              )
+            })}
+          </tr>
+        ))}
         </thead>
         <TableContextMenu>
           <tbody>
-            {paddingTop > 0 && (
-              <tr>
-                <td style={{ height: `${paddingTop}px` }} />
-              </tr>
-            )}
-            {virtualRows.map((virtualRow) => {
-              const row = rows[virtualRow.index] as Row<Record<string, string>>
-              return (
-                <TableRow
-                  key={row.id}
-                  index={virtualRow.index}
-                  row={row}
-                  reorderRow={reorderRow}
-                />
-              )
-            })}
-            {paddingBottom > 0 && (
-              <tr>
-                <td style={{ height: `${paddingBottom}px` }} />
-              </tr>
-            )}
+          {paddingTop > 0 && (
+            <tr>
+              <td style={{ height: `${paddingTop}px` }} />
+            </tr>
+          )}
+          {virtualRows.map((virtualRow) => {
+            const row = rows[virtualRow.index] as Row<Record<string, string>>
+            return (
+              <TableRow
+                key={row.id}
+                index={virtualRow.index}
+                row={row}
+                reorderRow={reorderRow}
+              />
+            )
+          })}
+          {paddingBottom > 0 && (
+            <tr>
+              <td style={{ height: `${paddingBottom}px` }} />
+            </tr>
+          )}
           </tbody>
         </TableContextMenu>
+        <tfoot>
+        <tr>
+          <td colSpan={10} className='add-row' onClick={() => addRowBelow(value.rules.length - 1)}>
+            <PlusOutlined />
+          </td>
+        </tr>
+        </tfoot>
       </table>
-      <Stack>
-        <Button
-          type={'link'}
-          icon={<PlusOutlined />}
-          onClick={() => {
-            addRowBelow(value.rules.length - 1)
-          }}
-        >
-          Add row
-        </Button>
-      </Stack>
     </div>
   )
 }

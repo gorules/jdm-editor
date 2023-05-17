@@ -14,8 +14,7 @@ export const DecisionTableCommandBar: React.FC = () => {
     disabled,
     configurable,
     exportCsv,
-    importCsv,
-    addRowBelow,
+    importCsv
   } = useDecisionTable()
 
   return (
@@ -23,43 +22,30 @@ export const DecisionTableCommandBar: React.FC = () => {
       horizontal
       horizontalAlign={'space-between'}
       verticalAlign={'center'}
-      style={{
-        padding: '0.5rem',
-      }}
+      style={{ paddingBottom: '1rem' }}
     >
-      <Space size={0} className='full-width'>
+      <Space size={8} className='full-width'>
         <Button
-          type='link'
-          size={'small'}
-          icon={<PlusOutlined />}
-          disabled={disabled}
-          onClick={() => {
-            addRowBelow(value.rules.length - 1)
-          }}
-        >
-          Add row
-        </Button>
-        <Button
-          type='link'
+          type='default'
           size={'small'}
           color='secondary'
           icon={<ExportOutlined />}
           onClick={() =>
             exportCsv({
-              name: name as string,
+              name: name as string
             })
           }
         >
           Export CSV
         </Button>
         <Button
-          type='link'
+          type='default'
           size={'small'}
           color='secondary'
           icon={<ImportOutlined />}
           onClick={() => importCsv()}
         >
-          Upload CSV
+          Import CSV
         </Button>
       </Space>
       <Select
@@ -71,13 +57,13 @@ export const DecisionTableCommandBar: React.FC = () => {
           {
             key: 'first',
             label: 'First',
-            value: 'first',
+            value: 'first'
           },
           {
             key: 'collect',
             label: 'Collect',
-            value: 'collect',
-          },
+            value: 'collect'
+          }
         ]}
         onSelect={updateHitPolicy}
       />
