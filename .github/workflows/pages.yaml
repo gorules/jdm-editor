@@ -1,0 +1,25 @@
+name: Storybook
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  storybook:
+    runs-on: ubuntu-latest
+    name: Build Storybook
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        run: pnpm install
+      - name: Run build-storybook
+        run: pnpm build-storybook
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: docs
+          CLEAN: true
+          FORCE: true
