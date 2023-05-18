@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { Checkbox, theme } from 'antd'
+import { Checkbox } from 'antd'
 import React, { useState } from 'react'
 
 import { DecisionTable } from '../../index'
@@ -43,10 +43,7 @@ export const Uncontrolled: Story = {
           height: '500px',
         }}
       >
-        <DecisionTable
-          defaultValue={shippingFeesDefault}
-          {...args}
-        />
+        <DecisionTable defaultValue={shippingFeesDefault} {...args} />
       </div>
     )
   },
