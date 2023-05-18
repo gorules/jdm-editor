@@ -7,7 +7,7 @@ Live demo and usage at https://gorules.github.io/jdm-editor/
 > Coming soon
 
 ## Decision Table
-<img width="945" alt="Screenshot 2023-05-18 at 22 17 06" src="https://github.com/gorules/jdm-editor/assets/60513195/102975cc-8781-4d4f-9ba4-508c69a1be42">
+<img width="945" alt="Rules Engine Editor" src="https://github.com/gorules/jdm-editor/assets/60513195/8db213d7-0b59-4969-a7d8-afaffd1c5a85">
 
 ### API
 
