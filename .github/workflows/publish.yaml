@@ -24,6 +24,8 @@ jobs:
         with:
           node-version: '18.x'
           registry-url: 'https://registry.npmjs.org'
+      - name: Install pnpm
+        run: npm i pnpm -g
       - name: Install dependencies
         run: pnpm install
       - name: Run lint and prettier
