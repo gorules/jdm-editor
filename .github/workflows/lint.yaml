@@ -12,6 +12,8 @@ jobs:
     name: Lint code
     steps:
       - uses: actions/checkout@v3
+      - name: Install pnpm
+        run: npm i pnpm -g
       - name: Install dependencies
         run: pnpm install
       - name: Run lint and prettier
