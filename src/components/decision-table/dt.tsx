@@ -9,7 +9,7 @@ import { DecisionTableDialogs } from './dt-dialogs'
 import { DecisionTableContextProps, DecisionTableProvider } from './dt.context'
 import './dt.scss'
 import { Table } from './table'
-import type { ThemeConfig } from '../../theme';
+import type { ThemeConfig } from '../../theme'
 
 export type DecisionTableProps = {
   theme?: ThemeConfig
