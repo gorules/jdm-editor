@@ -9,14 +9,20 @@ import { DecisionTableDialogs } from './dt-dialogs'
 import { DecisionTableContextProps, DecisionTableProvider } from './dt.context'
 import './dt.scss'
 import { Table } from './table'
+import type { ThemeConfig } from '../../theme';
 
-export type DecisionTableProps = DecisionTableContextProps
+export type DecisionTableProps = {
+  theme?: ThemeConfig
+} & DecisionTableContextProps
 
-export const DecisionTable: React.FC<DecisionTableProps> = (props) => {
+export const DecisionTable: React.FC<DecisionTableProps> = ({
+  theme,
+  ...rest
+}) => {
   return (
     <div className={'grl-dt'}>
-      <ConfigProvider>
-        <DecisionTableProvider {...props}>
+      <ConfigProvider theme={theme}>
+        <DecisionTableProvider {...rest}>
           <DecisionTableDialogProvider>
             <DecisionTableCommandBar />
             <DndProvider backend={HTML5Backend}>

@@ -4,6 +4,7 @@ import React from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 
 import { useDecisionTable } from './dt.context'
+import { Typography } from 'antd'
 
 const InnerTableRow: React.FC<{
   index: number
@@ -43,7 +44,7 @@ const InnerTableRow: React.FC<{
         }}
       >
         <div ref={disabled ? undefined : dragRef} className={'text'}>
-          {index + 1}
+          <Typography>{index + 1}</Typography>
         </div>
       </td>
       {row.getVisibleCells().map((cell) => (
