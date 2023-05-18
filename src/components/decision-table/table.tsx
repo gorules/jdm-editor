@@ -6,7 +6,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { Button, Dropdown, Modal, Typography } from 'antd'
+import { Button, Dropdown, Modal, theme, Typography } from 'antd'
 import React from 'react'
 import { useVirtual } from 'react-virtual'
 
@@ -32,6 +32,9 @@ export const Table: React.FC = () => {
     cellRenderer,
   } = useDecisionTable()
   const { setDialog } = useDecisionTableDialog()
+  const { token } = theme.useToken()
+
+  console.log(token)
 
   const columns = React.useMemo<ColumnDef<any>[]>(
     () => [
@@ -410,7 +413,19 @@ export const Table: React.FC = () => {
 
   return (
     <div ref={tableContainerRef} className='grl-dt__container'>
-      <table style={{ width: table.getCenterTotalSize() }}>
+      <table
+        style={
+          {
+            'width': table.getCenterTotalSize(),
+            'backgroundColor': token.colorBorder,
+            '--primary-color': token.colorPrimary,
+            '--primary-color-bg': token.colorPrimaryBg,
+            '--color-bg-layout': token.colorBgLayout,
+            '--color-bg-elevated': token.colorBgElevated,
+            '--color-bg-container': token.colorBgContainer,
+          } as any
+        }
+      >
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
@@ -479,14 +494,18 @@ export const Table: React.FC = () => {
           </tbody>
         </TableContextMenu>
         <tfoot>
-          <Button
-            type='link'
-            disabled={disabled}
-            icon={<PlusOutlined />}
-            onClick={() => addRowBelow(value.rules.length - 1)}
-          >
-            Add row
-          </Button>
+          <tr>
+            <td colSpan={inputs.length + outputs.length + 2}>
+              <Button
+                type='link'
+                disabled={disabled}
+                icon={<PlusOutlined />}
+                onClick={() => addRowBelow(value.rules.length - 1)}
+              >
+                Add row
+              </Button>
+            </td>
+          </tr>
         </tfoot>
       </table>
     </div>

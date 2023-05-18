@@ -1,4 +1,4 @@
-import { ConfigProvider } from 'antd'
+import { ConfigProvider, theme } from 'antd'
 import React from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
@@ -15,23 +15,36 @@ export type DecisionTableProps = {
   theme?: ThemeConfig
 } & DecisionTableContextProps
 
+const DecisionTableInner: React.FC<DecisionTableProps> = (props) => {
+  const { token } = theme.useToken()
+
+  return (
+    <div
+      className={'grl-dt'}
+      style={{
+        background: token.colorBgElevated,
+      }}
+    >
+      <DecisionTableProvider {...props}>
+        <DecisionTableDialogProvider>
+          <DecisionTableCommandBar />
+          <DndProvider backend={HTML5Backend}>
+            <Table />
+          </DndProvider>
+          <DecisionTableDialogs />
+        </DecisionTableDialogProvider>
+      </DecisionTableProvider>
+    </div>
+  )
+}
+
 export const DecisionTable: React.FC<DecisionTableProps> = ({
   theme,
   ...rest
 }) => {
   return (
-    <div className={'grl-dt'}>
-      <ConfigProvider theme={theme}>
-        <DecisionTableProvider {...rest}>
-          <DecisionTableDialogProvider>
-            <DecisionTableCommandBar />
-            <DndProvider backend={HTML5Backend}>
-              <Table />
-            </DndProvider>
-            <DecisionTableDialogs />
-          </DecisionTableDialogProvider>
-        </DecisionTableProvider>
-      </ConfigProvider>
-    </div>
+    <ConfigProvider theme={theme}>
+      <DecisionTableInner {...rest} />
+    </ConfigProvider>
   )
 }

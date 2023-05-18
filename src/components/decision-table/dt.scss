@@ -6,15 +6,14 @@
   flex-direction: column;
 
   table {
-    border-collapse: collapse;
-    border-spacing: 0;
+    border-spacing: 1px;
     font-family: arial, sans-serif;
     table-layout: fixed;
     width: fit-content;
   }
 
   thead {
-    background-color: #fff;
+    background-color: var(--color-bg-layout);
     margin: 0;
     position: sticky;
     top: 0;
@@ -25,12 +24,20 @@
     }
   }
 
+  tbody {
+    background-color: var(--color-bg-container);
+  }
+
+  tfoot {
+    background-color: var(--color-bg-elevated);
+  }
+
   tr {
     width: fit-content;
     height: 30px;
 
     &:focus-within > td:first-of-type {
-      background-color: #dee9fd;
+      background-color: var(--primary-color-bg);
     }
   }
 
@@ -52,23 +59,14 @@
   }
 
   th,
-  .th,
-  td,
-  .td {
-    box-shadow: inset 0 0 0 0.5px #d9d9d9;
-  }
-
-  th,
   .th {
     position: relative;
     height: 40px;
-    background-color: #fafafa;
   }
 
   .add-row {
     text-align: center;
     cursor: pointer;
-    color: #1677ff;
   }
 
   td,
@@ -103,15 +101,9 @@
     top: 0;
     height: 100%;
     width: 6px;
-    //background: rgba(0, 0, 0, 0.5);
     cursor: col-resize;
     user-select: none;
     touch-action: none;
-  }
-
-  .resizer.isResizing {
-    //background: blue;
-    opacity: 1;
   }
 
   @media (hover: hover) {
