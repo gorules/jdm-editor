@@ -1,4 +1,5 @@
 import React from 'react';
 import { DecisionTableContextProps } from './dt.context';
-export declare const DecisionTable: React.FC<DecisionTableContextProps>;
+export type DecisionTableProps = DecisionTableContextProps;
+export declare const DecisionTable: React.FC<DecisionTableProps>;
 //# sourceMappingURL=dt.d.ts.map
