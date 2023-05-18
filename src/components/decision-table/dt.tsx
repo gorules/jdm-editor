@@ -10,7 +10,9 @@ import { DecisionTableContextProps, DecisionTableProvider } from './dt.context'
 import './dt.scss'
 import { Table } from './table'
 
-export const DecisionTable: React.FC<DecisionTableContextProps> = (props) => {
+export type DecisionTableProps = DecisionTableContextProps
+
+export const DecisionTable: React.FC<DecisionTableProps> = (props) => {
   return (
     <div className={'grl-dt'}>
       <ConfigProvider>
