@@ -1,4 +1,4 @@
-import { ExportOutlined, ImportOutlined, PlusOutlined } from '@ant-design/icons'
+import { ExportOutlined, ImportOutlined } from '@ant-design/icons'
 import { Button, Select, Space } from 'antd'
 import React from 'react'
 
@@ -14,7 +14,7 @@ export const DecisionTableCommandBar: React.FC = () => {
     disabled,
     configurable,
     exportCsv,
-    importCsv
+    importCsv,
   } = useDecisionTable()
 
   return (
@@ -32,7 +32,7 @@ export const DecisionTableCommandBar: React.FC = () => {
           icon={<ExportOutlined />}
           onClick={() =>
             exportCsv({
-              name: name as string
+              name: name as string,
             })
           }
         >
@@ -57,13 +57,13 @@ export const DecisionTableCommandBar: React.FC = () => {
           {
             key: 'first',
             label: 'First',
-            value: 'first'
+            value: 'first',
           },
           {
             key: 'collect',
             label: 'Collect',
-            value: 'collect'
-          }
+            value: 'collect',
+          },
         ]}
         onSelect={updateHitPolicy}
       />

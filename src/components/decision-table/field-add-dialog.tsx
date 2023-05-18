@@ -58,12 +58,13 @@ export const FieldAdd: React.FC<FieldAddProps> = (props) => {
         form={form}
         layout='vertical'
         initialValues={{ type: 'expression' }}
-        onFinish={({ type, field, name }) => {
+        onFinish={({ type, field, name, defaultValue }) => {
           onSuccess?.({
             id: v4(),
             type: type || 'expression',
             field,
             name,
+            defaultValue,
           })
         }}
       >
@@ -92,6 +93,9 @@ export const FieldAdd: React.FC<FieldAddProps> = (props) => {
           label={type === 'expression' ? 'Selector' : 'Field'}
           rules={[{ required: true }]}
         >
+          <Input autoComplete='off' />
+        </Form.Item>
+        <Form.Item name='defaultValue' label='Default Value'>
           <Input autoComplete='off' />
         </Form.Item>
       </Form>

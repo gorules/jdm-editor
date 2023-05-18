@@ -17,6 +17,7 @@ export type TableSchemaItem = {
   name: string
   field?: string
   type: string
+  defaultValue?: string
 }
 
 export type TableSchema = {
@@ -94,7 +95,7 @@ export type DecisionTableState = {
 }
 
 export type DecisionTableProps = {
-  hitPolicy: HitPolicy
+  hitPolicy: HitPolicy | string
   inputs: TableSchemaItem[]
   outputs: TableSchemaItem[]
   rules: Record<string, string>[]
@@ -168,9 +169,9 @@ export const DecisionTableProvider: React.FC<
     namespace = 'default',
     children,
     activeRules,
-    configurable,
+    configurable = true,
     disabled,
-    disableHitPolicy,
+    disableHitPolicy = false,
     onChange,
     value,
     defaultValue,
@@ -206,7 +207,8 @@ export const DecisionTableProvider: React.FC<
   const outputs: TableSchemaItem[] = decisionTable?.outputs || []
 
   const cleanupTableRule = (
-    rule: Record<string, string>
+    rule: Record<string, string>,
+    defaultId?: string
   ): Record<string, string> => {
     const schemaItems = [...decisionTable.inputs, ...decisionTable.outputs]
     const newRule: Record<string, string> = {
@@ -214,13 +216,18 @@ export const DecisionTableProvider: React.FC<
       _description: rule._description,
     }
     schemaItems.forEach((schemaItem) => {
-      newRule[schemaItem.id || ''] = rule?.[schemaItem.id || ''] || ''
+      if (defaultId && newRule._id === defaultId) {
+        return (newRule[schemaItem.id] =
+          rule?.[schemaItem.id] || schemaItem?.defaultValue || '')
+      }
+      newRule[schemaItem.id] = rule?.[schemaItem.id] || ''
     })
     return newRule
   }
 
   const cleanupTableRules = (
-    decisionTable: DecisionTableProps
+    decisionTable: DecisionTableProps,
+    defaultId?: string
   ): Record<string, string>[] => {
     const rules = decisionTable?.rules || []
     const schemaItems = [...decisionTable.inputs, ...decisionTable.outputs]
@@ -230,7 +237,11 @@ export const DecisionTableProvider: React.FC<
         _description: rule._description,
       }
       schemaItems.forEach((schemaItem) => {
-        newRule[schemaItem.id || ''] = rule?.[schemaItem.id || ''] || ''
+        if (defaultId && newRule._id === defaultId) {
+          return (newRule[schemaItem.id] =
+            rule?.[schemaItem.id] || schemaItem?.defaultValue || '')
+        }
+        newRule[schemaItem.id] = rule?.[schemaItem.id] || ''
       })
       return newRule
     })
@@ -274,12 +285,16 @@ export const DecisionTableProvider: React.FC<
   const addRowAbove = (target: number) => {
     updateDecisionTable(
       produce(decisionTable, (draft) => {
+        const _id = v4()
         draft.rules.splice(
           target,
           0,
-          cleanupTableRule({
-            _id: v4(),
-          })
+          cleanupTableRule(
+            {
+              _id,
+            },
+            _id
+          )
         )
         return draft
       })
@@ -290,12 +305,16 @@ export const DecisionTableProvider: React.FC<
     target += 1
     updateDecisionTable(
       produce(decisionTable, (draft) => {
+        const _id = v4()
         draft.rules.splice(
           target,
           0,
-          cleanupTableRule({
-            _id: v4(),
-          })
+          cleanupTableRule(
+            {
+              _id,
+            },
+            _id
+          )
         )
         return draft
       })
@@ -335,6 +354,7 @@ export const DecisionTableProvider: React.FC<
               ...item,
               name: data?.name,
               field: data?.field,
+              defaultValue: data?.defaultValue,
             }
           }
           return item
@@ -379,12 +399,18 @@ export const DecisionTableProvider: React.FC<
     const { name } = options
     const schemaMeta = [
       ...inputs.map((input) =>
-        [input.name, input.field, 'INPUT', input.id].join(parserPipe)
-      ),
-      ...outputs.map((output) =>
-        [output.name, output.field, 'OUTPUT', output.id, output.type].join(
+        [input.name, input.field, 'INPUT', input.id, input.defaultValue].join(
           parserPipe
         )
+      ),
+      ...outputs.map((output) =>
+        [
+          output.name,
+          output.field,
+          'OUTPUT',
+          output.id,
+          output.defaultValue,
+        ].join(parserPipe)
       ),
     ]
 
@@ -436,15 +462,16 @@ export const DecisionTableProvider: React.FC<
 
     const headers: any[] = spreadsheetData?.splice(0, 1)?.[0]
     const columns = headers.map((header: string) => {
-      const [name, field, _type, id, type] = header
+      const [name, field, _type, id, defaultValue] = header
         .split(parserPipe)
         .map((s) => (s || '').trim())
       return {
         name,
         field,
         _type,
-        type: type || 'expression',
+        type: 'expression',
         id,
+        defaultValue,
       }
     })
 
@@ -455,6 +482,7 @@ export const DecisionTableProvider: React.FC<
         name: column?.name,
         field: column?.field,
         type: column?.type,
+        defaultValue: column?.defaultValue,
       }))
 
     const outputs = columns
@@ -464,6 +492,7 @@ export const DecisionTableProvider: React.FC<
         name: column?.name,
         field: column?.field,
         type: column?.type,
+        defaultValue: column?.defaultValue,
       }))
 
     const rules = spreadsheetData.map((data) => {

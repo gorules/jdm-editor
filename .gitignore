@@ -1,5 +1,10 @@
 .idea
 .DS_Store
-.yarn
 dist
 /node_modules
+node_modules
+
+# Ignore
+*.log*
+*.tgz
+docs

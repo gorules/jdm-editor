@@ -76,7 +76,10 @@
 
     &.sort-handler {
       padding: 2px 14px;
-      cursor: grab;
+
+      &.draggable {
+        cursor: grab;
+      }
 
       .text {
         width: 100%;
