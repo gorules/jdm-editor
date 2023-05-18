@@ -19,6 +19,8 @@ jobs:
         run: pnpm format
       - name: Run build-storybook
         run: pnpm build-storybook
+      - name: Bypass jekyll
+        run: touch docs/.nojekyll
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
