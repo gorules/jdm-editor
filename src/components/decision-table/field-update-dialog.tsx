@@ -25,6 +25,7 @@ export const FieldUpdate: React.FC<
       form.setFieldsValue({
         name: field?.name,
         field: field?.field,
+        defaultValue: field?.defaultValue,
       })
     }
   }, [isOpen, form, field])
@@ -50,6 +51,7 @@ export const FieldUpdate: React.FC<
         initialValues={{
           name: field?.name,
           field: field?.field,
+          defaultValue: field?.defaultValue,
         }}
         onFinish={(data) => {
           onSuccess?.({
@@ -80,6 +82,9 @@ export const FieldUpdate: React.FC<
         </Form.Item>
         <Form.Item name='field' label='Selector' rules={[{ required: true }]}>
           <Input />
+        </Form.Item>
+        <Form.Item name='defaultValue' label='Default Value'>
+          <Input autoComplete='off' />
         </Form.Item>
       </Form>
     </Modal>

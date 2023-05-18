@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "",
   "author": "GoRules <hi@gorules.io> (https://gorules.io)",
-  "homepage": "https://github.com/gorules/zen",
+  "homepage": "https://github.com/gorules/jdm-editor",
   "license": "MIT",
   "keywords": [],
   "type": "module",
@@ -28,11 +28,6 @@
     "format": "run-s lint prettier",
     "format:fix": "run-s lint:fix prettier:fix",
     "vite": "vite build"
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
   },
   "resolutions": {
     "@ant-design/cssinjs": "1.0.2",
@@ -68,6 +63,8 @@
     "eslint-plugin-react-hooks": "4.6.0",
     "npm-run-all": "4.1.5",
     "prettier": "2.8.8",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
     "sass": "^1.62.1",
     "storybook": "7.0.12",
     "typescript": "5.0.4",

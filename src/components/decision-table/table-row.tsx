@@ -1,4 +1,5 @@
 import { Row, flexRender } from '@tanstack/react-table'
+import clsx from 'clsx'
 import React from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 
@@ -8,7 +9,8 @@ const InnerTableRow: React.FC<{
   index: number
   row: Row<Record<string, string>>
   reorderRow: (draggedRowIndex: number, targetRowIndex: number) => void
-}> = ({ index, row, reorderRow }) => {
+  disabled?: boolean
+}> = ({ index, row, reorderRow, disabled }) => {
   const [, dropRef] = useDrop({
     accept: 'row',
     drop: (draggedRow: Row<Record<string, string>>) =>
@@ -27,12 +29,12 @@ const InnerTableRow: React.FC<{
 
   return (
     <tr
-      ref={previewRef} //previewRef could go here
+      ref={disabled ? undefined : previewRef} //previewRef could go here
       style={{ opacity: isDragging ? 0.5 : 1 }}
     >
       <td
-        className={'sort-handler'}
-        ref={dropRef}
+        className={clsx('sort-handler', !disabled && 'draggable')}
+        ref={disabled ? undefined : dropRef}
         onContextMenuCapture={() => {
           setCursor({
             x: 'id',
@@ -40,7 +42,7 @@ const InnerTableRow: React.FC<{
           })
         }}
       >
-        <div ref={dragRef} className={'text'}>
+        <div ref={disabled ? undefined : dragRef} className={'text'}>
           {index + 1}
         </div>
       </td>
