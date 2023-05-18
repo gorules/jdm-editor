@@ -1,3 +1,3 @@
 export * from './components';
-export { ThemeConfig } from './theme';
+export * from './theme';
 //# sourceMappingURL=index.d.ts.map
