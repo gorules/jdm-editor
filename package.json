@@ -1,14 +1,14 @@
 {
   "name": "@gorules/jdm-editor",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "",
   "author": "GoRules <hi@gorules.io> (https://gorules.io)",
   "homepage": "https://github.com/gorules/jdm-editor",
   "license": "MIT",
   "keywords": [],
   "type": "module",
-  "main": "dist/csm/index.js",
-  "module": "dist/esm/index.js",
+  "main": "dist/jdm-editor.umd.cjs",
+  "module": "dist/jdm-editor.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist/",
