@@ -479,15 +479,14 @@ export const Table: React.FC = () => {
           </tbody>
         </TableContextMenu>
         <tfoot>
-          <tr>
-            <td
-              colSpan={10}
-              className='add-row'
-              onClick={() => addRowBelow(value.rules.length - 1)}
-            >
-              <PlusOutlined />
-            </td>
-          </tr>
+          <Button
+            type='link'
+            disabled={disabled}
+            icon={<PlusOutlined />}
+            onClick={() => addRowBelow(value.rules.length - 1)}
+          >
+            Add row
+          </Button>
         </tfoot>
       </table>
     </div>
