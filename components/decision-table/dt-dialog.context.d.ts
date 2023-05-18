@@ -1,0 +1,17 @@
+import React from 'react';
+import { ColumnType, TableSchemaItem } from './dt.context';
+export type TableDialogType = 'add' | 'reorder' | 'edit';
+export type TableDialogState = {
+    type: TableDialogType;
+    item: TableSchemaItem | null;
+    columnType: ColumnType;
+};
+export type TableDialogContextState = {
+    setDialog: React.Dispatch<React.SetStateAction<TableDialogState | undefined>>;
+    dialog: TableDialogState | undefined;
+    isDialogActive: (type: TableDialogType) => boolean;
+};
+export declare const TableDialogContext: React.Context<TableDialogContextState>;
+export declare const DecisionTableDialogProvider: React.FC<React.PropsWithChildren>;
+export declare const useDecisionTableDialog: () => TableDialogContextState;
+//# sourceMappingURL=dt-dialog.context.d.ts.map

@@ -1,0 +1,1 @@
+{"version":3,"file":"spaced-text.d.ts","sourceRoot":"","sources":["../../../src/components/spaced-text.tsx"],"names":[],"mappings":"AACA,OAAO,KAAK,MAAM,OAAO,CAAA;AAIzB,MAAM,MAAM,eAAe,GAAG;IAC5B,IAAI,EAAE,MAAM,CAAA;IACZ,KAAK,EAAE,MAAM,CAAA;IACb,GAAG,CAAC,EAAE,MAAM,CAAA;CACb,CAAA;AAED,eAAO,MAAM,UAAU,EAAE,KAAK,CAAC,GAAG,CAAC,eAAe,CAWjD,CAAA"}
