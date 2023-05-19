@@ -414,10 +414,12 @@ export const Table: React.FC = () => {
   return (
     <div ref={tableContainerRef} className='grl-dt__container'>
       <table
+        className={'table'}
         style={
           {
             'width': table.getCenterTotalSize(),
             'backgroundColor': token.colorBorder,
+            '--border-color': token.colorBorder,
             '--primary-color': token.colorPrimary,
             '--primary-color-bg': token.colorPrimaryBg,
             '--color-bg-layout': token.colorBgLayout,
