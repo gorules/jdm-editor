@@ -150,7 +150,7 @@ export const useTableEvents = (): DecisionTableEvents => {
         return
       }
 
-      moveCursor(nextCursor)
+      trySetCursor(nextCursor)
       if (cell.querySelector('input[readonly]')) {
         table.current?.focus({ preventScroll: true })
         return e.preventDefault()

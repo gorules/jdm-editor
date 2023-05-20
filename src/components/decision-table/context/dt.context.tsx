@@ -258,6 +258,10 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
     if (x === undefined || y === undefined) {
       return false
     }
+    
+    if (x === cursor?.x && y === cursor?.y) {
+      return false;
+    }
 
     if (!schemaIds.includes(x)) {
       return false
