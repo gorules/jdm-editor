@@ -105,9 +105,9 @@ const FieldCard: React.FC<{
         <Stack horizontal verticalAlign='center'>
           <div className='grl-dt__fields-reorder__handle'>=</div>
           <Stack grow gap={0}>
-            <Typography.Text>{col?.name}</Typography.Text>
+            <Typography.Text>{col.name}</Typography.Text>
             <Typography.Text type='secondary' style={{ fontSize: 12 }}>
-              {col?.field}
+              {col.field}
             </Typography.Text>
           </Stack>
         </Stack>
@@ -127,13 +127,12 @@ export const FieldsReorder: React.VFC<FieldsReorderProps> = (props) => {
     }
   }, [isOpen, fields])
 
-  const moveCard = (from: number, to: number) => {
-    // dropped outside the list
-    if (!to) {
+  const moveCard = (from: number, to?: number) => {
+    if (to === undefined) {
       return
     }
-    const tmpList = [...columns]
 
+    const tmpList = [...columns]
     const element = tmpList.splice(from, 1)[0]
     tmpList.splice(to, 0, element)
     setColumns(tmpList)

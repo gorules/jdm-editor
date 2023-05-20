@@ -1,8 +1,7 @@
 import { Row, flexRender } from '@tanstack/react-table'
 import clsx from 'clsx'
-import React from 'react'
+import React, { useRef } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
-
 import { useDecisionTable } from './dt.context'
 import { Typography } from 'antd'
 
@@ -12,8 +11,14 @@ const InnerTableRow: React.FC<{
   reorderRow: (draggedRowIndex: number, targetRowIndex: number) => void
   disabled?: boolean
 }> = ({ index, row, reorderRow, disabled }) => {
-  const [, dropRef] = useDrop({
+  const trRef = useRef<HTMLTableRowElement>(null)
+  const [{ isDropping, direction }, dropRef] = useDrop({
     accept: 'row',
+    collect: (monitor) => ({
+      isDropping: monitor.isOver({ shallow: true }),
+      direction:
+        (monitor.getDifferenceFromInitialOffset()?.y || 0) > 0 ? 'down' : 'up',
+    }),
     drop: (draggedRow: Row<Record<string, string>>) =>
       reorderRow(draggedRow.index, row.index),
   })
@@ -28,14 +33,23 @@ const InnerTableRow: React.FC<{
 
   const { setCursor } = useDecisionTable()
 
+  previewRef(dropRef(trRef))
+
   return (
     <tr
-      ref={disabled ? undefined : previewRef} //previewRef could go here
-      style={{ opacity: isDragging ? 0.5 : 1 }}
+      ref={disabled ? undefined : trRef}
+      className={clsx(
+        'table-row',
+        isDropping && direction === 'down' && 'dropping-down',
+        isDropping && direction === 'up' && 'dropping-up'
+      )}
+      style={{
+        opacity: isDragging ? 0.5 : 1,
+      }}
     >
       <td
         className={clsx('sort-handler', !disabled && 'draggable')}
-        ref={disabled ? undefined : dropRef}
+        ref={disabled ? undefined : dragRef}
         onContextMenuCapture={() => {
           setCursor({
             x: 'id',
@@ -43,7 +57,7 @@ const InnerTableRow: React.FC<{
           })
         }}
       >
-        <div ref={disabled ? undefined : dragRef} className={'text'}>
+        <div className={'text'}>
           <Typography>{index + 1}</Typography>
         </div>
       </td>

@@ -16,6 +16,7 @@ import { useDecisionTable } from './dt.context'
 import { TableContextMenu } from './table-context-menu'
 import { DefaultCell } from './table-default-cell'
 import { TableRow } from './table-row'
+import clsx from 'clsx'
 
 export type TableProps = {
   maxHeight: string | number
@@ -446,27 +447,23 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
                 return (
                   <th
                     key={header.id}
-                    {...{
-                      colSpan: header.colSpan,
-                      style: {
-                        width: header.getSize(),
-                      },
+                    colSpan={header.colSpan}
+                    style={{
+                      width: header.getSize(),
                     }}
                   >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                    {!header.isPlaceholder &&
+                      flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
                     <div
-                      {...{
-                        onMouseDown: header.getResizeHandler(),
-                        onTouchStart: header.getResizeHandler(),
-                        className: `resizer ${
-                          header.column.getIsResizing() ? 'isResizing' : ''
-                        }`,
-                      }}
+                      className={clsx(
+                        'resizer',
+                        header.column.getIsResizing() && 'isResizing'
+                      )}
+                      onMouseDown={header.getResizeHandler()}
+                      onTouchStart={header.getResizeHandler()}
                     />
                   </th>
                 )
