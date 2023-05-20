@@ -1,1 +1,1 @@
-{"version":3,"file":"table-context-menu.d.ts","sourceRoot":"","sources":["../../../../../src/components/decision-table/table/table-context-menu.tsx"],"names":[],"mappings":"AACA,OAAO,KAAK,MAAM,OAAO,CAAA;AAiHzB,eAAO,MAAM,gBAAgB;;EAA0B,CAAA"}
+{"version":3,"file":"table-context-menu.d.ts","sourceRoot":"","sources":["../../../../../src/components/decision-table/table/table-context-menu.tsx"],"names":[],"mappings":"AACA,OAAO,KAAK,MAAM,OAAO,CAAA;AAoFzB,eAAO,MAAM,gBAAgB;;EAA0B,CAAA"}
