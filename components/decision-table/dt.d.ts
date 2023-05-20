@@ -1,5 +1,5 @@
 import React from 'react';
-import { DecisionTableContextProps } from './dt.context';
+import { DecisionTableContextProps } from './context/dt.context';
 export type DecisionTableProps = {
     tableHeight: string | number;
 } & DecisionTableContextProps;

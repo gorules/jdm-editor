@@ -1,1 +1,0 @@
-{"version":3,"file":"table-row.d.ts","sourceRoot":"","sources":["../../../../src/components/decision-table/table-row.tsx"],"names":[],"mappings":"AAAA,OAAO,EAAE,GAAG,EAAc,MAAM,uBAAuB,CAAA;AAEvD,OAAO,KAAiB,MAAM,OAAO,CAAA;AAsErC,eAAO,MAAM,QAAQ;WAhEZ,MAAM;SACR,IAAI,OAAO,MAAM,EAAE,MAAM,CAAC,CAAC;kCACF,MAAM,kBAAkB,MAAM,KAAK,IAAI;;EA8DtB,CAAA"}

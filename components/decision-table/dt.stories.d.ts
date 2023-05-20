@@ -1,5 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { DecisionTable } from '../../index';
+import { DecisionTable } from './dt';
+export declare const inputSchemaDefault: {
+    field: string;
+    name: string;
+    items: {
+        field: string;
+        name: string;
+    }[];
+}[];
 declare const meta: Meta<typeof DecisionTable>;
 export default meta;
 type Story = StoryObj<typeof DecisionTable>;
