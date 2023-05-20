@@ -3,9 +3,9 @@ import Papa from 'papaparse'
 import React, { useEffect, useRef, useState } from 'react'
 import { v4 } from 'uuid'
 
-import { SchemaSelectProps } from '../../helpers/components'
-import { saveFile } from '../../helpers/file-helpers'
-import { CellProps } from './table-default-cell'
+import { SchemaSelectProps } from '../../../helpers/components'
+import { saveFile } from '../../../helpers/file-helpers'
+import { CellProps } from '../table/table-default-cell'
 
 export type TableCursor = {
   x: string
@@ -33,7 +33,7 @@ export type TableEventElements = {
 }
 
 export type TableExportOptions = {
-  name: string
+  name?: string
 }
 
 export type TableImportOptions = {

@@ -2,7 +2,7 @@ import { Row, flexRender } from '@tanstack/react-table'
 import clsx from 'clsx'
 import React, { useRef } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
-import { useDecisionTable } from './dt.context'
+import { useDecisionTable } from '../context/dt.context'
 import { Typography } from 'antd'
 
 const InnerTableRow: React.FC<{
@@ -11,6 +11,7 @@ const InnerTableRow: React.FC<{
   reorderRow: (draggedRowIndex: number, targetRowIndex: number) => void
   disabled?: boolean
 }> = ({ index, row, reorderRow, disabled }) => {
+  const { setCursor } = useDecisionTable()
   const trRef = useRef<HTMLTableRowElement>(null)
   const [{ isDropping, direction }, dropRef] = useDrop({
     accept: 'row',
@@ -30,8 +31,6 @@ const InnerTableRow: React.FC<{
     item: () => row,
     type: 'row',
   })
-
-  const { setCursor } = useDecisionTable()
 
   previewRef(dropRef(trRef))
 

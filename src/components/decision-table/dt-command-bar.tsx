@@ -1,9 +1,9 @@
 import { ExportOutlined, ImportOutlined } from '@ant-design/icons'
-import { Button, Select, Space } from 'antd'
+import { Button, Select } from 'antd'
 import React from 'react'
 
 import { Stack } from '../stack'
-import { useDecisionTable } from './dt.context'
+import { useDecisionTable } from './context/dt.context'
 
 export const DecisionTableCommandBar: React.FC = () => {
   const {
@@ -24,17 +24,13 @@ export const DecisionTableCommandBar: React.FC = () => {
       verticalAlign={'center'}
       style={{ paddingBottom: '1rem' }}
     >
-      <Space size={8} className='full-width'>
+      <Stack gap={8} horizontal className='full-width'>
         <Button
           type='default'
           size={'small'}
           color='secondary'
           icon={<ExportOutlined />}
-          onClick={() =>
-            exportCsv({
-              name: name as string,
-            })
-          }
+          onClick={() => exportCsv({ name })}
         >
           Export CSV
         </Button>
@@ -47,12 +43,13 @@ export const DecisionTableCommandBar: React.FC = () => {
         >
           Import CSV
         </Button>
-      </Space>
+      </Stack>
       <Select
         style={{ width: 140 }}
         size={'small'}
         disabled={disabled || !configurable || disableHitPolicy}
-        value={value?.hitPolicy}
+        value={value.hitPolicy}
+        onSelect={updateHitPolicy}
         options={[
           {
             key: 'first',
@@ -65,7 +62,6 @@ export const DecisionTableCommandBar: React.FC = () => {
             value: 'collect',
           },
         ]}
-        onSelect={updateHitPolicy}
       />
     </Stack>
   )

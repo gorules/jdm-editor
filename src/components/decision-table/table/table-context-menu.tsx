@@ -1,10 +1,10 @@
 import { Dropdown } from 'antd'
 import React from 'react'
 
-import { platform } from '../../helpers/platform'
-import { copyToClipboard, pasteFromClipboard } from '../../helpers/utility'
-import { SpacedText } from '../spaced-text'
-import { useDecisionTable } from './dt.context'
+import { platform } from '../../../helpers/platform'
+import { copyToClipboard, pasteFromClipboard } from '../../../helpers/utility'
+import { SpacedText } from '../../spaced-text'
+import { useDecisionTable } from '../context/dt.context'
 
 const ContextMenu: React.FC<React.PropsWithChildren> = (props) => {
   const { children } = props

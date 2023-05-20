@@ -3,8 +3,8 @@ import React, { useEffect } from 'react'
 import slugify from 'slugify'
 import { v4 } from 'uuid'
 
-import { SchemaSelectProps, recursiveSelect } from '../../helpers/components'
-import { ColumnType, TableSchemaItem } from './dt.context'
+import { SchemaSelectProps, recursiveSelect } from '../../../helpers/components'
+import { ColumnType, TableSchemaItem } from '../context/dt.context'
 
 export type FieldAddProps = {
   id?: string
@@ -69,7 +69,7 @@ export const FieldAdd: React.FC<FieldAddProps> = (props) => {
         }}
       >
         {schema && (
-          <Form.Item label={'Chose from list'}>
+          <Form.Item label={'Choose from list'}>
             <Cascader
               fieldNames={{ label: 'name', value: 'field', children: 'items' }}
               options={schema}

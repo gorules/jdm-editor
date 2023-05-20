@@ -2,7 +2,7 @@ import { Input } from 'antd'
 import debounce from 'lodash.debounce'
 import React, { useCallback } from 'react'
 
-import { TableSchemaItem } from './dt.context'
+import { TableSchemaItem } from '../context/dt.context'
 
 export type CellProps = {
   column?: { colType: string } & TableSchemaItem
@@ -12,7 +12,7 @@ export type CellProps = {
   onFocus: () => void
 }
 
-export const DefaultCell: React.FC<CellProps> = ({
+export const TableDefaultCell: React.FC<CellProps> = ({
   value,
   onChange,
   disabled,
@@ -21,6 +21,7 @@ export const DefaultCell: React.FC<CellProps> = ({
   const changeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     onChange(event.target.value)
   }
+
   const debouncedChangeHandler = useCallback(debounce(changeHandler, 300), [])
   return (
     <Input

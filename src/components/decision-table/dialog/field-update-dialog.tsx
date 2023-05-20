@@ -1,8 +1,8 @@
 import { Cascader, Form, Input, Modal } from 'antd'
 import React, { useEffect } from 'react'
 
-import { SchemaSelectProps, recursiveSelect } from '../../helpers/components'
-import { TableSchemaItem } from './dt.context'
+import { SchemaSelectProps, recursiveSelect } from '../../../helpers/components'
+import { TableSchemaItem } from '../context/dt.context'
 
 export type FieldUpdateProps = {
   id?: string
@@ -61,7 +61,7 @@ export const FieldUpdate: React.FC<
         }}
       >
         {schema && (
-          <Form.Item label={'Chose from list'}>
+          <Form.Item label={'Choose from list'}>
             <Cascader
               fieldNames={{ label: 'name', value: 'field', children: 'items' }}
               options={schema}
