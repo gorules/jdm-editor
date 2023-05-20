@@ -3,26 +3,15 @@ import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 
 import { useDecisionTableDialog } from '../context/dt-dialog.context'
-import {
-  ColumnType,
-  TableSchemaItem,
-  useDecisionTable,
-} from '../context/dt.context'
+import { ColumnType, TableSchemaItem, useDecisionTable } from '../context/dt.context'
 import { FieldAdd } from './field-add-dialog'
 import { FieldUpdate } from './field-update-dialog'
 import { FieldsReorder } from './fields-reorder-dialog'
 
 export const DecisionTableDialogs: React.FC = () => {
   const { dialog, setDialog, isDialogActive } = useDecisionTableDialog()
-  const {
-    id,
-    addColumn,
-    updateColumn,
-    reorderColumns,
-    value,
-    inputsSchema,
-    outputsSchema,
-  } = useDecisionTable()
+  const { id, addColumn, updateColumn, reorderColumns, value, inputsSchema, outputsSchema } =
+    useDecisionTable()
 
   return (
     <>

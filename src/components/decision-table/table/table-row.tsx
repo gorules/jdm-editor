@@ -1,9 +1,10 @@
 import { Row, flexRender } from '@tanstack/react-table'
+import { Typography } from 'antd'
 import clsx from 'clsx'
 import React, { useRef } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
+
 import { useDecisionTable } from '../context/dt.context'
-import { Typography } from 'antd'
 
 const InnerTableRow: React.FC<{
   index: number
@@ -17,11 +18,9 @@ const InnerTableRow: React.FC<{
     accept: 'row',
     collect: (monitor) => ({
       isDropping: monitor.isOver({ shallow: true }),
-      direction:
-        (monitor.getDifferenceFromInitialOffset()?.y || 0) > 0 ? 'down' : 'up',
+      direction: (monitor.getDifferenceFromInitialOffset()?.y || 0) > 0 ? 'down' : 'up',
     }),
-    drop: (draggedRow: Row<Record<string, string>>) =>
-      reorderRow(draggedRow.index, row.index),
+    drop: (draggedRow: Row<Record<string, string>>) => reorderRow(draggedRow.index, row.index),
   })
 
   const [{ isDragging }, dragRef, previewRef] = useDrag({

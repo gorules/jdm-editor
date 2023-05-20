@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { Checkbox } from 'antd'
 import React, { useState } from 'react'
 
-import { DecisionTable } from './dt'
 import { DecisionTableProps } from './context/dt.context'
+import { DecisionTable } from './dt'
 
 const shippingFeesDefault = {
   hitPolicy: 'first',
@@ -39,24 +39,21 @@ const shippingFeesDefault = {
     },
     {
       '_id': 'KC6KqcWiOX',
-      '_description':
-        'If weight is above 40kg and any other country, fee is 50',
+      '_description': 'If weight is above 40kg and any other country, fee is 50',
       'HVo_JpALi8': '> 40',
       'HW6mSVfLbs': '',
       '3EGDrV0ssV': '50',
     },
     {
       '_id': 'k-zEFSTe7b',
-      '_description':
-        'if weight is between 20 and 40kg and country US, fee is 30',
+      '_description': 'if weight is between 20 and 40kg and country US, fee is 30',
       'HVo_JpALi8': '[20..40]',
       'HW6mSVfLbs': '"US"',
       '3EGDrV0ssV': '30',
     },
     {
       '_id': 'c_8VkmGZ_C',
-      '_description':
-        'if weight is between 20 and 40kg and any other country, fee is 32',
+      '_description': 'if weight is between 20 and 40kg and any other country, fee is 32',
       'HVo_JpALi8': '[20..40]',
       'HW6mSVfLbs': '',
       '3EGDrV0ssV': '32',
@@ -150,11 +147,7 @@ export const Uncontrolled: Story = {
   render: (args) => {
     return (
       <div>
-        <DecisionTable
-          defaultValue={shippingFeesDefault}
-          {...args}
-          tableHeight='500px'
-        />
+        <DecisionTable defaultValue={shippingFeesDefault} {...args} tableHeight='500px' />
       </div>
     )
   },

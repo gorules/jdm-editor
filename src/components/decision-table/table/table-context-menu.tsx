@@ -8,16 +8,8 @@ import { useDecisionTable } from '../context/dt.context'
 
 const ContextMenu: React.FC<React.PropsWithChildren> = (props) => {
   const { children } = props
-  const {
-    disabled,
-    cursor,
-    addRowBelow,
-    addRowAbove,
-    removeRow,
-    getColumnId,
-    value,
-    commitData,
-  } = useDecisionTable()
+  const { disabled, cursor, addRowBelow, addRowAbove, removeRow, getColumnId, value, commitData } =
+    useDecisionTable()
 
   return (
     <Dropdown
@@ -31,12 +23,7 @@ const ContextMenu: React.FC<React.PropsWithChildren> = (props) => {
         items: [
           {
             key: 'addRowAbove',
-            label: (
-              <SpacedText
-                left='Add row above'
-                right={platform.shortcut('Ctrl + Up')}
-              />
-            ),
+            label: <SpacedText left='Add row above' right={platform.shortcut('Ctrl + Up')} />,
             onClick: () => {
               if (!cursor) return
               addRowAbove(cursor.y)
@@ -44,12 +31,7 @@ const ContextMenu: React.FC<React.PropsWithChildren> = (props) => {
           },
           {
             key: 'addRowBelow',
-            label: (
-              <SpacedText
-                left='Add row below'
-                right={platform.shortcut('Ctrl + Down')}
-              />
-            ),
+            label: <SpacedText left='Add row below' right={platform.shortcut('Ctrl + Down')} />,
             onClick: () => {
               if (!cursor) return
               addRowBelow(cursor.y)
@@ -60,12 +42,7 @@ const ContextMenu: React.FC<React.PropsWithChildren> = (props) => {
           },
           {
             key: 'remove',
-            label: (
-              <SpacedText
-                left='Remove row'
-                right={platform.shortcut('Ctrl + Backspace')}
-              />
-            ),
+            label: <SpacedText left='Remove row' right={platform.shortcut('Ctrl + Backspace')} />,
             onClick: () => {
               if (!cursor) return
               removeRow(cursor.y)
@@ -76,9 +53,7 @@ const ContextMenu: React.FC<React.PropsWithChildren> = (props) => {
           },
           {
             key: 'copy',
-            label: (
-              <SpacedText left='Copy' right={platform.shortcut('Ctrl + C')} />
-            ),
+            label: <SpacedText left='Copy' right={platform.shortcut('Ctrl + C')} />,
             onClick: async () => {
               if (!cursor) return
               const columnId = getColumnId(cursor.x)
@@ -86,16 +61,12 @@ const ContextMenu: React.FC<React.PropsWithChildren> = (props) => {
                 return
               }
 
-              await copyToClipboard(
-                value.rules?.[cursor.y]?.[columnId.id] || ''
-              )
+              await copyToClipboard(value.rules?.[cursor.y]?.[columnId.id] || '')
             },
           },
           {
             key: 'paste',
-            label: (
-              <SpacedText left='Paste' right={platform.shortcut('Ctrl + V')} />
-            ),
+            label: <SpacedText left='Paste' right={platform.shortcut('Ctrl + V')} />,
             onClick: async () => {
               if (!cursor) return
 

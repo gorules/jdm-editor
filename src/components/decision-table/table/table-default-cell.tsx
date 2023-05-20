@@ -12,12 +12,7 @@ export type CellProps = {
   onFocus: () => void
 }
 
-export const TableDefaultCell: React.FC<CellProps> = ({
-  value,
-  onChange,
-  disabled,
-  onFocus,
-}) => {
+export const TableDefaultCell: React.FC<CellProps> = ({ value, onChange, disabled, onFocus }) => {
   const changeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     onChange(event.target.value)
   }

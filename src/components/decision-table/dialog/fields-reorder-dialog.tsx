@@ -43,8 +43,7 @@ const FieldCard: React.FC<{
       }
 
       const hoverBoundingRect = ref.current?.getBoundingClientRect()
-      const hoverMiddleY =
-        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
+      const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
 
       const clientOffset = monitor.getClientOffset()
       const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top
@@ -73,11 +72,7 @@ const FieldCard: React.FC<{
 
   drag(drop(ref))
   return (
-    <Card
-      ref={ref}
-      style={{ opacity: isDragging ? 0 : 1 }}
-      bodyStyle={{ padding: '0.5rem' }}
-    >
+    <Card ref={ref} style={{ opacity: isDragging ? 0 : 1 }} bodyStyle={{ padding: '0.5rem' }}>
       <div className='grl-dt__fields-reorder__item'>
         <Stack horizontal verticalAlign='center'>
           <div className='grl-dt__fields-reorder__handle'>=</div>
@@ -132,12 +127,7 @@ export const FieldsReorder: React.VFC<FieldsReorderProps> = (props) => {
       <Form id='fields-reorder-dialog' onFinish={() => onSuccess?.(columns)}>
         <Stack gap={8} horizontalAlign='stretch'>
           {columns.map((column, index) => (
-            <FieldCard
-              key={column.id}
-              col={column}
-              index={index}
-              moveCard={moveCard}
-            />
+            <FieldCard key={column.id} col={column} index={index} moveCard={moveCard} />
           ))}
         </Stack>
       </Form>

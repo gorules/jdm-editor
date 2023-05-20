@@ -1,9 +1,10 @@
-import React from 'react'
-import { TableSchemaItem, useDecisionTable } from '../context/dt.context'
+import { DownOutlined } from '@ant-design/icons'
 import { Button, Dropdown, Modal, Typography } from 'antd'
+import React from 'react'
+
 import { Stack } from '../../stack'
 import { useDecisionTableDialog } from '../context/dt-dialog.context'
-import { DownOutlined } from '@ant-design/icons'
+import { TableSchemaItem, useDecisionTable } from '../context/dt.context'
 
 export type TableHeadCellProps = {
   configurable?: boolean
@@ -16,10 +17,7 @@ export type TableHeadCellFieldProps = {
   schema: TableSchemaItem
 }
 
-export const TableHeadCellInput: React.FC<TableHeadCellProps> = ({
-  configurable,
-  disabled,
-}) => {
+export const TableHeadCellInput: React.FC<TableHeadCellProps> = ({ configurable, disabled }) => {
   const { inputs } = useDecisionTable()
   const { setDialog } = useDecisionTableDialog()
 
@@ -64,19 +62,12 @@ export const TableHeadCellInput: React.FC<TableHeadCellProps> = ({
   )
 }
 
-export const TableHeadCellOutput: React.FC<TableHeadCellProps> = ({
-  configurable,
-  disabled,
-}) => {
+export const TableHeadCellOutput: React.FC<TableHeadCellProps> = ({ configurable, disabled }) => {
   const { outputs } = useDecisionTable()
   const { setDialog } = useDecisionTableDialog()
 
   return (
-    <Stack
-      horizontal
-      horizontalAlign={'space-between'}
-      verticalAlign={'center'}
-    >
+    <Stack horizontal horizontalAlign={'space-between'} verticalAlign={'center'}>
       <Typography.Text>Outputs</Typography.Text>
       {configurable && (
         <div>
@@ -125,11 +116,7 @@ export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({
   const { removeColumn } = useDecisionTable()
 
   return (
-    <Stack
-      horizontal
-      horizontalAlign={'space-between'}
-      verticalAlign={'center'}
-    >
+    <Stack horizontal horizontalAlign={'space-between'} verticalAlign={'center'}>
       <Stack gap={0}>
         <Typography.Text>{schema.name}</Typography.Text>
         <Typography.Text type='secondary' style={{ fontSize: 12 }}>
@@ -164,8 +151,7 @@ export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({
                       icon: false,
                       content: (
                         <Typography.Paragraph>
-                          You are about to delete <strong>{schema.name}</strong>{' '}
-                          column.
+                          You are about to delete <strong>{schema.name}</strong> column.
                         </Typography.Paragraph>
                       ),
                       okText: 'Remove',
@@ -228,8 +214,7 @@ export const TableHeadCellOutputField: React.FC<TableHeadCellFieldProps> = ({
                       title: 'Remove column',
                       content: (
                         <Typography.Paragraph>
-                          You are about to delete <strong>{schema.name}</strong>{' '}
-                          column.
+                          You are about to delete <strong>{schema.name}</strong> column.
                         </Typography.Paragraph>
                       ),
                       icon: false,

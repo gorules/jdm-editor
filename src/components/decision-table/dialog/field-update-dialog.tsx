@@ -13,9 +13,7 @@ export type FieldUpdateProps = {
   schema?: SchemaSelectProps[]
 }
 
-export const FieldUpdate: React.FC<
-  React.PropsWithChildren<FieldUpdateProps>
-> = (props) => {
+export const FieldUpdate: React.FC<React.PropsWithChildren<FieldUpdateProps>> = (props) => {
   const { isOpen, onDismiss, onSuccess, field, schema } = props
   const [form] = Form.useForm()
 

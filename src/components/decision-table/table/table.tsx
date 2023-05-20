@@ -1,26 +1,21 @@
 import { PlusOutlined } from '@ant-design/icons'
-import {
-  ColumnDef,
-  Row,
-  getCoreRowModel,
-  useReactTable,
-} from '@tanstack/react-table'
-import { Button, theme, Typography } from 'antd'
+import { ColumnDef, Row, getCoreRowModel, useReactTable } from '@tanstack/react-table'
+import { Button, Typography, theme } from 'antd'
+import clsx from 'clsx'
 import React from 'react'
 import { useVirtual } from 'react-virtual'
 
 import { useDecisionTable } from '../context/dt.context'
 import { TableContextMenu } from './table-context-menu'
 import { TableDefaultCell } from './table-default-cell'
-import { TableRow } from './table-row'
-import clsx from 'clsx'
-import { TableHeadRow } from './table-head-row'
 import {
   TableHeadCellInput,
   TableHeadCellInputField,
   TableHeadCellOutput,
   TableHeadCellOutputField,
 } from './table-head-cell'
+import { TableHeadRow } from './table-head-row'
+import { TableRow } from './table-row'
 
 export type TableProps = {
   maxHeight: string | number
@@ -46,9 +41,7 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
         id: 'inputs',
         minSize: 200,
         size: 200,
-        header: () => (
-          <TableHeadCellInput configurable={configurable} disabled={disabled} />
-        ),
+        header: () => <TableHeadCellInput configurable={configurable} disabled={disabled} />,
         columns: [
           ...inputs.map((input) => {
             return {
@@ -71,12 +64,7 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
         id: 'outputs',
         minSize: 200,
         size: 200,
-        header: () => (
-          <TableHeadCellOutput
-            disabled={disabled}
-            configurable={configurable}
-          />
-        ),
+        header: () => <TableHeadCellOutput disabled={disabled} configurable={configurable} />,
         columns: [
           ...outputs.map((output) => {
             return {
@@ -218,9 +206,7 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
 
   const paddingTop = virtualRows.length > 0 ? virtualRows?.[0]?.start || 0 : 0
   const paddingBottom =
-    virtualRows.length > 0
-      ? totalSize - (virtualRows?.[virtualRows.length - 1]?.end || 0)
-      : 0
+    virtualRows.length > 0 ? totalSize - (virtualRows?.[virtualRows.length - 1]?.end || 0) : 0
 
   return (
     <div
@@ -232,9 +218,7 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
         <thead>
           {table.getHeaderGroups().map((headerGroup, id) => {
             if (id !== 0) return null
-            return (
-              <TableHeadRow key={headerGroup.id} headerGroup={headerGroup} />
-            )
+            return <TableHeadRow key={headerGroup.id} headerGroup={headerGroup} />
           })}
         </thead>
       </StyledTable>
@@ -242,9 +226,7 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
         <thead>
           {table.getHeaderGroups().map((headerGroup, id) => {
             if (id === 0) return null
-            return (
-              <TableHeadRow key={headerGroup.id} headerGroup={headerGroup} />
-            )
+            return <TableHeadRow key={headerGroup.id} headerGroup={headerGroup} />
           })}
         </thead>
         <TableContextMenu>
@@ -292,9 +274,12 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
   )
 }
 
-const StyledTable: React.FC<
-  React.HTMLAttributes<HTMLTableElement> & { width: number }
-> = ({ style, className, width, ...props }) => {
+const StyledTable: React.FC<React.HTMLAttributes<HTMLTableElement> & { width: number }> = ({
+  style,
+  className,
+  width,
+  ...props
+}) => {
   const { token } = theme.useToken()
 
   return (

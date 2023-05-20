@@ -1,6 +1,5 @@
 export const isTrue = (str: string | boolean | number | undefined) => {
-  if (typeof str === 'string')
-    return ((str as string) || '').toLowerCase() === 'true'
+  if (typeof str === 'string') return ((str as string) || '').toLowerCase() === 'true'
   else if (typeof str === 'boolean') return str === true
   else if (typeof str === 'number') return str === 1
   return false

@@ -1,8 +1,4 @@
-import {
-  ConfigProvider,
-  ThemeConfig as AntThemeConfig,
-  theme as antTheme,
-} from 'antd'
+import { ThemeConfig as AntThemeConfig, ConfigProvider, theme as antTheme } from 'antd'
 import React, { useMemo } from 'react'
 
 export type ThemeConfig = Omit<AntThemeConfig, 'algorithm'> & {
@@ -28,7 +24,5 @@ export const JdmConfigProvider: React.FC<JdmConfigProviderProps> = ({
     }
   }, [mode])
 
-  return (
-    <ConfigProvider theme={{ ...theme, algorithm }}>{children}</ConfigProvider>
-  )
+  return <ConfigProvider theme={{ ...theme, algorithm }}>{children}</ConfigProvider>
 }

@@ -71,9 +71,7 @@ export type DecisionTableState = {
   reorderColumns: (type: ColumnType, columns: TableSchemaItem[]) => void
   updateHitPolicy: (hitPolicy: HitPolicy) => void
 
-  getColumnId: (
-    x: string
-  ) => ({ colType: string } & TableSchemaItem) | undefined
+  getColumnId: (x: string) => ({ colType: string } & TableSchemaItem) | undefined
 
   cells: React.MutableRefObject<Record<string, TableCell | null>>
   table: React.MutableRefObject<HTMLTableElement | null>
@@ -101,9 +99,7 @@ export type DecisionTableProps = {
   rules: Record<string, string>[]
 }
 
-export const DecisionTableContext = React.createContext<DecisionTableState>(
-  {} as any
-)
+export const DecisionTableContext = React.createContext<DecisionTableState>({} as any)
 
 export type DecisionTableContextProps = {
   id?: string
@@ -160,9 +156,9 @@ const parseDecisionTable = (decisionTable?: DecisionTableProps) => {
   return dt
 }
 
-export const DecisionTableProvider: React.FC<
-  React.PropsWithChildren<DecisionTableContextProps>
-> = (props) => {
+export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTableContextProps>> = (
+  props
+) => {
   const {
     id,
     name,
@@ -217,8 +213,7 @@ export const DecisionTableProvider: React.FC<
     }
     schemaItems.forEach((schemaItem) => {
       if (defaultId && newRule._id === defaultId) {
-        return (newRule[schemaItem.id] =
-          rule?.[schemaItem.id] || schemaItem?.defaultValue || '')
+        return (newRule[schemaItem.id] = rule?.[schemaItem.id] || schemaItem?.defaultValue || '')
       }
       newRule[schemaItem.id] = rule?.[schemaItem.id] || ''
     })
@@ -238,8 +233,7 @@ export const DecisionTableProvider: React.FC<
       }
       schemaItems.forEach((schemaItem) => {
         if (defaultId && newRule._id === defaultId) {
-          return (newRule[schemaItem.id] =
-            rule?.[schemaItem.id] || schemaItem?.defaultValue || '')
+          return (newRule[schemaItem.id] = rule?.[schemaItem.id] || schemaItem?.defaultValue || '')
         }
         newRule[schemaItem.id] = rule?.[schemaItem.id] || ''
       })
@@ -341,11 +335,7 @@ export const DecisionTableProvider: React.FC<
     )
   }
 
-  const updateColumn = (
-    type: ColumnType,
-    id: string,
-    data: TableSchemaItem
-  ) => {
+  const updateColumn = (type: ColumnType, id: string, data: TableSchemaItem) => {
     updateDecisionTable(
       produce(decisionTable, (draft) => {
         draft[type] = draft[type].map((item) => {
@@ -399,18 +389,10 @@ export const DecisionTableProvider: React.FC<
     const { name } = options
     const schemaMeta = [
       ...inputs.map((input) =>
-        [input.name, input.field, 'INPUT', input.id, input.defaultValue].join(
-          parserPipe
-        )
+        [input.name, input.field, 'INPUT', input.id, input.defaultValue].join(parserPipe)
       ),
       ...outputs.map((output) =>
-        [
-          output.name,
-          output.field,
-          'OUTPUT',
-          output.id,
-          output.defaultValue,
-        ].join(parserPipe)
+        [output.name, output.field, 'OUTPUT', output.id, output.defaultValue].join(parserPipe)
       ),
     ]
 
@@ -419,8 +401,7 @@ export const DecisionTableProvider: React.FC<
       const newDataPoint: string[] = []
       schemaItems.forEach((schemaItem) => {
         const val = record?.[schemaItem.id || '']
-        const formattedVal =
-          typeof val === 'object' && val !== null ? JSON.stringify(val) : val
+        const formattedVal = typeof val === 'object' && val !== null ? JSON.stringify(val) : val
         newDataPoint.push(formattedVal || '')
       })
       return newDataPoint

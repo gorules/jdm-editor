@@ -9,9 +9,6 @@ export const platform = {
   shortcut: (s: string): string => {
     if (!isMac) return s
 
-    return Object.keys(keyMaps).reduce(
-      (acc, key) => acc.replaceAll(key, keyMaps[key]),
-      s
-    )
+    return Object.keys(keyMaps).reduce((acc, key) => acc.replaceAll(key, keyMaps[key]), s)
   },
 }
