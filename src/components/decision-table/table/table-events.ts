@@ -139,7 +139,7 @@ export const useTableEvents = (): DecisionTableEvents => {
 
       e.preventDefault()
     },
-    onClickCapture: (e) => {
+    onClick: (e) => {
       const nextCursor = getCursorFromEvent(e)
       if (!nextCursor) {
         return

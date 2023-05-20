@@ -258,16 +258,17 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
     if (x === undefined || y === undefined) {
       return false
     }
-    
+
+    // prevents unnecessary re-render
     if (x === cursor?.x && y === cursor?.y) {
-      return false;
+      return false
     }
 
     if (!schemaIds.includes(x)) {
       return false
     }
 
-    const rowExists = !!decisionTable?.rules?.[y]
+    const rowExists = !!cells?.current?.[`${y}:${x}`]
     if (!rowExists) return false
 
     setCursor({ x, y })
