@@ -5,6 +5,7 @@ import {
   flexRender,
   getCoreRowModel,
   useReactTable,
+  HeaderGroup,
 } from '@tanstack/react-table'
 import { Button, Dropdown, Modal, theme, Typography } from 'antd'
 import React from 'react'
@@ -37,12 +38,13 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
     cellRenderer,
   } = useDecisionTable()
   const { setDialog } = useDecisionTableDialog()
-  const { token } = theme.useToken()
 
   const columns = React.useMemo<ColumnDef<any>[]>(
     () => [
       {
         id: 'inputs',
+        minSize: 200,
+        size: 200,
         header: () => (
           <Stack
             horizontal
@@ -92,6 +94,7 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
               accessorKey: input.id,
               id: input.id,
               minSize: 200,
+              size: 200,
               header: () => (
                 <Stack
                   horizontal
@@ -166,6 +169,7 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
       {
         id: 'outputs',
         minSize: 200,
+        size: 200,
         header: () => (
           <Stack
             horizontal
@@ -420,56 +424,24 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
       className='grl-dt__container'
       style={{ maxHeight, overflowY: 'auto' }}
     >
-      <table
-        className={'table'}
-        style={
-          {
-            'width': table.getCenterTotalSize(),
-            '--border-color': token.colorBorder,
-            '--primary-color': token.colorPrimary,
-            '--primary-color-bg': token.colorPrimaryBg,
-            '--color-bg-layout': token.colorBgLayout,
-            '--color-bg-elevated': token.colorBgElevated,
-            '--color-bg-container': token.colorBgContainer,
-          } as any
-        }
-      >
+      <StyledTable width={table.getCenterTotalSize()}>
         <thead>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id}>
-              <th
-                style={{
-                  width: 48,
-                  maxWidth: 48,
-                }}
-              />
-              {headerGroup.headers.map((header) => {
-                return (
-                  <th
-                    key={header.id}
-                    colSpan={header.colSpan}
-                    style={{
-                      width: header.getSize(),
-                    }}
-                  >
-                    {!header.isPlaceholder &&
-                      flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                    <div
-                      className={clsx(
-                        'resizer',
-                        header.column.getIsResizing() && 'isResizing'
-                      )}
-                      onMouseDown={header.getResizeHandler()}
-                      onTouchStart={header.getResizeHandler()}
-                    />
-                  </th>
-                )
-              })}
-            </tr>
-          ))}
+          {table.getHeaderGroups().map((headerGroup, id) => {
+            if (id !== 0) return null
+            return (
+              <TableHeadRow key={headerGroup.id} headerGroup={headerGroup} />
+            )
+          })}
+        </thead>
+      </StyledTable>
+      <StyledTable width={table.getCenterTotalSize()}>
+        <thead>
+          {table.getHeaderGroups().map((headerGroup, id) => {
+            if (id === 0) return null
+            return (
+              <TableHeadRow key={headerGroup.id} headerGroup={headerGroup} />
+            )
+          })}
         </thead>
         <TableContextMenu>
           <tbody>
@@ -511,7 +483,64 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
             </td>
           </tr>
         </tfoot>
-      </table>
+      </StyledTable>
     </div>
   )
 }
+
+const StyledTable: React.FC<
+  React.HTMLAttributes<HTMLTableElement> & { width: number }
+> = ({ style, className, width, ...props }) => {
+  const { token } = theme.useToken()
+
+  return (
+    <table
+      className={clsx('table', className)}
+      style={
+        {
+          width,
+          '--border-color': token.colorBorder,
+          '--primary-color': token.colorPrimary,
+          '--primary-color-bg': token.colorPrimaryBg,
+          '--color-bg-layout': token.colorBgLayout,
+          '--color-bg-elevated': token.colorBgElevated,
+          '--color-bg-container': token.colorBgContainer,
+          ...style,
+        } as any
+      }
+      {...props}
+    />
+  )
+}
+
+const TableHeadRow: React.FC<{ headerGroup: HeaderGroup<any> }> = ({
+  headerGroup,
+}) => (
+  <tr key={headerGroup.id}>
+    <th colSpan={1} style={{ width: 48 }} />
+    {headerGroup.headers.map((header) => {
+      return (
+        <th
+          key={header.id}
+          colSpan={header.colSpan}
+          style={{
+            width: header.getSize(),
+          }}
+        >
+          {!header.isPlaceholder &&
+            flexRender(header.column.columnDef.header, header.getContext())}
+          {header.column.getCanResize() && (
+            <div
+              className={clsx(
+                'resizer',
+                header.column.getIsResizing() && 'isResizing'
+              )}
+              onMouseDown={header.getResizeHandler()}
+              onTouchStart={header.getResizeHandler()}
+            />
+          )}
+        </th>
+      )
+    })}
+  </tr>
+)

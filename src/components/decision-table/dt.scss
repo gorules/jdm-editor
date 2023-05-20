@@ -7,8 +7,8 @@
 
   .table {
     border-collapse: collapse;
-    font-family: arial, sans-serif;
     table-layout: fixed;
+    font-family: arial, sans-serif;
     width: fit-content;
     background-color: var(--color-bg-container);
 
@@ -20,13 +20,10 @@
       top: 0;
       z-index: 10;
 
-      tr:first-of-type th {
-        height: 30px;
-      }
-
       th {
         height: 40px;
         padding: 4px 8px;
+        box-sizing: border-box;
         text-align: left;
         position: relative;
         min-width: 200px;
@@ -89,23 +86,14 @@
 
     .resizer {
       position: absolute;
-      right: 0;
+      right: -5px;
+      z-index: 1;
       top: 0;
       height: 100%;
-      width: 6px;
+      width: 10px;
       cursor: col-resize;
       user-select: none;
       touch-action: none;
-    }
-
-    @media (hover: hover) {
-      .resizer {
-        opacity: 0;
-      }
-
-      *:hover > .resizer {
-        opacity: 1;
-      }
     }
 
     th, td {
