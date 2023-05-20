@@ -1,3 +1,8 @@
+.grl-dt__container {
+  flex: 1;
+  overflow: auto;
+}
+
 .grl-dt {
   padding-top: 0.5rem;
   font-size: 14px;
@@ -12,11 +17,20 @@
     width: fit-content;
     background-color: var(--color-bg-container);
 
+    * {
+      scroll-margin-top: 129px;
+      scroll-margin-bottom: 40px;
+      scroll-margin-left: 72px;
+    }
+
+    &:focus {
+      outline: none !important;
+    }
+
     thead {
       background-color: var(--color-bg-layout);
       border-color: var(--border-color);
       margin: 0;
-      position: sticky;
       top: 0;
       z-index: 10;
 
@@ -38,7 +52,7 @@
         width: fit-content;
         height: 30px;
 
-        &:focus-within > td:first-of-type {
+        &.row-selected > td:first-of-type {
           background-color: var(--primary-color-bg);
         }
       }
@@ -47,7 +61,7 @@
         height: 36px;
         padding: 0;
 
-        &:focus-within {
+        &.selected {
           outline: 2px solid var(--primary-color);
           outline-offset: -2px;
         }
@@ -77,11 +91,6 @@
     .add-row {
       text-align: center;
       cursor: pointer;
-    }
-
-    .grl-dt__container {
-      flex: 1;
-      overflow: auto;
     }
 
     .resizer {
@@ -140,5 +149,11 @@
     &:hover {
       cursor: grab;
     }
+  }
+}
+
+.grl-dt__cell__input {
+  &[readonly] {
+    cursor: cell;
   }
 }

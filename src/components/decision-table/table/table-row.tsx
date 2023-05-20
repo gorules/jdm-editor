@@ -12,7 +12,7 @@ const InnerTableRow: React.FC<{
   reorderRow: (draggedRowIndex: number, targetRowIndex: number) => void
   disabled?: boolean
 }> = ({ index, row, reorderRow, disabled }) => {
-  const { setCursor } = useDecisionTable()
+  const { setCursor, cells, cursor } = useDecisionTable()
   const trRef = useRef<HTMLTableRowElement>(null)
   const [{ isDropping, direction }, dropRef] = useDrop({
     accept: 'row',
@@ -33,11 +33,14 @@ const InnerTableRow: React.FC<{
 
   previewRef(dropRef(trRef))
 
+  const isCurrentCursor = (idx: string) => cursor?.x === idx && cursor?.y === index
+
   return (
     <tr
       ref={disabled ? undefined : trRef}
       className={clsx(
         'table-row',
+        cursor?.y === index && 'row-selected',
         isDropping && direction === 'down' && 'dropping-down',
         isDropping && direction === 'up' && 'dropping-up'
       )}
@@ -60,7 +63,15 @@ const InnerTableRow: React.FC<{
         </div>
       </td>
       {row.getVisibleCells().map((cell) => (
-        <td key={cell.id} style={{ width: cell.column.getSize() }}>
+        <td
+          className={clsx(isCurrentCursor(cell.column.id) && 'selected')}
+          key={cell.id}
+          ref={(instance) => (cells.current[`${index}:${cell.column.id}`] = instance)}
+          style={{ width: cell.column.getSize() }}
+          data-x={cell.column.id}
+          data-y={index}
+          data-table-cell=''
+        >
           {flexRender(cell.column.columnDef.cell, cell.getContext())}
         </td>
       ))}

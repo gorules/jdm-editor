@@ -44,12 +44,18 @@ export type TableImportOptions = {
 export type HitPolicy = 'first' | 'collect'
 export type ColumnType = 'inputs' | 'outputs'
 
+const makeSchemaIds = (...schemas: TableSchemaItem[]): string[] => {
+  return schemas.map((s) => s.id)
+}
+
 export type DecisionTableState = {
   id?: string
   name?: string
 
+  schemaIds: string[]
   cursor: TableCursor | null
   setCursor: (cursor: TableCursor | null) => void
+  trySetCursor: (cursor: Partial<TableCursor> | null) => boolean
 
   inputs: TableSchemaItem[]
   outputs: TableSchemaItem[]
@@ -201,6 +207,7 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
 
   const inputs: TableSchemaItem[] = decisionTable?.inputs || []
   const outputs: TableSchemaItem[] = decisionTable?.outputs || []
+  const schemaIds: string[] = [...makeSchemaIds(...inputs, ...outputs), '_description']
 
   const cleanupTableRule = (
     rule: Record<string, string>,
@@ -239,6 +246,28 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
       })
       return newRule
     })
+  }
+
+  const trySetCursor = (newCursor: Partial<TableCursor> | null): boolean => {
+    if (!newCursor) {
+      return false
+    }
+
+    const { x, y } = newCursor
+
+    if (x === undefined || y === undefined) {
+      return false
+    }
+
+    if (!schemaIds.includes(x)) {
+      return false
+    }
+
+    const rowExists = !!decisionTable?.rules?.[y]
+    if (!rowExists) return false
+
+    setCursor({ x, y })
+    return true
   }
 
   const getColumnId = (x: string) =>
@@ -293,12 +322,15 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
         return draft
       })
     )
-    if (cursor?.y === target) {
-      setCursor({
-        y: cursor.y + 1,
-        x: cursor.x,
-      })
-    }
+
+    setCursor((cursor) =>
+      cursor
+        ? {
+            ...cursor,
+            y: cursor.y + 1,
+          }
+        : null
+    )
   }
 
   const addRowBelow = (target: number) => {
@@ -319,12 +351,6 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
         return draft
       })
     )
-    if (cursor?.y === target) {
-      setCursor({
-        y: cursor.y - 1,
-        x: cursor.x,
-      })
-    }
   }
 
   const removeRow = (target: number) => {
@@ -335,6 +361,12 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
         return draft
       })
     )
+
+    if (cursor) {
+      if (!trySetCursor({ x: cursor.x, y: cursor.y - 1 })) {
+        trySetCursor({ x: cursor.x, y: cursor.y })
+      }
+    }
   }
 
   const addColumn = (type: ColumnType, column: TableSchemaItem) => {
@@ -524,8 +556,11 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
       value={{
         id,
         name,
+        schemaIds,
+
         cursor,
         setCursor,
+        trySetCursor,
 
         value: decisionTable,
         inputs,

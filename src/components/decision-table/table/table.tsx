@@ -8,6 +8,7 @@ import { useVirtual } from 'react-virtual'
 import { useDecisionTable } from '../context/dt.context'
 import { TableContextMenu } from './table-context-menu'
 import { TableDefaultCell } from './table-default-cell'
+import { useTableEvents } from './table-events'
 import {
   TableHeadCellInput,
   TableHeadCellInputField,
@@ -33,9 +34,7 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
     setCursor,
     addRowBelow,
     cellRenderer,
-    addRowAbove,
-    cursor,
-    removeRow,
+    table: tableRef,
   } = useDecisionTable()
 
   const columns = React.useMemo<ColumnDef<any>[]>(
@@ -98,6 +97,8 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
     swapRows(draggedRowIndex, targetRowIndex)
   }
 
+  const { onKeyDownCell, ...tableEvents } = useTableEvents()
+
   const defaultColumn: Partial<ColumnDef<Record<string, string>>> = {
     cell: ({ getValue, row: { index }, column: { id }, table }) => {
       const value = getValue() as string
@@ -119,13 +120,14 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
           value,
           onChange: update,
           onFocus: setCursor,
+          onKeyDown: onKeyDownCell,
         }) || (
           <TableDefaultCell
             disabled={disabled}
             column={column}
             value={value}
             onChange={update}
-            onFocus={setCursor}
+            onKeyDown={onKeyDownCell}
           />
         )
       )
@@ -175,9 +177,12 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
     <div
       ref={tableContainerRef}
       className='grl-dt__container'
-      style={{ maxHeight, overflowY: 'auto' }}
+      style={{ maxHeight, position: 'relative' }}
     >
-      <StyledTable width={table.getCenterTotalSize()}>
+      <StyledTable
+        style={{ position: 'sticky', top: 0, zIndex: 99 }}
+        width={table.getCenterTotalSize()}
+      >
         <thead>
           {table.getHeaderGroups().map((headerGroup, id) => {
             if (id !== 0) return null
@@ -185,34 +190,15 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
           })}
         </thead>
       </StyledTable>
-      <StyledTable width={table.getCenterTotalSize()}>
-        <thead>
+      <StyledTable ref={tableRef} tabIndex={1} width={table.getCenterTotalSize()} {...tableEvents}>
+        <thead style={{ position: 'sticky', top: 40 }}>
           {table.getHeaderGroups().map((headerGroup, id) => {
             if (id === 0) return null
             return <TableHeadRow key={headerGroup.id} headerGroup={headerGroup} />
           })}
         </thead>
         <TableContextMenu>
-          <tbody
-            onKeyDown={
-              disabled
-                ? undefined
-                : (e) => {
-                    if (cursor === null) return
-                    if (e.code === 'ArrowUp' && (e.metaKey || e.altKey)) {
-                      addRowAbove(cursor.y)
-                    }
-                    if (e.code === 'ArrowDown' && (e.metaKey || e.altKey)) {
-                      addRowBelow(cursor.y)
-                    }
-                    if (e.code === 'Backspace' && (e.metaKey || e.altKey)) {
-                      if (e.metaKey || e.altKey) {
-                        removeRow(cursor.y)
-                      }
-                    }
-                  }
-            }
-          >
+          <tbody>
             {paddingTop > 0 && (
               <tr>
                 <td style={{ height: `${paddingTop}px` }} />
@@ -244,6 +230,16 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
                 type='link'
                 disabled={disabled}
                 icon={<PlusOutlined />}
+                tabIndex={-1}
+                onClick={() => addRowBelow(value.rules.length - 1)}
+              >
+                Add row
+              </Button>
+              <Button
+                type='link'
+                disabled={disabled}
+                icon={<PlusOutlined />}
+                tabIndex={-1}
                 onClick={() => addRowBelow(value.rules.length - 1)}
               >
                 Add row
@@ -256,30 +252,30 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
   )
 }
 
-const StyledTable: React.FC<React.HTMLAttributes<HTMLTableElement> & { width: number }> = ({
-  style,
-  className,
-  width,
-  ...props
-}) => {
-  const { token } = theme.useToken()
+type StyledTableProps = React.HTMLAttributes<HTMLTableElement> & { width: number }
 
-  return (
-    <table
-      className={clsx('table', className)}
-      style={
-        {
-          width,
-          '--border-color': token.colorBorder,
-          '--primary-color': token.colorPrimary,
-          '--primary-color-bg': token.colorPrimaryBg,
-          '--color-bg-layout': token.colorBgLayout,
-          '--color-bg-elevated': token.colorBgElevated,
-          '--color-bg-container': token.colorBgContainer,
-          ...style,
-        } as any
-      }
-      {...props}
-    />
-  )
-}
+const StyledTable = React.forwardRef<HTMLTableElement, StyledTableProps>(
+  ({ style, className, width, ...props }, ref) => {
+    const { token } = theme.useToken()
+
+    return (
+      <table
+        ref={ref}
+        className={clsx('table', className)}
+        style={
+          {
+            width,
+            '--border-color': token.colorBorder,
+            '--primary-color': token.colorPrimary,
+            '--primary-color-bg': token.colorPrimaryBg,
+            '--color-bg-layout': token.colorBgLayout,
+            '--color-bg-elevated': token.colorBgElevated,
+            '--color-bg-container': token.colorBgContainer,
+            ...style,
+          } as any
+        }
+        {...props}
+      />
+    )
+  }
+)
