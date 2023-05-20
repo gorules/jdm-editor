@@ -1,3 +1,6 @@
 import React from 'react';
-export declare const Table: React.FC;
+export type TableProps = {
+    maxHeight: string | number;
+};
+export declare const Table: React.FC<TableProps>;
 //# sourceMappingURL=table.d.ts.map
