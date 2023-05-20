@@ -38,6 +38,7 @@ export const DecisionTableCommandBar: React.FC = () => {
           type='default'
           size={'small'}
           color='secondary'
+          disabled={disabled}
           icon={<ImportOutlined />}
           onClick={() => importCsv()}
         >
