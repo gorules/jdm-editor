@@ -1,4 +1,4 @@
-import { ConfigProvider, theme } from 'antd'
+import { theme } from 'antd'
 import React from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
@@ -9,14 +9,12 @@ import { DecisionTableDialogs } from './dt-dialogs'
 import { DecisionTableContextProps, DecisionTableProvider } from './dt.context'
 import './dt.scss'
 import { Table } from './table'
-import type { ThemeConfig } from '../../theme'
 
 export type DecisionTableProps = {
-  theme?: ThemeConfig
   tableHeight: string | number
 } & DecisionTableContextProps
 
-const DecisionTableInner: React.FC<DecisionTableProps> = ({
+export const DecisionTable: React.FC<DecisionTableProps> = ({
   tableHeight,
   ...props
 }) => {
@@ -39,16 +37,5 @@ const DecisionTableInner: React.FC<DecisionTableProps> = ({
         </DecisionTableDialogProvider>
       </DecisionTableProvider>
     </div>
-  )
-}
-
-export const DecisionTable: React.FC<DecisionTableProps> = ({
-  theme,
-  ...rest
-}) => {
-  return (
-    <ConfigProvider theme={theme}>
-      <DecisionTableInner {...rest} />
-    </ConfigProvider>
   )
 }
