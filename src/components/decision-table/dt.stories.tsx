@@ -38,12 +38,12 @@ type Story = StoryObj<typeof DecisionTable>
 export const Uncontrolled: Story = {
   render: (args) => {
     return (
-      <div
-        style={{
-          height: '500px',
-        }}
-      >
-        <DecisionTable defaultValue={shippingFeesDefault} {...args} />
+      <div>
+        <DecisionTable
+          defaultValue={shippingFeesDefault}
+          {...args}
+          tableHeight='500px'
+        />
       </div>
     )
   },
@@ -53,13 +53,10 @@ export const Controlled: Story = {
   render: (args) => {
     const [value, setValue] = useState<DecisionTableProps>(shippingFeesDefault)
     return (
-      <div
-        style={{
-          height: '500px',
-        }}
-      >
+      <div>
         <DecisionTable
           {...args}
+          tableHeight='500px'
           value={value}
           onChange={(val) => setValue(val)}
         />
@@ -70,25 +67,18 @@ export const Controlled: Story = {
 
 export const Empty: Story = {
   render: (args) => (
-    <div
-      style={{
-        height: '500px',
-      }}
-    >
-      <DecisionTable {...args} />
+    <div>
+      <DecisionTable {...args} tableHeight='500px' />
     </div>
   ),
 }
 
 export const CustomRenderer: Story = {
   render: (args) => (
-    <div
-      style={{
-        height: '500px',
-      }}
-    >
+    <div>
       <DecisionTable
         {...args}
+        tableHeight='500px'
         cellRenderer={(props) => {
           if (props?.column?.field === 'output') {
             return (
@@ -117,13 +107,10 @@ export const CustomRenderer: Story = {
 
 export const StressTest: Story = {
   render: (args) => (
-    <div
-      style={{
-        height: '500px',
-      }}
-    >
+    <div>
       <DecisionTable
         {...args}
+        tableHeight='500px'
         defaultValue={{
           ...shippingFeesDefault,
           rules: stressRules,

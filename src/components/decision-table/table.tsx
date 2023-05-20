@@ -17,7 +17,11 @@ import { TableContextMenu } from './table-context-menu'
 import { DefaultCell } from './table-default-cell'
 import { TableRow } from './table-row'
 
-export const Table: React.FC = () => {
+export type TableProps = {
+  maxHeight: string | number
+}
+
+export const Table: React.FC<TableProps> = ({ maxHeight }) => {
   const {
     configurable,
     disabled,
@@ -33,8 +37,6 @@ export const Table: React.FC = () => {
   } = useDecisionTable()
   const { setDialog } = useDecisionTableDialog()
   const { token } = theme.useToken()
-
-  console.log(token)
 
   const columns = React.useMemo<ColumnDef<any>[]>(
     () => [
@@ -412,13 +414,16 @@ export const Table: React.FC = () => {
       : 0
 
   return (
-    <div ref={tableContainerRef} className='grl-dt__container'>
+    <div
+      ref={tableContainerRef}
+      className='grl-dt__container'
+      style={{ maxHeight, overflowY: 'auto' }}
+    >
       <table
         className={'table'}
         style={
           {
             'width': table.getCenterTotalSize(),
-            'backgroundColor': token.colorBorder,
             '--border-color': token.colorBorder,
             '--primary-color': token.colorPrimary,
             '--primary-color-bg': token.colorPrimaryBg,

@@ -99,7 +99,7 @@ export const inputSchemaDefault = [
 ]
 
 export const stressRules: any[] = []
-for (let i = 10000; i > 0; i--) {
+for (let i = 10_000; i > 0; i--) {
   stressRules.push({
     '_id': `${i}`,
     '_description': `${i} description`,

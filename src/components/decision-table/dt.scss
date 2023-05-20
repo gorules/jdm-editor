@@ -6,7 +6,7 @@
   flex-direction: column;
 
   .table {
-    border-spacing: 1px;
+    border-collapse: collapse;
     font-family: arial, sans-serif;
     table-layout: fixed;
     width: fit-content;
@@ -104,6 +104,10 @@
       *:hover > .resizer {
         opacity: 1;
       }
+    }
+
+    th, td {
+      box-shadow: inset 0 0 0 0.5px var(--border-color);
     }
   }
 

@@ -13,9 +13,13 @@ import type { ThemeConfig } from '../../theme'
 
 export type DecisionTableProps = {
   theme?: ThemeConfig
+  tableHeight: string | number
 } & DecisionTableContextProps
 
-const DecisionTableInner: React.FC<DecisionTableProps> = (props) => {
+const DecisionTableInner: React.FC<DecisionTableProps> = ({
+  tableHeight,
+  ...props
+}) => {
   const { token } = theme.useToken()
 
   return (
@@ -29,7 +33,7 @@ const DecisionTableInner: React.FC<DecisionTableProps> = (props) => {
         <DecisionTableDialogProvider>
           <DecisionTableCommandBar />
           <DndProvider backend={HTML5Backend}>
-            <Table />
+            <Table maxHeight={tableHeight} />
           </DndProvider>
           <DecisionTableDialogs />
         </DecisionTableDialogProvider>
