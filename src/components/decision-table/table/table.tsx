@@ -33,6 +33,9 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
     setCursor,
     addRowBelow,
     cellRenderer,
+    addRowAbove,
+    cursor,
+    removeRow,
   } = useDecisionTable()
 
   const columns = React.useMemo<ColumnDef<any>[]>(
@@ -108,46 +111,6 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
       const setCursor = () => {
         ;(table.options.meta as any)?.setCursor?.(id, index)
       }
-
-      // const keyboardEventHandler = () =>
-      //   // e: React.KeyboardEvent<HTMLInputElement>
-      //   {
-      //     // Minor Events - Ignore if input
-      //     // const { key, preventDefault } = e
-      //     // if (e.code === 'ArrowUp') {
-      //     //   if ((e.metaKey || e.altKey)) {
-      //     //     addRowAbove(y)
-      //     //     return preventDefault();
-      //     //   }
-      //     //
-      //     //   trySetCursor({ x, y: y - 1 })
-      //     //   return preventDefault()
-      //     // }
-      //     // if (e.code === 'ArrowDown') {
-      //     //   if ((e.metaKey || e.altKey) && !disabled) {
-      //     //     addRowBelow(y)
-      //     //     return preventDefault()
-      //     //   }
-      //     //
-      //     //   trySetCursor({ x, y: y + 1 })
-      //     //   return preventDefault()
-      //     // }
-      //     // if (e.code === 'ArrowLeft') {
-      //     //   trySetCursor({ x: x - 1, y })
-      //     //   return preventDefault()
-      //     // }
-      //     // if (e.code === 'ArrowRight') {
-      //     //   trySetCursor({ x: x + 1, y })
-      //     //   return preventDefault()
-      //     // }
-      //     // if (e.code === 'Backspace') {
-      //     //   if (e.metaKey || e.altKey) {
-      //     //     removeRow(y)
-      //     //     return preventDefault()
-      //     //   }
-      //     //   return preventDefault()
-      //     // }
-      //   }
 
       return (
         (table.options.meta as any)?.getCell?.({
@@ -230,7 +193,26 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
           })}
         </thead>
         <TableContextMenu>
-          <tbody>
+          <tbody
+            onKeyDown={
+              disabled
+                ? undefined
+                : (e) => {
+                    if (cursor === null) return
+                    if (e.code === 'ArrowUp' && (e.metaKey || e.altKey)) {
+                      addRowAbove(cursor.y)
+                    }
+                    if (e.code === 'ArrowDown' && (e.metaKey || e.altKey)) {
+                      addRowBelow(cursor.y)
+                    }
+                    if (e.code === 'Backspace' && (e.metaKey || e.altKey)) {
+                      if (e.metaKey || e.altKey) {
+                        removeRow(cursor.y)
+                      }
+                    }
+                  }
+            }
+          >
             {paddingTop > 0 && (
               <tr>
                 <td style={{ height: `${paddingTop}px` }} />
