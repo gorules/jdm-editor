@@ -293,6 +293,12 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
         return draft
       })
     )
+    if (cursor?.y === target) {
+      setCursor({
+        y: cursor.y + 1,
+        x: cursor.x,
+      })
+    }
   }
 
   const addRowBelow = (target: number) => {
@@ -313,6 +319,12 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
         return draft
       })
     )
+    if (cursor?.y === target) {
+      setCursor({
+        y: cursor.y - 1,
+        x: cursor.x,
+      })
+    }
   }
 
   const removeRow = (target: number) => {
