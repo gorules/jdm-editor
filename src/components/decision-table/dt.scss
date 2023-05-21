@@ -12,6 +12,11 @@
     width: fit-content;
     background-color: var(--color-bg-container);
 
+    .cell-wrapper {
+      width: 100%;
+      height: 100%;
+    }
+
     thead {
       background-color: var(--color-bg-layout);
       border-color: var(--border-color);

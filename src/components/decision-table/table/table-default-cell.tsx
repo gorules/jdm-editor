@@ -1,30 +1,79 @@
+import { CellContext } from '@tanstack/react-table'
 import { Input } from 'antd'
-import debounce from 'lodash.debounce'
-import React, { useCallback } from 'react'
+import React, { useEffect, useState } from 'react'
 
-import { TableSchemaItem } from '../context/dt.context'
+import { TableSchemaItem, useDecisionTable } from '../context/dt.context'
 
-export type CellProps = {
-  column?: { colType: string } & TableSchemaItem
-  value: string
-  onChange: (val: string) => void
-  disabled?: boolean
-  onFocus: () => void
-}
+export type TableDefaultCellProps = {
+  context: CellContext<Record<string, string>, string>
+} & React.HTMLAttributes<HTMLDivElement>
 
-export const TableDefaultCell: React.FC<CellProps> = ({ value, onChange, disabled, onFocus }) => {
-  const changeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(event.target.value)
+export const TableDefaultCell: React.FC<TableDefaultCellProps> = ({ context, ...props }) => {
+  const {
+    getValue,
+    row: { index },
+    column: { id },
+    table,
+  } = context
+  const { disabled, getColumnId } = useDecisionTable()
+  const value = getValue()
+  const [internalValue, setInternalValue] = useState(value || '')
+
+  useEffect(() => {
+    setInternalValue(value)
+  }, [value])
+
+  const column = getColumnId(id)
+  const update = (value: string) => {
+    ;(table.options.meta as any)?.updateData?.(index, id, value)
   }
 
-  const debouncedChangeHandler = useCallback(debounce(changeHandler, 300), [])
+  const setCursor = () => {
+    ;(table.options.meta as any)?.setCursor?.(id, index)
+  }
+
+  return (
+    <div
+      className='cell-wrapper'
+      onFocus={setCursor}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+          update(internalValue)
+        }
+      }}
+      {...props}
+    >
+      {(table.options.meta as any)?.getCell?.({
+        disabled,
+        column,
+        value: internalValue,
+        onChange: setInternalValue,
+      }) || (
+        <TableInputCell
+          disabled={disabled}
+          column={column}
+          value={internalValue}
+          onChange={setInternalValue}
+        />
+      )}
+    </div>
+  )
+}
+
+export type TableCellProps = {
+  column?: { colType: string } & TableSchemaItem
+  value: string
+  onChange: (value: string) => void
+  disabled?: boolean
+}
+
+const TableInputCell: React.FC<TableCellProps> = ({ value, onChange, disabled }) => {
   return (
     <Input
       className={'grl-dt__cell__input'}
       disabled={disabled}
-      defaultValue={(value as string) || ''}
-      onChange={debouncedChangeHandler}
-      onFocus={onFocus}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
     />
   )
 }
