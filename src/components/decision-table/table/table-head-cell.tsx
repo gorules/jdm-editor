@@ -28,6 +28,7 @@ export const TableHeadCellInput: React.FC<TableHeadCellProps> = ({ configurable,
         <div>
           {inputs?.length > 1 && (
             <Button
+              tabIndex={-1}
               size={'small'}
               type={'link'}
               disabled={disabled}
@@ -43,6 +44,7 @@ export const TableHeadCellInput: React.FC<TableHeadCellProps> = ({ configurable,
             </Button>
           )}
           <Button
+            tabIndex={-1}
             size={'small'}
             type={'link'}
             disabled={disabled}
@@ -72,6 +74,7 @@ export const TableHeadCellOutput: React.FC<TableHeadCellProps> = ({ configurable
       {configurable && (
         <div>
           <Button
+            tabIndex={-1}
             size={'small'}
             type={'link'}
             disabled={disabled}
@@ -87,6 +90,7 @@ export const TableHeadCellOutput: React.FC<TableHeadCellProps> = ({ configurable
           </Button>
           {outputs?.length > 1 && (
             <Button
+              tabIndex={-1}
               size={'small'}
               type={'link'}
               disabled={disabled}
@@ -163,7 +167,7 @@ export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({
               ],
             }}
           >
-            <Button type='link' size={'small'} icon={<DownOutlined />} />
+            <Button tabIndex={-1} type='link' size={'small'} icon={<DownOutlined />} />
           </Dropdown>
         </div>
       )}
@@ -231,7 +235,7 @@ export const TableHeadCellOutputField: React.FC<TableHeadCellFieldProps> = ({
               ],
             }}
           >
-            <Button type='link' size={'small'} icon={<DownOutlined />} />
+            <Button tabIndex={-1} type='link' size={'small'} icon={<DownOutlined />} />
           </Dropdown>
         </div>
       )}

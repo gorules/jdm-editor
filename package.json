@@ -96,7 +96,6 @@
     "antd": "5.5.0",
     "clsx": "1.2.1",
     "immer": "10.0.2",
-    "lodash.debounce": "4.0.8",
     "papaparse": "5.4.1",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "16.0.1",

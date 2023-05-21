@@ -189,6 +189,7 @@ export const CustomRenderer: Story = {
               <div
                 style={{
                   paddingLeft: '1rem',
+                  userSelect: 'none',
                 }}
               >
                 <Checkbox
