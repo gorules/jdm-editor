@@ -21,8 +21,12 @@ export const TableDefaultCell: React.FC<CellProps> = ({ value, onChange, disable
     setInternalValue(value)
   }, [value])
 
-  const changeHandler = (event: React.ChangeEvent<HTMLInputElement>) => onChange(event.target.value)
-  const debouncedChangeHandler = useCallback(debounce(changeHandler, 300), [])
+  const changeHandler = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => onChange(event.target.value),
+    [onChange]
+  )
+
+  const debouncedChangeHandler = useCallback(debounce(changeHandler, 300), [changeHandler])
 
   return (
     <Input
@@ -37,8 +41,8 @@ export const TableDefaultCell: React.FC<CellProps> = ({ value, onChange, disable
       onBlur={() => setReadOnly(true)}
       onMouseDown={(e) => e.preventDefault()}
       onChange={(e) => {
+        changeHandler(e)
         debouncedChangeHandler(e)
-        setInternalValue(e.target.value)
       }}
       onDoubleClick={() => {
         setReadOnly(false)
