@@ -186,11 +186,7 @@ export const CustomRenderer: Story = {
         cellRenderer={(props) => {
           if (props?.column?.field === 'output') {
             return (
-              <div
-                style={{
-                  paddingLeft: '1rem',
-                }}
-              >
+              <div tabIndex={1} style={{ paddingLeft: '1rem' }}>
                 <Checkbox
                   disabled={props.disabled}
                   checked={props.value === 'true'}

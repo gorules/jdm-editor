@@ -98,38 +98,8 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
     swapRows(draggedRowIndex, targetRowIndex)
   }
 
-  const defaultColumn: Partial<ColumnDef<Record<string, string>>> = {
-    cell: ({ getValue, row: { index }, column: { id }, table }) => {
-      const value = getValue() as string
-
-      const { disabled, getColumnId } = useDecisionTable()
-      const column = getColumnId(id)
-      const update = (value: string) => {
-        ;(table.options.meta as any)?.updateData?.(index, id, value)
-      }
-
-      const setCursor = () => {
-        ;(table.options.meta as any)?.setCursor?.(id, index)
-      }
-
-      return (
-        (table.options.meta as any)?.getCell?.({
-          disabled,
-          column,
-          value,
-          onChange: update,
-          onFocus: setCursor,
-        }) || (
-          <TableDefaultCell
-            disabled={disabled}
-            column={column}
-            value={value}
-            onChange={update}
-            onFocus={setCursor}
-          />
-        )
-      )
-    },
+  const defaultColumn: Partial<ColumnDef<Record<string, string>, string>> = {
+    cell: (context) => <TableDefaultCell context={context} />,
   }
 
   const table = useReactTable({

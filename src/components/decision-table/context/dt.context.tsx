@@ -5,7 +5,7 @@ import { v4 } from 'uuid'
 
 import { SchemaSelectProps } from '../../../helpers/components'
 import { saveFile } from '../../../helpers/file-helpers'
-import { CellProps } from '../table/table-default-cell'
+import { TableCellProps } from '../table/table-default-cell'
 
 export type TableCursor = {
   x: string
@@ -89,7 +89,7 @@ export type DecisionTableState = {
   configurable?: boolean
   disableHitPolicy?: boolean
 
-  cellRenderer?: (props: CellProps) => JSX.Element | null | undefined
+  cellRenderer?: (props: TableCellProps) => JSX.Element | null | undefined
 }
 
 export type DecisionTableProps = {
@@ -114,7 +114,7 @@ export type DecisionTableContextProps = {
   disableHitPolicy?: boolean
   inputsSchema?: SchemaSelectProps[]
   outputsSchema?: SchemaSelectProps[]
-  cellRenderer?: (props: CellProps) => JSX.Element | null | undefined
+  cellRenderer?: (props: TableCellProps) => JSX.Element | null | undefined
 }
 
 const parserOptions = {
