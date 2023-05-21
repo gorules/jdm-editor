@@ -34,6 +34,7 @@ export const TableDefaultCell: React.FC<TableDefaultCellProps> = ({ context, ...
 
   return (
     <div
+      className='cell-wrapper'
       onFocus={setCursor}
       onBlur={(e) => {
         if (!e.currentTarget.contains(e.relatedTarget)) {
