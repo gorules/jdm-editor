@@ -1,5 +1,4 @@
 import { Input, InputRef } from 'antd'
-import debounce from 'lodash.debounce'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 import { TableSchemaItem } from '../context/dt.context'
@@ -26,8 +25,6 @@ export const TableDefaultCell: React.FC<CellProps> = ({ value, onChange, disable
     [onChange]
   )
 
-  const debouncedChangeHandler = useCallback(debounce(changeHandler, 300), [changeHandler])
-
   return (
     <Input
       ref={self}
@@ -38,12 +35,12 @@ export const TableDefaultCell: React.FC<CellProps> = ({ value, onChange, disable
       onKeyDown={onKeyDown}
       readOnly={readOnly}
       onFocus={() => setReadOnly(false)}
-      onBlur={() => setReadOnly(true)}
-      onMouseDown={(e) => e.preventDefault()}
-      onChange={(e) => {
+      onBlur={(e) => {
+        setReadOnly(true)
         changeHandler(e)
-        debouncedChangeHandler(e)
       }}
+      onMouseDown={(e) => e.preventDefault()}
+      onChange={(e) => setInternalValue(e.target.value)}
       onDoubleClick={() => {
         setReadOnly(false)
         self.current?.focus()
