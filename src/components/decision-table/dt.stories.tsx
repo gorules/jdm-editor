@@ -192,6 +192,7 @@ export const CustomRenderer: Story = {
                 }}
               >
                 <Checkbox
+                  disabled={props.disabled}
                   checked={props.value === 'true'}
                   onChange={(e) => {
                     props.onChange(`${e?.target?.checked}`)
