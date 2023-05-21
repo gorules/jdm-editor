@@ -1,6 +1,6 @@
 import React from 'react';
 import { SchemaSelectProps } from '../../../helpers/components';
-import { CellProps } from '../table/table-default-cell';
+import { TableCellProps } from '../table/table-default-cell';
 export type TableCursor = {
     x: string;
     y: number;
@@ -64,7 +64,7 @@ export type DecisionTableState = {
     disabled?: boolean;
     configurable?: boolean;
     disableHitPolicy?: boolean;
-    cellRenderer?: (props: CellProps) => JSX.Element | null | undefined;
+    cellRenderer?: (props: TableCellProps) => JSX.Element | null | undefined;
 };
 export type DecisionTableProps = {
     hitPolicy: HitPolicy | string;
@@ -86,7 +86,7 @@ export type DecisionTableContextProps = {
     disableHitPolicy?: boolean;
     inputsSchema?: SchemaSelectProps[];
     outputsSchema?: SchemaSelectProps[];
-    cellRenderer?: (props: CellProps) => JSX.Element | null | undefined;
+    cellRenderer?: (props: TableCellProps) => JSX.Element | null | undefined;
 };
 export declare const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTableContextProps>>;
 export declare const useDecisionTable: () => DecisionTableState;
