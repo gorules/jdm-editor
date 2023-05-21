@@ -235,15 +235,6 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
               >
                 Add row
               </Button>
-              <Button
-                type='link'
-                disabled={disabled}
-                icon={<PlusOutlined />}
-                tabIndex={-1}
-                onClick={() => addRowBelow(value.rules.length - 1)}
-              >
-                Add row
-              </Button>
             </td>
           </tr>
         </tfoot>
