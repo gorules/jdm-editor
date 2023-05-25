@@ -5,6 +5,7 @@ export type ThemeConfig = Omit<AntThemeConfig, 'algorithm'> & {
 };
 export type JdmConfigProviderProps = {
     theme?: ThemeConfig;
+    prefixCls?: string;
     children?: React.ReactNode;
 };
 export declare const JdmConfigProvider: React.FC<JdmConfigProviderProps>;
