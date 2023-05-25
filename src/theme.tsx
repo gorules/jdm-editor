@@ -7,11 +7,13 @@ export type ThemeConfig = Omit<AntThemeConfig, 'algorithm'> & {
 
 export type JdmConfigProviderProps = {
   theme?: ThemeConfig
+  prefixCls?: string
   children?: React.ReactNode
 }
 
 export const JdmConfigProvider: React.FC<JdmConfigProviderProps> = ({
   theme: { mode, ...theme } = {},
+  prefixCls,
   children,
 }) => {
   const algorithm = useMemo(() => {
@@ -24,5 +26,9 @@ export const JdmConfigProvider: React.FC<JdmConfigProviderProps> = ({
     }
   }, [mode])
 
-  return <ConfigProvider theme={{ ...theme, algorithm }}>{children}</ConfigProvider>
+  return (
+    <ConfigProvider prefixCls={prefixCls} theme={{ ...theme, algorithm }}>
+      {children}
+    </ConfigProvider>
+  )
 }
