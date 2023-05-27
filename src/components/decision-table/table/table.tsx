@@ -36,22 +36,23 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
     addRowAbove,
     cursor,
     removeRow,
+    minColWidth,
   } = useDecisionTable()
 
   const columns = React.useMemo<ColumnDef<any>[]>(
     () => [
       {
         id: 'inputs',
-        minSize: 200,
-        size: 200,
+        minSize: minColWidth,
+        size: minColWidth,
         header: () => <TableHeadCellInput configurable={configurable} disabled={disabled} />,
         columns: [
           ...inputs.map((input) => {
             return {
               accessorKey: input.id,
               id: input.id,
-              minSize: 200,
-              size: 200,
+              minSize: minColWidth,
+              size: minColWidth,
               header: () => (
                 <TableHeadCellInputField
                   schema={input}
@@ -65,14 +66,15 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
       },
       {
         id: 'outputs',
-        minSize: 200,
-        size: 200,
+        minSize: minColWidth,
+        size: minColWidth,
         header: () => <TableHeadCellOutput disabled={disabled} configurable={configurable} />,
         columns: [
           ...outputs.map((output) => {
             return {
               accessorKey: output.id,
-              minSize: 200,
+              minSize: minColWidth,
+              size: minColWidth,
               header: () => (
                 <TableHeadCellOutputField
                   schema={output}
@@ -88,7 +90,7 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
         id: '_description',
         accessorKey: '_description',
         header: () => <Typography.Text>Description</Typography.Text>,
-        minSize: 200,
+        minSize: minColWidth,
       },
     ],
     [configurable, disabled, inputs, outputs]
