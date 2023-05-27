@@ -44,6 +44,8 @@ export type TableImportOptions = {
 export type HitPolicy = 'first' | 'collect'
 export type ColumnType = 'inputs' | 'outputs'
 
+const defaultColWidth = 200
+
 export type DecisionTableState = {
   id?: string
   name?: string
@@ -88,6 +90,7 @@ export type DecisionTableState = {
   disabled?: boolean
   configurable?: boolean
   disableHitPolicy?: boolean
+  minColWidth: number
 
   cellRenderer?: (props: TableCellProps) => JSX.Element | null | undefined
 }
@@ -115,6 +118,7 @@ export type DecisionTableContextProps = {
   inputsSchema?: SchemaSelectProps[]
   outputsSchema?: SchemaSelectProps[]
   cellRenderer?: (props: TableCellProps) => JSX.Element | null | undefined
+  minColWidth?: number
 }
 
 const parserOptions = {
@@ -174,6 +178,7 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
     inputsSchema,
     outputsSchema,
     cellRenderer,
+    minColWidth = defaultColWidth,
   } = props
 
   const fileInput = useRef<HTMLInputElement>(null)
@@ -561,6 +566,8 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
         disabled,
         configurable,
         disableHitPolicy,
+
+        minColWidth,
 
         inputsSchema,
         outputsSchema,

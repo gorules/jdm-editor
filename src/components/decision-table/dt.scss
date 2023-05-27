@@ -31,8 +31,21 @@
         box-sizing: border-box;
         text-align: left;
         position: relative;
-        min-width: 200px;
         font-weight: normal;
+
+        .text-wrapper {
+          overflow: hidden;
+          .span-overflow {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            width: 100%;
+          }
+        }
+
+        .cta-wrapper {
+          display: flex;
+        }
       }
     }
 
@@ -101,7 +114,8 @@
       touch-action: none;
     }
 
-    th, td {
+    th,
+    td {
       box-shadow: inset 0 0 0 0.5px var(--border-color);
     }
 

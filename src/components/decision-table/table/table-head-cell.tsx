@@ -23,9 +23,11 @@ export const TableHeadCellInput: React.FC<TableHeadCellProps> = ({ configurable,
 
   return (
     <Stack horizontal horizontalAlign='space-between' verticalAlign='center'>
-      <Typography.Text>Inputs</Typography.Text>
+      <Stack gap={0} className={'text-wrapper'} verticalAlign={'center'}>
+        <Typography.Text className={'span-overflow'}>Inputs</Typography.Text>
+      </Stack>
       {configurable && (
-        <div>
+        <div className={'cta-wrapper'}>
           {inputs?.length > 1 && (
             <Button
               size={'small'}
@@ -68,9 +70,11 @@ export const TableHeadCellOutput: React.FC<TableHeadCellProps> = ({ configurable
 
   return (
     <Stack horizontal horizontalAlign={'space-between'} verticalAlign={'center'}>
-      <Typography.Text>Outputs</Typography.Text>
+      <Stack gap={0} className={'text-wrapper'} verticalAlign={'center'}>
+        <Typography.Text className={'span-overflow'}>Outputs</Typography.Text>
+      </Stack>
       {configurable && (
-        <div>
+        <div className={'cta-wrapper'}>
           <Button
             size={'small'}
             type={'link'}
@@ -117,9 +121,9 @@ export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({
 
   return (
     <Stack horizontal horizontalAlign={'space-between'} verticalAlign={'center'}>
-      <Stack gap={0}>
-        <Typography.Text>{schema.name}</Typography.Text>
-        <Typography.Text type='secondary' style={{ fontSize: 12 }}>
+      <Stack gap={0} className={'text-wrapper'}>
+        <Typography.Text className={'span-overflow'}>{schema.name}</Typography.Text>
+        <Typography.Text className={'span-overflow'} type='secondary' style={{ fontSize: 12 }}>
           {schema.field}
         </Typography.Text>
       </Stack>
@@ -181,9 +185,9 @@ export const TableHeadCellOutputField: React.FC<TableHeadCellFieldProps> = ({
 
   return (
     <Stack horizontal horizontalAlign='space-between' verticalAlign={'center'}>
-      <Stack gap={0} verticalAlign={'center'}>
-        <Typography.Text>{schema.name}</Typography.Text>
-        <Typography.Text type='secondary' style={{ fontSize: 12 }}>
+      <Stack gap={0} className={'text-wrapper'} verticalAlign={'center'}>
+        <Typography.Text className={'span-overflow'}>{schema.name}</Typography.Text>
+        <Typography.Text className={'span-overflow'} type='secondary' style={{ fontSize: 12 }}>
           {schema.field}
         </Typography.Text>
       </Stack>
