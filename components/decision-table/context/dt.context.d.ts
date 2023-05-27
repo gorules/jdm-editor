@@ -64,6 +64,7 @@ export type DecisionTableState = {
     disabled?: boolean;
     configurable?: boolean;
     disableHitPolicy?: boolean;
+    minColWidth: number;
     cellRenderer?: (props: TableCellProps) => JSX.Element | null | undefined;
 };
 export type DecisionTableProps = {
@@ -87,6 +88,7 @@ export type DecisionTableContextProps = {
     inputsSchema?: SchemaSelectProps[];
     outputsSchema?: SchemaSelectProps[];
     cellRenderer?: (props: TableCellProps) => JSX.Element | null | undefined;
+    minColWidth?: number;
 };
 export declare const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTableContextProps>>;
 export declare const useDecisionTable: () => DecisionTableState;
