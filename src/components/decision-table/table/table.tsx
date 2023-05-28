@@ -37,6 +37,7 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
     cursor,
     removeRow,
     minColWidth,
+    colWidth,
   } = useDecisionTable()
 
   const columns = React.useMemo<ColumnDef<any>[]>(
@@ -44,7 +45,7 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
       {
         id: 'inputs',
         minSize: minColWidth,
-        size: minColWidth,
+        size: colWidth,
         header: () => <TableHeadCellInput configurable={configurable} disabled={disabled} />,
         columns: [
           ...inputs.map((input) => {
@@ -52,7 +53,7 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
               accessorKey: input.id,
               id: input.id,
               minSize: minColWidth,
-              size: minColWidth,
+              size: colWidth,
               header: () => (
                 <TableHeadCellInputField
                   schema={input}
@@ -74,7 +75,7 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
             return {
               accessorKey: output.id,
               minSize: minColWidth,
-              size: minColWidth,
+              size: colWidth,
               header: () => (
                 <TableHeadCellOutputField
                   schema={output}
@@ -91,6 +92,7 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
         accessorKey: '_description',
         header: () => <Typography.Text>Description</Typography.Text>,
         minSize: minColWidth,
+        size: colWidth,
       },
     ],
     [configurable, disabled, inputs, outputs]
