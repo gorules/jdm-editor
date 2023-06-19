@@ -11,10 +11,11 @@ export type FieldUpdateProps = {
   onDismiss?: () => void
   isOpen?: boolean
   schema?: SchemaSelectProps[]
+  getContainer?: () => HTMLElement
 }
 
 export const FieldUpdate: React.FC<React.PropsWithChildren<FieldUpdateProps>> = (props) => {
-  const { isOpen, onDismiss, onSuccess, field, schema } = props
+  const { isOpen, onDismiss, onSuccess, field, schema, getContainer } = props
   const [form] = Form.useForm()
 
   useEffect(() => {
@@ -40,6 +41,7 @@ export const FieldUpdate: React.FC<React.PropsWithChildren<FieldUpdateProps>> = 
         htmlType: 'submit',
       }}
       width={360}
+      getContainer={getContainer}
     >
       <Form
         id='field-update-dialog'

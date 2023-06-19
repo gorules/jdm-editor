@@ -10,6 +10,7 @@ export type FieldsReorderProps = {
   onSuccess?: (columns: TableSchemaItem[]) => void
   onDismiss?: () => void
   isOpen?: boolean
+  getContainer?: () => HTMLElement
 }
 
 interface DragItem {
@@ -88,8 +89,8 @@ const FieldCard: React.FC<{
   )
 }
 
-export const FieldsReorder: React.VFC<FieldsReorderProps> = (props) => {
-  const { isOpen, onDismiss, onSuccess, fields } = props
+export const FieldsReorder: React.FC<FieldsReorderProps> = (props) => {
+  const { isOpen, onDismiss, onSuccess, fields, getContainer } = props
 
   const [columns, setColumns] = useState<TableSchemaItem[]>([])
 
@@ -123,6 +124,7 @@ export const FieldsReorder: React.VFC<FieldsReorderProps> = (props) => {
         htmlType: 'submit',
         form: 'fields-reorder-dialog',
       }}
+      getContainer={getContainer}
     >
       <Form id='fields-reorder-dialog' onFinish={() => onSuccess?.(columns)}>
         <Stack gap={8} horizontalAlign='stretch'>

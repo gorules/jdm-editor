@@ -116,7 +116,7 @@ export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({
   disabled,
   schema,
 }) => {
-  const { setDialog } = useDecisionTableDialog()
+  const { setDialog, getContainer } = useDecisionTableDialog()
   const { removeColumn } = useDecisionTable()
 
   return (
@@ -153,6 +153,7 @@ export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({
                     Modal.confirm({
                       title: 'Remove column',
                       icon: false,
+                      getContainer,
                       content: (
                         <Typography.Paragraph>
                           You are about to delete <strong>{schema.name}</strong> column.
@@ -180,7 +181,7 @@ export const TableHeadCellOutputField: React.FC<TableHeadCellFieldProps> = ({
   disabled,
   schema,
 }) => {
-  const { setDialog } = useDecisionTableDialog()
+  const { setDialog, getContainer } = useDecisionTableDialog()
   const { removeColumn } = useDecisionTable()
 
   return (
@@ -221,6 +222,7 @@ export const TableHeadCellOutputField: React.FC<TableHeadCellFieldProps> = ({
                           You are about to delete <strong>{schema.name}</strong> column.
                         </Typography.Paragraph>
                       ),
+                      getContainer,
                       icon: false,
                       okText: 'Remove',
                       okButtonProps: {

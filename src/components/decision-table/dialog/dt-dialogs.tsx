@@ -9,7 +9,7 @@ import { FieldUpdate } from './field-update-dialog'
 import { FieldsReorder } from './fields-reorder-dialog'
 
 export const DecisionTableDialogs: React.FC = () => {
-  const { dialog, setDialog, isDialogActive } = useDecisionTableDialog()
+  const { dialog, setDialog, isDialogActive, getContainer } = useDecisionTableDialog()
   const { id, addColumn, updateColumn, reorderColumns, value, inputsSchema, outputsSchema } =
     useDecisionTable()
 
@@ -26,6 +26,7 @@ export const DecisionTableDialogs: React.FC = () => {
           addColumn(dialog.columnType, data)
           setDialog(undefined)
         }}
+        getContainer={getContainer}
       />
       <FieldUpdate
         id={id}
@@ -38,6 +39,7 @@ export const DecisionTableDialogs: React.FC = () => {
           updateColumn(dialog.columnType, data.id, data)
           setDialog(undefined)
         }}
+        getContainer={getContainer}
       />
       <DndProvider backend={HTML5Backend}>
         <FieldsReorder
@@ -49,6 +51,7 @@ export const DecisionTableDialogs: React.FC = () => {
             reorderColumns(dialog.columnType, data)
             setDialog(undefined)
           }}
+          getContainer={getContainer}
         />
       </DndProvider>
     </>

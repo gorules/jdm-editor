@@ -169,6 +169,16 @@ export const Controlled: Story = {
   },
 }
 
+export const NonBodyDialogsMount: Story = {
+  render: (args) => {
+    return (
+      <div>
+        <DecisionTable {...args} tableHeight='500px' mountDialogsOnBody={false} />
+      </div>
+    )
+  },
+}
+
 export const Empty: Story = {
   render: (args) => (
     <div>

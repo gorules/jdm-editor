@@ -13,10 +13,11 @@ export type FieldAddProps = {
   isOpen?: boolean
   schema?: SchemaSelectProps[]
   columnType?: ColumnType
+  getContainer?: () => HTMLElement
 }
 
 export const FieldAdd: React.FC<FieldAddProps> = (props) => {
-  const { isOpen, onDismiss, onSuccess, schema } = props
+  const { isOpen, onDismiss, onSuccess, schema, getContainer } = props
   const [form] = Form.useForm<TableSchemaItem>()
   const name = Form.useWatch('name', form)
   const type = Form.useWatch('type', form)
@@ -51,6 +52,7 @@ export const FieldAdd: React.FC<FieldAddProps> = (props) => {
         form: 'field-add-dialog',
         htmlType: 'submit',
       }}
+      getContainer={getContainer}
     >
       <Form
         id='field-add-dialog'

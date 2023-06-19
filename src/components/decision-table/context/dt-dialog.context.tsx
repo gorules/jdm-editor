@@ -13,11 +13,16 @@ export type TableDialogContextState = {
   setDialog: React.Dispatch<React.SetStateAction<TableDialogState | undefined>>
   dialog: TableDialogState | undefined
   isDialogActive: (type: TableDialogType) => boolean
+  getContainer?: () => HTMLElement
 }
 
 export const TableDialogContext = React.createContext<TableDialogContextState>({} as any)
 
-export const DecisionTableDialogProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
+export const DecisionTableDialogProvider: React.FC<
+  React.PropsWithChildren<{
+    getContainer?: () => HTMLElement
+  }>
+> = ({ children, getContainer }) => {
   const [dialog, setDialog] = useState<TableDialogState | undefined>(undefined)
   const isDialogActive = (type: TableDialogType) => {
     return dialog?.type === type
@@ -29,6 +34,7 @@ export const DecisionTableDialogProvider: React.FC<React.PropsWithChildren> = ({
         dialog,
         setDialog,
         isDialogActive,
+        getContainer,
       }}
     >
       {children}
