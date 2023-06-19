@@ -13,6 +13,7 @@ export default meta;
 type Story = StoryObj<typeof DecisionTable>;
 export declare const Uncontrolled: Story;
 export declare const Controlled: Story;
+export declare const NonBodyDialogsMount: Story;
 export declare const Empty: Story;
 export declare const CustomRenderer: Story;
 export declare const StressTest: Story;

@@ -5,6 +5,7 @@ export type FieldsReorderProps = {
     onSuccess?: (columns: TableSchemaItem[]) => void;
     onDismiss?: () => void;
     isOpen?: boolean;
+    getContainer?: () => HTMLElement;
 };
-export declare const FieldsReorder: React.VFC<FieldsReorderProps>;
+export declare const FieldsReorder: React.FC<FieldsReorderProps>;
 //# sourceMappingURL=fields-reorder-dialog.d.ts.map

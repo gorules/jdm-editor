@@ -8,6 +8,7 @@ export type FieldAddProps = {
     isOpen?: boolean;
     schema?: SchemaSelectProps[];
     columnType?: ColumnType;
+    getContainer?: () => HTMLElement;
 };
 export declare const FieldAdd: React.FC<FieldAddProps>;
 //# sourceMappingURL=field-add-dialog.d.ts.map
