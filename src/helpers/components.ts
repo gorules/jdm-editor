@@ -15,3 +15,19 @@ export const recursiveSelect = (
   }
   return field
 }
+
+export const getPath = (key: string, items: SchemaSelectProps[]): string[] | undefined => {
+  if (!key || !items) return
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i]
+    if (item.field === key) {
+      return [item.field]
+    }
+
+    if (item.items) {
+      const path = getPath(key, item.items)
+      if (!path) continue
+      return [item.field, ...path]
+    }
+  }
+}

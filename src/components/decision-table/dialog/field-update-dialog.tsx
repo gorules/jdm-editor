@@ -1,7 +1,7 @@
 import { Cascader, Form, Input, Modal } from 'antd'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 
-import { SchemaSelectProps, recursiveSelect } from '../../../helpers/components'
+import { SchemaSelectProps, getPath, recursiveSelect } from '../../../helpers/components'
 import { TableSchemaItem } from '../context/dt.context'
 
 export type FieldUpdateProps = {
@@ -18,6 +18,8 @@ export const FieldUpdate: React.FC<React.PropsWithChildren<FieldUpdateProps>> = 
   const { isOpen, onDismiss, onSuccess, field, schema, getContainer } = props
   const [form] = Form.useForm()
 
+  const [selectorValue, setSelectorValue] = useState<(string | number)[]>()
+
   useEffect(() => {
     if (isOpen) {
       form.resetFields()
@@ -26,8 +28,9 @@ export const FieldUpdate: React.FC<React.PropsWithChildren<FieldUpdateProps>> = 
         field: field?.field,
         defaultValue: field?.defaultValue,
       })
+      setSelectorValue(getPath(field?.field as string, schema as SchemaSelectProps[]))
     }
-  }, [isOpen, form, field])
+  }, [isOpen, form, field, schema])
 
   return (
     <Modal
@@ -65,7 +68,9 @@ export const FieldUpdate: React.FC<React.PropsWithChildren<FieldUpdateProps>> = 
             <Cascader
               fieldNames={{ label: 'name', value: 'field', children: 'items' }}
               options={schema}
+              value={selectorValue}
               onChange={(val) => {
+                setSelectorValue(val)
                 const field = recursiveSelect(val as string[], schema)
                 if (field) {
                   form.setFieldsValue({
