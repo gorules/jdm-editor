@@ -1,7 +1,7 @@
 .grl-dt {
   padding-top: 0.5rem;
   font-size: 14px;
-  height: 100%;
+  height: calc(100% - 36px);
   display: flex;
   flex-direction: column;
 
@@ -159,5 +159,9 @@
     &:hover {
       cursor: grab;
     }
+  }
+
+  &__command-bar {
+    padding: 0.5rem;
   }
 }

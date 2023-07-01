@@ -22,7 +22,7 @@ export const DecisionTableCommandBar: React.FC = () => {
       horizontal
       horizontalAlign={'space-between'}
       verticalAlign={'center'}
-      style={{ paddingBottom: '1rem' }}
+      className={'grl-dt__command-bar'}
     >
       <Stack gap={8} horizontal className='full-width'>
         <Button
