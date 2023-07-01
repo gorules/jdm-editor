@@ -1,6 +1,6 @@
 import React from 'react';
 import { SchemaSelectProps } from '../../../helpers/components';
-import { TableSchemaItem } from '../context/dt.context';
+import { ColumnType, TableSchemaItem } from '../context/dt.context';
 export type FieldUpdateProps = {
     id?: string;
     field?: TableSchemaItem;
@@ -8,6 +8,7 @@ export type FieldUpdateProps = {
     onDismiss?: () => void;
     isOpen?: boolean;
     schema?: SchemaSelectProps[];
+    columnType?: ColumnType;
     getContainer?: () => HTMLElement;
 };
 export declare const FieldUpdate: React.FC<React.PropsWithChildren<FieldUpdateProps>>;
