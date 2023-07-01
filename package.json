@@ -102,6 +102,8 @@
     "papaparse": "5.4.1",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "16.0.1",
+    "react-draggable": "^4.4.5",
+    "react-virtual": "2.10.4",
     "reactflow": "11.7.1",
     "slugify": "1.6.6",
     "uuid": "9.0.0",
