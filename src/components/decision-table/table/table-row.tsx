@@ -1,7 +1,7 @@
 import { Row, flexRender } from '@tanstack/react-table'
 import { Typography } from 'antd'
 import clsx from 'clsx'
-import React, { useRef } from 'react'
+import React, { useMemo, useRef } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 
 import { useDecisionTable } from '../context/dt.context'
@@ -12,7 +12,7 @@ const InnerTableRow: React.FC<{
   reorderRow: (draggedRowIndex: number, targetRowIndex: number) => void
   disabled?: boolean
 }> = ({ index, row, reorderRow, disabled }) => {
-  const { setCursor } = useDecisionTable()
+  const { setCursor, activeRules } = useDecisionTable()
   const trRef = useRef<HTMLTableRowElement>(null)
   const [{ isDropping, direction }, dropRef] = useDrop({
     accept: 'row',
@@ -33,13 +33,18 @@ const InnerTableRow: React.FC<{
 
   previewRef(dropRef(trRef))
 
+  const isActive = useMemo(() => {
+    return Array.isArray(activeRules) && activeRules.indexOf(row.id) > -1
+  }, [row.id, activeRules])
+
   return (
     <tr
       ref={disabled ? undefined : trRef}
       className={clsx(
         'table-row',
         isDropping && direction === 'down' && 'dropping-down',
-        isDropping && direction === 'up' && 'dropping-up'
+        isDropping && direction === 'up' && 'dropping-up',
+        isActive && 'active'
       )}
       style={{
         opacity: isDragging ? 0.5 : 1,

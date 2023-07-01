@@ -1,5 +1,4 @@
 .grl-dt {
-  padding-top: 0.5rem;
   font-size: 14px;
   height: calc(100% - 36px);
   display: flex;
@@ -138,6 +137,10 @@
       &.dropping-down:after {
         bottom: 0;
         height: 2px;
+      }
+
+      &.active {
+        background-color: var(--primary-color-bg);
       }
     }
   }
