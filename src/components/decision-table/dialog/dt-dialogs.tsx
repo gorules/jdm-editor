@@ -30,6 +30,7 @@ export const DecisionTableDialogs: React.FC = () => {
       />
       <FieldUpdate
         id={id}
+        columnType={dialog?.columnType}
         isOpen={isDialogActive('edit')}
         schema={dialog?.columnType === 'inputs' ? inputsSchema : outputsSchema}
         field={dialog?.item as TableSchemaItem}

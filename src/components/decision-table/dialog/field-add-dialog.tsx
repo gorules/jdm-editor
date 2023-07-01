@@ -64,7 +64,7 @@ export const FieldAdd: React.FC<FieldAddProps> = (props) => {
           onSuccess?.({
             id: v4(),
             type: type || 'expression',
-            field,
+            field: (field || '')?.trim?.()?.length > 0 ? field : undefined,
             name,
             defaultValue,
           })
@@ -93,7 +93,7 @@ export const FieldAdd: React.FC<FieldAddProps> = (props) => {
         <Form.Item
           name='field'
           label={type === 'expression' ? 'Selector' : 'Field'}
-          rules={[{ required: true }]}
+          rules={[{ required: props.columnType === 'outputs' }]}
         >
           <Input autoComplete='off' />
         </Form.Item>
