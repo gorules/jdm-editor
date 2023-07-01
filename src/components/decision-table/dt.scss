@@ -54,7 +54,7 @@
 
       tr {
         width: fit-content;
-        height: 30px;
+        height: 36px;
 
         &:focus-within > td:first-of-type {
           background-color: var(--primary-color-bg);
@@ -144,10 +144,10 @@
 
   &__cell__input {
     border: 0;
-    height: 100%;
+    height: calc(100% - 4px) !important;
     width: 100%;
     background-color: transparent;
-    padding-left: 0.5rem;
+    padding: 0.5rem 0.75rem;
     font-size: 14px;
 
     &:focus {

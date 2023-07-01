@@ -69,10 +69,15 @@ export type TableCellProps = {
 
 const TableInputCell: React.FC<TableCellProps> = ({ value, onChange, disabled }) => {
   return (
-    <Input
+    <Input.TextArea
       className={'grl-dt__cell__input'}
+      rows={1}
       disabled={disabled}
       value={value}
+      autoSize={{
+        minRows: 1,
+        maxRows: 1,
+      }}
       onChange={(e) => onChange(e.target.value)}
     />
   )

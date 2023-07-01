@@ -2,7 +2,7 @@ import { Cascader, Form, Input, Modal } from 'antd'
 import React, { useEffect, useState } from 'react'
 
 import { SchemaSelectProps, getPath, recursiveSelect } from '../../../helpers/components'
-import { TableSchemaItem } from '../context/dt.context'
+import { ColumnType, TableSchemaItem } from '../context/dt.context'
 
 export type FieldUpdateProps = {
   id?: string
@@ -11,6 +11,7 @@ export type FieldUpdateProps = {
   onDismiss?: () => void
   isOpen?: boolean
   schema?: SchemaSelectProps[]
+  columnType?: ColumnType
   getContainer?: () => HTMLElement
 }
 
@@ -60,6 +61,7 @@ export const FieldUpdate: React.FC<React.PropsWithChildren<FieldUpdateProps>> = 
           onSuccess?.({
             ...field,
             ...data,
+            field: data?.field?.trim?.()?.length > 0 ? data?.field : undefined,
           })
         }}
       >
@@ -85,7 +87,11 @@ export const FieldUpdate: React.FC<React.PropsWithChildren<FieldUpdateProps>> = 
         <Form.Item name='name' label='Label' rules={[{ required: true }]}>
           <Input />
         </Form.Item>
-        <Form.Item name='field' label='Selector' rules={[{ required: true }]}>
+        <Form.Item
+          name='field'
+          label='Selector'
+          rules={[{ required: props.columnType === 'outputs' }]}
+        >
           <Input />
         </Form.Item>
         <Form.Item name='defaultValue' label='Default Value'>
