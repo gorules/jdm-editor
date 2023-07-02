@@ -28,17 +28,22 @@ export const DecisionTable: React.FC<DecisionTableProps> = ({
 
   return (
     <div ref={ref} className={'grl-dt'} style={{ background: token.colorBgElevated }}>
-      <DecisionTableProvider {...props}>
-        <DecisionTableDialogProvider
-          getContainer={mountDialogsOnBody === true ? undefined : getContainer}
-        >
-          <DecisionTableCommandBar />
-          <DndProvider backend={HTML5Backend}>
+      <DndProvider
+        backend={HTML5Backend}
+        options={{
+          rootElement: ref.current,
+        }}
+      >
+        <DecisionTableProvider {...props}>
+          <DecisionTableDialogProvider
+            getContainer={mountDialogsOnBody === true ? undefined : getContainer}
+          >
+            <DecisionTableCommandBar />
             <Table maxHeight={tableHeight} />
-          </DndProvider>
-          <DecisionTableDialogs />
-        </DecisionTableDialogProvider>
-      </DecisionTableProvider>
+            <DecisionTableDialogs />
+          </DecisionTableDialogProvider>
+        </DecisionTableProvider>
+      </DndProvider>
     </div>
   )
 }

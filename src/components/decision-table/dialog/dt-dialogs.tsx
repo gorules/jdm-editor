@@ -42,19 +42,17 @@ export const DecisionTableDialogs: React.FC = () => {
         }}
         getContainer={getContainer}
       />
-      <DndProvider backend={HTML5Backend}>
-        <FieldsReorder
-          isOpen={isDialogActive('reorder')}
-          fields={value?.[dialog?.columnType as ColumnType]}
-          onDismiss={() => setDialog(undefined)}
-          onSuccess={(data) => {
-            if (!dialog) return
-            reorderColumns(dialog.columnType, data)
-            setDialog(undefined)
-          }}
-          getContainer={getContainer}
-        />
-      </DndProvider>
+      <FieldsReorder
+        isOpen={isDialogActive('reorder')}
+        fields={value?.[dialog?.columnType as ColumnType]}
+        onDismiss={() => setDialog(undefined)}
+        onSuccess={(data) => {
+          if (!dialog) return
+          reorderColumns(dialog.columnType, data)
+          setDialog(undefined)
+        }}
+        getContainer={getContainer}
+      />
     </>
   )
 }
