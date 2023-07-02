@@ -76,7 +76,7 @@ const TableInputCell: React.FC<TableCellProps> = ({ value, onChange, disabled })
       value={value}
       autoSize={{
         minRows: 1,
-        maxRows: 1,
+        maxRows: 3,
       }}
       onChange={(e) => onChange(e.target.value)}
     />

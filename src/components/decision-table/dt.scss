@@ -10,6 +10,7 @@
     font-family: arial, sans-serif;
     width: fit-content;
     background-color: var(--color-bg-container);
+    height: 1px;
 
     .cell-wrapper {
       width: 100%;
@@ -53,7 +54,7 @@
 
       tr {
         width: fit-content;
-        height: 36px;
+        min-height: 36px;
 
         &:focus-within > td:first-of-type {
           background-color: var(--primary-color-bg);
@@ -61,7 +62,7 @@
       }
 
       td {
-        height: 36px;
+        min-height: 36px;
         padding: 0;
 
         &:focus-within {
@@ -147,7 +148,6 @@
 
   &__cell__input {
     border: 0;
-    height: calc(100% - 4px) !important;
     width: 100%;
     background-color: transparent;
     padding: 0.5rem 0.75rem;
