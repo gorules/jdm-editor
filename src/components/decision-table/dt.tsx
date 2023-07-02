@@ -1,5 +1,5 @@
 import { theme } from 'antd'
-import React, { useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 
@@ -17,33 +17,40 @@ export type DecisionTableProps = {
 
 export const DecisionTable: React.FC<DecisionTableProps> = ({
   tableHeight,
-  mountDialogsOnBody = true,
+  mountDialogsOnBody = false,
   ...props
 }) => {
   const { token } = theme.useToken()
 
+  const [_, setMounted] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const getContainer = () => ref.current as HTMLElement
 
   return (
     <div ref={ref} className={'grl-dt'} style={{ background: token.colorBgElevated }}>
-      <DndProvider
-        backend={HTML5Backend}
-        options={{
-          rootElement: ref.current,
-        }}
-      >
-        <DecisionTableProvider {...props}>
-          <DecisionTableDialogProvider
-            getContainer={mountDialogsOnBody === true ? undefined : getContainer}
-          >
-            <DecisionTableCommandBar />
-            <Table maxHeight={tableHeight} />
-            <DecisionTableDialogs />
-          </DecisionTableDialogProvider>
-        </DecisionTableProvider>
-      </DndProvider>
+      {ref.current && (
+        <DndProvider
+          backend={HTML5Backend}
+          options={{
+            rootElement: ref.current,
+          }}
+        >
+          <DecisionTableProvider {...props}>
+            <DecisionTableDialogProvider
+              getContainer={mountDialogsOnBody === true ? undefined : getContainer}
+            >
+              <DecisionTableCommandBar />
+              <Table maxHeight={tableHeight} />
+              <DecisionTableDialogs />
+            </DecisionTableDialogProvider>
+          </DecisionTableProvider>
+        </DndProvider>
+      )}
     </div>
   )
 }
