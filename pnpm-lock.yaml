@@ -50,6 +50,9 @@ dependencies:
   slugify:
     specifier: 1.6.6
     version: 1.6.6
+  topological-sort:
+    specifier: ^0.3.0
+    version: 0.3.0
   uuid:
     specifier: 9.0.0
     version: 9.0.0
@@ -10008,6 +10011,11 @@ packages:
     resolution: {integrity: sha512-o5sSPKEkg/DIQNmH43V0/uerLrpzVedkUh8tGNvaeXpfpuwjKenlSox/2O/BTlZUtEe+JG7s5YhEz608PlAHRA==}
     engines: {node: '>=0.6'}
     dev: true
+
+  /topological-sort@0.3.0:
+    resolution: {integrity: sha512-BmO2t72jjJ3B9PZC3LTHyojgNynOKEvWG4GiYqyfSMUjtO6+yZK0oozlMYVA+tC6YvS3NZh4OPx6QaolEYOg6A==}
+    engines: {node: '>=8'}
+    dev: false
 
   /tr46@0.0.3:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}

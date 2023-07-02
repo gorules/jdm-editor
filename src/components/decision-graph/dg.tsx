@@ -1,5 +1,5 @@
 import { CheckOutlined, CloseOutlined, SettingOutlined } from '@ant-design/icons'
-import { Button, Tabs, theme } from 'antd'
+import { Button, Tabs, message, theme } from 'antd'
 import clsx from 'clsx'
 import React, { useMemo, useRef, useState } from 'react'
 import ReactFlow, {
@@ -15,12 +15,15 @@ import ReactFlow, {
   useNodesState,
 } from 'reactflow'
 import 'reactflow/dist/style.css'
+import TopologicalSort from 'topological-sort'
 import { v4 } from 'uuid'
 
 import { Stack } from '../stack'
 import DecisionGraphContextProvider, {
   DecisionEdge,
   DecisionNode,
+  mapToDecisionEdges,
+  mapToDecisionNodes,
   mapToGraphEdges,
   mapToGraphNodes,
 } from './context/dg.context'
@@ -31,13 +34,15 @@ import { MultiNodeForm } from './multi-node-form'
 import { NodeForm } from './node-form'
 import { GraphNode, GraphNodeEdit } from './nodes'
 
+export type DecisionContent = {
+  nodes: DecisionNode[]
+  edges: DecisionEdge[]
+}
 export const DecisionGraph: React.FC<{
-  value?: {
-    nodes: DecisionNode[]
-    edges: DecisionEdge[]
-  }
+  value?: DecisionContent
+  onChange: (val: DecisionContent) => void
   disabled: boolean
-}> = ({ value, disabled }) => {
+}> = ({ value, onChange, disabled }) => {
   const [viewport, setViewport] = useState<Viewport | undefined>({
     x: 0,
     y: 0,
@@ -285,6 +290,42 @@ export const DecisionGraph: React.FC<{
     }
   }, [])
 
+  const confirmEdit = () => {
+    try {
+      const edges = mapToDecisionEdges(editEdges)
+      const nodes = mapToDecisionNodes(editNodes)
+      if (nodes.filter((node) => node?.type === 'inputNode')?.length > 1) {
+        message.error('Maximum 1 input')
+        return
+      }
+      if (nodes.filter((node) => node?.type === 'outputNode')?.length > 1) {
+        message.error('Maximum 1 output')
+        return
+      }
+
+      const nds = new Map()
+      const sortOp = new TopologicalSort(nds)
+      sortOp.addNodes(new Map(nodes.map((node) => [node.id, node])))
+      edges.forEach((edge) => {
+        sortOp.addEdge(edge.sourceId, edge.targetId)
+      })
+      sortOp.sort()
+
+      const sortedNodes = Array.from<any>(sortOp.sort().values())
+        .map((el) => el?.node)
+        .filter((el) => !!el)
+
+      onChange?.({
+        nodes: sortedNodes,
+        edges,
+      })
+      setEditGraph(false)
+    } catch (e: any) {
+      console.log(e);
+      message.error(e?.message)
+    }
+  }
+
   const { token } = theme.useToken()
 
   return (
@@ -362,7 +403,7 @@ export const DecisionGraph: React.FC<{
                       type='default'
                       size={'small'}
                       onClick={() => {
-                        // confirmEdit()
+                        confirmEdit()
                       }}
                       icon={<CheckOutlined />}
                     >
@@ -517,7 +558,7 @@ export const DecisionGraph: React.FC<{
                       try {
                         // await graphClipboard.pasteNodes()
                       } catch {
-                        // message.error(e?.message);
+                        message.error(e?.message)
                       }
                     }
                   }}
@@ -532,7 +573,7 @@ export const DecisionGraph: React.FC<{
                   }}
                   onCopy={async () => {
                     // await graphClipboard.copyNodes(selected);
-                    // message.success('Copied to clipboard!');
+                    message.success('Copied to clipboard!')
                   }}
                   removeNode={(node) => {
                     setEditEdges((edges) =>
@@ -548,7 +589,7 @@ export const DecisionGraph: React.FC<{
                   nodes={selected}
                   onCopy={async (nodes) => {
                     // await graphClipboard.copyNodes(nodes)
-                    // message.success('Copied to clipboard!')
+                    message.success('Copied to clipboard!')
                   }}
                   removeNodes={(nodes) => {
                     const nodeIds = nodes.map((i) => i.id)

@@ -32,7 +32,7 @@ export const Controlled: Story = {
     const [value, setValue] = useState<any>()
     return (
       <div>
-        <DecisionGraph {...args} value={value} />
+        <DecisionGraph {...args} value={value} onChange={(val) => setValue(val)} />
       </div>
     )
   },
