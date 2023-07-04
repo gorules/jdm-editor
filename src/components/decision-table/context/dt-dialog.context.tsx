@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { ColumnType, TableSchemaItem } from '../dt.hook'
+import { ColumnType, TableSchemaItem } from './dt-store.context'
 
 export type TableDialogType = 'add' | 'reorder' | 'edit'
 export type TableDialogState = {

@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { XYCoord, useDrag, useDrop } from 'react-dnd'
 
 import { Stack } from '../../stack'
-import { TableSchemaItem } from '../dt.hook'
+import { TableSchemaItem } from '../context/dt-store.context'
 
 export type FieldsReorderProps = {
   fields?: TableSchemaItem[]

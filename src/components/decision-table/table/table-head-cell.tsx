@@ -4,8 +4,7 @@ import React from 'react'
 
 import { Stack } from '../../stack'
 import { useDecisionTableDialog } from '../context/dt-dialog.context'
-import { useDecisionTableStore } from '../context/dt-store.context'
-import { TableSchemaItem } from '../dt.hook'
+import { TableSchemaItem, useDecisionTableStore } from '../context/dt-store.context'
 
 export type TableHeadCellProps = {
   configurable?: boolean

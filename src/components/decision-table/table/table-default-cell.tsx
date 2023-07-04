@@ -3,8 +3,8 @@ import { Input } from 'antd'
 import React, { memo, useRef } from 'react'
 import { shallow } from 'zustand/shallow'
 
-import { useDecisionTableStore } from '../context/dt-store.context'
-import { TableSchemaItem, columnIdSelector } from '../dt.hook'
+import { columnIdSelector } from '../../../helpers/components'
+import { TableSchemaItem, useDecisionTableStore } from '../context/dt-store.context'
 
 export type TableDefaultCellProps = {
   context: CellContext<Record<string, string>, string>
@@ -21,7 +21,10 @@ export const TableDefaultCell = memo<TableDefaultCellProps>(({ context, ...props
     shallow
   )
 
-  const column = useDecisionTableStore(columnIdSelector(id), shallow)
+  const column = useDecisionTableStore(
+    columnIdSelector(id),
+    (a, b) => a?.id !== undefined && b?.id !== undefined && a?.id === b?.id
+  )
 
   const disabled = useDecisionTableStore((store) => store.disabled, shallow)
   const commitData = useDecisionTableStore((store) => store.commitData, shallow)

@@ -4,6 +4,7 @@ import { Button, Typography, theme } from 'antd'
 import clsx from 'clsx'
 import React, { memo } from 'react'
 import { useVirtual } from 'react-virtual'
+import { shallow } from 'zustand/shallow'
 
 import { useDecisionTableStore } from '../context/dt-store.context'
 import { TableContextMenu } from './table-context-menu'
@@ -24,7 +25,7 @@ export type TableProps = {
 export const Table = memo<TableProps>(({ maxHeight }) => {
   const configurable = useDecisionTableStore((store) => store.configurable)
   const disabled = useDecisionTableStore((store) => store.disabled)
-  const cellRenderer = useDecisionTableStore((store) => store.cellRenderer)
+  const cellRenderer = useDecisionTableStore((store) => store.cellRenderer, shallow)
 
   const minColWidth = useDecisionTableStore((store) => store.minColWidth)
   const colWidth = useDecisionTableStore((store) => store.colWidth)

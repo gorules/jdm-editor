@@ -1,8 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import React, { useEffect } from 'react'
+import { Checkbox } from 'antd'
+import React, { useState } from 'react'
 
+import { DecisionTableType } from './context/dt-store.context'
 import { DecisionTable } from './dt'
-import { useDecisionTable } from './dt.hook'
 
 const shippingFeesDefault = {
   hitPolicy: 'first',
@@ -73,33 +74,33 @@ const shippingFeesDefault = {
     },
   ],
 }
-//
-// const inputSchemaDefault = [
-//   {
-//     field: 'cart',
-//     name: 'Cart',
-//     items: [
-//       {
-//         field: 'cart.total',
-//         name: 'Total',
-//       },
-//       {
-//         field: 'cart.weight',
-//         name: 'Weight',
-//       },
-//     ],
-//   },
-//   {
-//     field: 'customer',
-//     name: 'Customer',
-//     items: [
-//       {
-//         field: 'customer.country',
-//         name: 'Country',
-//       },
-//     ],
-//   },
-// ]
+
+const inputSchemaDefault = [
+  {
+    field: 'cart',
+    name: 'Cart',
+    items: [
+      {
+        field: 'cart.total',
+        name: 'Total',
+      },
+      {
+        field: 'cart.weight',
+        name: 'Weight',
+      },
+    ],
+  },
+  {
+    field: 'customer',
+    name: 'Customer',
+    items: [
+      {
+        field: 'customer.country',
+        name: 'Country',
+      },
+    ],
+  },
+]
 
 const stressRules = () => {
   const stressRules: any[] = []
@@ -125,16 +126,18 @@ const meta: Meta<typeof DecisionTable> = {
   title: 'Decision Table',
   component: DecisionTable,
   argTypes: {
-    // configurable: { control: 'boolean' },
-    // disabled: { control: 'boolean' },
-    // cellRenderer: {
-    //   control: false,
-    // },
+    configurable: { control: 'boolean' },
+    disabled: { control: 'boolean' },
+    cellRenderer: {
+      control: false,
+    },
   },
   args: {
-    // inputsSchema: inputSchemaDefault,
-    // configurable: true,
-    // disabled: false,
+    schema: {
+      inputsSchema: inputSchemaDefault,
+    },
+    configurable: true,
+    disabled: false,
   },
 }
 
@@ -142,92 +145,77 @@ export default meta
 
 type Story = StoryObj<typeof DecisionTable>
 
-export const Uncontrolled: Story = {
+export const Controlled: Story = {
   render: () => {
-    const store = useDecisionTable()
+    const [value, setValue] = useState<any>()
     return (
       <div>
-        <DecisionTable store={store} tableHeight='500px' />
+        <DecisionTable
+          value={value}
+          onChange={(val) => {
+            setValue(val)
+          }}
+          schema={{
+            inputsSchema: inputSchemaDefault,
+          }}
+          tableHeight='500px'
+        />
       </div>
     )
   },
 }
-//
-// export const Controlled: Story = {
-//   render: (args) => {
-//     const [value, setValue] = useState<DecisionTableProps>(shippingFeesDefault)
-//     return (
-//       <div>
-//         <DecisionTable
-//           {...args}
-//           tableHeight='500px'
-//           value={value}
-//           onChange={(val) => setValue(val)}
-//         />
-//       </div>
-//     )
-//   },
-// }
-//
-// export const NonBodyDialogsMount: Story = {
-//   render: (args) => {
-//     return (
-//       <div>
-//         <DecisionTable {...args} tableHeight='500px' mountDialogsOnBody={false} />
-//       </div>
-//     )
-//   },
-// }
-//
-// export const Empty: Story = {
-//   render: (args) => (
-//     <div>
-//       <DecisionTable {...args} tableHeight='500px' />
-//     </div>
-//   ),
-// }
-//
-// export const CustomRenderer: Story = {
-//   render: (args) => (
-//     <div>
-//       <DecisionTable
-//         {...args}
-//         tableHeight='500px'
-//         cellRenderer={(props) => {
-//           if (props?.column?.field === 'output') {
-//             return (
-//               <div tabIndex={1} style={{ paddingLeft: '1rem' }}>
-//                 <Checkbox
-//                   disabled={props.disabled}
-//                   checked={props.value === 'true'}
-//                   onChange={(e) => {
-//                     props.onChange(`${e?.target?.checked}`)
-//                   }}
-//                 >
-//                   Enabled
-//                 </Checkbox>
-//               </div>
-//             )
-//           }
-//           return null
-//         }}
-//       />
-//     </div>
-//   ),
-// }
 
-export const StressTest: Story = {
-  render: () => {
-    const store = useDecisionTable()
-    useEffect(() => {
-      store.getState().setDecisionTable({
-        ...shippingFeesDefault,
-        rules: stressRules(),
-      })
-    }, [])
+export const CustomRenderer: Story = {
+  render: (args) => {
+    const [value, setValue] = useState<DecisionTableType>()
     return (
       <div>
-        <DecisionTable store={store} tableHeight='500px' />
+        <DecisionTable
+          {...args}
+          tableHeight='500px'
+          value={value}
+          onChange={(val) => setValue(val)}
+          cellRenderer={(props) => {
+            if (props?.column?.field === 'output') {
+              return (
+                <div tabIndex={1} style={{ paddingLeft: '1rem' }}>
+                  <Checkbox
+                    disabled={props.disabled}
+                    checked={props.value === 'true'}
+                    onChange={(e) => {
+                      props.onChange(`${e?.target?.checked}`)
+                    }}
+                  >
+                    Enabled
+                  </Checkbox>
+                </div>
+              )
+            }
+            return null
+          }}
+        />
+      </div>
+    )
+  },
+}
+
+export const StressTest: Story = {
+  render: (args) => {
+    const [value, setValue] = useState<DecisionTableType>({
+      ...shippingFeesDefault,
+      rules: stressRules(),
+    })
+    return (
+      <div>
+        <DecisionTable
+          {...args}
+          value={value}
+          onChange={(val) => {
+            console.log(val)
+            setValue(val)
+          }}
+          tableHeight='500px'
+        />
       </div>
     )
   },

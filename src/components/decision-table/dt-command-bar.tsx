@@ -6,7 +6,11 @@ import { v4 } from 'uuid'
 
 import { saveFile } from '../../helpers/file-helpers'
 import { Stack } from '../stack'
-import { TableExportOptions, useDecisionTableStore } from './context/dt-store.context'
+import {
+  TableExportOptions,
+  useDecisionTableRaw,
+  useDecisionTableStore,
+} from './context/dt-store.context'
 
 const parserOptions = {
   delimiter: ';',
@@ -15,14 +19,16 @@ const parserOptions = {
 const parserPipe = ' | '
 
 export const DecisionTableCommandBar: React.FC = () => {
-  const { disableHitPolicy, updateHitPolicy, disabled, configurable, setDecisionTable } =
-    useDecisionTableStore((store) => ({
+  const { disableHitPolicy, updateHitPolicy, disabled, configurable } = useDecisionTableStore(
+    (store) => ({
       disableHitPolicy: store.disableHitPolicy,
       updateHitPolicy: store.updateHitPolicy,
       disabled: store.disabled,
       configurable: store.configurable,
-      setDecisionTable: store.setDecisionTable,
-    }))
+    })
+  )
+
+  const store = useDecisionTableRaw()
 
   const decisionTable = useDecisionTableStore((store) => store.decisionTable)
 
@@ -130,11 +136,13 @@ export const DecisionTableCommandBar: React.FC = () => {
       return dataPoint
     })
 
-    setDecisionTable({
-      inputs,
-      outputs,
-      rules,
-      hitPolicy: 'first',
+    store.setState({
+      decisionTable: {
+        inputs,
+        outputs,
+        rules,
+        hitPolicy: 'first',
+      },
     })
   }
 

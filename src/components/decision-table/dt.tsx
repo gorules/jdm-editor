@@ -7,13 +7,15 @@ import { DecisionTableDialogProvider } from './context/dt-dialog.context'
 import { DecisionTableContextProps, DecisionTableProvider } from './context/dt-store.context'
 import { DecisionTableDialogs } from './dialog/dt-dialogs'
 import { DecisionTableCommandBar } from './dt-command-bar'
+import { DecisionTableEmpty, DecisionTableEmptyType } from './dt-empty'
 import './dt.scss'
 import { Table } from './table/table'
 
 export type DecisionTableProps = {
   tableHeight: string | number
   mountDialogsOnBody?: boolean
-} & DecisionTableContextProps
+} & DecisionTableContextProps &
+  DecisionTableEmptyType
 
 export const DecisionTable: React.FC<DecisionTableProps> = ({
   tableHeight,
@@ -40,13 +42,14 @@ export const DecisionTable: React.FC<DecisionTableProps> = ({
             rootElement: ref.current,
           }}
         >
-          <DecisionTableProvider {...props}>
+          <DecisionTableProvider>
             <DecisionTableDialogProvider
               getContainer={mountDialogsOnBody === true ? undefined : getContainer}
             >
               <DecisionTableCommandBar />
               <Table maxHeight={tableHeight} />
               <DecisionTableDialogs />
+              <DecisionTableEmpty {...props} />
             </DecisionTableDialogProvider>
           </DecisionTableProvider>
         </DndProvider>
