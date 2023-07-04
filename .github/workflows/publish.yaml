@@ -43,11 +43,11 @@ jobs:
         run: pnpm build
       - name: Publish Beta
         run: npm publish --tag beta --access public
-        if: ${{ github.event.inputs.version == "beta" }}
+        if: ${{ github.event.inputs.version == 'beta' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Publish
         run: npm publish --access public
-        if: ${{ github.event.inputs.version == "release" }}
+        if: ${{ github.event.inputs.version == 'release' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
