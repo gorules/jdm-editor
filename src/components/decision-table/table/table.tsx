@@ -34,8 +34,8 @@ export const Table = memo<TableProps>(({ maxHeight }) => {
   const rules = useDecisionTableStore(
     (store) => store?.decisionTable?.rules,
     (prevState, newState) =>
-      prevState.map((rule: any) => rule._id).join('') ===
-      newState.map((rule: any) => rule._id).join('')
+      (prevState || []).map((rule: any) => rule._id).join('') ===
+      (newState || []).map((rule: any) => rule._id).join('')
   )
 
   const removeRow = useDecisionTableStore((store) => store.removeRow)

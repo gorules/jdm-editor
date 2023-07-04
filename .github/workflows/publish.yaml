@@ -2,14 +2,6 @@ name: Publish Package to npmjs
 on:
   workflow_dispatch:
     inputs:
-      branch:
-        description: 'Branch to use'
-        required: true
-        default: 'master'
-        type: choice
-        options:
-          - master
-          - feat/zustand
       version:
         description: 'Version'
         required: true
@@ -27,8 +19,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event.inputs.branch }}
       - uses: actions/setup-node@v3
         with:
           node-version: '18.x'
