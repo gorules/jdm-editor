@@ -4,7 +4,8 @@ import React from 'react'
 
 import { Stack } from '../../stack'
 import { useDecisionTableDialog } from '../context/dt-dialog.context'
-import { TableSchemaItem, useDecisionTable } from '../context/dt.context'
+import { useDecisionTableStore } from '../context/dt-store.context'
+import { TableSchemaItem } from '../dt.hook'
 
 export type TableHeadCellProps = {
   configurable?: boolean
@@ -18,7 +19,7 @@ export type TableHeadCellFieldProps = {
 }
 
 export const TableHeadCellInput: React.FC<TableHeadCellProps> = ({ configurable, disabled }) => {
-  const { inputs } = useDecisionTable()
+  const inputs = useDecisionTableStore((store: any) => store.decisionTable?.inputs)
   const { setDialog } = useDecisionTableDialog()
 
   return (
@@ -65,7 +66,7 @@ export const TableHeadCellInput: React.FC<TableHeadCellProps> = ({ configurable,
 }
 
 export const TableHeadCellOutput: React.FC<TableHeadCellProps> = ({ configurable, disabled }) => {
-  const { outputs } = useDecisionTable()
+  const outputs = useDecisionTableStore((store: any) => store.decisionTable?.outputs)
   const { setDialog } = useDecisionTableDialog()
 
   return (
@@ -117,7 +118,8 @@ export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({
   schema,
 }) => {
   const { setDialog, getContainer } = useDecisionTableDialog()
-  const { removeColumn } = useDecisionTable()
+
+  const removeColumn = useDecisionTableStore((store: any) => store.removeColumn)
 
   return (
     <Stack horizontal horizontalAlign={'space-between'} verticalAlign={'center'}>
@@ -182,7 +184,7 @@ export const TableHeadCellOutputField: React.FC<TableHeadCellFieldProps> = ({
   schema,
 }) => {
   const { setDialog, getContainer } = useDecisionTableDialog()
-  const { removeColumn } = useDecisionTable()
+  const removeColumn = useDecisionTableStore((store: any) => store.removeColumn)
 
   return (
     <Stack horizontal horizontalAlign='space-between' verticalAlign={'center'}>

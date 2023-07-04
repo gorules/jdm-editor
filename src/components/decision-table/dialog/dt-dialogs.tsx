@@ -1,15 +1,22 @@
 import React from 'react'
 
 import { useDecisionTableDialog } from '../context/dt-dialog.context'
-import { ColumnType, TableSchemaItem, useDecisionTable } from '../context/dt.context'
+import { useDecisionTableStore } from '../context/dt-store.context'
+import { ColumnType, TableSchemaItem } from '../dt.hook'
 import { FieldAdd } from './field-add-dialog'
 import { FieldUpdate } from './field-update-dialog'
 import { FieldsReorder } from './fields-reorder-dialog'
 
 export const DecisionTableDialogs: React.FC = () => {
   const { dialog, setDialog, isDialogActive, getContainer } = useDecisionTableDialog()
-  const { id, addColumn, updateColumn, reorderColumns, value, inputsSchema, outputsSchema } =
-    useDecisionTable()
+
+  const id = 'test'
+  const inputsSchema = useDecisionTableStore((store: any) => store.schema?.inputsSchema)
+  const outputsSchema = useDecisionTableStore((store: any) => store.schema?.outputsSchema)
+  const addColumn = useDecisionTableStore((store: any) => store.addColumn)
+  const updateColumn = useDecisionTableStore((store: any) => store.updateColumn)
+  const reorderColumns = useDecisionTableStore((store: any) => store.reorderColumns)
+  const decisionTable = useDecisionTableStore((store: any) => store.decisionTable)
 
   return (
     <>
@@ -42,7 +49,7 @@ export const DecisionTableDialogs: React.FC = () => {
       />
       <FieldsReorder
         isOpen={isDialogActive('reorder')}
-        fields={value?.[dialog?.columnType as ColumnType]}
+        fields={decisionTable?.[dialog?.columnType as ColumnType]}
         onDismiss={() => setDialog(undefined)}
         onSuccess={(data) => {
           if (!dialog) return

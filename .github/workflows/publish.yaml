@@ -5,12 +5,11 @@ on:
       version:
         description: 'Version'
         required: true
-        default: 'patch'
+        default: 'beta'
         type: choice
         options:
-          - patch
-          - minor
-          - major
+          - beta
+          - release
 
 permissions:
   contents: write
@@ -32,7 +31,13 @@ jobs:
         run: pnpm format
       - name: Build
         run: pnpm build
+      - name: Publish Beta
+        run: npm publish --tag beta --access public
+        if: ${{ github.event.inputs.version == "beta" }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Publish
         run: npm publish --access public
+        if: ${{ github.event.inputs.version == "release" }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

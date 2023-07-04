@@ -2,10 +2,10 @@ import { PlusOutlined } from '@ant-design/icons'
 import { ColumnDef, Row, getCoreRowModel, useReactTable } from '@tanstack/react-table'
 import { Button, Typography, theme } from 'antd'
 import clsx from 'clsx'
-import React from 'react'
+import React, { memo } from 'react'
 import { useVirtual } from 'react-virtual'
 
-import { useDecisionTable } from '../context/dt.context'
+import { useDecisionTableStore } from '../context/dt-store.context'
 import { TableContextMenu } from './table-context-menu'
 import { TableDefaultCell } from './table-default-cell'
 import {
@@ -21,24 +21,32 @@ export type TableProps = {
   maxHeight: string | number
 }
 
-export const Table: React.FC<TableProps> = ({ maxHeight }) => {
-  const {
-    configurable,
-    disabled,
-    inputs,
-    outputs,
-    value,
-    commitData,
-    swapRows,
-    setCursor,
-    addRowBelow,
-    cellRenderer,
-    addRowAbove,
-    cursor,
-    removeRow,
-    minColWidth,
-    colWidth,
-  } = useDecisionTable()
+export const Table = memo<TableProps>(({ maxHeight }) => {
+  const configurable = useDecisionTableStore((store) => store.configurable)
+  const disabled = useDecisionTableStore((store) => store.disabled)
+  const cellRenderer = useDecisionTableStore((store) => store.cellRenderer)
+
+  const minColWidth = useDecisionTableStore((store) => store.minColWidth)
+  const colWidth = useDecisionTableStore((store) => store.colWidth)
+
+  const inputs = useDecisionTableStore((store) => store.decisionTable?.inputs)
+  const outputs = useDecisionTableStore((store) => store.decisionTable?.outputs)
+  const rules = useDecisionTableStore(
+    (store) => store?.decisionTable?.rules,
+    (prevState, newState) =>
+      prevState.map((rule: any) => rule._id).join('') ===
+      newState.map((rule: any) => rule._id).join('')
+  )
+
+  const removeRow = useDecisionTableStore((store) => store.removeRow)
+  const addRowAbove = useDecisionTableStore((store) => store.addRowAbove)
+  const addRowBelow = useDecisionTableStore((store) => store.addRowBelow)
+  const swapRows = useDecisionTableStore((store) => store.swapRows)
+
+  const cursor = useDecisionTableStore(
+    (store) => store.cursor,
+    (prevState, newState) => prevState?.y === newState?.y
+  )
 
   const columns = React.useMemo<ColumnDef<any>[]>(
     () => [
@@ -48,7 +56,7 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
         size: colWidth,
         header: () => <TableHeadCellInput configurable={configurable} disabled={disabled} />,
         columns: [
-          ...inputs.map((input) => {
+          ...(inputs || []).map((input: any) => {
             return {
               accessorKey: input.id,
               id: input.id,
@@ -71,7 +79,7 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
         size: minColWidth,
         header: () => <TableHeadCellOutput disabled={disabled} configurable={configurable} />,
         columns: [
-          ...outputs.map((output) => {
+          ...(outputs || []).map((output: any) => {
             return {
               accessorKey: output.id,
               minSize: minColWidth,
@@ -107,7 +115,7 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
   }
 
   const table = useReactTable({
-    data: value.rules,
+    data: rules,
     columnResizeMode: 'onChange',
     getRowId: (row) => row._id,
     defaultColumn,
@@ -115,18 +123,6 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
     getCoreRowModel: getCoreRowModel(),
     meta: {
       getCell: cellRenderer,
-      updateData: (rowIndex: number, columnId: string, value: any) => {
-        commitData(value, {
-          x: columnId,
-          y: rowIndex,
-        })
-      },
-      setCursor: (x: string, y: number) => {
-        setCursor({
-          x,
-          y,
-        })
-      },
     },
   })
 
@@ -172,17 +168,14 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
               disabled
                 ? undefined
                 : (e) => {
-                    if (cursor === null) return
                     if (e.code === 'ArrowUp' && (e.metaKey || e.altKey)) {
-                      addRowAbove(cursor.y)
+                      if (cursor) addRowAbove(cursor?.y)
                     }
                     if (e.code === 'ArrowDown' && (e.metaKey || e.altKey)) {
-                      addRowBelow(cursor.y)
+                      if (cursor) addRowBelow(cursor?.y)
                     }
                     if (e.code === 'Backspace' && (e.metaKey || e.altKey)) {
-                      if (e.metaKey || e.altKey) {
-                        removeRow(cursor.y)
-                      }
+                      if (cursor) removeRow(cursor?.y)
                     }
                   }
             }
@@ -218,7 +211,7 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
                 type='link'
                 disabled={disabled}
                 icon={<PlusOutlined />}
-                onClick={() => addRowBelow(value.rules.length - 1)}
+                onClick={() => addRowBelow()}
               >
                 Add row
               </Button>
@@ -228,7 +221,7 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
       </StyledTable>
     </div>
   )
-}
+})
 
 const StyledTable: React.FC<React.HTMLAttributes<HTMLTableElement> & { width: number }> = ({
   style,

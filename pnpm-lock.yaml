@@ -41,6 +41,9 @@ dependencies:
   uuid:
     specifier: 9.0.0
     version: 9.0.0
+  zustand:
+    specifier: ^4.3.8
+    version: 4.3.8(immer@10.0.2)(react@18.2.0)
 
 devDependencies:
   '@storybook/addon-actions':

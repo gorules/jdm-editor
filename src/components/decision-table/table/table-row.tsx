@@ -3,8 +3,9 @@ import { Typography } from 'antd'
 import clsx from 'clsx'
 import React, { useMemo, useRef } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
+import { shallow } from 'zustand/shallow'
 
-import { useDecisionTable } from '../context/dt.context'
+import { useDecisionTableStore } from '../context/dt-store.context'
 
 const InnerTableRow: React.FC<{
   index: number
@@ -12,7 +13,8 @@ const InnerTableRow: React.FC<{
   reorderRow: (draggedRowIndex: number, targetRowIndex: number) => void
   disabled?: boolean
 }> = ({ index, row, reorderRow, disabled }) => {
-  const { setCursor, activeRules } = useDecisionTable()
+  const setCursor = useDecisionTableStore((store) => store.setCursor)
+  const activeRules = useDecisionTableStore((store) => store.activeRules, shallow)
   const trRef = useRef<HTMLTableRowElement>(null)
   const [{ isDropping, direction }, dropRef] = useDrop({
     accept: 'row',

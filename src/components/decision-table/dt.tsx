@@ -4,7 +4,7 @@ import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 
 import { DecisionTableDialogProvider } from './context/dt-dialog.context'
-import { DecisionTableContextProps, DecisionTableProvider } from './context/dt.context'
+import { DecisionTableContextProps, DecisionTableProvider } from './context/dt-store.context'
 import { DecisionTableDialogs } from './dialog/dt-dialogs'
 import { DecisionTableCommandBar } from './dt-command-bar'
 import './dt.scss'
