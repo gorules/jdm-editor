@@ -73,33 +73,33 @@ const shippingFeesDefault = {
     },
   ],
 }
-
-const inputSchemaDefault = [
-  {
-    field: 'cart',
-    name: 'Cart',
-    items: [
-      {
-        field: 'cart.total',
-        name: 'Total',
-      },
-      {
-        field: 'cart.weight',
-        name: 'Weight',
-      },
-    ],
-  },
-  {
-    field: 'customer',
-    name: 'Customer',
-    items: [
-      {
-        field: 'customer.country',
-        name: 'Country',
-      },
-    ],
-  },
-]
+//
+// const inputSchemaDefault = [
+//   {
+//     field: 'cart',
+//     name: 'Cart',
+//     items: [
+//       {
+//         field: 'cart.total',
+//         name: 'Total',
+//       },
+//       {
+//         field: 'cart.weight',
+//         name: 'Weight',
+//       },
+//     ],
+//   },
+//   {
+//     field: 'customer',
+//     name: 'Customer',
+//     items: [
+//       {
+//         field: 'customer.country',
+//         name: 'Country',
+//       },
+//     ],
+//   },
+// ]
 
 const stressRules = () => {
   const stressRules: any[] = []
@@ -143,7 +143,7 @@ export default meta
 type Story = StoryObj<typeof DecisionTable>
 
 export const Uncontrolled: Story = {
-  render: (args) => {
+  render: () => {
     const store = useDecisionTable()
     return (
       <div>
@@ -217,7 +217,7 @@ export const Uncontrolled: Story = {
 // }
 
 export const StressTest: Story = {
-  render: (args) => {
+  render: () => {
     const store = useDecisionTable()
     useEffect(() => {
       store.getState().setDecisionTable({
