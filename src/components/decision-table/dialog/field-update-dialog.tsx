@@ -2,7 +2,7 @@ import { Cascader, Form, Input, Modal } from 'antd'
 import React, { useEffect, useState } from 'react'
 
 import { SchemaSelectProps, getPath, recursiveSelect } from '../../../helpers/components'
-import { ColumnType, TableSchemaItem } from '../context/dt.context'
+import { ColumnType, TableSchemaItem } from '../context/dt-store.context'
 
 export type FieldUpdateProps = {
   id?: string

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { Checkbox } from 'antd'
 import React, { useState } from 'react'
 
-import { DecisionTableProps } from './context/dt.context'
+import { DecisionTableType } from './context/dt-store.context'
 import { DecisionTable } from './dt'
 
 const shippingFeesDefault = {
@@ -75,7 +75,7 @@ const shippingFeesDefault = {
   ],
 }
 
-export const inputSchemaDefault = [
+const inputSchemaDefault = [
   {
     field: 'cart',
     name: 'Cart',
@@ -133,7 +133,9 @@ const meta: Meta<typeof DecisionTable> = {
     },
   },
   args: {
-    inputsSchema: inputSchemaDefault,
+    schema: {
+      inputsSchema: inputSchemaDefault,
+    },
     configurable: true,
     disabled: false,
   },
@@ -143,19 +145,29 @@ export default meta
 
 type Story = StoryObj<typeof DecisionTable>
 
-export const Uncontrolled: Story = {
-  render: (args) => {
+export const Controlled: Story = {
+  render: () => {
+    const [value, setValue] = useState<any>()
     return (
       <div>
-        <DecisionTable defaultValue={shippingFeesDefault} {...args} tableHeight='500px' />
+        <DecisionTable
+          value={value}
+          onChange={(val) => {
+            setValue(val)
+          }}
+          schema={{
+            inputsSchema: inputSchemaDefault,
+          }}
+          tableHeight='500px'
+        />
       </div>
     )
   },
 }
 
-export const Controlled: Story = {
+export const CustomRenderer: Story = {
   render: (args) => {
-    const [value, setValue] = useState<DecisionTableProps>(shippingFeesDefault)
+    const [value, setValue] = useState<DecisionTableType>()
     return (
       <div>
         <DecisionTable
@@ -163,70 +175,48 @@ export const Controlled: Story = {
           tableHeight='500px'
           value={value}
           onChange={(val) => setValue(val)}
+          cellRenderer={(props) => {
+            if (props?.column?.field === 'output') {
+              return (
+                <div tabIndex={1} style={{ paddingLeft: '1rem' }}>
+                  <Checkbox
+                    disabled={props.disabled}
+                    checked={props.value === 'true'}
+                    onChange={(e) => {
+                      props.onChange(`${e?.target?.checked}`)
+                    }}
+                  >
+                    Enabled
+                  </Checkbox>
+                </div>
+              )
+            }
+            return null
+          }}
         />
       </div>
     )
   },
 }
 
-export const NonBodyDialogsMount: Story = {
+export const StressTest: Story = {
   render: (args) => {
+    const [value, setValue] = useState<DecisionTableType>({
+      ...shippingFeesDefault,
+      rules: stressRules(),
+    })
     return (
       <div>
-        <DecisionTable {...args} tableHeight='500px' mountDialogsOnBody={false} />
+        <DecisionTable
+          {...args}
+          value={value}
+          onChange={(val) => {
+            console.log(val)
+            setValue(val)
+          }}
+          tableHeight='500px'
+        />
       </div>
     )
   },
-}
-
-export const Empty: Story = {
-  render: (args) => (
-    <div>
-      <DecisionTable {...args} tableHeight='500px' />
-    </div>
-  ),
-}
-
-export const CustomRenderer: Story = {
-  render: (args) => (
-    <div>
-      <DecisionTable
-        {...args}
-        tableHeight='500px'
-        cellRenderer={(props) => {
-          if (props?.column?.field === 'output') {
-            return (
-              <div tabIndex={1} style={{ paddingLeft: '1rem' }}>
-                <Checkbox
-                  disabled={props.disabled}
-                  checked={props.value === 'true'}
-                  onChange={(e) => {
-                    props.onChange(`${e?.target?.checked}`)
-                  }}
-                >
-                  Enabled
-                </Checkbox>
-              </div>
-            )
-          }
-          return null
-        }}
-      />
-    </div>
-  ),
-}
-
-export const StressTest: Story = {
-  render: (args) => (
-    <div>
-      <DecisionTable
-        {...args}
-        tableHeight='500px'
-        defaultValue={{
-          ...shippingFeesDefault,
-          rules: stressRules(),
-        }}
-      />
-    </div>
-  ),
 }
