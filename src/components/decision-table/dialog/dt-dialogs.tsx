@@ -10,8 +10,8 @@ export const DecisionTableDialogs: React.FC = () => {
   const { dialog, setDialog, isDialogActive, getContainer } = useDecisionTableDialog()
 
   const id = 'test'
-  const inputsSchema = useDecisionTableStore((store: any) => store.schema?.inputsSchema)
-  const outputsSchema = useDecisionTableStore((store: any) => store.schema?.outputsSchema)
+  const inputsSchema = useDecisionTableStore((store: any) => store?.inputsSchema)
+  const outputsSchema = useDecisionTableStore((store: any) => store?.outputsSchema)
   const addColumn = useDecisionTableStore((store: any) => store.addColumn)
   const updateColumn = useDecisionTableStore((store: any) => store.updateColumn)
   const reorderColumns = useDecisionTableStore((store: any) => store.reorderColumns)

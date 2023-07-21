@@ -1,6 +1,6 @@
 import { CellContext } from '@tanstack/react-table'
 import { Input } from 'antd'
-import React, { memo, useRef } from 'react'
+import React, { memo, useLayoutEffect, useRef, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
 import { columnIdSelector } from '../../../helpers/components'
@@ -21,6 +21,13 @@ export const TableDefaultCell = memo<TableDefaultCellProps>(({ context, ...props
     shallow
   )
 
+  const [inner, setInner] = useState(value)
+  useLayoutEffect(() => {
+    if (inner !== value) {
+      setInner(value)
+    }
+  }, [value])
+
   const column = useDecisionTableStore(
     columnIdSelector(id),
     (a, b) => a?.id !== undefined && b?.id !== undefined && a?.id === b?.id
@@ -31,6 +38,7 @@ export const TableDefaultCell = memo<TableDefaultCellProps>(({ context, ...props
   const setCursor = useDecisionTableStore((store) => store.setCursor, shallow)
 
   const commit = (val: string) => {
+    setInner(val)
     commitData(val, {
       x: id,
       y: index,
@@ -51,9 +59,9 @@ export const TableDefaultCell = memo<TableDefaultCellProps>(({ context, ...props
       {(table.options.meta as any)?.getCell?.({
         disabled,
         column,
-        value,
+        value: inner,
         onChange: commit,
-      }) || <TableInputCell disabled={disabled} column={column} value={value} onChange={commit} />}
+      }) || <TableInputCell disabled={disabled} column={column} value={inner} onChange={commit} />}
     </div>
   )
 })

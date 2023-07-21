@@ -133,9 +133,7 @@ const meta: Meta<typeof DecisionTable> = {
     },
   },
   args: {
-    schema: {
-      inputsSchema: inputSchemaDefault,
-    },
+    inputsSchema: inputSchemaDefault,
     configurable: true,
     disabled: false,
   },
@@ -155,9 +153,7 @@ export const Controlled: Story = {
           onChange={(val) => {
             setValue(val)
           }}
-          schema={{
-            inputsSchema: inputSchemaDefault,
-          }}
+          inputsSchema={inputSchemaDefault}
           tableHeight='500px'
         />
       </div>
@@ -211,7 +207,6 @@ export const StressTest: Story = {
           {...args}
           value={value}
           onChange={(val) => {
-            console.log(val)
             setValue(val)
           }}
           tableHeight='500px'

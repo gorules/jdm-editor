@@ -135,10 +135,8 @@ export type DecisionTableStoreType = {
 
   activeRules?: string[]
 
-  schema?: {
-    inputsSchema?: SchemaSelectProps[]
-    outputsSchema?: SchemaSelectProps[]
-  }
+  inputsSchema?: SchemaSelectProps[]
+  outputsSchema?: SchemaSelectProps[]
 
   // Props
   disabled?: boolean

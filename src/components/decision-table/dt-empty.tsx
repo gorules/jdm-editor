@@ -17,10 +17,8 @@ export type DecisionTableEmptyType = {
   disableHitPolicy?: boolean
   activeRules?: string[]
   cellRenderer?: (props: TableCellProps) => JSX.Element | null | undefined
-  schema?: {
-    inputsSchema?: SchemaSelectProps[]
-    outputsSchema?: SchemaSelectProps[]
-  }
+  inputsSchema?: SchemaSelectProps[]
+  outputsSchema?: SchemaSelectProps[]
   onChange?: (val: DecisionTableType) => void
 }
 export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
@@ -30,7 +28,8 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
   configurable = true,
   disableHitPolicy = false,
   activeRules,
-  schema,
+  inputsSchema,
+  outputsSchema,
   cellRenderer,
   onChange,
 }) => {
@@ -43,11 +42,22 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
       configurable,
       disableHitPolicy,
       activeRules,
-      schema,
+      inputsSchema,
+      outputsSchema,
       cellRenderer,
       onChange,
     })
-  }, [id, disabled, configurable, disableHitPolicy, activeRules, schema, cellRenderer, onChange])
+  }, [
+    id,
+    disabled,
+    configurable,
+    disableHitPolicy,
+    activeRules,
+    inputsSchema,
+    outputsSchema,
+    cellRenderer,
+    onChange,
+  ])
 
   useEffect(() => {
     setDecisionTable(parseDecisionTable(value))
