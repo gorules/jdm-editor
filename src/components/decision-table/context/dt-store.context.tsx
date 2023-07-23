@@ -332,12 +332,13 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
         },
         removeColumn: (type: ColumnType, id: string) => {
           getState()?.onChange?.(
-            produce(getState().decisionTable, (draft) => {
-              draft[type] = (draft?.[type] || []).filter((item) => item?.id !== id)
-              draft.rules = cleanupTableRules(draft)
-              draft = parseDecisionTable(draft)
-              return draft
-            })
+            parseDecisionTable(
+              produce(getState().decisionTable, (draft) => {
+                draft[type] = (draft?.[type] || []).filter((item) => item?.id !== id)
+                draft.rules = cleanupTableRules(draft)
+                return draft
+              })
+            )
           )
           set(
             produce<DecisionTableStoreType>((draft) => {
