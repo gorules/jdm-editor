@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { Checkbox } from 'antd'
-import React, { useState } from 'react'
+import { createDragDropManager } from 'dnd-core'
+import React, { useMemo, useState } from 'react'
+import { HTML5Backend } from 'react-dnd-html5-backend'
 
 import { DecisionTableType } from './context/dt-store.context'
 import { DecisionTable } from './dt'
@@ -146,10 +148,14 @@ type Story = StoryObj<typeof DecisionTable>
 export const Controlled: Story = {
   render: () => {
     const [value, setValue] = useState<any>()
+    const manager = useMemo(() => {
+      return createDragDropManager(HTML5Backend)
+    }, [])
     return (
       <div>
         <DecisionTable
           value={value}
+          manager={manager}
           onChange={(val) => {
             setValue(val)
           }}

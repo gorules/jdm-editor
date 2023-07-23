@@ -1,5 +1,5 @@
 import { theme } from 'antd'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 
@@ -14,12 +14,14 @@ import { Table } from './table/table'
 export type DecisionTableProps = {
   tableHeight: string | number
   mountDialogsOnBody?: boolean
+  manager?: any
 } & DecisionTableContextProps &
   DecisionTableEmptyType
 
 export const DecisionTable: React.FC<DecisionTableProps> = ({
   tableHeight,
   mountDialogsOnBody = false,
+  manager,
   ...props
 }) => {
   const { token } = theme.useToken()
@@ -33,15 +35,24 @@ export const DecisionTable: React.FC<DecisionTableProps> = ({
 
   const getContainer = () => ref.current as HTMLElement
 
+  const dndProps = useMemo(() => {
+    if (manager) {
+      return {
+        manager,
+      }
+    }
+    return {
+      backend: HTML5Backend,
+      options: {
+        rootElement: ref.current,
+      },
+    }
+  }, [])
+
   return (
     <div ref={ref} className={'grl-dt'} style={{ background: token.colorBgElevated }}>
       {ref.current && (
-        <DndProvider
-          backend={HTML5Backend}
-          options={{
-            rootElement: ref.current,
-          }}
-        >
+        <DndProvider {...dndProps}>
           <DecisionTableProvider>
             <DecisionTableDialogProvider
               getContainer={mountDialogsOnBody === true ? undefined : getContainer}
