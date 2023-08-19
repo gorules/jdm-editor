@@ -7,7 +7,6 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import { DecisionTableType } from './context/dt-store.context'
 import { DecisionTable } from './dt'
 
-
 const shippingFeesDefault = {
   hitPolicy: 'first',
   inputs: [
@@ -147,8 +146,8 @@ export default meta
 type Story = StoryObj<typeof DecisionTable>
 
 export const Controlled: Story = {
-  render: () => {
-    const [value, setValue] = useState<any>()
+  render: ({ disabled, configurable, disableHitPolicy }) => {
+    const [value, setValue] = useState<any>(shippingFeesDefault)
     const manager = useMemo(() => {
       return createDragDropManager(HTML5Backend)
     }, [])
@@ -157,10 +156,30 @@ export const Controlled: Story = {
       <div>
         <DecisionTable
           value={value}
+          disabled={disabled}
+          configurable={configurable}
+          disableHitPolicy={disableHitPolicy}
           manager={manager}
           onChange={(val) => {
             setValue(val)
           }}
+          inputsSchema={inputSchemaDefault}
+          tableHeight='500px'
+        />
+      </div>
+    )
+  },
+}
+
+export const UnControlled: Story = {
+  render: ({ disabled, configurable, disableHitPolicy }) => {
+    return (
+      <div>
+        <DecisionTable
+          disabled={disabled}
+          configurable={configurable}
+          disableHitPolicy={disableHitPolicy}
+          defaultValue={shippingFeesDefault}
           inputsSchema={inputSchemaDefault}
           tableHeight='500px'
         />

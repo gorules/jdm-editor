@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 import { SchemaSelectProps } from '../../helpers/components'
 import {
@@ -11,6 +11,7 @@ import { TableCellProps } from './table/table-default-cell'
 
 export type DecisionTableEmptyType = {
   id?: string
+  defaultValue?: DecisionTableType
   value?: DecisionTableType
   disabled?: boolean
   configurable?: boolean
@@ -20,9 +21,12 @@ export type DecisionTableEmptyType = {
   inputsSchema?: SchemaSelectProps[]
   outputsSchema?: SchemaSelectProps[]
   onChange?: (val: DecisionTableType) => void
+  colWidth?: number
+  minColWidth?: number
 }
 export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
   id,
+  defaultValue,
   value,
   disabled = false,
   configurable = true,
@@ -30,14 +34,29 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
   activeRules,
   inputsSchema,
   outputsSchema,
+  colWidth= 200,
+  minColWidth= 150,
   cellRenderer,
   onChange,
 }) => {
   const store = useDecisionTableRaw()
   const setDecisionTable = useDecisionTableStore((store) => store.setDecisionTable)
+
+  const changeHandler = useCallback(
+    (val: DecisionTableType) => {
+      if (value === undefined) {
+        setDecisionTable(parseDecisionTable(val))
+      }
+      onChange?.(val)
+    },
+    [onChange, value, setDecisionTable]
+  )
+
   useEffect(() => {
     store.setState({
       id,
+      colWidth,
+      minColWidth,
       disabled,
       configurable,
       disableHitPolicy,
@@ -45,7 +64,7 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
       inputsSchema,
       outputsSchema,
       cellRenderer,
-      onChange,
+      onChange: changeHandler,
     })
   }, [
     id,
@@ -55,12 +74,21 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
     activeRules,
     inputsSchema,
     outputsSchema,
+    colWidth,
+    minColWidth,
     cellRenderer,
-    onChange,
+    changeHandler,
   ])
 
   useEffect(() => {
     setDecisionTable(parseDecisionTable(value))
   }, [value])
+
+  useEffect(() => {
+    if (value === undefined) {
+      setDecisionTable(parseDecisionTable(defaultValue))
+    }
+  }, [])
+
   return null
 }
