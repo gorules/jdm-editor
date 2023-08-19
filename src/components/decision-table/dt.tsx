@@ -41,6 +41,7 @@ export const DecisionTable: React.FC<DecisionTableProps> = ({
         manager,
       }
     }
+
     return {
       backend: HTML5Backend,
       options: {

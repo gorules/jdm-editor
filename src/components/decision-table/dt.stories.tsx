@@ -7,6 +7,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import { DecisionTableType } from './context/dt-store.context'
 import { DecisionTable } from './dt'
 
+
 const shippingFeesDefault = {
   hitPolicy: 'first',
   inputs: [
@@ -151,6 +152,7 @@ export const Controlled: Story = {
     const manager = useMemo(() => {
       return createDragDropManager(HTML5Backend)
     }, [])
+
     return (
       <div>
         <DecisionTable

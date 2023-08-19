@@ -1,10 +1,11 @@
 import { CellContext } from '@tanstack/react-table'
 import { Input } from 'antd'
-import React, { memo, useLayoutEffect, useRef, useState } from 'react'
+import React, { memo, useLayoutEffect, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
 import { columnIdSelector } from '../../../helpers/components'
 import { TableSchemaItem, useDecisionTableStore } from '../context/dt-store.context'
+
 
 export type TableDefaultCellProps = {
   context: CellContext<Record<string, string>, string>
@@ -74,10 +75,8 @@ export type TableCellProps = {
 }
 
 const TableInputCell: React.FC<TableCellProps> = ({ value, onChange, disabled }) => {
-  const ref = useRef<any>(null)
   return (
     <Input.TextArea
-      ref={ref}
       className={'grl-dt__cell__input'}
       value={value}
       rows={1}

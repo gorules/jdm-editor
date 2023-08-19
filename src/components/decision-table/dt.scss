@@ -6,7 +6,7 @@
 
   .table {
     border-collapse: collapse;
-    table-layout: fixed;
+    table-layout: auto;
     font-family: arial, sans-serif;
     width: fit-content;
     background-color: var(--color-bg-container);
@@ -100,6 +100,7 @@
     .grl-dt__container {
       flex: 1;
       overflow: auto;
+      position: relative;
     }
 
     .resizer {

@@ -1,9 +1,16 @@
 import { PlusOutlined } from '@ant-design/icons'
-import { ColumnDef, Row, getCoreRowModel, useReactTable } from '@tanstack/react-table'
+import {
+  ColumnDef,
+  Table as ReactTable,
+  Row,
+  getCoreRowModel,
+  useReactTable,
+} from '@tanstack/react-table'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import { Button, Typography, theme } from 'antd'
 import clsx from 'clsx'
-import React, { memo } from 'react'
-import { useVirtual } from 'react-virtual'
+import React, { memo, useEffect, useState } from 'react'
+import { TableVirtuoso } from 'react-virtuoso'
 import { shallow } from 'zustand/shallow'
 
 import { useDecisionTableStore } from '../context/dt-store.context'
@@ -18,6 +25,7 @@ import {
 import { TableHeadRow } from './table-head-row'
 import { TableRow } from './table-row'
 
+
 export type TableProps = {
   maxHeight: string | number
 }
@@ -30,6 +38,7 @@ export const Table = memo<TableProps>(({ maxHeight }) => {
   const minColWidth = useDecisionTableStore((store) => store.minColWidth)
   const colWidth = useDecisionTableStore((store) => store.colWidth)
 
+  const addRowBelow = useDecisionTableStore((store) => store.addRowBelow)
   const inputs = useDecisionTableStore((store) => store.decisionTable?.inputs)
   const outputs = useDecisionTableStore((store) => store.decisionTable?.outputs)
   const rules = useDecisionTableStore(
@@ -39,22 +48,13 @@ export const Table = memo<TableProps>(({ maxHeight }) => {
       (newState || []).map((rule: any) => rule._id).join('')
   )
 
-  const removeRow = useDecisionTableStore((store) => store.removeRow)
-  const addRowAbove = useDecisionTableStore((store) => store.addRowAbove)
-  const addRowBelow = useDecisionTableStore((store) => store.addRowBelow)
-  const swapRows = useDecisionTableStore((store) => store.swapRows)
-
-  const cursor = useDecisionTableStore(
-    (store) => store.cursor,
-    (prevState, newState) => prevState?.y === newState?.y
-  )
-
   const columns = React.useMemo<ColumnDef<any>[]>(
     () => [
       {
         id: 'inputs',
         minSize: minColWidth,
         size: colWidth,
+        enableResizing: false,
         header: () => <TableHeadCellInput configurable={configurable} disabled={disabled} />,
         columns: [
           ...(inputs || []).map((input: any) => {
@@ -107,10 +107,6 @@ export const Table = memo<TableProps>(({ maxHeight }) => {
     [configurable, disabled, inputs, outputs]
   )
 
-  const reorderRow = (draggedRowIndex: number, targetRowIndex: number) => {
-    swapRows(draggedRowIndex, targetRowIndex)
-  }
-
   const defaultColumn: Partial<ColumnDef<Record<string, string>, string>> = {
     cell: (context) => <TableDefaultCell context={context} />,
   }
@@ -127,20 +123,63 @@ export const Table = memo<TableProps>(({ maxHeight }) => {
     },
   })
 
-  const tableContainerRef = React.useRef<HTMLDivElement>(null)
+  const rowModel = table.getRowModel()
 
-  const { rows } = table.getRowModel()
-  const rowVirtualizer = useVirtual({
-    parentRef: tableContainerRef,
-    size: rows.length,
-    overscan: 30,
-  })
+  const swapRows = useDecisionTableStore((store) => store.swapRows)
 
-  const { virtualItems: virtualRows, totalSize } = rowVirtualizer
+  const reorderRow = (draggedRowIndex: number, targetRowIndex: number) => {
+    swapRows(draggedRowIndex, targetRowIndex)
+  }
 
-  const paddingTop = virtualRows.length > 0 ? virtualRows?.[0]?.start || 0 : 0
-  const paddingBottom =
-    virtualRows.length > 0 ? totalSize - (virtualRows?.[virtualRows.length - 1]?.end || 0) : 0
+  return (
+    <TableVirtuoso
+      style={{ height: maxHeight }}
+      totalCount={rowModel.rows.length}
+      overscan={{ main: 50, reverse: 50 }}
+      components={{
+        Table: ({ children, ...props }) => (
+          <StyledTable width={table.getCenterTotalSize()} {...props}>
+            {children}
+            <tfoot>
+              <tr>
+                <td colSpan={inputs.length + outputs.length + 2}>
+                  <Button
+                    type='link'
+                    disabled={disabled}
+                    icon={<PlusOutlined />}
+                    onClick={() => addRowBelow()}
+                  >
+                    Add row
+                  </Button>
+                </td>
+              </tr>
+            </tfoot>
+          </StyledTable>
+        ),
+        // TableBody: React.forwardRef(({ style, ...props }, ref) => <tbody {...props} ref={ref} />),
+        TableRow: (props) => {
+          const index = props['data-index']
+          const row = rowModel.rows[index]
+
+          return (
+            <TableRow
+              key={row.id}
+              index={index}
+              row={row}
+              reorderRow={reorderRow}
+              disabled={disabled}
+              {...props}
+            />
+          )
+        },
+      }}
+      fixedHeaderContent={() => {
+        return table
+          .getHeaderGroups()
+          .map((headerGroup) => <TableHeadRow key={headerGroup.id} headerGroup={headerGroup} />)
+      }}
+    />
+  )
 
   return (
     <div
@@ -164,46 +203,9 @@ export const Table = memo<TableProps>(({ maxHeight }) => {
           })}
         </thead>
         <TableContextMenu>
-          <tbody
-            onKeyDown={
-              disabled
-                ? undefined
-                : (e) => {
-                    if (e.code === 'ArrowUp' && (e.metaKey || e.altKey)) {
-                      if (cursor) addRowAbove(cursor?.y)
-                    }
-                    if (e.code === 'ArrowDown' && (e.metaKey || e.altKey)) {
-                      if (cursor) addRowBelow(cursor?.y)
-                    }
-                    if (e.code === 'Backspace' && (e.metaKey || e.altKey)) {
-                      if (cursor) removeRow(cursor?.y)
-                    }
-                  }
-            }
-          >
-            {paddingTop > 0 && (
-              <tr>
-                <td style={{ height: `${paddingTop}px` }} />
-              </tr>
-            )}
-            {virtualRows.map((virtualRow) => {
-              const row = rows[virtualRow.index] as Row<Record<string, string>>
-              return (
-                <TableRow
-                  key={row.id}
-                  index={virtualRow.index}
-                  row={row}
-                  reorderRow={reorderRow}
-                  disabled={disabled}
-                />
-              )
-            })}
-            {paddingBottom > 0 && (
-              <tr>
-                <td style={{ height: `${paddingBottom}px` }} />
-              </tr>
-            )}
-          </tbody>
+          <TableBody>
+            <TableBodyContents table={table} tableContainerRef={tableContainerRef} />
+          </TableBody>
         </TableContextMenu>
         <tfoot>
           <tr>
@@ -223,6 +225,99 @@ export const Table = memo<TableProps>(({ maxHeight }) => {
     </div>
   )
 })
+
+type TableBodyProps = {
+  children: React.ReactNode
+}
+
+const TableBody: React.FC<TableBodyProps> = ({ children }) => {
+  const removeRow = useDecisionTableStore((store) => store.removeRow)
+  const addRowAbove = useDecisionTableStore((store) => store.addRowAbove)
+  const addRowBelow = useDecisionTableStore((store) => store.addRowBelow)
+  const disabled = useDecisionTableStore((store) => store.disabled)
+  const cursor = useDecisionTableStore(
+    (store) => store.cursor,
+    (prevState, newState) => prevState?.y === newState?.y
+  )
+
+  return (
+    <tbody
+      onKeyDown={
+        disabled
+          ? undefined
+          : (e) => {
+              if (e.code === 'ArrowUp' && (e.metaKey || e.altKey)) {
+                if (cursor) addRowAbove(cursor?.y)
+              }
+              if (e.code === 'ArrowDown' && (e.metaKey || e.altKey)) {
+                if (cursor) addRowBelow(cursor?.y)
+              }
+              if (e.code === 'Backspace' && (e.metaKey || e.altKey)) {
+                if (cursor) removeRow(cursor?.y)
+              }
+            }
+      }
+    >
+      {children}
+    </tbody>
+  )
+}
+
+type TableBodyContentsProps = {
+  table: ReactTable<any>
+  tableContainerRef: React.RefObject<HTMLElement>
+}
+
+const TableBodyContents: React.FC<TableBodyContentsProps> = ({ table, tableContainerRef }) => {
+  const disabled = useDecisionTableStore((store) => store.disabled)
+  const swapRows = useDecisionTableStore((store) => store.swapRows)
+
+  const reorderRow = (draggedRowIndex: number, targetRowIndex: number) => {
+    swapRows(draggedRowIndex, targetRowIndex)
+  }
+
+  const { rows } = table.getRowModel()
+  const rowVirtualizer = useVirtualizer({
+    count: rows.length,
+    getScrollElement: () => tableContainerRef.current,
+    overscan: 10,
+    estimateSize: () => 38,
+  })
+
+  const virtualRows = rowVirtualizer.getVirtualItems()
+  const totalSize = rowVirtualizer.getTotalSize()
+
+  const paddingTop = virtualRows.length > 0 ? virtualRows?.[0]?.start || 0 : 0
+  const paddingBottom =
+    virtualRows.length > 0 ? totalSize - (virtualRows?.[virtualRows.length - 1]?.end || 0) : 0
+
+  return (
+    <>
+      {paddingTop > 0 && (
+        <tr>
+          <td style={{ height: `${paddingTop}px` }} />
+        </tr>
+      )}
+      {virtualRows.map((virtualRow) => {
+        const row = rows[virtualRow.index] as Row<Record<string, string>>
+        return (
+          <TableRow
+            key={row.id}
+            index={virtualRow.index}
+            row={row}
+            reorderRow={reorderRow}
+            disabled={disabled}
+          />
+        )
+      })}
+      {paddingBottom > 0 && (
+        <tr>
+          <td style={{ height: `${paddingBottom}px` }} />
+        </tr>
+      )}
+    </>
+  )
+}
 
 const StyledTable: React.FC<React.HTMLAttributes<HTMLTableElement> & { width: number }> = ({
   style,
