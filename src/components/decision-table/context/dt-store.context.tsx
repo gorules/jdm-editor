@@ -184,56 +184,56 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
         configurable: true,
         disableHitPolicy: false,
         setCursor: (cursor: TableCursor) =>
-          set(
-            produce<DecisionTableStoreType>((draft) => {
-              draft.cursor = cursor
-              return draft
-            })
-          ),
+          set({
+            cursor,
+          }),
         commitData: (value: string, cursor: TableCursor) => {
-          getState()?.onChange?.(
-            produce(getState().decisionTable, (draft) => {
-              const { x, y } = cursor
-              draft.rules[y][x] = value
-              return draft
-            })
-          )
+          const updatedDecisionTable = produce(getState().decisionTable, (draft) => {
+            const { x, y } = cursor
+            draft.rules[y][x] = value
+            return draft
+          })
+          set({
+            decisionTable: updatedDecisionTable,
+            cursor: null,
+          })
+          getState()?.onChange?.(updatedDecisionTable)
         },
         swapRows: (source: number, target: number) => {
-          getState()?.onChange?.(
-            produce(getState().decisionTable, (draft) => {
-              const input = draft?.rules?.[source]
-              draft.rules.splice(source, 1)
-              draft.rules.splice(target, 0, input)
-              return draft
-            })
-          )
-          set(
-            produce<DecisionTableStoreType>((draft) => {
-              draft.cursor = null
-              return draft
-            })
-          )
+          const updatedDecisionTable = produce(getState().decisionTable, (draft) => {
+            const input = draft?.rules?.[source]
+            draft.rules.splice(source, 1)
+            draft.rules.splice(target, 0, input)
+            return draft
+          })
+          set({
+            decisionTable: updatedDecisionTable,
+            cursor: null,
+          })
+          getState()?.onChange?.(updatedDecisionTable)
         },
         addRowAbove: (target?: number) => {
-          getState()?.onChange?.(
-            produce(getState().decisionTable, (draft) => {
-              if (target === undefined) target = 0
-              const _id = v4()
-              draft.rules.splice(
-                target,
-                0,
-                cleanupTableRule(
-                  draft,
-                  {
-                    _id,
-                  },
-                  _id
-                )
+          const updatedDecisionTable = produce(getState().decisionTable, (draft) => {
+            if (target === undefined) target = 0
+            const _id = v4()
+            draft.rules.splice(
+              target,
+              0,
+              cleanupTableRule(
+                draft,
+                {
+                  _id,
+                },
+                _id
               )
-              return draft
-            })
-          )
+            )
+            return draft
+          })
+          set({
+            decisionTable: updatedDecisionTable,
+          })
+          getState()?.onChange?.(updatedDecisionTable)
+
           const cursor = getState()?.cursor
           if (cursor && cursor?.y === target) {
             set(
@@ -250,28 +250,31 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
           }
         },
         addRowBelow: (target?: number) => {
-          getState()?.onChange?.(
-            produce(getState().decisionTable, (draft) => {
-              if (target === undefined) {
-                target = draft?.rules?.length
-              } else {
-                target += 1
-              }
-              const _id = v4()
-              draft.rules.splice(
-                target,
-                0,
-                cleanupTableRule(
-                  draft,
-                  {
-                    _id,
-                  },
-                  _id
-                )
+          const updatedDecisionTable = produce(getState().decisionTable, (draft) => {
+            if (target === undefined) {
+              target = draft?.rules?.length
+            } else {
+              target += 1
+            }
+            const _id = v4()
+            draft.rules.splice(
+              target,
+              0,
+              cleanupTableRule(
+                draft,
+                {
+                  _id,
+                },
+                _id
               )
-              return draft
-            })
-          )
+            )
+            return draft
+          })
+          set({
+            decisionTable: updatedDecisionTable,
+          })
+          getState()?.onChange?.(updatedDecisionTable)
+
           const cursor = getState()?.cursor
           if (cursor && cursor?.y === target) {
             set(
@@ -288,81 +291,83 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
           }
         },
         removeRow: (target?: number) => {
-          getState()?.onChange?.(
-            produce(getState().decisionTable, (draft) => {
-              if (target === undefined) target = draft?.rules?.length || 0
-              draft.rules.splice(target, 1)
-              return draft
-            })
-          )
-          set(
-            produce<DecisionTableStoreType>((draft) => {
-              draft.cursor = null
-              return draft
-            })
-          )
+          const updatedDecisionTable = produce(getState().decisionTable, (draft) => {
+            if (target === undefined) target = draft?.rules?.length || 0
+            draft.rules.splice(target, 1)
+            return draft
+          })
+          set({
+            decisionTable: updatedDecisionTable,
+            cursor: null,
+          })
+          getState()?.onChange?.(updatedDecisionTable)
         },
         addColumn: (type: ColumnType, column: TableSchemaItem) => {
-          getState()?.onChange?.(
-            produce(getState().decisionTable, (draft) => {
-              draft[type].push(column)
-              draft.rules = cleanupTableRules(draft)
-              return draft
-            })
-          )
+          const updatedDecisionTable = produce(getState().decisionTable, (draft) => {
+            draft[type].push(column)
+            draft.rules = cleanupTableRules(draft)
+            return draft
+          })
+          set({
+            decisionTable: updatedDecisionTable,
+          })
+          getState()?.onChange?.(updatedDecisionTable)
         },
         updateColumn: (type: ColumnType, id: string, data: TableSchemaItem) => {
-          getState()?.onChange?.(
-            produce(getState().decisionTable, (draft) => {
-              draft[type] = draft[type].map((item) => {
-                if (item.id === id) {
-                  return {
-                    ...item,
-                    name: data?.name,
-                    field: data?.field,
-                    defaultValue: data?.defaultValue,
-                  }
+          const updatedDecisionTable = produce(getState().decisionTable, (draft) => {
+            draft[type] = draft[type].map((item) => {
+              if (item.id === id) {
+                return {
+                  ...item,
+                  name: data?.name,
+                  field: data?.field,
+                  defaultValue: data?.defaultValue,
                 }
-                return item
-              })
-              draft.rules = cleanupTableRules(draft)
-              return draft
+              }
+              return item
             })
-          )
+            draft.rules = cleanupTableRules(draft)
+            return draft
+          })
+          set({
+            decisionTable: updatedDecisionTable,
+          })
+          getState()?.onChange?.(updatedDecisionTable)
         },
         removeColumn: (type: ColumnType, id: string) => {
-          getState()?.onChange?.(
-            parseDecisionTable(
-              produce(getState().decisionTable, (draft) => {
-                draft[type] = (draft?.[type] || []).filter((item) => item?.id !== id)
-                draft.rules = cleanupTableRules(draft)
-                return draft
-              })
-            )
-          )
-          set(
-            produce<DecisionTableStoreType>((draft) => {
-              draft.cursor = null
-              return draft
-            })
-          )
-        },
-        reorderColumns: (type: ColumnType, columns: TableSchemaItem[]) => {
-          getState()?.onChange?.(
+          const updatedDecisionTable = parseDecisionTable(
             produce(getState().decisionTable, (draft) => {
-              draft[type] = columns
+              draft[type] = (draft?.[type] || []).filter((item) => item?.id !== id)
               draft.rules = cleanupTableRules(draft)
               return draft
             })
           )
+          set({
+            decisionTable: updatedDecisionTable,
+            cursor: null,
+          })
+          getState()?.onChange?.(updatedDecisionTable)
+        },
+        reorderColumns: (type: ColumnType, columns: TableSchemaItem[]) => {
+          const updatedDecisionTable = produce(getState().decisionTable, (draft) => {
+            draft[type] = columns
+            draft.rules = cleanupTableRules(draft)
+            return draft
+          })
+          set({
+            decisionTable: updatedDecisionTable,
+          })
+          getState()?.onChange?.(updatedDecisionTable)
         },
         updateHitPolicy: (hitPolicy: HitPolicy) => {
-          getState()?.onChange?.(
-            produce(getState().decisionTable, (draft) => {
-              draft.hitPolicy = hitPolicy
-              return draft
-            })
-          )
+          const updatedDecisionTable = produce(getState().decisionTable, (draft) => {
+            draft.hitPolicy = hitPolicy
+            return draft
+          })
+          set({
+            decisionTable: updatedDecisionTable,
+          })
+          getState()?.onChange?.(updatedDecisionTable)
         },
       })),
     []

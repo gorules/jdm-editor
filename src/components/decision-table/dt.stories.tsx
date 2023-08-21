@@ -146,18 +146,41 @@ export default meta
 type Story = StoryObj<typeof DecisionTable>
 
 export const Controlled: Story = {
-  render: () => {
-    const [value, setValue] = useState<any>()
+  render: (args) => {
+    const [value, setValue] = useState<any>(shippingFeesDefault)
     const manager = useMemo(() => {
       return createDragDropManager(HTML5Backend)
     }, [])
     return (
       <div>
         <DecisionTable
+          {...args}
           value={value}
           manager={manager}
           onChange={(val) => {
             setValue(val)
+          }}
+          inputsSchema={inputSchemaDefault}
+          tableHeight='500px'
+        />
+      </div>
+    )
+  },
+}
+
+export const Uncontrolled: Story = {
+  render: (args) => {
+    const manager = useMemo(() => {
+      return createDragDropManager(HTML5Backend)
+    }, [])
+    return (
+      <div>
+        <DecisionTable
+          {...args}
+          manager={manager}
+          defaultValue={shippingFeesDefault}
+          onChange={(val) => {
+            console.log(val)
           }}
           inputsSchema={inputSchemaDefault}
           tableHeight='500px'

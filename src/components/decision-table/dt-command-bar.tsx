@@ -8,6 +8,7 @@ import { saveFile } from '../../helpers/file-helpers'
 import { Stack } from '../stack'
 import {
   TableExportOptions,
+  parseDecisionTable,
   useDecisionTableRaw,
   useDecisionTableStore,
 } from './context/dt-store.context'
@@ -43,6 +44,7 @@ export const DecisionTableCommandBar: React.FC = () => {
       ...decisionTable.outputs.map((output: any) =>
         [output.name, output.field, 'OUTPUT', output.id, output.defaultValue].join(parserPipe)
       ),
+      'DESCRIPTION',
     ]
 
     const schemaItems = [...decisionTable.inputs, ...decisionTable.outputs]
@@ -53,6 +55,7 @@ export const DecisionTableCommandBar: React.FC = () => {
         const formattedVal = typeof val === 'object' && val !== null ? JSON.stringify(val) : val
         newDataPoint.push(formattedVal || '')
       })
+      newDataPoint.push(record?.['_description'] || '')
       return newDataPoint
     })
 
@@ -95,6 +98,12 @@ export const DecisionTableCommandBar: React.FC = () => {
       const [name, field, _type, id, defaultValue] = header
         .split(parserPipe)
         .map((s) => (s || '').trim())
+      if (name.toLowerCase() === 'description') {
+        return {
+          name,
+          id: '_description',
+        }
+      }
       return {
         name,
         field,
@@ -136,14 +145,14 @@ export const DecisionTableCommandBar: React.FC = () => {
       return dataPoint
     })
 
-    store.setState({
-      decisionTable: {
-        inputs,
-        outputs,
-        rules,
-        hitPolicy: 'first',
-      },
+    const newTable = parseDecisionTable({
+      inputs,
+      outputs,
+      rules,
+      hitPolicy: 'first',
     })
+    store.getState().setDecisionTable?.(newTable)
+    store.getState().onChange?.(newTable)
   }
 
   const handleUploadInput = async (event: any) => {
