@@ -1,64 +1,70 @@
 import { CellContext } from '@tanstack/react-table'
 import { Input } from 'antd'
-import React, { useEffect, useState } from 'react'
+import React, { memo, useLayoutEffect, useRef, useState } from 'react'
+import { shallow } from 'zustand/shallow'
 
-import { TableSchemaItem, useDecisionTable } from '../context/dt.context'
+import { columnIdSelector } from '../../../helpers/components'
+import { TableSchemaItem, useDecisionTableStore } from '../context/dt-store.context'
 
 export type TableDefaultCellProps = {
   context: CellContext<Record<string, string>, string>
 } & React.HTMLAttributes<HTMLDivElement>
 
-export const TableDefaultCell: React.FC<TableDefaultCellProps> = ({ context, ...props }) => {
+export const TableDefaultCell = memo<TableDefaultCellProps>(({ context, ...props }) => {
   const {
-    getValue,
     row: { index },
     column: { id },
     table,
   } = context
-  const { disabled, getColumnId } = useDecisionTable()
-  const value = getValue()
-  const [internalValue, setInternalValue] = useState(value || '')
+  const value = useDecisionTableStore(
+    (store: any) => store.decisionTable?.rules?.[index]?.[id],
+    shallow
+  )
 
-  useEffect(() => {
-    setInternalValue(value)
+  const [inner, setInner] = useState(value)
+  useLayoutEffect(() => {
+    if (inner !== value) {
+      setInner(value)
+    }
   }, [value])
 
-  const column = getColumnId(id)
-  const update = (value: string) => {
-    ;(table.options.meta as any)?.updateData?.(index, id, value)
-  }
+  const column = useDecisionTableStore(
+    columnIdSelector(id),
+    (a, b) => a?.id !== undefined && b?.id !== undefined && a?.id === b?.id
+  )
 
-  const setCursor = () => {
-    ;(table.options.meta as any)?.setCursor?.(id, index)
+  const disabled = useDecisionTableStore((store) => store.disabled, shallow)
+  const commitData = useDecisionTableStore((store) => store.commitData, shallow)
+  const setCursor = useDecisionTableStore((store) => store.setCursor, shallow)
+
+  const commit = (val: string) => {
+    setInner(val)
+    commitData(val, {
+      x: id,
+      y: index,
+    })
   }
 
   return (
     <div
       className='cell-wrapper'
-      onFocus={setCursor}
-      onBlur={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget)) {
-          update(internalValue)
-        }
-      }}
+      onFocus={() =>
+        setCursor({
+          x: id,
+          y: index,
+        })
+      }
       {...props}
     >
       {(table.options.meta as any)?.getCell?.({
         disabled,
         column,
-        value: internalValue,
-        onChange: setInternalValue,
-      }) || (
-        <TableInputCell
-          disabled={disabled}
-          column={column}
-          value={internalValue}
-          onChange={setInternalValue}
-        />
-      )}
+        value: inner,
+        onChange: commit,
+      }) || <TableInputCell disabled={disabled} column={column} value={inner} onChange={commit} />}
     </div>
   )
-}
+})
 
 export type TableCellProps = {
   column?: { colType: string } & TableSchemaItem
@@ -68,12 +74,14 @@ export type TableCellProps = {
 }
 
 const TableInputCell: React.FC<TableCellProps> = ({ value, onChange, disabled }) => {
+  const ref = useRef<any>(null)
   return (
     <Input.TextArea
+      ref={ref}
       className={'grl-dt__cell__input'}
+      value={value}
       rows={1}
       disabled={disabled}
-      value={value}
       autoSize={{
         minRows: 1,
         maxRows: 3,

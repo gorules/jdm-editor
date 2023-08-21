@@ -4,7 +4,7 @@ import slugify from 'slugify'
 import { v4 } from 'uuid'
 
 import { SchemaSelectProps, recursiveSelect } from '../../../helpers/components'
-import { ColumnType, TableSchemaItem } from '../context/dt.context'
+import { ColumnType, TableSchemaItem } from '../context/dt-store.context'
 
 export type FieldAddProps = {
   id?: string

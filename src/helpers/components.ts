@@ -1,3 +1,5 @@
+import { DecisionTableStoreType } from '../components/decision-table/context/dt-store.context'
+
 export type SchemaSelectProps = {
   field: string
   name?: string
@@ -31,3 +33,15 @@ export const getPath = (key: string, items: SchemaSelectProps[]): string[] | und
     }
   }
 }
+
+export const columnIdSelector = (x: string) => (state: DecisionTableStoreType) =>
+  [
+    ...state.decisionTable.inputs.map((i: any) => ({
+      ...i,
+      colType: 'input',
+    })),
+    ...state.decisionTable.outputs.map((i: any) => ({
+      ...i,
+      colType: 'output',
+    })),
+  ].find((c) => c.id === x)
