@@ -8,6 +8,7 @@ import { saveFile } from '../../helpers/file-helpers'
 import { Stack } from '../stack'
 import {
   TableExportOptions,
+  TableSchemaItem,
   parseDecisionTable,
   useDecisionTableRaw,
   useDecisionTableStore,
@@ -122,7 +123,7 @@ export const DecisionTableCommandBar: React.FC = () => {
         field: column?.field,
         type: column?.type,
         defaultValue: column?.defaultValue,
-      }))
+      })) as TableSchemaItem[]
 
     const outputs = columns
       .filter((column) => column._type === 'OUTPUT')
@@ -132,7 +133,7 @@ export const DecisionTableCommandBar: React.FC = () => {
         field: column?.field,
         type: column?.type,
         defaultValue: column?.defaultValue,
-      }))
+      })) as TableSchemaItem[]
 
     const rules = spreadsheetData.map((data) => {
       const dataPoint: Record<string, string> = {
