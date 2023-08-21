@@ -1,6 +1,6 @@
 import React from 'react';
 import { SchemaSelectProps } from '../../../helpers/components';
-import { ColumnType, TableSchemaItem } from '../context/dt.context';
+import { ColumnType, TableSchemaItem } from '../context/dt-store.context';
 export type FieldUpdateProps = {
     id?: string;
     field?: TableSchemaItem;

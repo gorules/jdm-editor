@@ -1,10 +1,10 @@
 import { CellContext } from '@tanstack/react-table';
 import React from 'react';
-import { TableSchemaItem } from '../context/dt.context';
+import { TableSchemaItem } from '../context/dt-store.context';
 export type TableDefaultCellProps = {
     context: CellContext<Record<string, string>, string>;
 } & React.HTMLAttributes<HTMLDivElement>;
-export declare const TableDefaultCell: React.FC<TableDefaultCellProps>;
+export declare const TableDefaultCell: React.NamedExoticComponent<TableDefaultCellProps>;
 export type TableCellProps = {
     column?: {
         colType: string;

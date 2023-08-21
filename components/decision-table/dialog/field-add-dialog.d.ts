@@ -1,6 +1,6 @@
 import React from 'react';
 import { SchemaSelectProps } from '../../../helpers/components';
-import { ColumnType, TableSchemaItem } from '../context/dt.context';
+import { ColumnType, TableSchemaItem } from '../context/dt-store.context';
 export type FieldAddProps = {
     id?: string;
     onSuccess?: (column: TableSchemaItem) => void;
