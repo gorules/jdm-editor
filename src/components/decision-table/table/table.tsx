@@ -1,13 +1,17 @@
 import { PlusOutlined } from '@ant-design/icons'
-import { ColumnDef, Row, getCoreRowModel, useReactTable } from '@tanstack/react-table'
+import {
+  ColumnDef,
+  Table as ReactTable,
+  getCoreRowModel,
+  useReactTable,
+} from '@tanstack/react-table'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import { Button, Typography, theme } from 'antd'
 import clsx from 'clsx'
-import React, { memo } from 'react'
-import { useVirtual } from 'react-virtual'
-import { shallow } from 'zustand/shallow'
+import equal from 'fast-deep-equal/es6/react'
+import React, { memo, useRef } from 'react'
 
 import { useDecisionTableStore } from '../context/dt-store.context'
-import { TableContextMenu } from './table-context-menu'
 import { TableDefaultCell } from './table-default-cell'
 import {
   TableHeadCellInput,
@@ -18,35 +22,52 @@ import {
 import { TableHeadRow } from './table-head-row'
 import { TableRow } from './table-row'
 
+
 export type TableProps = {
   maxHeight: string | number
 }
 
 export const Table = memo<TableProps>(({ maxHeight }) => {
-  const configurable = useDecisionTableStore((store) => store.configurable)
-  const disabled = useDecisionTableStore((store) => store.disabled)
-  const cellRenderer = useDecisionTableStore((store) => store.cellRenderer, shallow)
-
-  const minColWidth = useDecisionTableStore((store) => store.minColWidth)
-  const colWidth = useDecisionTableStore((store) => store.colWidth)
-
-  const inputs = useDecisionTableStore((store) => store.decisionTable?.inputs)
-  const outputs = useDecisionTableStore((store) => store.decisionTable?.outputs)
-  const rules = useDecisionTableStore(
-    (store) => store?.decisionTable?.rules,
-    (prevState, newState) =>
-      (prevState || []).map((rule: any) => rule._id).join('') ===
-      (newState || []).map((rule: any) => rule._id).join('')
+  const {
+    configurable,
+    disabled,
+    cellRenderer,
+    minColWidth,
+    colWidth,
+    addRowBelow,
+    inputs,
+    outputs,
+  } = useDecisionTableStore(
+    ({
+      configurable,
+      disabled,
+      cellRenderer,
+      minColWidth,
+      colWidth,
+      addRowBelow,
+      decisionTable,
+    }) => ({
+      configurable,
+      disabled,
+      cellRenderer,
+      minColWidth,
+      colWidth,
+      addRowBelow,
+      inputs: decisionTable.inputs,
+      outputs: decisionTable.outputs,
+    }),
+    equal
   )
 
-  const removeRow = useDecisionTableStore((store) => store.removeRow)
-  const addRowAbove = useDecisionTableStore((store) => store.addRowAbove)
-  const addRowBelow = useDecisionTableStore((store) => store.addRowBelow)
-  const swapRows = useDecisionTableStore((store) => store.swapRows)
-
-  const cursor = useDecisionTableStore(
-    (store) => store.cursor,
-    (prevState, newState) => prevState?.y === newState?.y
+  const { rules } = useDecisionTableStore(
+    ({ decisionTable }) => ({
+      rules: decisionTable.rules,
+    }),
+    (prev, curr) =>
+      equal(
+        prev.rules.map((i: any) => i?._id),
+        curr.rules.map((i: any) => i?._id)
+      )
   )
 
   const columns = React.useMemo<ColumnDef<any>[]>(
@@ -55,6 +76,7 @@ export const Table = memo<TableProps>(({ maxHeight }) => {
         id: 'inputs',
         minSize: minColWidth,
         size: colWidth,
+        enableResizing: false,
         header: () => <TableHeadCellInput configurable={configurable} disabled={disabled} />,
         columns: [
           ...(inputs || []).map((input: any) => {
@@ -107,10 +129,6 @@ export const Table = memo<TableProps>(({ maxHeight }) => {
     [configurable, disabled, inputs, outputs]
   )
 
-  const reorderRow = (draggedRowIndex: number, targetRowIndex: number) => {
-    swapRows(draggedRowIndex, targetRowIndex)
-  }
-
   const defaultColumn: Partial<ColumnDef<Record<string, string>, string>> = {
     cell: (context) => <TableDefaultCell context={context} />,
   }
@@ -127,20 +145,7 @@ export const Table = memo<TableProps>(({ maxHeight }) => {
     },
   })
 
-  const tableContainerRef = React.useRef<HTMLDivElement>(null)
-
-  const { rows } = table.getRowModel()
-  const rowVirtualizer = useVirtual({
-    parentRef: tableContainerRef,
-    size: rows.length,
-    overscan: 30,
-  })
-
-  const { virtualItems: virtualRows, totalSize } = rowVirtualizer
-
-  const paddingTop = virtualRows.length > 0 ? virtualRows?.[0]?.start || 0 : 0
-  const paddingBottom =
-    virtualRows.length > 0 ? totalSize - (virtualRows?.[virtualRows.length - 1]?.end || 0) : 0
+  const tableContainerRef = useRef<HTMLDivElement>(null)
 
   return (
     <div
@@ -150,61 +155,24 @@ export const Table = memo<TableProps>(({ maxHeight }) => {
     >
       <StyledTable width={table.getCenterTotalSize()}>
         <thead>
-          {table.getHeaderGroups().map((headerGroup, id) => {
-            if (id !== 0) return null
-            return <TableHeadRow key={headerGroup.id} headerGroup={headerGroup} />
-          })}
+          {table
+            .getHeaderGroups()
+            .filter((_, i) => i === 0)
+            .map((headerGroup) => (
+              <TableHeadRow key={headerGroup.id} headerGroup={headerGroup} />
+            ))}
         </thead>
       </StyledTable>
       <StyledTable width={table.getCenterTotalSize()}>
         <thead>
-          {table.getHeaderGroups().map((headerGroup, id) => {
-            if (id === 0) return null
-            return <TableHeadRow key={headerGroup.id} headerGroup={headerGroup} />
-          })}
+          {table
+            .getHeaderGroups()
+            .filter((_, i) => i === 1)
+            .map((headerGroup) => (
+              <TableHeadRow key={headerGroup.id} headerGroup={headerGroup} />
+            ))}
         </thead>
-        <TableContextMenu>
-          <tbody
-            onKeyDown={
-              disabled
-                ? undefined
-                : (e) => {
-                    if (e.code === 'ArrowUp' && (e.metaKey || e.altKey)) {
-                      if (cursor) addRowAbove(cursor?.y)
-                    }
-                    if (e.code === 'ArrowDown' && (e.metaKey || e.altKey)) {
-                      if (cursor) addRowBelow(cursor?.y)
-                    }
-                    if (e.code === 'Backspace' && (e.metaKey || e.altKey)) {
-                      if (cursor) removeRow(cursor?.y)
-                    }
-                  }
-            }
-          >
-            {paddingTop > 0 && (
-              <tr>
-                <td style={{ height: `${paddingTop}px` }} />
-              </tr>
-            )}
-            {virtualRows.map((virtualRow) => {
-              const row = rows[virtualRow.index] as Row<Record<string, string>>
-              return (
-                <TableRow
-                  key={row.id}
-                  index={virtualRow.index}
-                  row={row}
-                  reorderRow={reorderRow}
-                  disabled={disabled}
-                />
-              )
-            })}
-            {paddingBottom > 0 && (
-              <tr>
-                <td style={{ height: `${paddingBottom}px` }} />
-              </tr>
-            )}
-          </tbody>
-        </TableContextMenu>
+        <TableBody tableContainerRef={tableContainerRef} table={table} />
         <tfoot>
           <tr>
             <td colSpan={inputs.length + outputs.length + 2}>
@@ -223,6 +191,89 @@ export const Table = memo<TableProps>(({ maxHeight }) => {
     </div>
   )
 })
+
+type TableBodyProps = {
+  tableContainerRef: React.RefObject<HTMLDivElement>
+  table: ReactTable<any>
+} & Omit<React.HTMLAttributes<HTMLTableSectionElement>, 'children'>
+
+const TableBody = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(
+  ({ table, tableContainerRef, ...props }, ref) => {
+    const { disabled, cursor, addRowAbove, addRowBelow, removeRow, swapRows } =
+      useDecisionTableStore(
+        ({ disabled, cursor, addRowAbove, addRowBelow, removeRow, swapRows }) => ({
+          disabled,
+          cursor,
+          addRowAbove,
+          addRowBelow,
+          removeRow,
+          swapRows,
+        }),
+        equal
+      )
+
+    const { rows } = table.getRowModel()
+    const virtualizer = useVirtualizer({
+      getScrollElement: () => tableContainerRef.current,
+      estimateSize: () => 38,
+      count: rows.length,
+      overscan: 10,
+    })
+
+    const virtualItems = virtualizer.getVirtualItems()
+    const totalSize = virtualizer.getTotalSize()
+
+    const paddingTop = virtualItems.length > 0 ? virtualItems?.[0]?.start || 0 : 0
+    const paddingBottom =
+      virtualItems.length > 0 ? totalSize - (virtualItems?.[virtualItems.length - 1]?.end || 0) : 0
+
+    return (
+      <tbody
+        ref={ref}
+        {...props}
+        onKeyDown={(e) => {
+          if (disabled) {
+            return
+          }
+
+          if (e.code === 'ArrowUp' && (e.metaKey || e.altKey)) {
+            if (cursor) addRowAbove(cursor.y)
+          }
+          if (e.code === 'ArrowDown' && (e.metaKey || e.altKey)) {
+            if (cursor) addRowBelow(cursor.y)
+          }
+          if (e.code === 'Backspace' && (e.metaKey || e.altKey)) {
+            if (cursor) removeRow(cursor.y)
+          }
+        }}
+      >
+        {paddingTop > 0 && (
+          <tr>
+            <td style={{ height: `${paddingTop}px` }} />
+          </tr>
+        )}
+        {virtualItems.map((item) => {
+          const row = rows[item.index]
+
+          return (
+            <TableRow
+              key={row.id}
+              index={item.index}
+              row={row}
+              reorderRow={swapRows}
+              disabled={disabled}
+            />
+          )
+        })}
+        {paddingBottom > 0 && (
+          <tr>
+            <td style={{ height: `${paddingBottom}px` }} />
+          </tr>
+        )}
+      </tbody>
+    )
+  }
+)
 
 const StyledTable: React.FC<React.HTMLAttributes<HTMLTableElement> & { width: number }> = ({
   style,
@@ -244,6 +295,9 @@ const StyledTable: React.FC<React.HTMLAttributes<HTMLTableElement> & { width: nu
           '--color-bg-layout': token.colorBgLayout,
           '--color-bg-elevated': token.colorBgElevated,
           '--color-bg-container': token.colorBgContainer,
+          '--color-text': token.colorText,
+          '--font-family': token.fontFamily,
+          '--line-height': token.lineHeight,
           ...style,
         } as any
       }
