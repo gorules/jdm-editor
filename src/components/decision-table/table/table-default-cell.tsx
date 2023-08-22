@@ -1,5 +1,5 @@
 import { CellContext } from '@tanstack/react-table'
-import React, { memo, useId, useLayoutEffect, useState } from 'react'
+import React, { memo, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
 import { columnIdSelector } from '../../../helpers/components'
@@ -46,16 +46,7 @@ export const TableDefaultCell = memo<TableDefaultCellProps>(({ context, ...props
   }
 
   return (
-    <div
-      className='cell-wrapper'
-      onFocus={() =>
-        setCursor({
-          x: id,
-          y: index,
-        })
-      }
-      {...props}
-    >
+    <div className='cell-wrapper' onFocus={() => setCursor({ x: id, y: index })} {...props}>
       {(table.options.meta as any)?.getCell?.({
         disabled,
         column,
@@ -73,15 +64,72 @@ export type TableCellProps = {
   disabled?: boolean
 }
 
+const recalculateRows = (node: HTMLTextAreaElement) => {
+  const computedStyles = getComputedStyle(node)
+  const lineHeight = parseInt(computedStyles.lineHeight)
+  const paddingTop = parseInt(computedStyles.paddingTop)
+  const paddingBottom = parseInt(computedStyles.paddingBottom)
+
+  node.rows = 1
+
+  const contentHeight = node.scrollHeight - paddingTop - paddingBottom
+  const calculatedRows = Math.floor(contentHeight / lineHeight)
+
+  node.rows = Math.min(calculatedRows, 3)
+}
+
 const TableInputCell: React.FC<TableCellProps> = ({ value, onChange, disabled }) => {
   const id = useId()
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    if (!textareaRef.current) {
+      return
+    }
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      if (entries.length !== 1) {
+        return
+      }
+
+      recalculateRows(entries[0].target as HTMLTextAreaElement)
+    })
+
+    const parentContainer = textareaRef.current.closest('div.cell-wrapper')! as HTMLElement;
+    const eventListener = (e: Event) => {
+      if (e.target === textareaRef.current || !textareaRef.current) {
+        return;
+      }
+
+      textareaRef.current.focus();
+      textareaRef.current.selectionStart = textareaRef.current.value.length;
+    }
+
+    parentContainer.style.cursor = 'text';
+    parentContainer.addEventListener('click', eventListener);
+    resizeObserver.observe(textareaRef.current)
+
+    return () => {
+      parentContainer.style.cursor = '';
+      parentContainer.removeEventListener('click', eventListener);
+      resizeObserver.disconnect()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!textareaRef.current) {
+      return
+    }
+
+    recalculateRows(textareaRef.current)
+  }, [value])
 
   return (
     <textarea
       id={id}
       className={'grl-dt__cell__input textarea-input'}
+      ref={textareaRef}
       value={value}
-      rows={Math.min(value?.split?.('\n')?.length || 1, 3)}
       disabled={disabled}
       onChange={(e) => onChange(e.target.value)}
     />
