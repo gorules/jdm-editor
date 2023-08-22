@@ -3,7 +3,6 @@ import { Typography } from 'antd'
 import clsx from 'clsx'
 import React, { useMemo, useRef } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
-import { InView } from 'react-intersection-observer'
 import { shallow } from 'zustand/shallow'
 
 import { useDecisionTableStore } from '../context/dt-store.context'
@@ -85,15 +84,6 @@ export const TableRow: React.FC<TableRowProps> = ({
         <td key={cell.id} style={{ width: cell.column.getSize() }}>
           {flexRender(cell.column.columnDef.cell, cell.getContext())}
         </td>
-        // <InView key={cell.id}>
-        //   {({ inView, ref }) => {
-        //     return (
-        //       <td ref={ref} key={cell.id} style={{ width: cell.column.getSize() }}>
-        //         {inView && flexRender(cell.column.columnDef.cell, cell.getContext())}
-        //       </td>
-        //     )
-        //   }}
-        // </InView>
       ))}
     </tr>
   )

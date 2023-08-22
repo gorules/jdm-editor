@@ -1,11 +1,11 @@
 import { produce } from 'immer'
 import React, { useMemo } from 'react'
 import { v4 } from 'uuid'
-import { StoreApi, UseBoundStore } from 'zustand'
-import { create } from 'zustand'
+import { StoreApi, UseBoundStore, create } from 'zustand'
 
 import { SchemaSelectProps } from '../../../helpers/components'
 import { TableCellProps } from '../table/table-default-cell'
+
 
 export type TableExportOptions = {
   name?: string
@@ -374,10 +374,12 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
   )
 }
 
-export const useDecisionTableStore = (
-  selector: (state: DecisionTableStoreType) => any,
+export function useDecisionTableStore<T>(
+  selector: (state: DecisionTableStoreType) => T,
   equals?: (a: any, b: any) => boolean
-) => React.useContext(DecisionTableStoreContext)(selector, equals)
+): T {
+  return React.useContext(DecisionTableStoreContext)(selector, equals)
+}
 
 export const useDecisionTableRaw = () => React.useContext(DecisionTableStoreContext)
 export default DecisionTableProvider

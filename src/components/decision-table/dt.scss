@@ -6,7 +6,7 @@
 
   .table {
     border-collapse: collapse;
-    table-layout: auto;
+    table-layout: fixed;
     font-family: arial, sans-serif;
     width: fit-content;
     background-color: var(--color-bg-container);
@@ -15,6 +15,21 @@
     .cell-wrapper {
       width: 100%;
       height: 100%;
+    }
+
+    .textarea-input {
+      line-height: var(--line-height);
+      color: var(--color-text);
+      resize: none;
+      width: 100%;
+      box-sizing: border-box;
+      font-family: var(--font-family);
+
+      &:focus {
+        border-color: var(--border-color);
+        border-inline-end-width: 1px;
+        outline: none;
+      }
     }
 
     thead {
