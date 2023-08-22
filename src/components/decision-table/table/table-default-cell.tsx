@@ -1,6 +1,5 @@
 import { CellContext } from '@tanstack/react-table'
-import { Input } from 'antd'
-import React, { memo, useLayoutEffect, useRef, useState } from 'react'
+import React, { memo, useId, useLayoutEffect, useRef, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
 import { columnIdSelector } from '../../../helpers/components'
@@ -74,18 +73,15 @@ export type TableCellProps = {
 }
 
 const TableInputCell: React.FC<TableCellProps> = ({ value, onChange, disabled }) => {
-  const ref = useRef<any>(null)
+  const id = useId()
+
   return (
-    <Input.TextArea
-      ref={ref}
-      className={'grl-dt__cell__input'}
+    <textarea
+      id={id}
+      className={'grl-dt__cell__input textarea-input'}
       value={value}
-      rows={1}
+      rows={Math.min(value?.split?.('\n')?.length || 1, 3)}
       disabled={disabled}
-      autoSize={{
-        minRows: 1,
-        maxRows: 3,
-      }}
       onChange={(e) => onChange(e.target.value)}
     />
   )
