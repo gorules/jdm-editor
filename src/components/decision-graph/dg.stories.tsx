@@ -2,7 +2,6 @@ import { ApartmentOutlined, EditOutlined } from '@ant-design/icons';
 import type { Meta, StoryObj } from '@storybook/react';
 import { Button, Form, Input } from 'antd';
 import React, { useRef, useState } from 'react';
-import { XYPosition } from 'reactflow';
 import { v4 } from 'uuid';
 
 import { DecisionGraph } from './dg';
