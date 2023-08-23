@@ -1,4 +1,4 @@
-import './styles.scss'
+import './styles.scss';
 
-export * from './components'
-export * from './theme'
+export * from './components';
+export * from './theme';

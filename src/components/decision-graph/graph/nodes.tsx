@@ -4,51 +4,48 @@ import {
   CodeOutlined,
   FunctionOutlined,
   TableOutlined,
-} from '@ant-design/icons'
-import { Space, Typography } from 'antd'
-import clsx from 'clsx'
-import equal from 'fast-deep-equal/es6/react'
-import React, { FC, useMemo } from 'react'
-import { Handle, NodeProps, Position } from 'reactflow'
+} from '@ant-design/icons';
+import { Space, Typography } from 'antd';
+import clsx from 'clsx';
+import equal from 'fast-deep-equal/es6/react';
+import React, { FC, useMemo } from 'react';
+import { Handle, NodeProps, Position } from 'reactflow';
 
-import { CustomNodeType, useDecisionGraphStore } from '../context/dg-store.context'
+import { CustomNodeType, useDecisionGraphStore } from '../context/dg-store.context';
 
 const useNodeError = (id: string, simulate: any) => {
   if (simulate?.error?.data?.nodeId === id) {
-    return simulate?.error?.data
+    return simulate?.error?.data;
   }
 
-  return null
-}
+  return null;
+};
 
 export const GraphNode: FC<NodeProps> = (props) => {
-  const { id, data, isConnectable, type } = props
+  const { id, data, isConnectable, type } = props;
 
-  const simulate = useDecisionGraphStore((store) => store.simulate, equal)
-  const openTab = useDecisionGraphStore((store) => store.openTab, equal)
+  const simulate = useDecisionGraphStore((store) => store.simulate, equal);
+  const openTab = useDecisionGraphStore((store) => store.openTab, equal);
 
-  const customComponents: CustomNodeType[] = useDecisionGraphStore(
-    (store) => store.components || [],
-    equal
-  )
+  const customComponents: CustomNodeType[] = useDecisionGraphStore((store) => store.components || [], equal);
 
   const component = useMemo(() => {
-    return customComponents.find((component) => component.type === type)
-  }, [customComponents, type])
+    return customComponents.find((component) => component.type === type);
+  }, [customComponents, type]);
 
   const trace = useMemo(() => {
-    return simulate?.result?.trace?.[id]
-  }, [simulate])
+    return simulate?.result?.trace?.[id];
+  }, [simulate]);
 
-  const error = useNodeError(id, simulate)
+  const error = useNodeError(id, simulate);
 
   const innerOpen = () => {
     if (component) {
-      component?.onOpen?.()
+      component?.onOpen?.();
     } else {
-      openTab?.(id)
+      openTab?.(id);
     }
-  }
+  };
 
   return (
     <div
@@ -61,7 +58,7 @@ export const GraphNode: FC<NodeProps> = (props) => {
       ])}
       onDoubleClick={() => {
         if (type !== 'inputNode' && type !== 'outputNode') {
-          innerOpen()
+          innerOpen();
         }
       }}
     >
@@ -84,9 +81,7 @@ export const GraphNode: FC<NodeProps> = (props) => {
         type === 'decisionNode' ||
         type === 'functionNode' ||
         type === 'expressionNode' ||
-        type === 'outputNode') && (
-        <Handle type='target' position={Position.Left} isConnectable={isConnectable} />
-      )}
+        type === 'outputNode') && <Handle type='target' position={Position.Left} isConnectable={isConnectable} />}
       <Space
         direction={'vertical'}
         size={0}
@@ -146,7 +141,7 @@ export const GraphNode: FC<NodeProps> = (props) => {
           <Typography.Link
             onClick={() => {
               if (type !== 'inputNode' && type !== 'outputNode') {
-                innerOpen()
+                innerOpen();
               }
             }}
           >
@@ -158,24 +153,19 @@ export const GraphNode: FC<NodeProps> = (props) => {
         type === 'decisionNode' ||
         type === 'functionNode' ||
         type === 'expressionNode' ||
-        type === 'inputNode') && (
-        <Handle type='source' position={Position.Right} isConnectable={isConnectable} />
-      )}
+        type === 'inputNode') && <Handle type='source' position={Position.Right} isConnectable={isConnectable} />}
     </div>
-  )
-}
+  );
+};
 
 export const GraphNodeEdit: FC<NodeProps> = (props) => {
-  const { data, isConnectable, type, selected } = props
+  const { data, isConnectable, type, selected } = props;
 
-  const customComponents: CustomNodeType[] = useDecisionGraphStore(
-    (store) => store.components || [],
-    equal
-  )
+  const customComponents: CustomNodeType[] = useDecisionGraphStore((store) => store.components || [], equal);
 
   const component = useMemo(() => {
-    return customComponents.find((component) => component.type === type)
-  }, [customComponents, type])
+    return customComponents.find((component) => component.type === type);
+  }, [customComponents, type]);
 
   return (
     <div
@@ -191,9 +181,7 @@ export const GraphNodeEdit: FC<NodeProps> = (props) => {
         type === 'functionNode' ||
         type === 'expressionNode' ||
         type === 'outputNode' ||
-        component) && (
-        <Handle type='target' position={Position.Left} isConnectable={isConnectable} />
-      )}
+        component) && <Handle type='target' position={Position.Left} isConnectable={isConnectable} />}
       <Space
         direction={'vertical'}
         size={0}
@@ -256,9 +244,7 @@ export const GraphNodeEdit: FC<NodeProps> = (props) => {
         type === 'functionNode' ||
         type === 'expressionNode' ||
         type === 'inputNode' ||
-        component) && (
-        <Handle type='source' position={Position.Right} isConnectable={isConnectable} />
-      )}
+        component) && <Handle type='source' position={Position.Right} isConnectable={isConnectable} />}
     </div>
-  )
-}
+  );
+};

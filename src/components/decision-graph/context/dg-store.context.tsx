@@ -1,90 +1,88 @@
-import { produce } from 'immer'
-import React, { useMemo } from 'react'
-import { XYPosition } from 'reactflow'
-import { StoreApi, UseBoundStore } from 'zustand'
-import { create } from 'zustand'
+import { produce } from 'immer';
+import React, { useMemo } from 'react';
+import { XYPosition } from 'reactflow';
+import { StoreApi, UseBoundStore } from 'zustand';
+import { create } from 'zustand';
 
 export type Position = {
-  x: number
-  y: number
-}
+  x: number;
+  y: number;
+};
 
 export type DecisionNode = {
-  id: string
+  id: string;
 
-  name: string
-  description?: string
-  type?: string
+  name: string;
+  description?: string;
+  type?: string;
 
-  content?: any
+  content?: any;
 
-  position: Position
-}
+  position: Position;
+};
 
 export type DecisionEdge = {
-  id: string
-  name: string
+  id: string;
+  name?: string;
 
-  sourceId: string
-  targetId: string
+  sourceId: string;
+  targetId: string;
 
-  type?: string
-}
+  type?: string;
+};
 
 export type DecisionGraphType = {
-  nodes: DecisionNode[]
-  edges: DecisionEdge[]
-}
+  nodes: DecisionNode[];
+  edges: DecisionEdge[];
+};
 
 export type CustomNodeType = {
-  type: string
-  name: string
-  onOpen?: () => void
-  renderForm?: () => React.ReactNode
-  renderIcon?: () => React.ReactNode
-}
+  type: string;
+  name: string;
+  onOpen?: () => void;
+  renderForm?: () => React.ReactNode;
+  renderIcon?: () => React.ReactNode;
+};
 
 export type DecisionGraphStoreType = {
-  id?: string
+  id?: string;
 
-  components?: CustomNodeType[]
+  components?: CustomNodeType[];
 
-  decisionGraph: DecisionGraphType
-  setDecisionGraph: (val: DecisionGraphType) => void
+  decisionGraph: DecisionGraphType;
+  setDecisionGraph: (val: DecisionGraphType) => void;
 
-  disabled?: boolean
-  configurable?: boolean
+  disabled?: boolean;
+  configurable?: boolean;
 
-  simulate?: any
+  simulate?: any;
 
-  updateNode: (id: string, content: any) => void
+  updateNode: (id: string, content: any) => void;
 
-  openTabs: string[]
-  activeTab: string
-  closeTab: (id: string) => void
-  openTab: (id: string) => void
+  openTabs: string[];
+  activeTab: string;
+  closeTab: (id: string) => void;
+  openTab: (id: string) => void;
 
-  onChange?: (val: DecisionGraphType) => void
-  onOpenNode?: (node: DecisionNode) => void
-  onEditGraph?: (edit: boolean) => void
-  onAddNode?: (type: string, position?: XYPosition) => void
-  onTabChange?: (tab?: string) => void
-}
+  onChange?: (val: DecisionGraphType) => void;
+  onOpenNode?: (node: DecisionNode) => void;
+  onEditGraph?: (edit: boolean) => void;
+  onAddNode?: (type: string, position?: XYPosition) => void;
+  onTabChange?: (tab?: string) => void;
+};
 
 export const DecisionGraphStoreContext = React.createContext<
   UseBoundStore<StoreApi<DecisionGraphStoreType>> & {
-    setState: (partial: Partial<DecisionGraphStoreType>) => void
+    setState: (partial: Partial<DecisionGraphStoreType>) => void;
   }
->({} as any)
+>({} as any);
 
 export type DecisionGraphContextProps = {
   //
-}
+};
 
-export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGraphContextProps>> = (
-  props
-) => {
-  const { children } = props
+export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGraphContextProps>> = (props) => {
+  const { children } = props;
   const store = useMemo(
     () =>
       create<DecisionGraphStoreType>((set, getState) => ({
@@ -95,52 +93,52 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         setDecisionGraph: (graph) => {
           set({
             decisionGraph: graph,
-          })
-          getState()?.onChange?.(graph)
+          });
+          getState()?.onChange?.(graph);
         },
         updateNode: (id, content) => {
           const decisionGraph = produce(getState().decisionGraph, (draft) => {
             const nodes = (draft.nodes || []).map((node) => {
               if (id === node?.id) {
-                node.content = content
+                node.content = content;
               }
-              return node
-            })
-            draft.nodes = nodes
-          })
+              return node;
+            });
+            draft.nodes = nodes;
+          });
           set({
             decisionGraph,
-          })
-          getState()?.onChange?.(decisionGraph)
+          });
+          getState()?.onChange?.(decisionGraph);
         },
         openTabs: [],
         activeTab: 'graph',
         openTab: (id: string) => {
-          const openTabs = getState().openTabs
-          const nodeId = openTabs.find((i) => i === id)
+          const openTabs = getState().openTabs;
+          const nodeId = openTabs.find((i) => i === id);
           if (nodeId) {
             set({
               activeTab: nodeId,
-            })
+            });
           } else {
             set({
               openTabs: [...openTabs, id],
               activeTab: id,
-            })
+            });
           }
         },
         closeTab: (id: string) => {
-          const openTabs = getState().openTabs
-          const activeTab = getState().activeTab
-          const index = openTabs?.findIndex((i) => i === id)
-          const tab = openTabs?.[index]
+          const openTabs = getState().openTabs;
+          const activeTab = getState().activeTab;
+          const index = openTabs?.findIndex((i) => i === id);
+          const tab = openTabs?.[index];
           set({
             openTabs: openTabs.filter((id) => id !== tab),
-          })
+          });
           if (activeTab === id) {
             set({
               activeTab: index > 0 ? openTabs?.[index - 1] : 'graph',
-            })
+            });
           }
         },
         disabled: false,
@@ -148,18 +146,14 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         components: [],
       })),
     []
-  )
-  return (
-    <DecisionGraphStoreContext.Provider value={store}>
-      {children}
-    </DecisionGraphStoreContext.Provider>
-  )
-}
+  );
+  return <DecisionGraphStoreContext.Provider value={store}>{children}</DecisionGraphStoreContext.Provider>;
+};
 
 export const useDecisionGraphStore = (
   selector: (state: DecisionGraphStoreType) => any,
   equals?: (a: any, b: any) => boolean
-) => React.useContext(DecisionGraphStoreContext)(selector, equals)
+) => React.useContext(DecisionGraphStoreContext)(selector, equals);
 
-export const useDecisionGraphRaw = () => React.useContext(DecisionGraphStoreContext)
-export default DecisionGraphProvider
+export const useDecisionGraphRaw = () => React.useContext(DecisionGraphStoreContext);
+export default DecisionGraphProvider;

@@ -1,23 +1,23 @@
-import { theme } from 'antd'
-import React from 'react'
+import { theme } from 'antd';
+import React from 'react';
 
-import { DecisionGraphContextProps, DecisionGraphProvider } from './context/dg-store.context'
-import { DecisionGraphEmpty, DecisionGraphEmptyType } from './dg-empty'
-import { DecisionGraphWrapper } from './dg-wrapper'
-import './dg.scss'
+import { DecisionGraphContextProps, DecisionGraphProvider } from './context/dg-store.context';
+import { DecisionGraphEmpty, DecisionGraphEmptyType } from './dg-empty';
+import { DecisionGraphWrapper } from './dg-wrapper';
+import './dg.scss';
 
 export type DecisionGraphProps = {
-  manager?: any
+  manager?: any;
   components?: {
-    type: string
-    icon?: React.ReactNode
-    form?: React.ReactNode
-  }[]
+    type: string;
+    icon?: React.ReactNode;
+    form?: React.ReactNode;
+  }[];
 } & DecisionGraphContextProps &
-  DecisionGraphEmptyType
+  DecisionGraphEmptyType;
 
 export const DecisionGraph: React.FC<DecisionGraphProps> = ({ manager: _, ...props }) => {
-  const { token } = theme.useToken()
+  const { token } = theme.useToken();
 
   return (
     <div
@@ -39,5 +39,5 @@ export const DecisionGraph: React.FC<DecisionGraphProps> = ({ manager: _, ...pro
         <DecisionGraphEmpty {...props} />
       </DecisionGraphProvider>
     </div>
-  )
-}
+  );
+};

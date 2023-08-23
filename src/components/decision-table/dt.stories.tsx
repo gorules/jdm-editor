@@ -1,11 +1,11 @@
-import type { Meta, StoryObj } from '@storybook/react'
-import { Checkbox } from 'antd'
-import { createDragDropManager } from 'dnd-core'
-import React, { useMemo, useState } from 'react'
-import { HTML5Backend } from 'react-dnd-html5-backend'
+import type { Meta, StoryObj } from '@storybook/react';
+import { Checkbox } from 'antd';
+import { createDragDropManager } from 'dnd-core';
+import React, { useMemo, useState } from 'react';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
-import { DecisionTableType } from './context/dt-store.context'
-import { DecisionTable } from './dt'
+import { DecisionTableType } from './context/dt-store.context';
+import { DecisionTable } from './dt';
 
 const shippingFeesDefault = {
   hitPolicy: 'first',
@@ -75,7 +75,7 @@ const shippingFeesDefault = {
       '3EGDrV0ssV': '30',
     },
   ],
-}
+};
 
 const inputSchemaDefault = [
   {
@@ -102,10 +102,10 @@ const inputSchemaDefault = [
       },
     ],
   },
-]
+];
 
 const stressRules = () => {
-  const stressRules: any[] = []
+  const stressRules: any[] = [];
 
   for (let i = 10_000; i > 0; i--) {
     stressRules.push({
@@ -114,11 +114,11 @@ const stressRules = () => {
       'HVo_JpALi8': `> ${i}`,
       'HW6mSVfLbs': '"US"',
       '3EGDrV0ssV': `${i}`,
-    })
+    });
   }
 
-  return stressRules
-}
+  return stressRules;
+};
 
 const meta: Meta<typeof DecisionTable> = {
   /* 👇 The title prop is optional.
@@ -139,64 +139,68 @@ const meta: Meta<typeof DecisionTable> = {
     configurable: true,
     disabled: false,
   },
-}
+};
 
-export default meta
+export default meta;
 
-type Story = StoryObj<typeof DecisionTable>
+type Story = StoryObj<typeof DecisionTable>;
 
 export const Controlled: Story = {
   render: (args) => {
-    const [value, setValue] = useState<any>(shippingFeesDefault)
+    const [value, setValue] = useState<any>(shippingFeesDefault);
     const manager = useMemo(() => {
-      return createDragDropManager(HTML5Backend)
-    }, [])
+      return createDragDropManager(HTML5Backend);
+    }, []);
     return (
-      <div style={{
-        height: '100%'
-      }}>
+      <div
+        style={{
+          height: '100%',
+        }}
+      >
         <DecisionTable
           {...args}
           value={value}
           manager={manager}
           onChange={(val) => {
-            setValue(val)
+            setValue(val);
           }}
           inputsSchema={inputSchemaDefault}
           tableHeight='100%'
         />
       </div>
-    )
+    );
   },
-}
+};
 
 export const Uncontrolled: Story = {
   render: (args) => {
     const manager = useMemo(() => {
-      return createDragDropManager(HTML5Backend)
-    }, [])
+      return createDragDropManager(HTML5Backend);
+    }, []);
     return (
-      <div style={{
-        height: '100%'
-      }}>
+      <div
+        style={{
+          height: '100%',
+        }}
+      >
         <DecisionTable
           {...args}
           manager={manager}
           defaultValue={shippingFeesDefault}
           onChange={(val) => {
-            console.log(val)
+            console.log(val);
           }}
           inputsSchema={inputSchemaDefault}
           tableHeight='100%'
         />
       </div>
-    )
+    );
   },
-}
+};
 
 export const CustomRenderer: Story = {
   render: (args) => {
-    const [value, setValue] = useState<DecisionTableType>()
+    const [value, setValue] = useState<DecisionTableType>();
     return (
       <div>
         <DecisionTable
@@ -212,41 +216,43 @@ export const CustomRenderer: Story = {
                     disabled={props.disabled}
                     checked={props.value === 'true'}
                     onChange={(e) => {
-                      props.onChange(`${e?.target?.checked}`)
+                      props.onChange(`${e?.target?.checked}`);
                     }}
                   >
                     Enabled
                   </Checkbox>
                 </div>
-              )
+              );
             }
-            return null
+            return null;
           }}
         />
       </div>
-    )
+    );
   },
-}
+};
 
 export const StressTest: Story = {
   render: (args) => {
     const [value, setValue] = useState<DecisionTableType>({
       ...shippingFeesDefault,
       rules: stressRules(),
-    })
+    });
     return (
-      <div style={{
-        height: '100%'
-      }}>
+      <div
+        style={{
+          height: '100%',
+        }}
+      >
         <DecisionTable
           {...args}
           value={value}
           onChange={(val) => {
-            setValue(val)
+            setValue(val);
           }}
           tableHeight='100%'
         />
       </div>
-    )
+    );
   },
-}
+};

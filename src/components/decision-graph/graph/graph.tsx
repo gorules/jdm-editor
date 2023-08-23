@@ -1,8 +1,8 @@
-import { CheckOutlined, CloseOutlined, SettingOutlined } from '@ant-design/icons'
-import { Button, message } from 'antd'
-import clsx from 'clsx'
-import equal from 'fast-deep-equal/es6/react'
-import React, { forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import { CheckOutlined, CloseOutlined, SettingOutlined } from '@ant-design/icons';
+import { Button, message } from 'antd';
+import clsx from 'clsx';
+import equal from 'fast-deep-equal/es6/react';
+import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import ReactFlow, {
   Background,
   Controls,
@@ -13,77 +13,71 @@ import ReactFlow, {
   addEdge,
   useEdgesState,
   useNodesState,
-} from 'reactflow'
-import 'reactflow/dist/style.css'
-import TopologicalSort from 'topological-sort'
-import { v4 } from 'uuid'
+} from 'reactflow';
+import 'reactflow/dist/style.css';
+import { v4 } from 'uuid';
 
-import { DecisionEdge, DecisionNode, useDecisionGraphStore } from '../context/dg-store.context'
-import { edgeFunction } from '../custom-edge'
-import {
-  mapToDecisionEdges,
-  mapToDecisionNodes,
-  mapToGraphEdges,
-  mapToGraphNode,
-  mapToGraphNodes,
-} from '../dg-util'
-import '../dg.scss'
-import { GraphComponents } from './graph-components'
-import { useGraphClipboard } from '../hooks/use-graph-clipboard'
-import { MultiNodeForm } from './multi-node-form'
-import { NodeForm } from './node-form'
-import { GraphNode, GraphNodeEdit } from './nodes'
+import { DecisionEdge, DecisionGraphType, DecisionNode, useDecisionGraphStore } from '../context/dg-store.context';
+import { edgeFunction } from '../custom-edge';
+import { mapToDecisionEdges, mapToDecisionNodes, mapToGraphEdges, mapToGraphNode, mapToGraphNodes } from '../dg-util';
+import '../dg.scss';
+import { useGraphClipboard } from '../hooks/use-graph-clipboard';
+import { GraphComponents } from './graph-components';
+import { MultiNodeForm } from './multi-node-form';
+import { NodeForm } from './node-form';
+import { GraphNode, GraphNodeEdit } from './nodes';
 
 export type GraphProps = {
-  className?: string
-}
+  className?: string;
+};
 export const Graph = forwardRef<
   {
-    openEdit?: () => void
-    closeEdit?: () => void
-    confirmEdit?: () => void
+    openEdit?: () => void;
+    closeEdit?: () => void;
+    confirmEdit?: () => void;
+    addNode?: (node: DecisionNode) => void;
+    setDecisionGraph?: (decisionGraph: DecisionGraphType) => void;
   },
   GraphProps
 >(({ className }, ref) => {
-  const reactFlowWrapper = useRef<any>(null)
-  const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>()
+  const reactFlowWrapper = useRef<any>(null);
+  const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
 
-  const [editGraph, setEditGraph] = useState(false)
+  const [editGraph, setEditGraph] = useState(false);
 
-  const [editNodes, setEditNodes, onEditNodesChange] = useNodesState([])
-  const [editEdges, setEditEdges, onEditEdgesChange] = useEdgesState([])
+  const [editNodes, setEditNodes, onEditNodesChange] = useNodesState([]);
+  const [editEdges, setEditEdges, onEditEdgesChange] = useEdgesState([]);
 
-  const inputNodes = editNodes?.filter?.((node) => node.type === 'inputNode')
-  const outputNodes = editNodes?.filter?.((node) => node.type === 'outputNode')
+  const inputNodes = editNodes?.filter?.((node) => node.type === 'inputNode');
+  const outputNodes = editNodes?.filter?.((node) => node.type === 'outputNode');
 
-  const selected = editNodes?.filter?.((node) => node?.selected)
-  const selectedEdges = editEdges?.filter?.((edge) => edge?.selected)
+  const selected = editNodes?.filter?.((node) => node?.selected);
+  const selectedEdges = editEdges?.filter?.((edge) => edge?.selected);
 
-  const nodes: DecisionNode[] = useDecisionGraphStore(
-    (store) => store.decisionGraph?.nodes || [],
-    equal
-  )
-  const edges: DecisionEdge[] = useDecisionGraphStore(
-    (store) => store.decisionGraph?.edges || [],
-    equal
-  )
-  const setDecisionGraph = useDecisionGraphStore((store) => store.setDecisionGraph, equal)
-  const disabled = useDecisionGraphStore((store) => store.disabled, equal)
-  const closeTab = useDecisionGraphStore((store) => store.closeTab, equal)
-  const onAddNode = useDecisionGraphStore((store) => store.onAddNode, equal)
+  const nodes: DecisionNode[] = useDecisionGraphStore((store) => store.decisionGraph?.nodes || [], equal);
+  const edges: DecisionEdge[] = useDecisionGraphStore((store) => store.decisionGraph?.edges || [], equal);
+  const setDecisionGraph = useDecisionGraphStore((store) => store.setDecisionGraph, equal);
+  const disabled = useDecisionGraphStore((store) => store.disabled, equal);
+  const closeTab = useDecisionGraphStore((store) => store.closeTab, equal);
+  const onAddNode = useDecisionGraphStore((store) => store.onAddNode, equal);
+  const onEditGraph = useDecisionGraphStore((store) => store.onEditGraph, equal);
 
-  const graphClipboard = useGraphClipboard(reactFlowInstance, reactFlowWrapper.current || undefined)
+  const graphClipboard = useGraphClipboard(reactFlowInstance, reactFlowWrapper.current || undefined);
+
+  useEffect(() => {
+    onEditGraph?.(editGraph);
+  }, [editGraph]);
 
   const addNode = (type: string, position?: XYPosition) => {
-    if (!reactFlowWrapper.current || !reactFlowInstance) return
+    if (!reactFlowWrapper.current || !reactFlowInstance) return;
     if (!position) {
-      const rect = reactFlowWrapper?.current?.getBoundingClientRect() as DOMRect
+      const rect = reactFlowWrapper?.current?.getBoundingClientRect() as DOMRect;
       const rectCenter = {
         x: rect.width / 2,
         y: rect.height / 2,
-      }
+      };
 
-      position = reactFlowInstance?.project(rectCenter)
+      position = reactFlowInstance?.project(rectCenter);
     }
 
     if (
@@ -93,30 +87,30 @@ export const Graph = forwardRef<
       type !== 'inputNode' &&
       type !== 'outputNode'
     ) {
-      return onAddNode(type, position)
+      return onAddNode(type, position);
     }
 
-    const count = (nodes || []).filter((node) => node?.type === type)?.length
+    const count = (nodes || []).filter((node) => node?.type === type)?.length;
 
-    const data: any = {}
+    const data: any = {};
     if (type === 'decisionTableNode') {
       const inputField = {
         id: v4(),
         name: 'Input',
         type: 'expression',
-      }
+      };
       const outputField = {
         field: 'output',
         id: v4(),
         name: 'Output',
         type: 'expression',
-      }
+      };
       data.content = {
         hitPolicy: 'first',
         inputs: [inputField],
         outputs: [outputField],
         rules: [],
-      }
+      };
     } else if (type === 'functionNode') {
       data.content = [
         '/**',
@@ -128,15 +122,15 @@ export const Graph = forwardRef<
         'const handler = (input, { moment }) => {',
         '  return input;',
         '}',
-      ].join('\n')
+      ].join('\n');
     } else if (type === 'inputNode') {
-      data.name = 'Request'
+      data.name = 'Request';
     } else if (type === 'outputNode') {
-      data.name = 'Response'
+      data.name = 'Response';
     } else if (type === 'expressionNode') {
       data.content = {
         expressions: [],
-      }
+      };
     }
 
     const newNode: Node = {
@@ -147,10 +141,10 @@ export const Graph = forwardRef<
         name: `${type} ${count + 1}`,
         ...data,
       },
-    }
+    };
 
-    setEditNodes((nodes) => nodes.concat(newNode))
-  }
+    setEditNodes((nodes) => nodes.concat(newNode));
+  };
 
   const updateNode = (node: Partial<Node>) => {
     setEditNodes((nodes) => {
@@ -164,43 +158,43 @@ export const Graph = forwardRef<
               ...(e?.data || {}),
               ...(node?.data || {}),
             },
-          }
+          };
         }
-        return e
-      })
-    })
-  }
+        return e;
+      });
+    });
+  };
 
   const onDrop = (event: React.DragEvent) => {
-    event.preventDefault()
+    event.preventDefault();
 
-    if (!reactFlowWrapper.current || !reactFlowInstance) return
+    if (!reactFlowWrapper.current || !reactFlowInstance) return;
 
-    const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect()
-    const type = event.dataTransfer.getData('application/reactflow')
-    let elementPosition: XYPosition
+    const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+    const type = event.dataTransfer.getData('application/reactflow');
+    let elementPosition: XYPosition;
 
     try {
-      elementPosition = JSON.parse(event.dataTransfer.getData('relativePosition'))
+      elementPosition = JSON.parse(event.dataTransfer.getData('relativePosition'));
     } catch (e) {
-      return
+      return;
     }
 
     const position = reactFlowInstance.project({
       x: event.clientX - reactFlowBounds.left,
       y: event.clientY - reactFlowBounds.top,
-    }) as XYPosition
+    }) as XYPosition;
 
-    position.x -= Math.round((elementPosition.x * 180) / 10) * 10
-    position.y -= Math.round((elementPosition.y * 80) / 10) * 10
+    position.x -= Math.round((elementPosition.x * 180) / 10) * 10;
+    position.y -= Math.round((elementPosition.y * 80) / 10) * 10;
 
-    addNode(type, position)
-  }
+    addNode(type, position);
+  };
 
   const onDragOver = (event: any) => {
-    event.preventDefault()
-    event.dataTransfer.dropEffect = 'move'
-  }
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+  };
 
   const onConnect = (params: any) => {
     setEditEdges((els: Edge[]) => {
@@ -211,9 +205,9 @@ export const Graph = forwardRef<
           id: v4(),
         },
         els
-      )
-    })
-  }
+      );
+    });
+  };
 
   const edgeTypes = useMemo(
     () => ({
@@ -222,7 +216,7 @@ export const Graph = forwardRef<
       }),
     }),
     [nodes]
-  )
+  );
 
   const nodeTypes = useMemo(() => {
     return {
@@ -232,8 +226,8 @@ export const Graph = forwardRef<
       expressionNode: GraphNode,
       inputNode: GraphNode,
       outputNode: GraphNode,
-    }
-  }, [])
+    };
+  }, []);
 
   const editNodeTypes = useMemo(() => {
     return {
@@ -243,64 +237,53 @@ export const Graph = forwardRef<
       expressionNode: GraphNodeEdit,
       inputNode: GraphNodeEdit,
       outputNode: GraphNodeEdit,
-    }
-  }, [])
+    };
+  }, []);
 
   const confirmEdit = () => {
     try {
-      // const edges = mapToDecisionEdges(editEdges)
-      // const nodes = mapToDecisionNodes(editNodes)
-      // if (nodes.filter((node) => node?.type === 'inputNode')?.length > 1) {
-      //   message.error('Maximum 1 input')
-      //   return
-      // }
-      // if (nodes.filter((node) => node?.type === 'outputNode')?.length > 1) {
-      //   message.error('Maximum 1 output')
-      //   return
-      // }
-      //
-      // const nds = new Map()
-      // const sortOp = new TopologicalSort(nds)
-      // sortOp.addNodes(new Map(nodes.map((node) => [node.id, node])))
-      // edges.forEach((edge) => {
-      //   sortOp.addEdge(edge.sourceId, edge.targetId)
-      // })
-      // sortOp.sort()
-      //
-      // const sortedNodes = Array.from<any>(sortOp.sort().values())
-      //   .map((el) => el?.node)
-      //   .filter((el) => !!el)
+      const edges = mapToDecisionEdges(editEdges);
+      const nodes = mapToDecisionNodes(editNodes);
+      if (nodes.filter((node) => node?.type === 'inputNode')?.length > 1) {
+        message.error('Maximum 1 input');
+        return;
+      }
+      if (nodes.filter((node) => node?.type === 'outputNode')?.length > 1) {
+        message.error('Maximum 1 output');
+        return;
+      }
 
       setDecisionGraph({
-        nodes: mapToDecisionNodes(editNodes),
-        edges: mapToDecisionEdges(editEdges),
-      })
-      setEditGraph(false)
+        nodes,
+        edges,
+      });
+      setEditGraph(false);
     } catch (e: any) {
-      console.log(e)
-      message.error(e?.message)
+      console.log(e);
+      message.error(e?.message);
     }
-  }
+  };
 
   useImperativeHandle(ref, () => ({
     openEdit: () => {
-      if (disabled) return
-      setEditNodes(mapToGraphNodes(nodes))
-      setEditEdges(mapToGraphEdges(edges))
-      setEditGraph(true)
+      if (disabled) return;
+      setEditNodes(mapToGraphNodes(nodes));
+      setEditEdges(mapToGraphEdges(edges));
+      setEditGraph(true);
     },
     closeEdit: () => {
-      setEditGraph(false)
+      setEditGraph(false);
     },
     confirmEdit: () => {
-      confirmEdit()
+      confirmEdit();
     },
     addNode: (node: DecisionNode) => {
       if (editGraph) {
-        setEditNodes((nodes) => nodes.concat(mapToGraphNode(node)))
+        setEditNodes((nodes) => nodes.concat(mapToGraphNode(node)));
       }
     },
-  }))
+    setDecisionGraph,
+  }));
 
   return (
     <div className={clsx(['tab-content', className])}>
@@ -311,9 +294,9 @@ export const Graph = forwardRef<
             size={'small'}
             disabled={disabled}
             onClick={() => {
-              setEditNodes(mapToGraphNodes(nodes))
-              setEditEdges(mapToGraphEdges(edges))
-              setEditGraph(true)
+              setEditNodes(mapToGraphNodes(nodes));
+              setEditEdges(mapToGraphEdges(edges));
+              setEditGraph(true);
             }}
             icon={<SettingOutlined />}
           >
@@ -325,7 +308,7 @@ export const Graph = forwardRef<
             type='default'
             size={'small'}
             onClick={() => {
-              confirmEdit()
+              confirmEdit();
             }}
             icon={<CheckOutlined />}
           >
@@ -338,7 +321,7 @@ export const Graph = forwardRef<
             color='secondary'
             size={'small'}
             onClick={() => {
-              setEditGraph(false)
+              setEditGraph(false);
             }}
             icon={<CloseOutlined />}
           >
@@ -367,16 +350,16 @@ export const Graph = forwardRef<
               hideAttribution: true,
             }}
             onNodesChange={(e) => {
-              editGraph && onEditNodesChange(e)
+              editGraph && onEditNodesChange(e);
             }}
             onEdgesChange={(e) => {
-              editGraph && onEditEdgesChange(e)
+              editGraph && onEditEdgesChange(e);
             }}
             onNodesDelete={(e) => {
               if (editGraph) {
                 e.forEach((node) => {
-                  closeTab?.(node?.id)
-                })
+                  closeTab?.(node?.id);
+                });
               }
             }}
             onEdgesDelete={() => {
@@ -401,7 +384,7 @@ export const Graph = forwardRef<
                     try {
                       // await graphClipboard.pasteNodes()
                     } catch (e) {
-                      message.error(e?.message)
+                      message.error(e?.message);
                     }
                   }
                 }}
@@ -412,17 +395,17 @@ export const Graph = forwardRef<
                 node={selected?.[0]}
                 onChange={updateNode}
                 onClose={() => {
-                  setEditNodes((nodes) => nodes.map((i) => ({ ...i, selected: false })))
+                  setEditNodes((nodes) => nodes.map((i) => ({ ...i, selected: false })));
                 }}
                 onCopy={async () => {
-                  await graphClipboard.copyNodes(selected)
-                  message.success('Copied to clipboard!')
+                  await graphClipboard.copyNodes(selected);
+                  message.success('Copied to clipboard!');
                 }}
                 removeNode={(node) => {
                   setEditEdges((edges) =>
                     edges.filter((edge) => edge?.target !== node?.id && edge?.source !== node?.id)
-                  )
-                  setEditNodes((nodes) => nodes.filter((n) => n?.id !== node?.id))
+                  );
+                  setEditNodes((nodes) => nodes.filter((n) => n?.id !== node?.id));
                 }}
               />
             )}
@@ -431,25 +414,23 @@ export const Graph = forwardRef<
                 edges={selectedEdges}
                 nodes={selected}
                 onCopy={async (nodes) => {
-                  await graphClipboard.copyNodes(nodes)
-                  message.success('Copied to clipboard!')
+                  await graphClipboard.copyNodes(nodes);
+                  message.success('Copied to clipboard!');
                 }}
                 removeNodes={(nodes) => {
-                  const nodeIds = nodes.map((i) => i.id)
+                  const nodeIds = nodes.map((i) => i.id);
                   setEditEdges((edges) =>
-                    edges.filter(
-                      (edge) => !nodeIds.includes(edge?.target) && !nodeIds.includes(edge?.source)
-                    )
-                  )
-                  setEditNodes((nodes) => nodes.filter((n) => !nodeIds.includes(n?.id)))
+                    edges.filter((edge) => !nodeIds.includes(edge?.target) && !nodeIds.includes(edge?.source))
+                  );
+                  setEditNodes((nodes) => nodes.filter((n) => !nodeIds.includes(n?.id)));
                 }}
                 removeEdges={(edges) => {
-                  const edgeIds = edges.map((i) => i.id)
-                  setEditEdges((edges) => edges.filter((edge) => !edgeIds.includes(edge?.id)))
+                  const edgeIds = edges.map((i) => i.id);
+                  setEditEdges((edges) => edges.filter((edge) => !edgeIds.includes(edge?.id)));
                 }}
                 onClose={() => {
-                  setEditNodes((nodes) => nodes.map((i) => ({ ...i, selected: false })))
-                  setEditEdges((edges) => edges.map((i) => ({ ...i, selected: false })))
+                  setEditNodes((nodes) => nodes.map((i) => ({ ...i, selected: false })));
+                  setEditEdges((edges) => edges.map((i) => ({ ...i, selected: false })));
                 }}
               />
             )}
@@ -457,5 +438,5 @@ export const Graph = forwardRef<
         )}
       </div>
     </div>
-  )
-})
+  );
+});

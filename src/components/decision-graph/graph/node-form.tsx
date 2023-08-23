@@ -1,66 +1,63 @@
-import { CloseOutlined } from '@ant-design/icons'
-import { Button, Form, Input, Space, Typography } from 'antd'
-import equal from 'fast-deep-equal/es6/react'
-import React, { FC, useEffect, useMemo } from 'react'
-import { Node } from 'reactflow'
+import { CloseOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Space, Typography } from 'antd';
+import equal from 'fast-deep-equal/es6/react';
+import React, { FC, useEffect, useMemo } from 'react';
+import { Node } from 'reactflow';
 
-import { Stack } from '../../stack'
-import { CustomNodeType, useDecisionGraphStore } from '../context/dg-store.context'
+import { Stack } from '../../stack';
+import { CustomNodeType, useDecisionGraphStore } from '../context/dg-store.context';
 
 export type NodeFormProps<T = any> = {
-  node: Node
-  onCopy?: (node: Node) => void
-  onChange?: (data: T) => void
-  onClose?: () => void
-  removeNode?: (node: Node) => void
-}
+  node: Node;
+  onCopy?: (node: Node) => void;
+  onChange?: (data: T) => void;
+  onClose?: () => void;
+  removeNode?: (node: Node) => void;
+};
 
 export const NodeForm: FC<NodeFormProps> = ({ node, onChange, removeNode, onClose, onCopy }) => {
-  const [form] = Form.useForm()
+  const [form] = Form.useForm();
 
   useEffect(() => {
     form.setFieldsValue({
       name: node?.data?.name,
       description: node?.data?.description,
       content: node?.data?.content,
-    })
-  }, [node?.id])
+    });
+  }, [node?.id]);
 
   useEffect(() => {
     form.setFieldsValue({
       name: node?.data?.name,
       description: node?.data?.description,
       content: node?.data?.content,
-    })
-  }, [node?.data])
+    });
+  }, [node?.data]);
 
-  const customComponents: CustomNodeType[] = useDecisionGraphStore(
-    (store) => store.components || [],
-    equal
-  )
+  const customComponents: CustomNodeType[] = useDecisionGraphStore((store) => store.components || [], equal);
 
   const component = useMemo(() => {
-    return customComponents.find((component) => component.type === node.type)
-  }, [customComponents, node?.type])
+    return customComponents.find((component) => component.type === node.type);
+  }, [customComponents, node?.type]);
 
   const nodeType = useMemo(() => {
     switch (node.type) {
       case 'inputNode':
-        return 'Input'
+        return 'Input';
       case 'outputNode':
-        return 'Output'
+        return 'Output';
       case 'decisionTableNode':
-        return 'Decision Table'
+        return 'Decision Table';
       case 'decisionNode':
-        return 'Decision'
+        return 'Decision';
       case 'functionNode':
-        return 'Function'
+        return 'Function';
       case 'expressionNode':
-        return 'Expression'
+        return 'Expression';
     }
 
-    return 'Unknown'
-  }, [node?.type])
+    return 'Unknown';
+  }, [node?.type]);
 
   return (
     <div className={'node-form'}>
@@ -77,7 +74,7 @@ export const NodeForm: FC<NodeFormProps> = ({ node, onChange, removeNode, onClos
           onChange?.({
             id: node?.id,
             data,
-          })
+          });
         }}
       >
         <Button className={'button'} type='text' onClick={onClose} icon={<CloseOutlined />} />
@@ -108,5 +105,5 @@ export const NodeForm: FC<NodeFormProps> = ({ node, onChange, removeNode, onClos
         </Form.Item>
       </Form>
     </div>
-  )
-}
+  );
+};

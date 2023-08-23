@@ -1,6 +1,6 @@
-import { HeaderGroup, flexRender } from '@tanstack/react-table'
-import clsx from 'clsx'
-import React from 'react'
+import { HeaderGroup, flexRender } from '@tanstack/react-table';
+import clsx from 'clsx';
+import React from 'react';
 
 export const TableHeadRow: React.FC<{ headerGroup: HeaderGroup<any> }> = ({ headerGroup }) => (
   <tr key={headerGroup.id}>
@@ -23,7 +23,7 @@ export const TableHeadRow: React.FC<{ headerGroup: HeaderGroup<any> }> = ({ head
             />
           )}
         </th>
-      )
+      );
     })}
   </tr>
-)
+);

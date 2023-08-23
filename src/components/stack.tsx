@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo } from 'react';
 
 export type StackAlignment =
   | 'start'
@@ -8,18 +8,18 @@ export type StackAlignment =
   | 'space-around'
   | 'space-evenly'
   | 'baseline'
-  | 'stretch'
+  | 'stretch';
 
 export type StackProps = {
-  horizontal?: boolean
-  reversed?: boolean
-  grow?: boolean
-  verticalAlign?: StackAlignment
-  horizontalAlign?: StackAlignment
-  gap?: string | number
-  height?: string | number
-  width?: string | number
-} & React.HTMLAttributes<HTMLDivElement>
+  horizontal?: boolean;
+  reversed?: boolean;
+  grow?: boolean;
+  verticalAlign?: StackAlignment;
+  horizontalAlign?: StackAlignment;
+  gap?: string | number;
+  height?: string | number;
+  width?: string | number;
+} & React.HTMLAttributes<HTMLDivElement>;
 
 export const Stack: React.FC<StackProps> = (props) => {
   const {
@@ -33,14 +33,14 @@ export const Stack: React.FC<StackProps> = (props) => {
     grow,
     style,
     ...rest
-  } = props
+  } = props;
 
   const flexDirection = useMemo(() => {
     if (horizontal) {
-      return !reversed ? 'row' : 'row-reverse'
+      return !reversed ? 'row' : 'row-reverse';
     }
-    return !reversed ? 'column' : 'column-reverse'
-  }, [horizontal, reversed])
+    return !reversed ? 'column' : 'column-reverse';
+  }, [horizontal, reversed]);
 
   return (
     <div
@@ -57,5 +57,5 @@ export const Stack: React.FC<StackProps> = (props) => {
       }}
       {...rest}
     />
-  )
-}
+  );
+};

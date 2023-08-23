@@ -1,9 +1,10 @@
-import { ApartmentOutlined, EditOutlined } from '@ant-design/icons'
-import type { Meta, StoryObj } from '@storybook/react'
-import { Button, Form, Input } from 'antd'
-import React, { useState } from 'react'
+import { ApartmentOutlined, EditOutlined } from '@ant-design/icons';
+import type { Meta, StoryObj } from '@storybook/react';
+import { Button, Form, Input } from 'antd';
+import React, { useState } from 'react';
 
-import { DecisionGraph } from './dg'
+import { DecisionGraph } from './dg';
+import { defaultGraph } from './dg.stories-values';
 
 const meta: Meta<typeof DecisionGraph> = {
   /* 👇 The title prop is optional.
@@ -16,15 +17,15 @@ const meta: Meta<typeof DecisionGraph> = {
   args: {
     //
   },
-}
+};
 
-export default meta
+export default meta;
 
-type Story = StoryObj<typeof DecisionGraph>
+type Story = StoryObj<typeof DecisionGraph>;
 
 export const Controlled: Story = {
   render: (args) => {
-    const [value, setValue] = useState<any>()
+    const [value, setValue] = useState<any>(defaultGraph);
     return (
       <div
         style={{
@@ -35,18 +36,38 @@ export const Controlled: Story = {
           {...args}
           value={value}
           onChange={(val) => {
-            console.log(val)
-            setValue(val)
+            console.log(val);
+            setValue(val);
           }}
         />
       </div>
-    )
+    );
   },
-}
+};
+
+export const Uncontrolled: Story = {
+  render: (args) => {
+    return (
+      <div
+        style={{
+          height: '100%',
+        }}
+      >
+        <DecisionGraph
+          {...args}
+          defaultValue={defaultGraph}
+          onChange={(val) => {
+            console.log(val);
+          }}
+        />
+      </div>
+    );
+  },
+};
 
 export const Extended: Story = {
   render: (args) => {
-    const [value, setValue] = useState<any>()
+    const [value, setValue] = useState<any>();
     return (
       <div
         style={{
@@ -62,16 +83,12 @@ export const Extended: Story = {
               name: 'Decision',
               type: 'decisionNode',
               onOpen: async () => {
-                console.log('here')
+                console.log('here');
               },
               renderForm: () => (
                 <Form.Item label={'Key'}>
                   <Input.Group>
-                    <Form.Item
-                      noStyle
-                      style={{ width: 'calc(100% - 32px)' }}
-                      name={['content', 'key']}
-                    >
+                    <Form.Item noStyle style={{ width: 'calc(100% - 32px)' }} name={['content', 'key']}>
                       <Input style={{ width: 'calc(100% - 32px)' }} placeholder={'Key'} />
                     </Form.Item>
                     <Button
@@ -90,13 +107,13 @@ export const Extended: Story = {
             },
           ]}
           onTabChange={(e) => {
-            console.log(e)
+            console.log(e);
           }}
           onAddNode={(e, position) => {
-            console.log(position)
+            console.log(position);
           }}
         />
       </div>
-    )
+    );
   },
-}
+};

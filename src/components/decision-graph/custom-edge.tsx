@@ -1,18 +1,9 @@
-import clsx from 'clsx'
-import React from 'react'
-import { getBezierPath } from 'reactflow'
+import clsx from 'clsx';
+import React from 'react';
+import { getBezierPath } from 'reactflow';
 
 export const CustomEdge: React.FC<any> = (props) => {
-  const {
-    sourceX,
-    sourceY,
-    targetX,
-    targetY,
-    sourcePosition,
-    targetPosition,
-    style = {},
-    markerEnd,
-  } = props
+  const { sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, style = {}, markerEnd } = props;
 
   const [edgePath] = getBezierPath({
     sourceX,
@@ -21,7 +12,7 @@ export const CustomEdge: React.FC<any> = (props) => {
     targetX,
     targetY,
     targetPosition,
-  })
+  });
 
   return (
     <>
@@ -40,7 +31,7 @@ export const CustomEdge: React.FC<any> = (props) => {
         fillRule='evenodd'
       />
     </>
-  )
-}
+  );
+};
 
-export const edgeFunction = (outer: any) => (props: any) => <CustomEdge {...props} {...outer} />
+export const edgeFunction = (outer: any) => (props: any) => <CustomEdge {...props} {...outer} />;

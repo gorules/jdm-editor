@@ -1,6 +1,6 @@
-import { Edge, Node } from 'reactflow'
+import { Edge, Node } from 'reactflow';
 
-import { DecisionEdge, DecisionNode } from './context/dg-store.context'
+import { DecisionEdge, DecisionNode } from './context/dg-store.context';
 
 export const mapToDecisionNode = (node: Node): DecisionNode => {
   return {
@@ -10,11 +10,11 @@ export const mapToDecisionNode = (node: Node): DecisionNode => {
     name: node?.data?.name,
     description: node?.data?.description,
     content: node?.data?.content,
-  }
-}
+  };
+};
 export const mapToDecisionNodes = (nodes: Node[]): DecisionNode[] => {
-  return nodes.map(mapToDecisionNode)
-}
+  return nodes.map(mapToDecisionNode);
+};
 
 export const mapToDecisionEdges = (edges: Edge[]): DecisionEdge[] => {
   return edges.map((edge) => {
@@ -24,9 +24,9 @@ export const mapToDecisionEdges = (edges: Edge[]): DecisionEdge[] => {
       type: edge?.type,
       targetId: edge?.target,
       name: edge?.label as string,
-    }
-  })
-}
+    };
+  });
+};
 
 export const mapToGraphNode = (node: DecisionNode): Node => {
   return {
@@ -38,11 +38,11 @@ export const mapToGraphNode = (node: DecisionNode): Node => {
       description: node.description,
       content: node?.content,
     },
-  }
-}
+  };
+};
 export const mapToGraphNodes = (nodes: DecisionNode[]): Node[] => {
-  return nodes.map(mapToGraphNode)
-}
+  return nodes.map(mapToGraphNode);
+};
 
 export const mapToGraphEdges = (edges: DecisionEdge[]): Edge[] => {
   return edges
@@ -54,6 +54,6 @@ export const mapToGraphEdges = (edges: DecisionEdge[]): Edge[] => {
         type: edge?.type || 'edge',
         target: edge.targetId,
         label: edge.name,
-      }
-    })
-}
+      };
+    });
+};

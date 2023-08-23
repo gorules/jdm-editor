@@ -1,46 +1,39 @@
-import { Button, Typography } from 'antd'
-import clsx from 'clsx'
-import equal from 'fast-deep-equal/es6/react'
-import React, { useCallback } from 'react'
-import { XYPosition } from 'reactflow'
+import { Button, Typography } from 'antd';
+import clsx from 'clsx';
+import equal from 'fast-deep-equal/es6/react';
+import React, { useCallback } from 'react';
+import { XYPosition } from 'reactflow';
 
-import { CustomNodeType, useDecisionGraphStore } from '../context/dg-store.context'
+import { CustomNodeType, useDecisionGraphStore } from '../context/dg-store.context';
 
 export type GraphComponentsProps = {
-  inputDisabled?: boolean
-  outputDisabled?: boolean
-  onPaste?: () => void
-  components?: React.ReactNode[]
-}
+  inputDisabled?: boolean;
+  outputDisabled?: boolean;
+  onPaste?: () => void;
+  components?: React.ReactNode[];
+};
 
-export const GraphComponents: React.FC<GraphComponentsProps> = ({
-  inputDisabled,
-  outputDisabled,
-  onPaste,
-}) => {
+export const GraphComponents: React.FC<GraphComponentsProps> = ({ inputDisabled, outputDisabled, onPaste }) => {
   const onDragStart = useCallback((event: React.DragEvent, nodeType: string) => {
-    const target = event.target as HTMLDivElement
+    const target = event.target as HTMLDivElement;
     if (!target) {
-      return
+      return;
     }
 
-    const { offsetX, offsetY } = event.nativeEvent
-    const { height, width } = target.getBoundingClientRect()
+    const { offsetX, offsetY } = event.nativeEvent;
+    const { height, width } = target.getBoundingClientRect();
 
     const positionData: XYPosition = {
       x: offsetX / width,
       y: offsetY / height,
-    }
+    };
 
-    event.dataTransfer.effectAllowed = 'move'
-    event.dataTransfer.setData('application/reactflow', nodeType)
-    event.dataTransfer.setData('relativePosition', JSON.stringify(positionData))
-  }, [])
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('application/reactflow', nodeType);
+    event.dataTransfer.setData('relativePosition', JSON.stringify(positionData));
+  }, []);
 
-  const customComponents: CustomNodeType[] = useDecisionGraphStore(
-    (store) => store.components || [],
-    equal
-  )
+  const customComponents: CustomNodeType[] = useDecisionGraphStore((store) => store.components || [], equal);
 
   return (
     <div className={'wrapper'}>
@@ -64,25 +57,13 @@ export const GraphComponents: React.FC<GraphComponentsProps> = ({
             Output
           </Typography.Text>
         </div>
-        <div
-          className={clsx(['component'])}
-          onDragStart={(event) => onDragStart(event, 'decisionTableNode')}
-          draggable
-        >
+        <div className={clsx(['component'])} onDragStart={(event) => onDragStart(event, 'decisionTableNode')} draggable>
           <Typography.Text strong>Decision Table</Typography.Text>
         </div>
-        <div
-          className={clsx(['component'])}
-          onDragStart={(event) => onDragStart(event, 'functionNode')}
-          draggable
-        >
+        <div className={clsx(['component'])} onDragStart={(event) => onDragStart(event, 'functionNode')} draggable>
           <Typography.Text strong>Function</Typography.Text>
         </div>
-        <div
-          className={clsx(['component'])}
-          onDragStart={(event) => onDragStart(event, 'expressionNode')}
-          draggable
-        >
+        <div className={clsx(['component'])} onDragStart={(event) => onDragStart(event, 'expressionNode')} draggable>
           <Typography.Text strong>Expression</Typography.Text>
         </div>
         {customComponents.map((component) => (
@@ -100,5 +81,5 @@ export const GraphComponents: React.FC<GraphComponentsProps> = ({
         Paste from clipboard
       </Button>
     </div>
-  )
-}
+  );
+};
