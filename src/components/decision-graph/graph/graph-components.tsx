@@ -1,12 +1,16 @@
 import { Button, Typography } from 'antd'
 import clsx from 'clsx'
+import equal from 'fast-deep-equal/es6/react'
 import React, { useCallback } from 'react'
 import { XYPosition } from 'reactflow'
+
+import { CustomNodeType, useDecisionGraphStore } from '../context/dg-store.context'
 
 export type GraphComponentsProps = {
   inputDisabled?: boolean
   outputDisabled?: boolean
   onPaste?: () => void
+  components?: React.ReactNode[]
 }
 
 export const GraphComponents: React.FC<GraphComponentsProps> = ({
@@ -33,11 +37,14 @@ export const GraphComponents: React.FC<GraphComponentsProps> = ({
     event.dataTransfer.setData('relativePosition', JSON.stringify(positionData))
   }, [])
 
+  const customComponents: CustomNodeType[] = useDecisionGraphStore(
+    (store) => store.components || [],
+    equal
+  )
+
   return (
     <div className={'wrapper'}>
-      <Typography.Title level={5} style={{ marginBottom: '1rem' }}>
-        Drag and Drop
-      </Typography.Title>
+      <Typography.Text style={{ marginBottom: '0.5rem' }}>Drag and Drop components</Typography.Text>
       <div className={'list'}>
         <div
           className={clsx(['component', inputDisabled && 'disabled'])}
@@ -78,13 +85,16 @@ export const GraphComponents: React.FC<GraphComponentsProps> = ({
         >
           <Typography.Text strong>Expression</Typography.Text>
         </div>
-        <div
-          className={clsx(['component'])}
-          onDragStart={(event) => onDragStart(event, 'decisionNode')}
-          draggable
-        >
-          <Typography.Text strong>Decision</Typography.Text>
-        </div>
+        {customComponents.map((component) => (
+          <div
+            key={component.type}
+            className={clsx(['component'])}
+            onDragStart={(event) => onDragStart(event, component.type)}
+            draggable
+          >
+            <Typography.Text strong>{component.name}</Typography.Text>
+          </div>
+        ))}
       </div>
       <Button onClick={onPaste} type='default' ghost style={{ marginTop: 'auto' }}>
         Paste from clipboard

@@ -1,32 +1,6 @@
-import React from 'react'
 import { Edge, Node } from 'reactflow'
 
-export type Position = {
-  x: number
-  y: number
-}
-
-export type DecisionNode = {
-  id: string
-
-  name: string
-  description?: string
-  type?: string
-
-  content?: any
-
-  position: Position
-}
-
-export type DecisionEdge = {
-  id: string
-  name: string
-
-  sourceId: string
-  targetId: string
-
-  type?: string
-}
+import { DecisionEdge, DecisionNode } from './context/dg-store.context'
 
 export const mapToDecisionNode = (node: Node): DecisionNode => {
   return {
@@ -83,44 +57,3 @@ export const mapToGraphEdges = (edges: DecisionEdge[]): Edge[] => {
       }
     })
 }
-
-export type DecisionGraphContextState = {
-  simulate?: any
-  nodes?: DecisionNode[]
-  edges?: DecisionEdge[]
-  openNode?: (id: string) => void
-  closeNode?: (id: string) => void
-}
-
-export type DecisionGraphContextProps = {
-  simulate?: any
-  onOpenNode?: (id: string) => void
-  onCloseNode?: (id: string) => void
-  nodes?: DecisionNode[]
-  edges?: DecisionEdge[]
-}
-
-const DecisionGraphContext = React.createContext<DecisionGraphContextState>({} as any)
-
-const DecisionGraphContextProvider: React.FC<React.PropsWithChildren<DecisionGraphContextProps>> = (
-  props
-) => {
-  const { children, simulate, nodes, edges, onOpenNode, onCloseNode } = props
-
-  return (
-    <DecisionGraphContext.Provider
-      value={{
-        simulate,
-        openNode: onOpenNode,
-        closeNode: onCloseNode,
-        nodes,
-        edges,
-      }}
-    >
-      {children}
-    </DecisionGraphContext.Provider>
-  )
-}
-
-export const useDecisionGraph = () => React.useContext(DecisionGraphContext)
-export default DecisionGraphContextProvider

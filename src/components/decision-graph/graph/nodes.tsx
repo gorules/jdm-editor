@@ -7,10 +7,11 @@ import {
 } from '@ant-design/icons'
 import { Space, Typography } from 'antd'
 import clsx from 'clsx'
+import equal from 'fast-deep-equal/es6/react'
 import React, { FC, useMemo } from 'react'
 import { Handle, NodeProps, Position } from 'reactflow'
 
-import { useDecisionGraph } from './context/dg.context'
+import { CustomNodeType, useDecisionGraphStore } from '../context/dg-store.context'
 
 const useNodeError = (id: string, simulate: any) => {
   if (simulate?.error?.data?.nodeId === id) {
@@ -22,7 +23,18 @@ const useNodeError = (id: string, simulate: any) => {
 
 export const GraphNode: FC<NodeProps> = (props) => {
   const { id, data, isConnectable, type } = props
-  const { simulate, openNode } = useDecisionGraph()
+
+  const simulate = useDecisionGraphStore((store) => store.simulate, equal)
+  const openTab = useDecisionGraphStore((store) => store.openTab, equal)
+
+  const customComponents: CustomNodeType[] = useDecisionGraphStore(
+    (store) => store.components || [],
+    equal
+  )
+
+  const component = useMemo(() => {
+    return customComponents.find((component) => component.type === type)
+  }, [customComponents, type])
 
   const trace = useMemo(() => {
     return simulate?.result?.trace?.[id]
@@ -31,16 +43,10 @@ export const GraphNode: FC<NodeProps> = (props) => {
   const error = useNodeError(id, simulate)
 
   const innerOpen = () => {
-    switch (type) {
-      case 'decisionTableNode':
-      case 'functionNode':
-      case 'expressionNode':
-        return openNode?.(id)
-      case 'decisionNode':
-        // openDocument(data?.content?.key)
-        break
-      default:
-        break
+    if (component) {
+      component?.onOpen?.()
+    } else {
+      openTab?.(id)
     }
   }
 
@@ -64,13 +70,13 @@ export const GraphNode: FC<NodeProps> = (props) => {
           type === 'expressionNode' ||
           type === 'decisionTableNode' ||
           type === 'functionNode') && (
-          <div className={'perfromance'}>
+          <div className={'performance'}>
             <Typography.Text
               style={{
                 fontSize: 10,
               }}
             >
-              {trace?.performance}
+              {trace?.performance || null}
             </Typography.Text>
           </div>
         )}
@@ -102,7 +108,6 @@ export const GraphNode: FC<NodeProps> = (props) => {
               <Space size={4} style={{ maxWidth: '100%' }}>
                 <TableOutlined />
                 <span>Decision Table</span>
-                {data?.hitPolicy === 'COLLECT' && <span>(c)</span>}
               </Space>
             )}
             {type === 'functionNode' && (
@@ -117,12 +122,6 @@ export const GraphNode: FC<NodeProps> = (props) => {
                 <span>Expression</span>
               </Space>
             )}
-            {type === 'decisionNode' && (
-              <Space size={4} style={{ maxWidth: '100%' }}>
-                <ApartmentOutlined />
-                <span>Decision</span>
-              </Space>
-            )}
             {type === 'inputNode' && (
               <Space size={4} style={{ maxWidth: '100%' }}>
                 <ArrowRightOutlined />
@@ -135,10 +134,16 @@ export const GraphNode: FC<NodeProps> = (props) => {
                 <span>Output</span>
               </Space>
             )}
+            {component && (
+              <Space size={4} style={{ maxWidth: '100%' }}>
+                {component?.renderIcon?.()}
+                <span>{component.name}</span>
+              </Space>
+            )}
           </Typography.Text>
         </div>
         {type !== 'inputNode' && type !== 'outputNode' && (
-          <a
+          <Typography.Link
             onClick={() => {
               if (type !== 'inputNode' && type !== 'outputNode') {
                 innerOpen()
@@ -146,7 +151,7 @@ export const GraphNode: FC<NodeProps> = (props) => {
             }}
           >
             Open
-          </a>
+          </Typography.Link>
         )}
       </Space>
       {(type === 'decisionTableNode' ||
@@ -163,6 +168,15 @@ export const GraphNode: FC<NodeProps> = (props) => {
 export const GraphNodeEdit: FC<NodeProps> = (props) => {
   const { data, isConnectable, type, selected } = props
 
+  const customComponents: CustomNodeType[] = useDecisionGraphStore(
+    (store) => store.components || [],
+    equal
+  )
+
+  const component = useMemo(() => {
+    return customComponents.find((component) => component.type === type)
+  }, [customComponents, type])
+
   return (
     <div
       className={clsx([
@@ -176,7 +190,8 @@ export const GraphNodeEdit: FC<NodeProps> = (props) => {
         type === 'decisionNode' ||
         type === 'functionNode' ||
         type === 'expressionNode' ||
-        type === 'outputNode') && (
+        type === 'outputNode' ||
+        component) && (
         <Handle type='target' position={Position.Left} isConnectable={isConnectable} />
       )}
       <Space
@@ -215,12 +230,6 @@ export const GraphNodeEdit: FC<NodeProps> = (props) => {
                 <span>Expression</span>
               </Space>
             )}
-            {type === 'decisionNode' && (
-              <Space size={4} style={{ maxWidth: '100%' }}>
-                <ApartmentOutlined />
-                <span>Decision</span>
-              </Space>
-            )}
             {type === 'inputNode' && (
               <Space size={4} style={{ maxWidth: '100%' }}>
                 <ArrowRightOutlined />
@@ -233,6 +242,12 @@ export const GraphNodeEdit: FC<NodeProps> = (props) => {
                 <span>Output</span>
               </Space>
             )}
+            {component && (
+              <Space size={4} style={{ maxWidth: '100%' }}>
+                <ApartmentOutlined />
+                <span>{component?.name}</span>
+              </Space>
+            )}
           </Typography.Text>
         </div>
       </Space>
@@ -240,7 +255,8 @@ export const GraphNodeEdit: FC<NodeProps> = (props) => {
         type === 'decisionNode' ||
         type === 'functionNode' ||
         type === 'expressionNode' ||
-        type === 'inputNode') && (
+        type === 'inputNode' ||
+        component) && (
         <Handle type='source' position={Position.Right} isConnectable={isConnectable} />
       )}
     </div>

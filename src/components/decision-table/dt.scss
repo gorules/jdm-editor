@@ -1,6 +1,6 @@
 .grl-dt {
   font-size: 14px;
-  height: calc(100% - 36px);
+  height: 100%;
   display: flex;
   flex-direction: column;
 
@@ -181,5 +181,6 @@
 
   &__command-bar {
     padding: 0.5rem;
+    box-sizing: border-box;
   }
 }

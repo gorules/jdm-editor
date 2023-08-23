@@ -1,9 +1,11 @@
-import { CloseOutlined, EditOutlined } from '@ant-design/icons'
+import { CloseOutlined } from '@ant-design/icons'
 import { Button, Form, Input, Space, Typography } from 'antd'
+import equal from 'fast-deep-equal/es6/react'
 import React, { FC, useEffect, useMemo } from 'react'
 import { Node } from 'reactflow'
 
-import { Stack } from '../stack'
+import { Stack } from '../../stack'
+import { CustomNodeType, useDecisionGraphStore } from '../context/dg-store.context'
 
 export type NodeFormProps<T = any> = {
   node: Node
@@ -31,6 +33,15 @@ export const NodeForm: FC<NodeFormProps> = ({ node, onChange, removeNode, onClos
       content: node?.data?.content,
     })
   }, [node?.data])
+
+  const customComponents: CustomNodeType[] = useDecisionGraphStore(
+    (store) => store.components || [],
+    equal
+  )
+
+  const component = useMemo(() => {
+    return customComponents.find((component) => component.type === node.type)
+  }, [customComponents, node?.type])
 
   const nodeType = useMemo(() => {
     switch (node.type) {
@@ -73,39 +84,10 @@ export const NodeForm: FC<NodeFormProps> = ({ node, onChange, removeNode, onClos
         <Form.Item noStyle>
           <Space direction={'vertical'}>
             <Typography.Text>Type</Typography.Text>
-            <Typography.Text strong>{nodeType}</Typography.Text>
+            <Typography.Text strong>{component?.type || nodeType}</Typography.Text>
           </Space>
         </Form.Item>
-        {node?.type === 'decisionNode' && (
-          <>
-            <Typography.Link
-              onClick={() => {
-                //TODO Invoke open document
-              }}
-            >
-              Open in new tab
-            </Typography.Link>
-            <Form.Item name={['name']} label={'Name'}>
-              <Input placeholder={'Name'} />
-            </Form.Item>
-            <Form.Item label={'Key'}>
-              <Input.Group>
-                <Form.Item noStyle style={{ width: 'calc(100% - 32px)' }} name={['content', 'key']}>
-                  <Input style={{ width: 'calc(100% - 32px)' }} placeholder={'Key'} />
-                </Form.Item>
-                <Button
-                  icon={<EditOutlined />}
-                  onClick={() => {
-                    // TODO INVOKE ON EDIT
-                  }}
-                />
-              </Input.Group>
-            </Form.Item>
-          </>
-        )}
-        {(node?.type === 'decisionTableNode' ||
-          node?.type === 'functionNode' ||
-          node?.type === 'expressionNode') && (
+        {node?.type !== 'inputNode' && node?.type !== 'outputNode' && (
           <>
             <Form.Item name={['name']} label={'Name'}>
               <Input placeholder={'Name'} />
@@ -115,6 +97,7 @@ export const NodeForm: FC<NodeFormProps> = ({ node, onChange, removeNode, onClos
             </Form.Item>
           </>
         )}
+        {component && component?.renderForm && component?.renderForm?.()}
         <Form.Item>
           <Stack gap={8} horizontal>
             <Button onClick={() => onCopy?.(node)}>Copy</Button>

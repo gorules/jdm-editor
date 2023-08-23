@@ -36,7 +36,15 @@ const preview: Preview = {
             dangerouslySetInnerHTML={{
               __html: `html { background-color: ${
                 isDark ? '#1f1f1f' : 'white'
-              } }`,
+              } }
+              body {
+                height: 100vh;
+                padding: 0 !important;
+              }
+              #storybook-root {
+                height: 100%;
+              }
+              `,
             }}
           />
           <Story />

@@ -3,7 +3,7 @@ import { Button, Typography } from 'antd'
 import React, { FC } from 'react'
 import { Edge, Node } from 'reactflow'
 
-import { Stack } from '../stack'
+import { Stack } from '../../stack'
 
 export type MultiNodeFormProps = {
   nodes: Node[]
@@ -27,9 +27,7 @@ export const MultiNodeForm: FC<MultiNodeFormProps> = ({
       <Button className={'button'} type='text' onClick={onClose} icon={<CloseOutlined />} />
       {nodes?.length > 0 && (
         <>
-          <Typography.Text style={{ display: 'block', margin: '0.5rem 0 0' }}>
-            Nodes selected:
-          </Typography.Text>
+          <Typography.Text style={{ display: 'block' }}>Nodes selected:</Typography.Text>
           <ul style={{ padding: '0 1rem 0' }}>
             {nodes.map((n) => (
               <li key={n.id}>

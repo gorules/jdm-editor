@@ -152,7 +152,9 @@ export const Controlled: Story = {
       return createDragDropManager(HTML5Backend)
     }, [])
     return (
-      <div>
+      <div style={{
+        height: '100%'
+      }}>
         <DecisionTable
           {...args}
           value={value}
@@ -161,7 +163,7 @@ export const Controlled: Story = {
             setValue(val)
           }}
           inputsSchema={inputSchemaDefault}
-          tableHeight='500px'
+          tableHeight='100%'
         />
       </div>
     )
@@ -174,7 +176,9 @@ export const Uncontrolled: Story = {
       return createDragDropManager(HTML5Backend)
     }, [])
     return (
-      <div>
+      <div style={{
+        height: '100%'
+      }}>
         <DecisionTable
           {...args}
           manager={manager}
@@ -183,7 +187,7 @@ export const Uncontrolled: Story = {
             console.log(val)
           }}
           inputsSchema={inputSchemaDefault}
-          tableHeight='500px'
+          tableHeight='100%'
         />
       </div>
     )
@@ -197,7 +201,7 @@ export const CustomRenderer: Story = {
       <div>
         <DecisionTable
           {...args}
-          tableHeight='500px'
+          tableHeight='100%'
           value={value}
           onChange={(val) => setValue(val)}
           cellRenderer={(props) => {
@@ -231,14 +235,16 @@ export const StressTest: Story = {
       rules: stressRules(),
     })
     return (
-      <div>
+      <div style={{
+        height: '100%'
+      }}>
         <DecisionTable
           {...args}
           value={value}
           onChange={(val) => {
             setValue(val)
           }}
-          tableHeight='500px'
+          tableHeight='100%'
         />
       </div>
     )
