@@ -30,16 +30,15 @@ import { GraphNode, GraphNodeEdit } from './nodes';
 export type GraphProps = {
   className?: string;
 };
-export const Graph = forwardRef<
-  {
-    openEdit?: () => void;
-    closeEdit?: () => void;
-    confirmEdit?: () => void;
-    addNode?: (node: DecisionNode) => void;
-    setDecisionGraph?: (decisionGraph: DecisionGraphType) => void;
-  },
-  GraphProps
->(({ className }, ref) => {
+
+export type GraphRef = {
+  openEdit?: () => void;
+  closeEdit?: () => void;
+  confirmEdit?: () => void;
+  addNode?: (node: DecisionNode) => void;
+  setDecisionGraph?: (decisionGraph: DecisionGraphType) => void;
+};
+export const Graph = forwardRef<GraphRef, GraphProps>(({ className }, ref) => {
   const reactFlowWrapper = useRef<any>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
 
@@ -278,6 +277,7 @@ export const Graph = forwardRef<
       confirmEdit();
     },
     addNode: (node: DecisionNode) => {
+      console.log(node);
       if (editGraph) {
         setEditNodes((nodes) => nodes.concat(mapToGraphNode(node)));
       }

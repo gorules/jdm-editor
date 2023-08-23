@@ -1,10 +1,13 @@
 import { ApartmentOutlined, EditOutlined } from '@ant-design/icons';
 import type { Meta, StoryObj } from '@storybook/react';
 import { Button, Form, Input } from 'antd';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
+import { XYPosition } from 'reactflow';
+import { v4 } from 'uuid';
 
 import { DecisionGraph } from './dg';
 import { defaultGraph } from './dg.stories-values';
+import { GraphRef } from './graph/graph';
 
 const meta: Meta<typeof DecisionGraph> = {
   /* 👇 The title prop is optional.
@@ -67,6 +70,7 @@ export const Uncontrolled: Story = {
 
 export const Extended: Story = {
   render: (args) => {
+    const ref = useRef<GraphRef>(null);
     const [value, setValue] = useState<any>();
     return (
       <div
@@ -76,6 +80,7 @@ export const Extended: Story = {
       >
         <DecisionGraph
           {...args}
+          ref={ref}
           value={value}
           onChange={(val) => setValue(val)}
           components={[
@@ -109,8 +114,16 @@ export const Extended: Story = {
           onTabChange={(e) => {
             console.log(e);
           }}
-          onAddNode={(e, position) => {
-            console.log(position);
+          onAddNode={(type, position) => {
+            ref!.current!.addNode!({
+              id: v4(),
+              type,
+              position: position as any,
+              name: 'Decision',
+              content: {
+                key: 'test',
+              },
+            });
           }}
         />
       </div>

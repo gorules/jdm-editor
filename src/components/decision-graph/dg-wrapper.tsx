@@ -1,17 +1,17 @@
 import clsx from 'clsx';
 import equal from 'fast-deep-equal/es6/react';
-import React from 'react';
+import React, { forwardRef } from 'react';
 import 'reactflow/dist/style.css';
 
 import { DecisionNode, useDecisionGraphStore } from './context/dg-store.context';
 import './dg.scss';
-import { Graph } from './graph/graph';
+import { Graph, GraphRef } from './graph/graph';
 import { GraphTabs } from './graph/graph-tabs';
 import { TabDecisionTable } from './graph/tab-decision-table';
 import { TabExpression } from './graph/tab-expression';
 import { TabFunction } from './graph/tab-function';
 
-export const DecisionGraphWrapper: React.FC = () => {
+export const DecisionGraphWrapper = forwardRef<GraphRef>((_, ref) => {
   const activeNode: DecisionNode = useDecisionGraphStore((store) => {
     return (store.decisionGraph?.nodes || []).find((node) => node.id === store.activeTab);
   }, equal);
@@ -25,7 +25,7 @@ export const DecisionGraphWrapper: React.FC = () => {
     <div className={'grl-dg__wrapper'}>
       <div className={'grl-dg__graph'}>
         <GraphTabs />
-        <Graph className={clsx([!activeNode && 'active'])} />
+        <Graph ref={ref} className={clsx([!activeNode && 'active'])} />
         {(openedNodes || []).map((node) => {
           return (
             <div key={node?.id} className={clsx(['tab-content', activeNode?.id === node?.id && 'active'])}>
@@ -38,4 +38,4 @@ export const DecisionGraphWrapper: React.FC = () => {
       </div>
     </div>
   );
-};
+});

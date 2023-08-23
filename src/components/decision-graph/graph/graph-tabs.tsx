@@ -8,7 +8,7 @@ export type GraphTabsProps = {
   disabled?: boolean;
   onTabChange?: (val: string) => void;
 };
-export const GraphTabs: React.FC<GraphTabsProps> = ({ onTabChange }) => {
+export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled, onTabChange }) => {
   const closeTab = useDecisionGraphStore((store) => store.closeTab, equal);
   const openTab = useDecisionGraphStore((store) => store.openTab, equal);
 
@@ -43,7 +43,7 @@ export const GraphTabs: React.FC<GraphTabsProps> = ({ onTabChange }) => {
     >
       <Tabs.TabPane closable={false} tab={'Graph'} key='graph' />
       {openedNodes?.map((node) => (
-        <Tabs.TabPane disabled={openTab === 'graph'} key={node?.id} tab={node?.name || node?.type} closable={true} />
+        <Tabs.TabPane disabled={disabled} key={node?.id} tab={node?.name || node?.type} closable={true} />
       ))}
     </Tabs>
   );
