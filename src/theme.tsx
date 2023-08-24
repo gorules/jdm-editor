@@ -1,6 +1,12 @@
 import { ThemeConfig as AntThemeConfig, ConfigProvider, theme as antTheme } from 'antd';
 import React, { useMemo } from 'react';
 
+declare module 'antd/es/theme/interface/alias' {
+  export interface AliasToken {
+    mode: 'dark' | 'light';
+  }
+}
+
 export type ThemeConfig = Omit<AntThemeConfig, 'algorithm'> & {
   mode?: 'light' | 'dark';
 };
@@ -27,7 +33,7 @@ export const JdmConfigProvider: React.FC<JdmConfigProviderProps> = ({
   }, [mode]);
 
   return (
-    <ConfigProvider prefixCls={prefixCls} theme={{ ...theme, algorithm }}>
+    <ConfigProvider prefixCls={prefixCls} theme={{ ...theme, algorithm, token: { mode } }}>
       {children}
     </ConfigProvider>
   );

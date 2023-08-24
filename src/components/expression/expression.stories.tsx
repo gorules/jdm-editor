@@ -18,14 +18,15 @@ const meta: Meta<typeof Expression> = {
    */
   title: 'Expression',
   component: Expression,
-  argTypes: {
-    configurable: { control: 'boolean' },
-    disabled: { control: 'boolean' },
-  },
   args: {
     configurable: true,
     disabled: false,
+    defaultValue: expressionDefault,
   },
+  argTypes: {
+    manager: { table: { disable: true } },
+    value: { table: { disable: true } },
+  }
 };
 
 export default meta;
@@ -33,26 +34,26 @@ export default meta;
 type Story = StoryObj<typeof Expression>;
 
 const StoryWrapper: React.FC<React.PropsWithChildren<any>> = ({ children }) => (
-  <div style={{ maxWidth: 800, padding: '1rem' }}>{children}</div>
+  <div style={{ maxWidth: 900 }}>{children}</div>
 );
 
 export const Uncontrolled: Story = {
-  render: ({ configurable, disabled }) => {
+  render: (args) => {
     return (
       <StoryWrapper>
-        <Expression defaultValue={expressionDefault} configurable={configurable} disabled={disabled} />
+        <Expression {...args} />
       </StoryWrapper>
     );
   },
 };
 
 export const Controlled: Story = {
-  render: ({ configurable, disabled }) => {
+  render: (args) => {
     const [value, setValue] = useState(expressionDefault);
 
     return (
       <StoryWrapper>
-        <Expression value={value} onChange={setValue} configurable={configurable} disabled={disabled} />
+        <Expression value={value} onChange={setValue} {...args} />
       </StoryWrapper>
     );
   },

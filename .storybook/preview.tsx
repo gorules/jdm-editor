@@ -1,9 +1,11 @@
 // @ts-ignore
-import React, { useEffect, useState } from 'react'
-import { Preview } from '@storybook/react'
-import { JdmConfigProvider } from '../src'
-import { addons } from '@storybook/addons'
-import { DARK_MODE_EVENT_NAME } from 'storybook-dark-mode'
+import { addons } from '@storybook/addons';
+import { Preview } from '@storybook/react';
+import React from 'react';
+import { useDarkMode } from 'storybook-dark-mode';
+
+import { JdmConfigProvider } from '../src';
+
 
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },
@@ -16,27 +18,20 @@ export const parameters = {
       date: /Date$/,
     },
   },
-}
+};
 
-const channel = addons.getChannel()
+const channel = addons.getChannel();
 
 const preview: Preview = {
   decorators: [
     (Story) => {
-      const [isDark, setDark] = useState(true)
-
-      useEffect(() => {
-        channel.on(DARK_MODE_EVENT_NAME, setDark)
-        return () => channel.off(DARK_MODE_EVENT_NAME, setDark)
-      }, [channel, setDark])
+      const isDark = useDarkMode();
 
       return (
         <JdmConfigProvider theme={{ mode: isDark ? 'dark' : 'light' }}>
           <style
             dangerouslySetInnerHTML={{
-              __html: `html { background-color: ${
-                isDark ? '#1f1f1f' : 'white'
-              } }
+              __html: `html { background-color: ${isDark ? '#1f1f1f' : 'white'} }
               body {
                 height: 100vh;
                 padding: 0 !important;
@@ -49,9 +44,9 @@ const preview: Preview = {
           />
           <Story />
         </JdmConfigProvider>
-      )
+      );
     },
   ],
-}
+};
 
-export default preview
+export default preview;
