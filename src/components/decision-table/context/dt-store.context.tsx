@@ -147,7 +147,7 @@ export type DecisionTableStoreType = {
   cellRenderer?: (props: TableCellProps) => JSX.Element | null | undefined;
 };
 
-export const DecisionTableStoreContext = React.createContext<
+const DecisionTableStoreContext = React.createContext<
   UseBoundStore<StoreApi<DecisionTableStoreType>> & {
     setState: (partial: Partial<DecisionTableStoreType>) => void;
   }
