@@ -1,14 +1,10 @@
 import equal from 'fast-deep-equal/es6/react';
-import React, { useEffect, useRef } from 'react';
-import { XYPosition } from 'reactflow';
+import type React from 'react';
+import { useEffect, useRef } from 'react';
+import type { XYPosition } from 'reactflow';
 
-import {
-  CustomNodeType,
-  DecisionGraphType,
-  DecisionNode,
-  useDecisionGraphRaw,
-  useDecisionGraphStore,
-} from './context/dg-store.context';
+import type { CustomNodeType, DecisionGraphType, DecisionNode } from './context/dg-store.context';
+import { useDecisionGraphRaw, useDecisionGraphStore } from './context/dg-store.context';
 
 export type DecisionGraphEmptyType = {
   id?: string;
@@ -45,7 +41,7 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
     ({ setDecisionGraph }) => ({
       setDecisionGraph,
     }),
-    equal
+    equal,
   );
 
   useEffect(() => {

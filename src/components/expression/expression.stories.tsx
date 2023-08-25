@@ -1,9 +1,8 @@
-import { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 import React, { useState } from 'react';
 
-import { ExpressionEntry } from './context/expression-store.context';
+import type { ExpressionEntry } from './context/expression-store.context';
 import { Expression } from './expression';
-
 
 const expressionDefault: ExpressionEntry[] = [
   { id: '1', key: 'customer.fullName', value: 'customer.firstName + " " + customer.lastName' },
@@ -26,7 +25,7 @@ const meta: Meta<typeof Expression> = {
   argTypes: {
     manager: { table: { disable: true } },
     value: { table: { disable: true } },
-  }
+  },
 };
 
 export default meta;

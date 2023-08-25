@@ -4,10 +4,12 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import { DecisionTableDialogProvider } from './context/dt-dialog.context';
-import { DecisionTableContextProps, DecisionTableProvider } from './context/dt-store.context';
+import type { DecisionTableContextProps } from './context/dt-store.context';
+import { DecisionTableProvider } from './context/dt-store.context';
 import { DecisionTableDialogs } from './dialog/dt-dialogs';
 import { DecisionTableCommandBar } from './dt-command-bar';
-import { DecisionTableEmpty, DecisionTableEmptyType } from './dt-empty';
+import type { DecisionTableEmptyType } from './dt-empty';
+import { DecisionTableEmpty } from './dt-empty';
 import './dt.scss';
 import { Table } from './table/table';
 

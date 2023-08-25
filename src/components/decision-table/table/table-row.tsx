@@ -1,4 +1,5 @@
-import { Row, flexRender } from '@tanstack/react-table';
+import type { Row } from '@tanstack/react-table';
+import { flexRender } from '@tanstack/react-table';
 import { Typography } from 'antd';
 import clsx from 'clsx';
 import React, { useMemo, useRef } from 'react';
@@ -46,7 +47,7 @@ const InnerTableRow: React.FC<{
         'table-row',
         isDropping && direction === 'down' && 'dropping-down',
         isDropping && direction === 'up' && 'dropping-up',
-        isActive && 'active'
+        isActive && 'active',
       )}
       style={{
         opacity: isDragging ? 0.5 : 1,

@@ -1,10 +1,11 @@
 import { produce } from 'immer';
 import React, { useMemo } from 'react';
 import { v4 } from 'uuid';
-import { StoreApi, UseBoundStore, create } from 'zustand';
+import type { StoreApi, UseBoundStore } from 'zustand';
+import { create } from 'zustand';
 
-import { SchemaSelectProps } from '../../../helpers/components';
-import { TableCellProps } from '../table/table-default-cell';
+import type { SchemaSelectProps } from '../../../helpers/components';
+import type { TableCellProps } from '../table/table-default-cell';
 
 export type TableExportOptions = {
   name?: string;
@@ -41,7 +42,7 @@ export type DecisionTableType = {
 const cleanupTableRule = (
   decisionTable: DecisionTableType,
   rule: Record<string, string>,
-  defaultId?: string
+  defaultId?: string,
 ): Record<string, string> => {
   const schemaItems = [...decisionTable.inputs, ...decisionTable.outputs];
   const newRule: Record<string, string> = {
@@ -168,7 +169,7 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
             produce<DecisionTableStoreType>((draft) => {
               draft.decisionTable = val;
               return draft;
-            })
+            }),
           );
         },
         cursor: null,
@@ -218,8 +219,8 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
                 {
                   _id,
                 },
-                _id
-              )
+                _id,
+              ),
             );
             return draft;
           });
@@ -239,7 +240,7 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
                   };
                 }
                 return draft;
-              })
+              }),
             );
           }
         },
@@ -259,8 +260,8 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
                 {
                   _id,
                 },
-                _id
-              )
+                _id,
+              ),
             );
             return draft;
           });
@@ -280,7 +281,7 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
                   };
                 }
                 return draft;
-              })
+              }),
             );
           }
         },
@@ -334,7 +335,7 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
               draft[type] = (draft?.[type] || []).filter((item) => item?.id !== id);
               draft.rules = cleanupTableRules(draft);
               return draft;
-            })
+            }),
           );
           set({
             decisionTable: updatedDecisionTable,
@@ -364,14 +365,14 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
           getState()?.onChange?.(updatedDecisionTable);
         },
       })),
-    []
+    [],
   );
   return <DecisionTableStoreContext.Provider value={store}>{children}</DecisionTableStoreContext.Provider>;
 };
 
 export function useDecisionTableStore<T>(
   selector: (state: DecisionTableStoreType) => T,
-  equals?: (a: any, b: any) => boolean
+  equals?: (a: any, b: any) => boolean,
 ): T {
   return React.useContext(DecisionTableStoreContext)(selector, equals);
 }

@@ -1,13 +1,14 @@
 import { theme } from 'antd';
 import React, { forwardRef } from 'react';
-import { ProOptions } from 'reactflow';
+import type { ProOptions } from 'reactflow';
 
-import { DecisionGraphContextProps, DecisionGraphProvider } from './context/dg-store.context';
-import { DecisionGraphEmpty, DecisionGraphEmptyType } from './dg-empty';
+import type { DecisionGraphContextProps } from './context/dg-store.context';
+import { DecisionGraphProvider } from './context/dg-store.context';
+import type { DecisionGraphEmptyType } from './dg-empty';
+import { DecisionGraphEmpty } from './dg-empty';
 import { DecisionGraphWrapper } from './dg-wrapper';
 import './dg.scss';
-import { GraphRef } from './graph/graph';
-
+import type { GraphRef } from './graph/graph';
 
 export type DecisionGraphProps = {
   manager?: any;
@@ -52,5 +53,5 @@ export const DecisionGraph = forwardRef<GraphRef, DecisionGraphProps>(
         </DecisionGraphProvider>
       </div>
     );
-  }
+  },
 );

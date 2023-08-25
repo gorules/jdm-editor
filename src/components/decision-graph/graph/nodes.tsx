@@ -8,11 +8,13 @@ import {
 import { Space, Typography } from 'antd';
 import clsx from 'clsx';
 import equal from 'fast-deep-equal/es6/react';
-import React, { FC, useMemo, useRef } from 'react';
-import { Handle, NodeProps, Position } from 'reactflow';
+import type { FC } from 'react';
+import React, { useMemo, useRef } from 'react';
+import type { NodeProps } from 'reactflow';
+import { Handle, Position } from 'reactflow';
 
-import { CustomNodeType, useDecisionGraphStore } from '../context/dg-store.context';
-
+import type { CustomNodeType } from '../context/dg-store.context';
+import { useDecisionGraphStore } from '../context/dg-store.context';
 
 const useNodeError = (id: string, simulate: any) => {
   if (simulate?.error?.data?.nodeId === id) {
@@ -32,7 +34,7 @@ export const GraphNode: FC<NodeProps> = (props) => {
       simulate,
       customComponents: components ?? [],
     }),
-    equal
+    equal,
   );
 
   const component = useMemo(() => {

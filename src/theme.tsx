@@ -1,4 +1,5 @@
-import { ThemeConfig as AntThemeConfig, ConfigProvider, theme as antTheme } from 'antd';
+import type { ThemeConfig as AntThemeConfig } from 'antd';
+import { ConfigProvider, theme as antTheme } from 'antd';
 import React, { useMemo } from 'react';
 
 declare module 'antd/es/theme/interface/alias' {

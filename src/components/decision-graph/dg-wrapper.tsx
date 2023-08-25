@@ -1,17 +1,17 @@
 import clsx from 'clsx';
 import equal from 'fast-deep-equal/es6/react';
 import React, { forwardRef } from 'react';
-import { ProOptions } from 'reactflow';
+import type { ProOptions } from 'reactflow';
 import 'reactflow/dist/style.css';
 
 import { useDecisionGraphStore } from './context/dg-store.context';
 import './dg.scss';
-import { Graph, GraphRef } from './graph/graph';
+import type { GraphRef } from './graph/graph';
+import { Graph } from './graph/graph';
 import { GraphTabs } from './graph/graph-tabs';
 import { TabDecisionTable } from './graph/tab-decision-table';
 import { TabExpression } from './graph/tab-expression';
 import { TabFunction } from './graph/tab-function';
-
 
 export type DecisionGraphWrapperProps = {
   reactFlowProOptions?: ProOptions;
@@ -23,7 +23,7 @@ export const DecisionGraphWrapper = forwardRef<GraphRef, DecisionGraphWrapperPro
       activeNode: (decisionGraph?.nodes ?? []).find((node) => node.id === activeTab),
       openNodes: (decisionGraph?.nodes ?? []).filter((node) => openTabs.includes(node.id)),
     }),
-    equal
+    equal,
   );
 
   return (

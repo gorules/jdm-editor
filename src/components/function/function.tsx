@@ -1,16 +1,15 @@
-import { Editor, useMonaco } from '@monaco-editor/react';
+import { Editor, loader, useMonaco } from '@monaco-editor/react';
 import { Spin, theme } from 'antd';
-import { editor } from 'monaco-editor';
+import * as monaco from 'monaco-editor';
 import React, { useEffect, useState } from 'react';
 import { useThrottledCallback } from 'use-debounce';
 
 import { FunctionDebugger } from './function-debugger';
 import './function.scss';
 import { functionDefinitions } from './helpers/libs';
-import { FunctionDebuggerTrace } from './types';
+import type { FunctionDebuggerTrace } from './types';
 
-
-import IStandaloneCodeEditor = editor.IStandaloneCodeEditor
+loader.config({ monaco });
 
 export type FunctionProps = {
   disabled?: boolean;
@@ -23,7 +22,7 @@ export type FunctionProps = {
 export const Function: React.FC<FunctionProps> = ({ disabled = false, defaultValue, value, onChange, trace }) => {
   const monaco = useMonaco();
   const { token } = theme.useToken();
-  const [editor, setEditor] = useState<IStandaloneCodeEditor>();
+  const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor>();
   const resizeEditor = useThrottledCallback(() => editor?.layout(), 100, { trailing: true });
 
   useEffect(() => {
@@ -38,7 +37,7 @@ export const Function: React.FC<FunctionProps> = ({ disabled = false, defaultVal
       (pkg: keyof typeof functionDefinitions) => ({
         content: `declare module '${pkg}' { ${functionDefinitions[pkg]} }`,
       }),
-      {}
+      {},
     );
 
     monaco.languages.typescript.javascriptDefaults.setExtraLibs(extraLibs);

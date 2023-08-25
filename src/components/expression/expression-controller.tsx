@@ -1,9 +1,10 @@
 import equal from 'fast-deep-equal/es6/react';
-import React, { useEffect, useRef } from 'react';
+import type React from 'react';
+import { useEffect, useRef } from 'react';
 import { v4 } from 'uuid';
 
-import { ExpressionEntry, useExpressionStore, useExpressionStoreRaw } from './context/expression-store.context';
-
+import type { ExpressionEntry } from './context/expression-store.context';
+import { useExpressionStore, useExpressionStoreRaw } from './context/expression-store.context';
 
 export type ExpressionControllerProps = {
   configurable?: boolean;

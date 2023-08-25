@@ -7,7 +7,6 @@ import React from 'react';
 import { useExpressionStore } from './context/expression-store.context';
 import { ExpressionItem } from './expression-item';
 
-
 export type ExpressionListProps = {
   //
 };
@@ -21,7 +20,7 @@ export const ExpressionList: React.FC<ExpressionListProps> = ({}) => {
       configurable,
       disabled,
     }),
-    equal
+    equal,
   );
 
   return (

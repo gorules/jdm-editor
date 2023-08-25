@@ -1,11 +1,13 @@
 import { CloseOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space, Typography } from 'antd';
 import equal from 'fast-deep-equal/es6/react';
-import React, { FC, useEffect, useMemo } from 'react';
-import { Node } from 'reactflow';
+import type { FC } from 'react';
+import React, { useEffect, useMemo } from 'react';
+import type { Node } from 'reactflow';
 
 import { Stack } from '../../stack';
-import { CustomNodeType, useDecisionGraphStore } from '../context/dg-store.context';
+import type { CustomNodeType } from '../context/dg-store.context';
+import { useDecisionGraphStore } from '../context/dg-store.context';
 
 export type NodeFormProps<T = any> = {
   node: Node;

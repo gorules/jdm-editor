@@ -1,7 +1,8 @@
 import React from 'react';
 
 import { useDecisionTableDialog } from '../context/dt-dialog.context';
-import { ColumnType, TableSchemaItem, useDecisionTableStore } from '../context/dt-store.context';
+import type { ColumnType, TableSchemaItem } from '../context/dt-store.context';
+import { useDecisionTableStore } from '../context/dt-store.context';
 import { FieldAdd } from './field-add-dialog';
 import { FieldUpdate } from './field-update-dialog';
 import { FieldsReorder } from './fields-reorder-dialog';

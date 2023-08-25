@@ -1,10 +1,9 @@
-import { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 
 import { Function } from './function';
 import { defaultFunctionValue } from './helpers/libs';
-import { FunctionDebuggerTrace } from './types'
-
+import type { FunctionDebuggerTrace } from './types';
 
 const exampleTrace = {
   performance: '2.820417ms',

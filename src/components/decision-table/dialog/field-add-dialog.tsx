@@ -3,8 +3,9 @@ import React, { useEffect } from 'react';
 import slugify from 'slugify';
 import { v4 } from 'uuid';
 
-import { SchemaSelectProps, recursiveSelect } from '../../../helpers/components';
-import { ColumnType, TableSchemaItem } from '../context/dt-store.context';
+import type { SchemaSelectProps } from '../../../helpers/components';
+import { recursiveSelect } from '../../../helpers/components';
+import type { ColumnType, TableSchemaItem } from '../context/dt-store.context';
 
 export type FieldAddProps = {
   id?: string;

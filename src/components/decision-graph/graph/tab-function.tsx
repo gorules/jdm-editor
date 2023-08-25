@@ -1,9 +1,13 @@
+import { Spin } from 'antd';
 import equal from 'fast-deep-equal/es6/react';
-import React from 'react';
+import React, { Suspense } from 'react';
 
-import { Function } from '../../function/function';
 import { useDecisionGraphStore } from '../context/dg-store.context';
 
+const Function = React.lazy(async () => {
+  const functionImport = await import('../../function');
+  return { default: functionImport.Function };
+});
 
 export type TabFunctionProps = {
   id: string;
@@ -17,17 +21,19 @@ export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
       updateNode,
       disabled,
     }),
-    equal
+    equal,
   );
 
   if (!node) return null;
 
   return (
-    <Function
-      value={typeof node?.content === 'string' ? node?.content : ''}
-      onChange={(val) => updateNode(id, val)}
-      disabled={disabled}
-      trace={nodeTrace}
-    />
+    <Suspense fallback={<Spin />}>
+      <Function
+        value={typeof node?.content === 'string' ? node?.content : ''}
+        onChange={(val) => updateNode(id, val)}
+        disabled={disabled}
+        trace={nodeTrace}
+      />
+    </Suspense>
   );
 };

@@ -1,12 +1,12 @@
 import { MenuOutlined, MinusCircleOutlined } from '@ant-design/icons';
-import { Row } from '@tanstack/react-table';
+import type { Row } from '@tanstack/react-table';
 import { Button, Input, Popconfirm } from 'antd';
 import clsx from 'clsx';
 import React, { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
-import { ExpressionEntry, useExpressionStore } from './context/expression-store.context';
-
+import type { ExpressionEntry } from './context/expression-store.context';
+import { useExpressionStore } from './context/expression-store.context';
 
 export type ExpressionItemProps = {
   expression: ExpressionEntry;
@@ -22,7 +22,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
       swapRows,
       disabled,
       configurable,
-    })
+    }),
   );
 
   const onChange = (update: Partial<Omit<ExpressionEntry, 'id'>>) => {
@@ -62,7 +62,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
         'expression-list-item',
         'expression-list__item',
         isDropping && direction === 'down' && 'dropping-down',
-        isDropping && direction === 'up' && 'dropping-up'
+        isDropping && direction === 'up' && 'dropping-up',
       )}
       style={{ opacity: !isDragging ? 1 : 0.5 }}
     >

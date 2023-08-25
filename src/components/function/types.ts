@@ -6,6 +6,6 @@ export type FunctionDebuggerLogData = {
 export type FunctionDebuggerTrace = {
   performance: string;
   traceData: {
-    log: FunctionDebuggerLogData[]
+    log: FunctionDebuggerLogData[];
   };
 };

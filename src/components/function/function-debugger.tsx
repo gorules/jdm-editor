@@ -3,8 +3,7 @@ import { Typography, theme } from 'antd';
 import React, { useState } from 'react';
 
 import { FunctionDebuggerLog } from './function-debugger-log';
-import { FunctionDebuggerTrace } from './types';
-
+import type { FunctionDebuggerTrace } from './types';
 
 export type FunctionDebuggerProps = {
   trace?: FunctionDebuggerTrace;

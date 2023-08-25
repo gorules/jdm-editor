@@ -2,9 +2,10 @@ import { Button, Typography } from 'antd';
 import clsx from 'clsx';
 import equal from 'fast-deep-equal/es6/react';
 import React, { useCallback } from 'react';
-import { XYPosition } from 'reactflow';
+import type { XYPosition } from 'reactflow';
 
-import { CustomNodeType, useDecisionGraphStore } from '../context/dg-store.context';
+import type { CustomNodeType } from '../context/dg-store.context';
+import { useDecisionGraphStore } from '../context/dg-store.context';
 
 export type GraphComponentsProps = {
   inputDisabled?: boolean;

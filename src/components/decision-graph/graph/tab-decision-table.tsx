@@ -4,7 +4,6 @@ import React from 'react';
 import { DecisionTable } from '../../decision-table';
 import { useDecisionGraphStore } from '../context/dg-store.context';
 
-
 export type TabDecisionTableProps = {
   id: string;
 };
@@ -18,7 +17,7 @@ export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id }) => {
       disabled,
       configurable,
     }),
-    equal
+    equal,
   );
 
   const activeRules: string[] =

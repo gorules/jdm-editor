@@ -1,9 +1,10 @@
 import { Card, Form, Modal, Typography } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
-import { XYCoord, useDrag, useDrop } from 'react-dnd';
+import type { XYCoord } from 'react-dnd';
+import { useDrag, useDrop } from 'react-dnd';
 
 import { Stack } from '../../stack';
-import { TableSchemaItem } from '../context/dt-store.context';
+import type { TableSchemaItem } from '../context/dt-store.context';
 
 export type FieldsReorderProps = {
   fields?: TableSchemaItem[];

@@ -4,7 +4,7 @@ import { createDragDropManager } from 'dnd-core';
 import React, { useMemo, useState } from 'react';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
-import { DecisionTableType } from './context/dt-store.context';
+import type { DecisionTableType } from './context/dt-store.context';
 import { DecisionTable } from './dt';
 
 const shippingFeesDefault = {

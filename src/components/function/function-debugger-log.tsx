@@ -53,7 +53,7 @@ export const FunctionDebuggerLog: React.FC<FunctionDebuggerLogProps> = ({ lines,
                     <>
                       <span style={{ color: jsonTheme.constants }}>{lastPart}</span>
                       {': '}
-                    </>
+                    </>,
                   );
                 }
 
@@ -101,7 +101,7 @@ const objectRenderer =
             {currentIndex !== objectEntries.length - 1 && <>{', '}</>}
           </span>,
         ],
-        [] satisfies React.ReactNode[]
+        [] satisfies React.ReactNode[],
       );
 
       return (
@@ -121,7 +121,7 @@ const objectRenderer =
             {currentIndex !== arrayData.length - 1 && <>{', '}</>}
           </span>,
         ],
-        [] satisfies React.ReactNode[]
+        [] satisfies React.ReactNode[],
       );
 
       return (

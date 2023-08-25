@@ -6,13 +6,8 @@ import { v4 } from 'uuid';
 
 import { saveFile } from '../../helpers/file-helpers';
 import { Stack } from '../stack';
-import {
-  TableExportOptions,
-  TableSchemaItem,
-  parseDecisionTable,
-  useDecisionTableRaw,
-  useDecisionTableStore,
-} from './context/dt-store.context';
+import type { TableExportOptions, TableSchemaItem } from './context/dt-store.context';
+import { parseDecisionTable, useDecisionTableRaw, useDecisionTableStore } from './context/dt-store.context';
 
 const parserOptions = {
   delimiter: ';',
@@ -38,10 +33,10 @@ export const DecisionTableCommandBar: React.FC = () => {
     const { name } = options;
     const schemaMeta = [
       ...decisionTable.inputs.map((input: any) =>
-        [input.name, input.field, 'INPUT', input.id, input.defaultValue].join(parserPipe)
+        [input.name, input.field, 'INPUT', input.id, input.defaultValue].join(parserPipe),
       ),
       ...decisionTable.outputs.map((output: any) =>
-        [output.name, output.field, 'OUTPUT', output.id, output.defaultValue].join(parserPipe)
+        [output.name, output.field, 'OUTPUT', output.id, output.defaultValue].join(parserPipe),
       ),
       'DESCRIPTION',
     ];
@@ -66,7 +61,7 @@ export const DecisionTableCommandBar: React.FC = () => {
       {
         ...parserOptions,
         header: true,
-      }
+      },
     );
 
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -89,7 +84,7 @@ export const DecisionTableCommandBar: React.FC = () => {
 
           resolve(results.data);
         },
-      })
+      }),
     );
 
     const headers: any[] = spreadsheetData?.splice(0, 1)?.[0];

@@ -4,7 +4,6 @@ import React, { useEffect } from 'react';
 
 import { useDecisionGraphStore } from '../context/dg-store.context';
 
-
 export type GraphTabsProps = {
   disabled?: boolean;
   onTabChange?: (val: string) => void;
@@ -17,7 +16,7 @@ export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled, onTabChange }) =
       openTab,
       closeTab,
     }),
-    equal
+    equal,
   );
 
   useEffect(() => {

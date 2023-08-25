@@ -6,8 +6,7 @@ import { v4 } from 'uuid';
 
 import { DecisionGraph } from './dg';
 import { defaultGraph } from './dg.stories-values';
-import { GraphRef } from './graph/graph';
-
+import type { GraphRef } from './graph/graph';
 
 const meta: Meta<typeof DecisionGraph> = {
   /* 👇 The title prop is optional.

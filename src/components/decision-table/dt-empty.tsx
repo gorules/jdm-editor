@@ -1,15 +1,12 @@
 import equal from 'fast-deep-equal/es6/react';
-import React, { useEffect, useRef } from 'react';
+import type React from 'react';
+import { useEffect, useRef } from 'react';
 import { shallow } from 'zustand/shallow';
 
-import { SchemaSelectProps } from '../../helpers/components';
-import {
-  DecisionTableType,
-  parseDecisionTable,
-  useDecisionTableRaw,
-  useDecisionTableStore,
-} from './context/dt-store.context';
-import { TableCellProps } from './table/table-default-cell';
+import type { SchemaSelectProps } from '../../helpers/components';
+import type { DecisionTableType } from './context/dt-store.context';
+import { parseDecisionTable, useDecisionTableRaw, useDecisionTableStore } from './context/dt-store.context';
+import type { TableCellProps } from './table/table-default-cell';
 
 export type DecisionTableEmptyType = {
   id?: string;

@@ -1,4 +1,5 @@
-import { HeaderGroup, flexRender } from '@tanstack/react-table';
+import type { HeaderGroup } from '@tanstack/react-table';
+import { flexRender } from '@tanstack/react-table';
 import clsx from 'clsx';
 import React from 'react';
 

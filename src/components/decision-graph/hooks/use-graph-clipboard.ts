@@ -60,7 +60,7 @@ export const useGraphClipboard = (reactFlow?: ReactFlowInstance, wrapper?: HTMLD
         message.error(e.message);
       }
     },
-    [reactFlow]
+    [reactFlow],
   );
 
   const pasteNodes = useCallback(async () => {
@@ -80,7 +80,7 @@ export const useGraphClipboard = (reactFlow?: ReactFlowInstance, wrapper?: HTMLD
         ...acc,
         [curr.id]: v4(),
       }),
-      {}
+      {},
     );
 
     const copyNodeIds = Object.keys(nodeIds);
@@ -166,7 +166,7 @@ export const useGraphClipboard = (reactFlow?: ReactFlowInstance, wrapper?: HTMLD
 
       return () => window.removeEventListener('keydown', listener);
     },
-    [copyNodes, pasteNodes]
+    [copyNodes, pasteNodes],
   );
 
   return {

@@ -1,4 +1,4 @@
-import { DecisionTableStoreType } from '../components/decision-table/context/dt-store.context';
+import type { DecisionTableStoreType } from '../components/decision-table/context/dt-store.context';
 
 export type SchemaSelectProps = {
   field: string;

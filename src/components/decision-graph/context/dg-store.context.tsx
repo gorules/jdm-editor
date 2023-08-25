@@ -1,7 +1,7 @@
 import { produce } from 'immer';
 import React, { useMemo } from 'react';
-import { XYPosition } from 'reactflow';
-import { StoreApi, UseBoundStore } from 'zustand';
+import type { XYPosition } from 'reactflow';
+import type { StoreApi, UseBoundStore } from 'zustand';
 import { create } from 'zustand';
 
 export type Position = {
@@ -145,14 +145,14 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         configurable: true,
         components: [],
       })),
-    []
+    [],
   );
   return <DecisionGraphStoreContext.Provider value={store}>{children}</DecisionGraphStoreContext.Provider>;
 };
 
 export function useDecisionGraphStore<T>(
   selector: (state: DecisionGraphStoreType) => T,
-  equals?: (a: any, b: any) => boolean
+  equals?: (a: any, b: any) => boolean,
 ): T {
   return React.useContext(DecisionGraphStoreContext)(selector, equals);
 }

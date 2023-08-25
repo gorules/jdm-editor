@@ -5,7 +5,6 @@ import React from 'react';
 import { Expression } from '../../expression/expression';
 import { useDecisionGraphStore } from '../context/dg-store.context';
 
-
 export type TabExpressionProps = {
   id: string;
 };
@@ -18,7 +17,7 @@ export const TabExpression: React.FC<TabExpressionProps> = ({ id }) => {
       disabled,
       configurable,
     }),
-    equal
+    equal,
   );
 
   if (!node) return null;

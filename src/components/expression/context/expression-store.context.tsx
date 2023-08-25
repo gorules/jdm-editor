@@ -1,8 +1,8 @@
 import { produce } from 'immer';
 import React, { useMemo } from 'react';
 import { v4 } from 'uuid';
-import { StoreApi, UseBoundStore, create } from 'zustand';
-
+import type { StoreApi, UseBoundStore } from 'zustand';
+import { create } from 'zustand';
 
 const ExpressionStoreContext = React.createContext<
   UseBoundStore<StoreApi<ExpressionStore>> & {
@@ -55,7 +55,7 @@ export const ExpressionStoreProvider: React.FC<React.PropsWithChildren<Expressio
             produce<ExpressionStore>((draft) => {
               draft.expressions.splice(index, 0, createExpression());
               return draft;
-            })
+            }),
           );
         },
         addRowBelow: (index) => {
@@ -65,7 +65,7 @@ export const ExpressionStoreProvider: React.FC<React.PropsWithChildren<Expressio
               draft.expressions.splice(index + 1, 0, createExpression());
 
               return draft;
-            })
+            }),
           );
         },
         expressions: [],
@@ -79,7 +79,7 @@ export const ExpressionStoreProvider: React.FC<React.PropsWithChildren<Expressio
               draft.expressions.splice(targetIndex, 0, input);
 
               return draft;
-            })
+            }),
           );
         },
         removeRow: (index) => {
@@ -87,7 +87,7 @@ export const ExpressionStoreProvider: React.FC<React.PropsWithChildren<Expressio
             produce<ExpressionStore>((draft) => {
               draft.expressions.splice(index, 1);
               return draft;
-            })
+            }),
           );
         },
         updateRow: (index, update) => {
@@ -99,11 +99,11 @@ export const ExpressionStoreProvider: React.FC<React.PropsWithChildren<Expressio
               };
 
               return draft;
-            })
+            }),
           );
         },
       })),
-    []
+    [],
   );
 
   return <ExpressionStoreContext.Provider value={store}>{children}</ExpressionStoreContext.Provider>;
@@ -111,7 +111,7 @@ export const ExpressionStoreProvider: React.FC<React.PropsWithChildren<Expressio
 
 export function useExpressionStore<T>(
   selector: (state: ExpressionStore) => T,
-  equals?: (a: any, b: any) => boolean
+  equals?: (a: any, b: any) => boolean,
 ): T {
   return React.useContext(ExpressionStoreContext)(selector, equals);
 }

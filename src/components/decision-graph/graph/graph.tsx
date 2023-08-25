@@ -3,23 +3,14 @@ import { Button, Tooltip, message } from 'antd';
 import clsx from 'clsx';
 import equal from 'fast-deep-equal/es6/react';
 import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import ReactFlow, {
-  Background,
-  Controls,
-  Edge,
-  Node,
-  ProOptions,
-  ReactFlowInstance,
-  XYPosition,
-  addEdge,
-  useEdgesState,
-  useNodesState,
-} from 'reactflow';
+import type { Edge, Node, ProOptions, ReactFlowInstance, XYPosition } from 'reactflow';
+import ReactFlow, { Background, Controls, addEdge, useEdgesState, useNodesState } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { v4 } from 'uuid';
 
 import { defaultFunctionValue } from '../../function/helpers/libs';
-import { DecisionGraphType, DecisionNode, useDecisionGraphStore } from '../context/dg-store.context';
+import type { DecisionGraphType, DecisionNode } from '../context/dg-store.context';
+import { useDecisionGraphStore } from '../context/dg-store.context';
 import { edgeFunction } from '../custom-edge';
 import { mapToDecisionEdges, mapToDecisionNodes, mapToGraphEdges, mapToGraphNode, mapToGraphNodes } from '../dg-util';
 import '../dg.scss';
@@ -67,7 +58,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
       onAddNode,
       onEditGraph,
     }),
-    equal
+    equal,
   );
 
   const graphClipboard = useGraphClipboard(reactFlowInstance, reactFlowWrapper.current || undefined);
@@ -202,7 +193,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
           type: 'edge',
           id: v4(),
         },
-        els
+        els,
       );
     });
   };
@@ -213,7 +204,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
         nodes,
       }),
     }),
-    [nodes]
+    [nodes],
   );
 
   const nodeTypes = useMemo(() => {
@@ -288,7 +279,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
     <div className={clsx(['tab-content', className])}>
       <div className={'grl-dg__command-bar'}>
         {!editGraph && (
-          <Tooltip title="Edit graph mode allows you to add, connect and move nodes.">
+          <Tooltip title='Edit graph mode allows you to add, connect and move nodes.'>
             <Button
               type='default'
               size={'small'}
@@ -403,7 +394,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
                 }}
                 removeNode={(node) => {
                   setEditEdges((edges) =>
-                    edges.filter((edge) => edge?.target !== node?.id && edge?.source !== node?.id)
+                    edges.filter((edge) => edge?.target !== node?.id && edge?.source !== node?.id),
                   );
                   setEditNodes((nodes) => nodes.filter((n) => n?.id !== node?.id));
                 }}
@@ -420,7 +411,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
                 removeNodes={(nodes) => {
                   const nodeIds = nodes.map((i) => i.id);
                   setEditEdges((edges) =>
-                    edges.filter((edge) => !nodeIds.includes(edge?.target) && !nodeIds.includes(edge?.source))
+                    edges.filter((edge) => !nodeIds.includes(edge?.target) && !nodeIds.includes(edge?.source)),
                   );
                   setEditNodes((nodes) => nodes.filter((n) => !nodeIds.includes(n?.id)));
                 }}

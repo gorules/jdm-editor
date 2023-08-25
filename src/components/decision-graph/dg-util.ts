@@ -1,6 +1,6 @@
-import { Edge, Node } from 'reactflow';
+import type { Edge, Node } from 'reactflow';
 
-import { DecisionEdge, DecisionNode } from './context/dg-store.context';
+import type { DecisionEdge, DecisionNode } from './context/dg-store.context';
 
 export const mapToDecisionNode = (node: Node): DecisionNode => {
   return {

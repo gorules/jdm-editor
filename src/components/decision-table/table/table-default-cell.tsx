@@ -1,9 +1,10 @@
-import { CellContext } from '@tanstack/react-table';
+import type { CellContext } from '@tanstack/react-table';
 import React, { memo, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { shallow } from 'zustand/shallow';
 
 import { columnIdSelector } from '../../../helpers/components';
-import { TableSchemaItem, useDecisionTableStore } from '../context/dt-store.context';
+import type { TableSchemaItem } from '../context/dt-store.context';
+import { useDecisionTableStore } from '../context/dt-store.context';
 
 export type TableDefaultCellProps = {
   context: CellContext<Record<string, string>, string>;
@@ -26,7 +27,7 @@ export const TableDefaultCell = memo<TableDefaultCellProps>(({ context, ...props
 
   const column = useDecisionTableStore(
     columnIdSelector(id),
-    (a, b) => a?.id !== undefined && b?.id !== undefined && a?.id === b?.id
+    (a, b) => a?.id !== undefined && b?.id !== undefined && a?.id === b?.id,
   );
 
   const disabled = useDecisionTableStore((store) => store.disabled, shallow);

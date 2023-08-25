@@ -1,7 +1,8 @@
 import { CloseOutlined } from '@ant-design/icons';
 import { Button, Typography } from 'antd';
-import React, { FC } from 'react';
-import { Edge, Node } from 'reactflow';
+import type { FC } from 'react';
+import React from 'react';
+import type { Edge, Node } from 'reactflow';
 
 import { Stack } from '../../stack';
 

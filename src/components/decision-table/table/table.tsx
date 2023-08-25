@@ -1,12 +1,14 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { ColumnDef, Table as ReactTable, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import type { ColumnDef, Table as ReactTable } from '@tanstack/react-table';
+import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { Button, Typography, theme } from 'antd';
 import clsx from 'clsx';
 import equal from 'fast-deep-equal/es6/react';
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 
-import { DecisionTableType, useDecisionTableStore } from '../context/dt-store.context';
+import type { DecisionTableType } from '../context/dt-store.context';
+import { useDecisionTableStore } from '../context/dt-store.context';
 import { TableDefaultCell } from './table-default-cell';
 import {
   TableHeadCellInput,
@@ -39,7 +41,7 @@ export const Table = forwardRef<
         inputs: decisionTable.inputs,
         outputs: decisionTable.outputs,
       }),
-      equal
+      equal,
     );
 
   const { rules } = useDecisionTableStore(
@@ -49,8 +51,8 @@ export const Table = forwardRef<
     (prev, curr) =>
       equal(
         prev.rules.map((i: any) => i?._id),
-        curr.rules.map((i: any) => i?._id)
-      )
+        curr.rules.map((i: any) => i?._id),
+      ),
   );
 
   const setDecisionTable = useDecisionTableStore((store) => store.setDecisionTable, equal);
@@ -105,7 +107,7 @@ export const Table = forwardRef<
         size: colWidth,
       },
     ],
-    [configurable, disabled, inputs, outputs]
+    [configurable, disabled, inputs, outputs],
   );
 
   const defaultColumn: Partial<ColumnDef<Record<string, string>, string>> = {
@@ -178,7 +180,7 @@ const TableBody = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(
         removeRow,
         swapRows,
       }),
-      equal
+      equal,
     );
 
     const { rows } = table.getRowModel();
@@ -232,7 +234,7 @@ const TableBody = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(
         )}
       </tbody>
     );
-  }
+  },
 );
 
 const StyledTable: React.FC<React.HTMLAttributes<HTMLTableElement> & { width: number }> = ({
