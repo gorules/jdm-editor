@@ -1,3 +1,4 @@
+import type { TabsProps } from 'antd';
 import { Tabs } from 'antd';
 import equal from 'fast-deep-equal/es6/react';
 import React, { useEffect } from 'react';
@@ -8,6 +9,10 @@ export type GraphTabsProps = {
   disabled?: boolean;
   onTabChange?: (val: string) => void;
 };
+
+type NonUndefined<T> = T extends undefined ? never : T;
+type TabItem = NonUndefined<TabsProps['items']>[number];
+
 export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled, onTabChange }) => {
   const { activeNode, openNodes, openTab, closeTab } = useDecisionGraphStore(
     ({ decisionGraph, openTab, closeTab, activeTab, openTabs }) => ({
@@ -36,11 +41,18 @@ export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled, onTabChange }) =
         }
       }}
       onChange={(val) => openTab(val)}
-    >
-      <Tabs.TabPane closable={false} tab={'Graph'} key='graph' />
-      {openNodes.map((node) => (
-        <Tabs.TabPane disabled={disabled} key={node?.id} tab={node?.name || node?.type} closable={true} />
-      ))}
-    </Tabs>
+      items={[
+        { closable: false, label: 'Graph', key: 'graph' },
+        ...openNodes.map(
+          (node) =>
+            ({
+              disabled,
+              key: node.id,
+              label: node?.name ?? node?.type,
+              closable: true,
+            }) satisfies TabItem,
+        ),
+      ]}
+    />
   );
 };
