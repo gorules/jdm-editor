@@ -1,5 +1,5 @@
 import { CheckOutlined, CloseOutlined, SettingOutlined } from '@ant-design/icons';
-import { Button, message } from 'antd';
+import { Button, Tooltip, message } from 'antd';
 import clsx from 'clsx';
 import equal from 'fast-deep-equal/es6/react';
 import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
@@ -8,12 +8,13 @@ import ReactFlow, {
   Controls,
   Edge,
   Node,
+  ProOptions,
   ReactFlowInstance,
   XYPosition,
   addEdge,
   useEdgesState,
-  useNodesState, ProOptions
-} from 'reactflow'
+  useNodesState,
+} from 'reactflow';
 import 'reactflow/dist/style.css';
 import { v4 } from 'uuid';
 
@@ -287,19 +288,21 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
     <div className={clsx(['tab-content', className])}>
       <div className={'grl-dg__command-bar'}>
         {!editGraph && (
-          <Button
-            type='default'
-            size={'small'}
-            disabled={disabled}
-            onClick={() => {
-              setEditNodes(mapToGraphNodes(nodes));
-              setEditEdges(mapToGraphEdges(edges));
-              setEditGraph(true);
-            }}
-            icon={<SettingOutlined />}
-          >
-            Edit Graph
-          </Button>
+          <Tooltip title="Edit graph mode allows you to add, connect and move nodes.">
+            <Button
+              type='default'
+              size={'small'}
+              disabled={disabled}
+              onClick={() => {
+                setEditNodes(mapToGraphNodes(nodes));
+                setEditEdges(mapToGraphEdges(edges));
+                setEditGraph(true);
+              }}
+              icon={<SettingOutlined />}
+            >
+              Edit Graph
+            </Button>
+          </Tooltip>
         )}
         {editGraph && (
           <Button
