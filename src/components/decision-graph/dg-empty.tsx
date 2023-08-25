@@ -1,7 +1,6 @@
 import equal from 'fast-deep-equal/es6/react';
 import React, { useEffect, useRef } from 'react';
 import { XYPosition } from 'reactflow';
-import { shallow } from 'zustand/shallow';
 
 import {
   CustomNodeType,
@@ -42,8 +41,12 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
 }) => {
   const mountedRef = useRef(false);
   const store = useDecisionGraphRaw();
-  const setDecisionGraph = useDecisionGraphStore((store) => store.setDecisionGraph, shallow);
-  const decisionGraph = useDecisionGraphStore((store) => store.decisionGraph, equal);
+  const { setDecisionGraph } = useDecisionGraphStore(
+    ({ setDecisionGraph }) => ({
+      setDecisionGraph,
+    }),
+    equal
+  );
 
   useEffect(() => {
     store.setState({
@@ -60,13 +63,18 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
   }, [id, disabled, configurable, components, onChange, onAddNode, onOpenNode, onTabChange, onEditGraph]);
 
   useEffect(() => {
-    if (mountedRef.current && !equal(value, decisionGraph)) {
+    if (mountedRef.current && value !== undefined) {
       setDecisionGraph(value);
     }
   }, [value]);
 
   useEffect(() => {
-    setDecisionGraph(value === undefined ? defaultValue : value);
+    if (value !== undefined) {
+      setDecisionGraph(value);
+    } else if (defaultValue !== undefined) {
+      setDecisionGraph(defaultValue);
+    }
+
     mountedRef.current = true;
   }, []);
   return null;

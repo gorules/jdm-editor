@@ -12,12 +12,13 @@ import ReactFlow, {
   XYPosition,
   addEdge,
   useEdgesState,
-  useNodesState,
-} from 'reactflow';
+  useNodesState, ProOptions
+} from 'reactflow'
 import 'reactflow/dist/style.css';
 import { v4 } from 'uuid';
 
-import { DecisionEdge, DecisionGraphType, DecisionNode, useDecisionGraphStore } from '../context/dg-store.context';
+import { defaultFunctionValue } from '../../function/helpers/libs';
+import { DecisionGraphType, DecisionNode, useDecisionGraphStore } from '../context/dg-store.context';
 import { edgeFunction } from '../custom-edge';
 import { mapToDecisionEdges, mapToDecisionNodes, mapToGraphEdges, mapToGraphNode, mapToGraphNodes } from '../dg-util';
 import '../dg.scss';
@@ -29,6 +30,7 @@ import { GraphNode, GraphNodeEdit } from './nodes';
 
 export type GraphProps = {
   className?: string;
+  reactFlowProOptions?: ProOptions;
 };
 
 export type GraphRef = {
@@ -38,7 +40,8 @@ export type GraphRef = {
   addNode?: (node: DecisionNode) => void;
   setDecisionGraph?: (decisionGraph: DecisionGraphType) => void;
 };
-export const Graph = forwardRef<GraphRef, GraphProps>(({ className }, ref) => {
+
+export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, className }, ref) => {
   const reactFlowWrapper = useRef<any>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
 
@@ -53,13 +56,18 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ className }, ref) => {
   const selected = editNodes?.filter?.((node) => node?.selected);
   const selectedEdges = editEdges?.filter?.((edge) => edge?.selected);
 
-  const nodes: DecisionNode[] = useDecisionGraphStore((store) => store.decisionGraph?.nodes || [], equal);
-  const edges: DecisionEdge[] = useDecisionGraphStore((store) => store.decisionGraph?.edges || [], equal);
-  const setDecisionGraph = useDecisionGraphStore((store) => store.setDecisionGraph, equal);
-  const disabled = useDecisionGraphStore((store) => store.disabled, equal);
-  const closeTab = useDecisionGraphStore((store) => store.closeTab, equal);
-  const onAddNode = useDecisionGraphStore((store) => store.onAddNode, equal);
-  const onEditGraph = useDecisionGraphStore((store) => store.onEditGraph, equal);
+  const { nodes, edges, setDecisionGraph, disabled, closeTab, onAddNode, onEditGraph } = useDecisionGraphStore(
+    ({ decisionGraph, setDecisionGraph, disabled, closeTab, onAddNode, onEditGraph }) => ({
+      nodes: decisionGraph?.nodes ?? [],
+      edges: decisionGraph?.edges ?? [],
+      setDecisionGraph,
+      disabled,
+      closeTab,
+      onAddNode,
+      onEditGraph,
+    }),
+    equal
+  );
 
   const graphClipboard = useGraphClipboard(reactFlowInstance, reactFlowWrapper.current || undefined);
 
@@ -86,7 +94,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ className }, ref) => {
       type !== 'inputNode' &&
       type !== 'outputNode'
     ) {
-      return onAddNode(type, position);
+      return onAddNode?.(type, position);
     }
 
     const count = (nodes || []).filter((node) => node?.type === type)?.length;
@@ -111,17 +119,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ className }, ref) => {
         rules: [],
       };
     } else if (type === 'functionNode') {
-      data.content = [
-        '/**',
-        '* @param input',
-        '* @param {{',
-        "*  moment: import('dayjs')",
-        '* }} helpers',
-        '*/',
-        'const handler = (input, { moment }) => {',
-        '  return input;',
-        '}',
-      ].join('\n');
+      data.content = defaultFunctionValue;
     } else if (type === 'inputNode') {
       data.name = 'Request';
     } else if (type === 'outputNode') {
@@ -336,6 +334,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ className }, ref) => {
             nodesDraggable={editGraph}
             elevateEdgesOnSelect={editGraph}
             elevateNodesOnSelect={editGraph}
+            zoomOnDoubleClick={false}
             nodes={editGraph ? editNodes : mapToGraphNodes(nodes || [])}
             edges={editGraph ? editEdges : mapToGraphEdges(edges || [])}
             onInit={(instance) => setReactFlowInstance(instance)}
@@ -346,9 +345,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ className }, ref) => {
             onDrop={(e) => (editGraph ? onDrop(e) : undefined)}
             onDragOver={editGraph ? onDragOver : undefined}
             onConnect={onConnect}
-            proOptions={{
-              hideAttribution: true,
-            }}
+            proOptions={reactFlowProOptions}
             onNodesChange={(e) => {
               editGraph && onEditNodesChange(e);
             }}
@@ -370,7 +367,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ className }, ref) => {
             }}
           >
             <Controls showInteractive={false} />
-            <Background color={'#d9d9d9'} gap={20} />
+            <Background color='var(--color-border)' gap={20} />
           </ReactFlow>
         </div>
         {editGraph && (

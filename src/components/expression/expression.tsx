@@ -34,7 +34,7 @@ export const Expression = React.forwardRef<ExpressionRef, ExpressionProps>(({ ma
         rootElement: container.current,
       },
     };
-  }, []);
+  }, [container.current]);
 
   return (
     <div ref={container}>

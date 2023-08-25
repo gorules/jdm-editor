@@ -4,22 +4,19 @@ import React from 'react';
 import { DecisionTable } from '../../decision-table';
 import { useDecisionGraphStore } from '../context/dg-store.context';
 
+
 export type TabDecisionTableProps = {
   id: string;
 };
 
 export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id }) => {
-  const node = useDecisionGraphStore(
-    (store) => (store.decisionGraph?.nodes || []).find((node) => node.id === id),
-    equal
-  );
-  const nodeTrace = useDecisionGraphStore((store) => store.simulate?.result?.trace?.[id], equal);
-  const updateNode = useDecisionGraphStore((store) => store.updateNode, equal);
-
-  const { disabled, configurable } = useDecisionGraphStore(
-    (store) => ({
-      disabled: store.disabled,
-      configurable: store.configurable,
+  const { node, nodeTrace, updateNode, disabled, configurable } = useDecisionGraphStore(
+    ({ decisionGraph, simulate, updateNode, disabled, configurable }) => ({
+      node: (decisionGraph?.nodes ?? []).find((node) => node.id === id),
+      nodeTrace: simulate?.result?.trace?.[id],
+      updateNode,
+      disabled,
+      configurable,
     }),
     equal
   );

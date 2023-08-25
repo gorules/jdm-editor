@@ -2,24 +2,23 @@ import { Tabs } from 'antd';
 import equal from 'fast-deep-equal/es6/react';
 import React, { useEffect } from 'react';
 
-import { DecisionNode, useDecisionGraphStore } from '../context/dg-store.context';
+import { useDecisionGraphStore } from '../context/dg-store.context';
+
 
 export type GraphTabsProps = {
   disabled?: boolean;
   onTabChange?: (val: string) => void;
 };
 export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled, onTabChange }) => {
-  const closeTab = useDecisionGraphStore((store) => store.closeTab, equal);
-  const openTab = useDecisionGraphStore((store) => store.openTab, equal);
-
-  const activeNode: DecisionNode = useDecisionGraphStore((store) => {
-    return (store.decisionGraph?.nodes || []).find((node) => node.id === store.activeTab);
-  }, equal);
-  const openedNodes: DecisionNode[] = useDecisionGraphStore((store) => {
-    return store.openTabs
-      .map((id) => (store.decisionGraph?.nodes || []).find((node) => node?.id === id))
-      .filter((node) => !!node);
-  }, equal);
+  const { activeNode, openNodes, openTab, closeTab } = useDecisionGraphStore(
+    ({ decisionGraph, openTab, closeTab, activeTab, openTabs }) => ({
+      activeNode: (decisionGraph?.nodes ?? []).find((node) => node.id === activeTab),
+      openNodes: (decisionGraph?.nodes ?? []).filter((node) => openTabs.includes(node.id)),
+      openTab,
+      closeTab,
+    }),
+    equal
+  );
 
   useEffect(() => {
     onTabChange?.(activeNode?.id || 'graph');
@@ -37,12 +36,10 @@ export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled, onTabChange }) =
           closeTab(targetKey);
         }
       }}
-      onChange={(val) => {
-        openTab(val);
-      }}
+      onChange={(val) => openTab(val)}
     >
       <Tabs.TabPane closable={false} tab={'Graph'} key='graph' />
-      {openedNodes?.map((node) => (
+      {openNodes.map((node) => (
         <Tabs.TabPane disabled={disabled} key={node?.id} tab={node?.name || node?.type} closable={true} />
       ))}
     </Tabs>

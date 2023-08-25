@@ -41,13 +41,14 @@ export const DecisionTable: React.FC<DecisionTableProps> = ({
         manager,
       };
     }
+
     return {
       backend: HTML5Backend,
       options: {
         rootElement: ref.current,
       },
     };
-  }, []);
+  }, [ref.current]);
 
   return (
     <div ref={ref} className={'grl-dt'} style={{ background: token.colorBgElevated }}>

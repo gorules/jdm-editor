@@ -14,6 +14,8 @@ export type GraphComponentsProps = {
 };
 
 export const GraphComponents: React.FC<GraphComponentsProps> = ({ inputDisabled, outputDisabled, onPaste }) => {
+  const customComponents: CustomNodeType[] = useDecisionGraphStore((store) => store.components || [], equal);
+
   const onDragStart = useCallback((event: React.DragEvent, nodeType: string) => {
     const target = event.target as HTMLDivElement;
     if (!target) {
@@ -33,11 +35,9 @@ export const GraphComponents: React.FC<GraphComponentsProps> = ({ inputDisabled,
     event.dataTransfer.setData('relativePosition', JSON.stringify(positionData));
   }, []);
 
-  const customComponents: CustomNodeType[] = useDecisionGraphStore((store) => store.components || [], equal);
-
   return (
     <div className={'wrapper'}>
-      <Typography.Text style={{ marginBottom: '0.5rem' }}>Drag and Drop components</Typography.Text>
+      <Typography.Text style={{ marginBottom: '1rem' }}>Drag and Drop components</Typography.Text>
       <div className={'list'}>
         <div
           className={clsx(['component', inputDisabled && 'disabled'])}
@@ -77,7 +77,7 @@ export const GraphComponents: React.FC<GraphComponentsProps> = ({ inputDisabled,
           </div>
         ))}
       </div>
-      <Button onClick={onPaste} type='default' ghost style={{ marginTop: 'auto' }}>
+      <Button onClick={onPaste} type='default' style={{ marginTop: 'auto' }}>
         Paste from clipboard
       </Button>
     </div>

@@ -1,5 +1,5 @@
 import { DownOutlined } from '@ant-design/icons';
-import { Button, Typography, theme } from 'antd';
+import { Typography, theme } from 'antd';
 import React, { useState } from 'react';
 
 import { FunctionDebuggerLog } from './function-debugger-log';
@@ -20,6 +20,7 @@ export const FunctionDebugger: React.FC<FunctionDebuggerProps> = ({ trace }) => 
       <div className='function-debugger__panel'>
         <div
           className='function-debugger__panel-header'
+          onClick={() => setOpen(!open)}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -30,6 +31,7 @@ export const FunctionDebugger: React.FC<FunctionDebuggerProps> = ({ trace }) => 
             background: token.colorBgLayout,
             zIndex: 3,
             borderBottom: `1px solid ${token.colorBorder}`,
+            cursor: 'pointer',
           }}
         >
           <Typography.Text
@@ -40,12 +42,9 @@ export const FunctionDebugger: React.FC<FunctionDebuggerProps> = ({ trace }) => 
           >
             Console
           </Typography.Text>
-          <Button
-            type='text'
-            style={{ paddingTop: 0, paddingBottom: 0 }}
-            icon={<DownOutlined style={{ transform: open ? 'rotate(-180deg)' : undefined, transformOrigin: '50%' }} />}
-            onClick={() => setOpen(!open)}
-          />
+          <div>
+            <DownOutlined style={{ transform: !open ? 'rotate(-180deg)' : undefined, transformOrigin: '50%' }} />
+          </div>
         </div>
         {open && (
           <>

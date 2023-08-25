@@ -15,7 +15,7 @@
     gap: 0.5rem;
     width: 100%;
     padding: 0.5rem;
-    border-bottom: 1px solid #f0f2f5;
+    border-bottom: 1px solid var(--color-border);
   }
 
   &__graph {
@@ -27,6 +27,7 @@
     .tabs {
       max-width: 100%;
       background-color: var(--color-bg-container);
+
       .ant-tabs-nav {
         margin: 0 !important;
       }
@@ -39,6 +40,7 @@
       position: relative;
       display: none;
       background-color: var(--color-bg-container);
+
       &.active {
         display: flex;
         flex-direction: column;
@@ -46,7 +48,6 @@
     }
 
     .content-wrapper {
-      flex-grow: 1;
       flex: 1;
       display: flex;
       flex-direction: row;
@@ -55,7 +56,6 @@
     }
 
     .react-flow {
-      flex-grow: 1;
       flex: 1;
       height: 100%;
       width: 100%;
@@ -70,26 +70,29 @@
       justify-content: center;
       box-sizing: border-box;
       padding: 0 8px;
-      border: 1px solid #d9d9d9;
+      border: 1px solid var(--color-border);
       border-radius: 4px;
       position: relative;
-      background-color: white;
+      background-color: var(--color-bg-elevated);
       transition: all 0.2s;
+
       &:hover {
-        border-color: var(--ant-primary-color-hover);
+        border-color: var(--color-primary-hover);
         cursor: pointer;
       }
 
       &.selected {
-        border-color: var(--ant-primary-color-active);
+        border-color: var(--color-primary-active);
       }
+
       &.simulated {
-        background-color: var(--ant-primary-1);
-        border: 1px solid var(--ant-primary-4);
+        background-color: var(--color-primary-bg);
+        border-color: var(--color-primary-active);
       }
+
       &.error {
-        background-color: red;
-        border: 1px solid red;
+        background-color: var(--color-error-bg);
+        border-color: var(--color-error-border);
       }
 
       &.input,
@@ -111,7 +114,7 @@
     min-width: 240px;
     height: 100%;
     overflow-y: auto;
-    border-left: 1px solid var(--border-color);
+    border-left: 1px solid var(--color-border);
 
     .wrapper {
       display: flex;
@@ -133,13 +136,12 @@
       align-items: center;
       justify-content: center;
       padding: 8px;
-      border: 1px solid #d9d9d9;
+      border: 1px solid var(--color-border);
       cursor: grab;
       border-radius: 6px;
 
       &.disabled {
-        background-color: gray;
-        border-color: gray;
+        background-color: var(--color-bg-container-disabled);
         cursor: not-allowed;
         user-select: none;
       }
@@ -165,25 +167,45 @@
 
   .react-flow {
     &__handle {
-      border: 0 !important;
-      background-color: #595959 !important;
-      height: 12px !important;
-      width: 12px !important;
-      border-radius: 4px !important;
+      border: 1px solid var(--color-primary-border) !important;
+      background-color: var(--color-primary-bg) !important;
+      height: 7px !important;
+      width: 7px !important;
+      border-radius: 50% !important;
+
+      &::after {
+        position: absolute;
+        content: '';
+        display: block;
+        width: 20px;
+        height: 20px;
+        left: 50%;
+        top: 50%;
+        border-radius: 50%;
+        //border: 1px solid var(--color-primary-border) !important;
+      }
     }
 
     &__handle-left {
-      left: -6px !important;
+      left: -5px !important;
+
+      &::after {
+        transform: translate(-60%, -50%);
+      }
     }
 
     &__handle-right {
-      right: -6px !important;
+      right: -5px !important;
+
+      &::after {
+        transform: translate(-40%, -50%);
+      }
     }
 
     &__edge-path-selector {
       fill: none;
       stroke: transparent;
-      stroke-width: 28;
+      stroke-width: 15;
 
       &:hover {
         cursor: pointer;
@@ -193,7 +215,33 @@
 
   .react-flow__edge-path-selector:hover + .react-flow__edge-path,
   .react-flow__edge-path:hover {
-    stroke: #555;
+    stroke: var(--color-primary-border-hover);
     cursor: pointer;
+  }
+
+  .react-flow__panel {
+    box-shadow: none;
+    border: 1px solid var(--color-border);
+  }
+
+  .react-flow__controls-button {
+    background: var(--color-bg-elevated);
+    color: var(--color-text);
+    border-color: var(--color-border);
+    transition: .15s background-color ease-in-out;
+
+    &:hover {
+      background: var(--color-primary-hover);
+    }
+
+    svg {
+      fill: currentColor;
+    }
+  }
+
+  .react-flow__attribution {
+    color: var(--color-text);
+    border: none;
+    background: transparent;
   }
 }

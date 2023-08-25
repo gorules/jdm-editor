@@ -1,28 +1,36 @@
 // import equal from 'fast-deep-equal/es6/react';
+import equal from 'fast-deep-equal/es6/react';
 import React from 'react';
 
-// import { useDecisionGraphStore } from '../context/dg-store.context';
+import { Expression } from '../../expression/expression';
+import { useDecisionGraphStore } from '../context/dg-store.context';
+
 
 export type TabExpressionProps = {
   id: string;
 };
 
-export const TabExpression: React.FC<TabExpressionProps> = (/* { id } */) => {
-  // const node = useDecisionGraphStore(
-  //   (store) => (store.decisionGraph?.nodes || []).find((node) => node.id === id),
-  //   equal
-  // );
-  // const nodeTrace = useDecisionGraphStore((store) => store.simulate?.result?.trace?.[id], equal);
-  // const updateNode = useDecisionGraphStore((store) => store.updateNode, equal);
-  //
-  // const { disabled, configurable } = useDecisionGraphStore(
-  //   (store) => ({
-  //     disabled: store.disabled,
-  //     configurable: store.configurable,
-  //   }),
-  //   equal
-  // );
-  // if (!node) return null;
+export const TabExpression: React.FC<TabExpressionProps> = ({ id }) => {
+  const { node, updateNode, disabled, configurable } = useDecisionGraphStore(
+    ({ decisionGraph, updateNode, disabled, configurable }) => ({
+      node: (decisionGraph?.nodes ?? []).find((node) => node.id === id),
+      updateNode,
+      disabled,
+      configurable,
+    }),
+    equal
+  );
 
-  return null;
+  if (!node) return null;
+
+  return (
+    <div style={{ maxWidth: 900 }}>
+      <Expression
+        value={Array.isArray(node?.content) ? node?.content : []}
+        onChange={(val) => updateNode(id, val)}
+        disabled={disabled}
+        configurable={configurable}
+      />
+    </div>
+  );
 };

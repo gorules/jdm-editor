@@ -8,10 +8,11 @@ import {
 import { Space, Typography } from 'antd';
 import clsx from 'clsx';
 import equal from 'fast-deep-equal/es6/react';
-import React, { FC, useMemo } from 'react';
+import React, { FC, useMemo, useRef } from 'react';
 import { Handle, NodeProps, Position } from 'reactflow';
 
 import { CustomNodeType, useDecisionGraphStore } from '../context/dg-store.context';
+
 
 const useNodeError = (id: string, simulate: any) => {
   if (simulate?.error?.data?.nodeId === id) {
@@ -23,11 +24,16 @@ const useNodeError = (id: string, simulate: any) => {
 
 export const GraphNode: FC<NodeProps> = (props) => {
   const { id, data, isConnectable, type } = props;
+  const doubleClickTimer = useRef<number>();
 
-  const simulate = useDecisionGraphStore((store) => store.simulate, equal);
-  const openTab = useDecisionGraphStore((store) => store.openTab, equal);
-
-  const customComponents: CustomNodeType[] = useDecisionGraphStore((store) => store.components || [], equal);
+  const { openTab, simulate, customComponents } = useDecisionGraphStore(
+    ({ simulate, openTab, components }) => ({
+      openTab,
+      simulate,
+      customComponents: components ?? [],
+    }),
+    equal
+  );
 
   const component = useMemo(() => {
     return customComponents.find((component) => component.type === type);
@@ -56,10 +62,14 @@ export const GraphNode: FC<NodeProps> = (props) => {
         type === 'outputNode' && 'output',
         type === 'inputNode' && 'input',
       ])}
-      onDoubleClick={() => {
-        if (type !== 'inputNode' && type !== 'outputNode') {
-          innerOpen();
+      onClick={() => {
+        if (doubleClickTimer.current && performance.now() - doubleClickTimer.current < 250) {
+          if (type !== 'inputNode' && type !== 'outputNode') {
+            innerOpen();
+          }
         }
+
+        doubleClickTimer.current = performance.now();
       }}
     >
       {trace &&
@@ -82,14 +92,7 @@ export const GraphNode: FC<NodeProps> = (props) => {
         type === 'functionNode' ||
         type === 'expressionNode' ||
         type === 'outputNode') && <Handle type='target' position={Position.Left} isConnectable={isConnectable} />}
-      <Space
-        direction={'vertical'}
-        size={0}
-        className={'full-width'}
-        style={{
-          textAlign: 'center',
-        }}
-      >
+      <Space direction={'vertical'} size={0} className={'full-width'} style={{ textAlign: 'center' }}>
         <div className={'text-ellipsis'}>
           <Typography.Text strong>{data?.name}</Typography.Text>
         </div>

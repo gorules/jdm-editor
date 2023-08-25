@@ -150,10 +150,12 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
   return <DecisionGraphStoreContext.Provider value={store}>{children}</DecisionGraphStoreContext.Provider>;
 };
 
-export const useDecisionGraphStore = (
-  selector: (state: DecisionGraphStoreType) => any,
+export function useDecisionGraphStore<T>(
+  selector: (state: DecisionGraphStoreType) => T,
   equals?: (a: any, b: any) => boolean
-) => React.useContext(DecisionGraphStoreContext)(selector, equals);
+): T {
+  return React.useContext(DecisionGraphStoreContext)(selector, equals);
+}
 
 export const useDecisionGraphRaw = () => React.useContext(DecisionGraphStoreContext);
 export default DecisionGraphProvider;
