@@ -85,13 +85,16 @@ const TableInputCell: React.FC<TableCellProps> = ({ value, onChange, disabled })
       return;
     }
 
-    const resizeObserver = new ResizeObserver((entries) => {
-      if (entries.length !== 1) {
-        return;
-      }
+    const observerCallback: ResizeObserverCallback = (entries: ResizeObserverEntry[]) => {
+      window.requestAnimationFrame((): void | undefined => {
+        if (!Array.isArray(entries) || entries.length === 0) {
+          return;
+        }
+        recalculateRows(entries[0].target as HTMLTextAreaElement);
+      });
+    };
 
-      recalculateRows(entries[0].target as HTMLTextAreaElement);
-    });
+    const resizeObserver = new ResizeObserver(observerCallback);
 
     const parentContainer = textareaRef.current.closest('div.cell-wrapper')! as HTMLElement;
     const eventListener = (e: Event) => {

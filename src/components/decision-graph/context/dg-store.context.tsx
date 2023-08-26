@@ -94,7 +94,6 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
           set({
             decisionGraph: graph,
           });
-          getState()?.onChange?.(graph);
         },
         updateNode: (id, content) => {
           const decisionGraph = produce(getState().decisionGraph, (draft) => {

@@ -22,6 +22,7 @@ import { GraphNode, GraphNodeEdit } from './nodes';
 
 export type GraphProps = {
   className?: string;
+  onDisableTabs?: (val: boolean) => void;
   reactFlowProOptions?: ProOptions;
 };
 
@@ -33,7 +34,7 @@ export type GraphRef = {
   setDecisionGraph?: (decisionGraph: DecisionGraphType) => void;
 };
 
-export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, className }, ref) => {
+export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, className, onDisableTabs }, ref) => {
   const reactFlowWrapper = useRef<any>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
 
@@ -48,23 +49,26 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
   const selected = editNodes?.filter?.((node) => node?.selected);
   const selectedEdges = editEdges?.filter?.((edge) => edge?.selected);
 
-  const { nodes, edges, setDecisionGraph, disabled, closeTab, onAddNode, onEditGraph } = useDecisionGraphStore(
-    ({ decisionGraph, setDecisionGraph, disabled, closeTab, onAddNode, onEditGraph }) => ({
-      nodes: decisionGraph?.nodes ?? [],
-      edges: decisionGraph?.edges ?? [],
-      setDecisionGraph,
-      disabled,
-      closeTab,
-      onAddNode,
-      onEditGraph,
-    }),
-    equal,
-  );
+  const { nodes, edges, setDecisionGraph, disabled, closeTab, onAddNode, onEditGraph, onChange } =
+    useDecisionGraphStore(
+      ({ decisionGraph, setDecisionGraph, disabled, closeTab, onChange, onAddNode, onEditGraph }) => ({
+        nodes: decisionGraph?.nodes ?? [],
+        edges: decisionGraph?.edges ?? [],
+        setDecisionGraph,
+        disabled,
+        closeTab,
+        onChange,
+        onAddNode,
+        onEditGraph,
+      }),
+      equal,
+    );
 
   const graphClipboard = useGraphClipboard(reactFlowInstance, reactFlowWrapper.current || undefined);
 
   useEffect(() => {
     onEditGraph?.(editGraph);
+    onDisableTabs?.(editGraph);
   }, [editGraph]);
 
   const addNode = (type: string, position?: XYPosition) => {
@@ -243,6 +247,10 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
       }
 
       setDecisionGraph({
+        nodes,
+        edges,
+      });
+      onChange?.({
         nodes,
         edges,
       });

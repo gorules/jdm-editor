@@ -67,7 +67,7 @@ export const Table = forwardRef<
         id: 'inputs',
         minSize: minColWidth,
         size: colWidth,
-        enableResizing: false,
+        enableResizing: true,
         header: () => <TableHeadCellInput configurable={configurable} disabled={disabled} />,
         columns: [
           ...(inputs || []).map((input: any) => {

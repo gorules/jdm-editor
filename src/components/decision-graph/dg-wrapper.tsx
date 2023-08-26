@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { createDragDropManager } from 'dnd-core';
 import equal from 'fast-deep-equal/es6/react';
-import React, { forwardRef, useMemo, useRef } from 'react';
+import React, { forwardRef, useMemo, useRef, useState } from 'react';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import type { ProOptions } from 'reactflow';
 import 'reactflow/dist/style.css';
@@ -29,6 +29,8 @@ export const DecisionGraphWrapper = forwardRef<GraphRef, DecisionGraphWrapperPro
     equal,
   );
 
+  const [disableTabs, setDisableTabs] = useState(false);
+
   const dndManager = useMemo(() => {
     return createDragDropManager(HTML5Backend, undefined, {
       rootElement: containerRef.current,
@@ -38,8 +40,13 @@ export const DecisionGraphWrapper = forwardRef<GraphRef, DecisionGraphWrapperPro
   return (
     <div className={'grl-dg__wrapper'}>
       <div className={'grl-dg__graph'}>
-        <GraphTabs />
-        <Graph ref={ref} className={clsx([!activeNode && 'active'])} reactFlowProOptions={reactFlowProOptions} />
+        <GraphTabs disabled={disableTabs} />
+        <Graph
+          ref={ref}
+          className={clsx([!activeNode && 'active'])}
+          reactFlowProOptions={reactFlowProOptions}
+          onDisableTabs={setDisableTabs}
+        />
         <div style={{ display: 'contents' }} ref={containerRef}>
           {openNodes.map((node) => (
             <div key={node?.id} className={clsx(['tab-content', activeNode?.id === node?.id && 'active'])}>

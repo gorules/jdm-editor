@@ -15,6 +15,8 @@ export type DecisionGraphEmptyType = {
   disabled?: boolean;
   configurable?: boolean;
 
+  simulate?: any;
+
   components?: CustomNodeType[];
 
   onChange?: (val: DecisionGraphType) => void;
@@ -35,6 +37,7 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
   onTabChange,
   onEditGraph,
   components,
+  simulate,
 }) => {
   const mountedRef = useRef(false);
   const store = useDecisionGraphRaw();
@@ -56,13 +59,14 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
       disabled,
       configurable,
       components,
+      simulate,
       onChange: innerChange,
       onAddNode,
       onOpenNode,
       onTabChange,
       onEditGraph,
     });
-  }, [id, disabled, configurable, components, onAddNode, onOpenNode, onTabChange, onEditGraph]);
+  }, [id, disabled, configurable, components, simulate, onAddNode, onOpenNode, onTabChange, onEditGraph]);
 
   useEffect(() => {
     if (mountedRef.current && value !== undefined && !equal(value, decisionGraph)) {
