@@ -1,5 +1,6 @@
 import type { CellContext } from '@tanstack/react-table';
-import React, { memo, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import React, { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { v4 } from 'uuid';
 import { shallow } from 'zustand/shallow';
 
 import { columnIdSelector } from '../../../helpers/components';
@@ -76,7 +77,7 @@ const recalculateRows = (node: HTMLTextAreaElement) => {
 };
 
 const TableInputCell: React.FC<TableCellProps> = ({ value, onChange, disabled }) => {
-  const id = useId();
+  const id = useMemo(() => v4(), []);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
