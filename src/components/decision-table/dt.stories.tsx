@@ -171,6 +171,7 @@ export const Controlled: Story = {
           onChange={(val) => {
             console.log(val);
             setValue(val);
+            args?.onChange?.(val);
           }}
           inputsSchema={inputSchemaDefault}
           tableHeight='100%'
@@ -197,6 +198,7 @@ export const Uncontrolled: Story = {
           defaultValue={shippingFeesDefault}
           onChange={(val) => {
             console.log(val);
+            args?.onChange?.(val);
           }}
           inputsSchema={inputSchemaDefault}
           tableHeight='100%'

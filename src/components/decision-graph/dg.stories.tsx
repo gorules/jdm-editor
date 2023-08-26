@@ -45,6 +45,7 @@ export const Controlled: Story = {
           onChange={(val) => {
             console.log(val);
             setValue(val);
+            args?.onChange?.(val);
           }}
         />
       </div>
@@ -65,6 +66,7 @@ export const Uncontrolled: Story = {
           defaultValue={defaultGraph}
           onChange={(val) => {
             console.log(val);
+            args?.onChange?.(val);
           }}
         />
       </div>
