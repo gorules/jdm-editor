@@ -1,6 +1,6 @@
 import equal from 'fast-deep-equal/es6/react';
 import type React from 'react';
-import { startTransition, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { v4 } from 'uuid';
 
 import type { ExpressionEntry } from './context/expression-store.context';

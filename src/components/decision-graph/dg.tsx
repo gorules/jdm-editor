@@ -49,5 +49,5 @@ export const DecisionGraph = forwardRef<GraphRef, DecisionGraphProps>(
         </DecisionGraphProvider>
       </div>
     );
-  }
+  },
 );
