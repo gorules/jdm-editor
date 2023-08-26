@@ -1,3 +1,4 @@
+import type { DragDropManager } from 'dnd-core';
 import equal from 'fast-deep-equal/es6/react';
 import React from 'react';
 
@@ -6,9 +7,10 @@ import { useDecisionGraphStore } from '../context/dg-store.context';
 
 export type TabDecisionTableProps = {
   id: string;
+  manager?: DragDropManager;
 };
 
-export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id }) => {
+export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager }) => {
   const { node, nodeTrace, updateNode, disabled, configurable } = useDecisionGraphStore(
     ({ decisionGraph, simulate, updateNode, disabled, configurable }) => ({
       node: (decisionGraph?.nodes ?? []).find((node) => node.id === id),
@@ -33,9 +35,8 @@ export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id }) => {
     <DecisionTable
       tableHeight={'100%'}
       value={node?.content as any}
-      onChange={(val) => {
-        updateNode(id, val);
-      }}
+      onChange={(val) => updateNode(id, val)}
+      manager={manager}
       disabled={disabled}
       configurable={configurable}
       activeRules={(activeRules || []).filter((id) => !!id)}

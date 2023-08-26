@@ -1,4 +1,4 @@
-import { CheckOutlined, CloseOutlined, SettingOutlined } from '@ant-design/icons';
+import { CheckOutlined, CloseOutlined, NodeIndexOutlined } from '@ant-design/icons';
 import { Button, Tooltip, message } from 'antd';
 import clsx from 'clsx';
 import equal from 'fast-deep-equal/es6/react';
@@ -289,9 +289,9 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
                 setEditEdges(mapToGraphEdges(edges));
                 setEditGraph(true);
               }}
-              icon={<SettingOutlined />}
+              icon={<NodeIndexOutlined />}
             >
-              Edit Graph
+              Edit graph
             </Button>
           </Tooltip>
         )}
@@ -304,7 +304,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
             }}
             icon={<CheckOutlined />}
           >
-            Confirm
+            Apply changes
           </Button>
         )}
         {editGraph && (
@@ -317,7 +317,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
             }}
             icon={<CloseOutlined />}
           >
-            Cancel
+            Revert
           </Button>
         )}
       </div>

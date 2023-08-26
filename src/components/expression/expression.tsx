@@ -1,3 +1,4 @@
+import type { DragDropManager } from 'dnd-core';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -11,7 +12,7 @@ import './expression.scss';
 export type ExpressionRef = null;
 
 export type ExpressionProps = {
-  manager?: any;
+  manager?: DragDropManager;
 } & ExpressionControllerProps;
 
 export const Expression = React.forwardRef<ExpressionRef, ExpressionProps>(({ manager, ...props }) => {
@@ -28,13 +29,14 @@ export const Expression = React.forwardRef<ExpressionRef, ExpressionProps>(({ ma
         manager,
       };
     }
+
     return {
       backend: HTML5Backend,
       options: {
         rootElement: container.current,
       },
     };
-  }, [container.current]);
+  }, [container.current, manager]);
 
   return (
     <div ref={container}>

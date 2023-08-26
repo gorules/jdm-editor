@@ -1,4 +1,5 @@
 import { theme } from 'antd';
+import type { DragDropManager } from 'dnd-core';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -16,7 +17,7 @@ import { Table } from './table/table';
 export type DecisionTableProps = {
   tableHeight: string | number;
   mountDialogsOnBody?: boolean;
-  manager?: any;
+  manager?: DragDropManager;
 } & DecisionTableContextProps &
   DecisionTableEmptyType;
 
@@ -50,7 +51,7 @@ export const DecisionTable: React.FC<DecisionTableProps> = ({
         rootElement: ref.current,
       },
     };
-  }, [ref.current]);
+  }, [ref.current, manager]);
 
   return (
     <div ref={ref} className={'grl-dt'} style={{ background: token.colorBgElevated }}>
