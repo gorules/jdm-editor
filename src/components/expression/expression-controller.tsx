@@ -1,6 +1,6 @@
 import equal from 'fast-deep-equal/es6/react';
 import type React from 'react';
-import { useEffect, useRef } from 'react';
+import { startTransition, useEffect, useRef } from 'react';
 import { v4 } from 'uuid';
 
 import type { ExpressionEntry } from './context/expression-store.context';
@@ -29,7 +29,10 @@ export const ExpressionController: React.FC<ExpressionControllerProps> = ({
 }) => {
   const mounted = useRef<boolean>(false);
   const store = useExpressionStoreRaw();
-  const { setExpressions } = useExpressionStore(({ setExpressions }) => ({ setExpressions }));
+  const { setExpressions, expressions } = useExpressionStore(({ setExpressions, expressions }) => ({
+    setExpressions,
+    expressions,
+  }));
 
   useEffect(() => {
     store.setState({
@@ -51,19 +54,18 @@ export const ExpressionController: React.FC<ExpressionControllerProps> = ({
   }, [store, onChange]);
 
   useEffect(() => {
-    if (mounted.current && value) {
+    if (mounted.current && value && !equal(value, expressions)) {
       setExpressions(value);
     }
   }, [value]);
 
   useEffect(() => {
-    mounted.current = true;
-
     if (value) {
       setExpressions(value);
     } else if (defaultValue) {
       setExpressions(defaultValue);
     }
+    mounted.current = true;
   }, []);
 
   return null;

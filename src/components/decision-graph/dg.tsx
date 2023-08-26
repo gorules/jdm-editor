@@ -1,4 +1,5 @@
 import { theme } from 'antd';
+import type { DragDropManager } from 'dnd-core';
 import React, { forwardRef } from 'react';
 import type { ProOptions } from 'reactflow';
 
@@ -11,12 +12,7 @@ import './dg.scss';
 import type { GraphRef } from './graph/graph';
 
 export type DecisionGraphProps = {
-  manager?: any;
-  components?: {
-    type: string;
-    icon?: React.ReactNode;
-    form?: React.ReactNode;
-  }[];
+  manager?: DragDropManager;
   reactFlowProOptions?: ProOptions;
 } & DecisionGraphContextProps &
   DecisionGraphEmptyType;
@@ -53,5 +49,5 @@ export const DecisionGraph = forwardRef<GraphRef, DecisionGraphProps>(
         </DecisionGraphProvider>
       </div>
     );
-  },
+  }
 );

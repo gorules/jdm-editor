@@ -29,13 +29,12 @@ export const FunctionDebugger: React.FC<FunctionDebuggerProps> = ({ trace }) => 
             top: 0,
             background: token.colorBgLayout,
             zIndex: 3,
-            borderBottom: `1px solid ${token.colorBorder}`,
+            borderBottom: open ? `1px solid ${token.colorBorder}` : 'none',
             cursor: 'pointer',
           }}
         >
           <Typography.Text
             style={{
-              fontSize: 16,
               fontWeight: 'bold',
             }}
           >

@@ -1,7 +1,7 @@
 import { ApartmentOutlined, EditOutlined } from '@ant-design/icons';
 import type { Meta, StoryObj } from '@storybook/react';
 import { Button, Form, Input } from 'antd';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { v4 } from 'uuid';
 
 import { DecisionGraph } from './dg';
@@ -28,6 +28,11 @@ type Story = StoryObj<typeof DecisionGraph>;
 export const Controlled: Story = {
   render: (args) => {
     const [value, setValue] = useState<any>(defaultGraph);
+    useEffect(() => {
+      if (args.value) {
+        setValue(args.value);
+      }
+    }, [args.value]);
     return (
       <div
         style={{

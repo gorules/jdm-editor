@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Checkbox } from 'antd';
 import { createDragDropManager } from 'dnd-core';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import type { DecisionTableType } from './context/dt-store.context';
@@ -151,6 +151,13 @@ export const Controlled: Story = {
     const manager = useMemo(() => {
       return createDragDropManager(HTML5Backend);
     }, []);
+
+    useEffect(() => {
+      if (args.value) {
+        setValue(args.value);
+      }
+    }, [args.value]);
+
     return (
       <div
         style={{
@@ -162,6 +169,7 @@ export const Controlled: Story = {
           value={value}
           manager={manager}
           onChange={(val) => {
+            console.log(val);
             setValue(val);
           }}
           inputsSchema={inputSchemaDefault}

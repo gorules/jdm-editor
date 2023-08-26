@@ -204,7 +204,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
         nodes,
       }),
     }),
-    [nodes],
+    [],
   );
 
   const nodeTypes = useMemo(() => {

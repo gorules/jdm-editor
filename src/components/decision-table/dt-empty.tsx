@@ -1,6 +1,7 @@
 import equal from 'fast-deep-equal/es6/react';
 import type React from 'react';
 import { useEffect, useRef } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
 import { shallow } from 'zustand/shallow';
 
 import type { SchemaSelectProps } from '../../helpers/components';
@@ -43,6 +44,10 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
   const setDecisionTable = useDecisionTableStore((store) => store.setDecisionTable, shallow);
   const decisionTable = useDecisionTableStore((store) => store.decisionTable, shallow);
 
+  const innerChange = useDebouncedCallback((table: DecisionTableType) => {
+    onChange?.(table);
+  }, 50);
+
   useEffect(() => {
     store.setState({
       id,
@@ -55,7 +60,7 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
       colWidth: colWidth || 200,
       minColWidth: minColWidth || 150,
       cellRenderer,
-      onChange,
+      onChange: innerChange,
     });
   }, [
     id,
@@ -68,11 +73,10 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
     colWidth,
     outputsSchema,
     cellRenderer,
-    onChange,
   ]);
 
   useEffect(() => {
-    if (mountedRef.current && !equal(value, decisionTable)) {
+    if (mountedRef.current && value !== undefined && !equal(value, decisionTable)) {
       setDecisionTable(parseDecisionTable(value));
     }
   }, [value]);
