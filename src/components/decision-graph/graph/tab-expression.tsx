@@ -24,10 +24,14 @@ export const TabExpression: React.FC<TabExpressionProps> = ({ id, manager }) => 
   if (!node) return null;
 
   return (
-    <div style={{ maxWidth: 900 }}>
+    <div style={{ maxWidth: 900, height: '100%', overflowY: 'auto', boxSizing: 'border-box', paddingBottom: '1.5rem' }}>
       <Expression
-        value={Array.isArray(node?.content) ? node?.content : []}
-        onChange={(val) => updateNode(id, val)}
+        value={node?.content?.expressions}
+        onChange={(val) =>
+          updateNode(id, {
+            expressions: val,
+          })
+        }
         disabled={disabled}
         configurable={configurable}
         manager={manager}

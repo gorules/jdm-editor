@@ -40,7 +40,7 @@ export const ExpressionList: React.FC<ExpressionListProps> = ({}) => {
         <Typography.Text type='secondary'>Expression</Typography.Text>
         <div />
       </div>
-      {expressions.map((expression, index) => (
+      {(expressions || []).map((expression, index) => (
         <ExpressionItem key={expression.id} expression={expression} index={index} />
       ))}
       {configurable && (

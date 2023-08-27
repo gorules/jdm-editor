@@ -1,7 +1,6 @@
 import equal from 'fast-deep-equal/es6/react';
 import type React from 'react';
 import { useEffect, useRef } from 'react';
-import { v4 } from 'uuid';
 
 import type { ExpressionEntry } from './context/expression-store.context';
 import { useExpressionStore, useExpressionStoreRaw } from './context/expression-store.context';
@@ -17,13 +16,7 @@ export type ExpressionControllerProps = {
 export const ExpressionController: React.FC<ExpressionControllerProps> = ({
   value,
   onChange,
-  defaultValue = [
-    {
-      id: v4(),
-      key: '',
-      value: '',
-    },
-  ],
+  defaultValue = [],
   configurable = true,
   disabled = false,
 }) => {
