@@ -1,6 +1,6 @@
 {
   "name": "@gorules/jdm-editor",
-  "version": "0.2.2-beta.6",
+  "version": "0.2.2-beta.7",
   "description": "",
   "author": "GoRules <hi@gorules.io> (https://gorules.io)",
   "homepage": "https://github.com/gorules/jdm-editor",
@@ -19,6 +19,7 @@
   "packageManager": "pnpm@8.5.1",
   "scripts": {
     "build": "vite build",
+    "build:watch": "vite build --watch",
     "storybook": "storybook dev -p 9009",
     "build-storybook": "storybook build -o docs",
     "lint": "eslint 'src/**/*.ts?(x)'",

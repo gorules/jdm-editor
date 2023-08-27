@@ -13,7 +13,7 @@ const parserOptions = {
   delimiter: ';',
 };
 
-const parserPipe = ' | ';
+const parserPipe = '|';
 
 export const DecisionTableCommandBar: React.FC = () => {
   const { disableHitPolicy, updateHitPolicy, disabled, configurable } = useDecisionTableStore((store) => ({
@@ -33,10 +33,10 @@ export const DecisionTableCommandBar: React.FC = () => {
     const { name } = options;
     const schemaMeta = [
       ...decisionTable.inputs.map((input: any) =>
-        [input.name, input.field, 'INPUT', input.id, input.defaultValue].join(parserPipe),
+        [input.name, input.field, 'INPUT', input.id, input.defaultValue].join(` ${parserPipe} `),
       ),
       ...decisionTable.outputs.map((output: any) =>
-        [output.name, output.field, 'OUTPUT', output.id, output.defaultValue].join(parserPipe),
+        [output.name, output.field, 'OUTPUT', output.id, output.defaultValue].join(` ${parserPipe} `),
       ),
       'DESCRIPTION',
     ];
