@@ -1,24 +1,24 @@
 import { theme } from 'antd';
 import type { DragDropManager } from 'dnd-core';
 import React, { forwardRef } from 'react';
-import type { ProOptions } from 'reactflow';
 
 import type { DecisionGraphContextProps } from './context/dg-store.context';
 import { DecisionGraphProvider } from './context/dg-store.context';
 import type { DecisionGraphEmptyType } from './dg-empty';
 import { DecisionGraphEmpty } from './dg-empty';
+import type { DecisionGraphWrapperProps } from './dg-wrapper';
 import { DecisionGraphWrapper } from './dg-wrapper';
 import './dg.scss';
 import type { GraphRef } from './graph/graph';
 
 export type DecisionGraphProps = {
   manager?: DragDropManager;
-  reactFlowProOptions?: ProOptions;
-} & DecisionGraphContextProps &
+} & DecisionGraphWrapperProps &
+  DecisionGraphContextProps &
   DecisionGraphEmptyType;
 
 export const DecisionGraph = forwardRef<GraphRef, DecisionGraphProps>(
-  ({ manager: _, reactFlowProOptions, ...props }, ref) => {
+  ({ manager: _, reactFlowProOptions, hideExportImport, ...props }, ref) => {
     const { token } = theme.useToken();
 
     return (
@@ -44,7 +44,11 @@ export const DecisionGraph = forwardRef<GraphRef, DecisionGraphProps>(
         }
       >
         <DecisionGraphProvider>
-          <DecisionGraphWrapper reactFlowProOptions={reactFlowProOptions} ref={ref} />
+          <DecisionGraphWrapper
+            reactFlowProOptions={reactFlowProOptions}
+            hideExportImport={hideExportImport}
+            ref={ref}
+          />
           <DecisionGraphEmpty {...props} />
         </DecisionGraphProvider>
       </div>
