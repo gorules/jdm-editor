@@ -35,6 +35,7 @@ export type GraphRef = {
   openEdit?: () => void;
   closeEdit?: () => void;
   confirmEdit?: () => void;
+  openNode?: (id: string) => void;
   addNode?: (node: DecisionNode) => void;
   setDecisionGraph?: (decisionGraph: DecisionGraphType) => void;
 };
@@ -56,14 +57,15 @@ export const Graph = forwardRef<GraphRef, GraphProps>(
     const selected = editNodes?.filter?.((node) => node?.selected);
     const selectedEdges = editEdges?.filter?.((edge) => edge?.selected);
 
-    const { nodes, edges, setDecisionGraph, disabled, closeTab, onAddNode, onEditGraph, onChange } =
+    const { nodes, edges, setDecisionGraph, disabled, closeTab, openTab, onAddNode, onEditGraph, onChange } =
       useDecisionGraphStore(
-        ({ decisionGraph, setDecisionGraph, disabled, closeTab, onChange, onAddNode, onEditGraph }) => ({
+        ({ decisionGraph, setDecisionGraph, disabled, closeTab, openTab, onChange, onAddNode, onEditGraph }) => ({
           nodes: decisionGraph?.nodes ?? [],
           edges: decisionGraph?.edges ?? [],
           setDecisionGraph,
           disabled,
           closeTab,
+          openTab,
           onChange,
           onAddNode,
           onEditGraph,
@@ -357,9 +359,13 @@ export const Graph = forwardRef<GraphRef, GraphProps>(
         confirmEdit();
       },
       addNode: (node: DecisionNode) => {
-        console.log(node);
         if (editGraph) {
           setEditNodes((nodes) => nodes.concat(mapToGraphNode(node)));
+        }
+      },
+      openNode: (id: string) => {
+        if (!editGraph) {
+          openTab(id);
         }
       },
       setDecisionGraph,

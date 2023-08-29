@@ -23,8 +23,9 @@ export type DecisionGraphWrapperProps = {
 export const DecisionGraphWrapper = forwardRef<GraphRef, DecisionGraphWrapperProps>(
   ({ reactFlowProOptions, hideExportImport }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
-    const { activeNode, openNodes } = useDecisionGraphStore(
-      ({ decisionGraph, activeTab, openTabs }) => ({
+    const { activeNode, openNodes, onTabChange } = useDecisionGraphStore(
+      ({ decisionGraph, activeTab, openTabs, onTabChange }) => ({
+        onTabChange,
         activeNode: (decisionGraph?.nodes ?? []).find((node) => node.id === activeTab),
         openNodes: (decisionGraph?.nodes ?? []).filter((node) => openTabs.includes(node.id)),
       }),
@@ -42,7 +43,7 @@ export const DecisionGraphWrapper = forwardRef<GraphRef, DecisionGraphWrapperPro
     return (
       <div className={'grl-dg__wrapper'}>
         <div className={'grl-dg__graph'}>
-          <GraphTabs disabled={disableTabs} />
+          <GraphTabs disabled={disableTabs} onTabChange={onTabChange} />
           <Graph
             ref={ref}
             className={clsx([!activeNode && 'active'])}
