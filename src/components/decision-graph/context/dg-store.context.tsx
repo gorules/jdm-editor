@@ -36,11 +36,16 @@ export type DecisionGraphType = {
   edges: DecisionEdge[];
 };
 
+export type CustomNodeRenderFormType = {
+  value: any;
+  onChange: (val: any) => void;
+};
+
 export type CustomNodeType = {
   type: string;
   name: string;
-  onOpen?: () => void;
-  renderForm?: () => React.ReactNode;
+  onOpen?: (node: DecisionNode) => void;
+  renderForm?: (props: CustomNodeRenderFormType) => React.ReactNode;
   renderIcon?: () => React.ReactNode;
 };
 

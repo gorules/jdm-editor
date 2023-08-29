@@ -1,6 +1,7 @@
 import { CloseOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space, Typography } from 'antd';
 import equal from 'fast-deep-equal/es6/react';
+import { produce } from 'immer';
 import type { FC } from 'react';
 import React, { useEffect, useMemo } from 'react';
 import type { Node } from 'reactflow';
@@ -61,6 +62,14 @@ export const NodeForm: FC<NodeFormProps> = ({ node, onChange, removeNode, onClos
     return 'Unknown';
   }, [node?.type]);
 
+  const handleChangeContent = (content: any) => {
+    onChange?.(
+      produce(node, (draft) => {
+        draft.data.content = content;
+      }),
+    );
+  };
+
   return (
     <div className={'node-form'}>
       <Form
@@ -96,7 +105,12 @@ export const NodeForm: FC<NodeFormProps> = ({ node, onChange, removeNode, onClos
             </Form.Item>
           </>
         )}
-        {component && component?.renderForm && component?.renderForm?.()}
+        {component &&
+          component?.renderForm &&
+          component?.renderForm?.({
+            value: node?.data?.content,
+            onChange: handleChangeContent,
+          })}
         <Form.Item>
           <Stack gap={8} horizontal>
             <Button onClick={() => onCopy?.(node)}>Copy</Button>

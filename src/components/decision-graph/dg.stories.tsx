@@ -1,6 +1,6 @@
-import { ApartmentOutlined, EditOutlined } from '@ant-design/icons';
+import { ApartmentOutlined } from '@ant-design/icons';
 import type { Meta, StoryObj } from '@storybook/react';
-import { Button, Form, Input } from 'antd';
+import { Form, Input } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { v4 } from 'uuid';
 
@@ -93,25 +93,20 @@ export const Extended: Story = {
             {
               name: 'Decision',
               type: 'decisionNode',
-              onOpen: async () => {
-                console.log('here');
+              onOpen: async (node) => {
+                console.log(node);
               },
-              renderForm: () => (
+              renderForm: ({ value, onChange }) => (
                 <Form.Item label={'Key'}>
-                  <Input.Group>
-                    <Form.Item noStyle style={{ width: 'calc(100% - 32px)' }} name={['content', 'key']}>
-                      <Input style={{ width: 'calc(100% - 32px)' }} placeholder={'Key'} />
-                    </Form.Item>
-                    <Button
-                      icon={<EditOutlined />}
-                      style={{
-                        borderRadius: '0 4px 4px 0',
-                      }}
-                      onClick={() => {
-                        // TODO INVOKE ON EDIT
-                      }}
-                    />
-                  </Input.Group>
+                  <Input
+                    placeholder={'Key'}
+                    value={value?.key || ''}
+                    onChange={(e) => {
+                      onChange({
+                        key: e.target.value,
+                      });
+                    }}
+                  />
                 </Form.Item>
               ),
               renderIcon: () => <ApartmentOutlined />,

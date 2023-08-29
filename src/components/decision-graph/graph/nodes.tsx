@@ -15,6 +15,7 @@ import { Handle, Position } from 'reactflow';
 
 import type { CustomNodeType } from '../context/dg-store.context';
 import { useDecisionGraphStore } from '../context/dg-store.context';
+import { mapToDecisionNode } from '../dg-util';
 
 const useNodeError = (id: string, simulate: any) => {
   if (simulate?.error?.data?.nodeId === id) {
@@ -49,7 +50,7 @@ export const GraphNode: FC<NodeProps> = (props) => {
 
   const innerOpen = () => {
     if (component) {
-      component?.onOpen?.();
+      component?.onOpen?.(mapToDecisionNode(props as any));
     } else {
       openTab?.(id);
     }
@@ -142,12 +143,19 @@ export const GraphNode: FC<NodeProps> = (props) => {
             )}
           </Typography.Text>
         </div>
-        {type !== 'inputNode' && type !== 'outputNode' && (
+        {component && component?.onOpen && (
           <Typography.Link
             onClick={() => {
-              if (type !== 'inputNode' && type !== 'outputNode') {
-                innerOpen();
-              }
+              innerOpen();
+            }}
+          >
+            Open
+          </Typography.Link>
+        )}
+        {!component && type !== 'inputNode' && type !== 'outputNode' && (
+          <Typography.Link
+            onClick={() => {
+              innerOpen();
             }}
           >
             Open
