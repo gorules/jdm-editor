@@ -2,6 +2,8 @@ import { CheckOutlined, CloseOutlined, ExportOutlined, ImportOutlined, NodeIndex
 import { Button, Tooltip, message } from 'antd';
 import clsx from 'clsx';
 import equal from 'fast-deep-equal/es6/react';
+import { DirectedGraph } from 'graphology';
+import { hasCycle } from 'graphology-dag';
 import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import type { Edge, Node, ProOptions, ReactFlowInstance, XYPosition } from 'reactflow';
 import ReactFlow, { Background, Controls, addEdge, useEdgesState, useNodesState } from 'reactflow';
@@ -246,6 +248,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(
       try {
         const edges = mapToDecisionEdges(editEdges);
         const nodes = mapToDecisionNodes(editNodes);
+
         if (nodes.filter((node) => node?.type === 'inputNode')?.length > 1) {
           message.error('Maximum 1 input');
           return;
@@ -253,6 +256,15 @@ export const Graph = forwardRef<GraphRef, GraphProps>(
         if (nodes.filter((node) => node?.type === 'outputNode')?.length > 1) {
           message.error('Maximum 1 output');
           return;
+        }
+
+        const graph = new DirectedGraph();
+        edges.forEach((edge) => {
+          graph.mergeEdge(edge.sourceId, edge.targetId);
+        });
+
+        if (hasCycle(graph)) {
+          throw new Error('Graph is cyclic');
         }
 
         setDecisionGraph({
@@ -265,7 +277,6 @@ export const Graph = forwardRef<GraphRef, GraphProps>(
         });
         setEditGraph(false);
       } catch (e: any) {
-        console.log(e);
         message.error(e?.message);
       }
     };
