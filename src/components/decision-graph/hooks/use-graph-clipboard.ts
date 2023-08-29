@@ -147,7 +147,8 @@ export const useGraphClipboard = (reactFlow?: ReactFlowInstance, wrapper?: HTMLD
   }, [reactFlow]);
 
   const register = useCallback(
-    (selected: Node[]) => {
+    (selected?: Node[]) => {
+      if (!selected) return;
       const listener = async (e: KeyboardEvent) => {
         if (e.code === 'KeyC' && (e.ctrlKey || e.metaKey) && selected.length > 0) {
           await copyNodes(selected);
@@ -157,7 +158,7 @@ export const useGraphClipboard = (reactFlow?: ReactFlowInstance, wrapper?: HTMLD
             await pasteNodes();
             message.success('Pasted from clipboard!');
           } catch (e) {
-            // message.error('Invalid clipboard data.');
+            message.error('Invalid clipboard data.');
           }
         }
       };

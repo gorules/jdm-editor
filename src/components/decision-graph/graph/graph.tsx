@@ -76,6 +76,10 @@ export const Graph = forwardRef<GraphRef, GraphProps>(
       onDisableTabs?.(editGraph);
     }, [editGraph]);
 
+    useEffect(() => {
+      return graphClipboard.register(editGraph ? selected : undefined);
+    }, [selected, graphClipboard.register, editGraph]);
+
     const addNode = (type: string, position?: XYPosition) => {
       if (!reactFlowWrapper.current || !reactFlowInstance) return;
       if (!position) {
@@ -485,7 +489,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(
                   onPaste={async () => {
                     if (editGraph) {
                       try {
-                        // await graphClipboard.pasteNodes()
+                        await graphClipboard.pasteNodes();
                       } catch (e) {
                         message.error(e?.message);
                       }
