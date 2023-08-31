@@ -48,6 +48,7 @@ export const Function: React.FC<FunctionProps> = ({ disabled = false, defaultVal
         {
           'height': '100%',
           '--color-text': token.colorTextBase,
+          '--color-background-elevated': token.colorBgElevated,
           '--color-border': token.colorBorder,
           '--line-height': token.lineHeight,
         } as any

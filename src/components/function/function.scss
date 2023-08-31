@@ -9,7 +9,7 @@
   border-radius: 8px;
   max-height: 40vh;
   overflow-y: scroll;
-  backdrop-filter: blur(12px);
+  background: var(--color-background-elevated);
 }
 
 .function-debugger-log {

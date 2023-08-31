@@ -31,7 +31,7 @@ const themes: Record<'dark' | 'light', JsonTheme> = {
 
 export const FunctionDebuggerLog: React.FC<FunctionDebuggerLogProps> = ({ lines, msSinceRun }) => {
   const { token } = theme.useToken();
-  const jsonTheme = themes[token.mode];
+  const jsonTheme = themes[token.mode ?? 'light'];
 
   return (
     <div className='function-debugger-log'>
