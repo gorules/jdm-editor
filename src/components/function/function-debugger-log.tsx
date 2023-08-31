@@ -62,8 +62,6 @@ export const FunctionDebuggerLog: React.FC<FunctionDebuggerLogProps> = ({ lines,
                   paths.pop();
                   paths = paths.reverse();
 
-                  console.log(data, paths);
-
                   parts.push(objectRenderer(jsonTheme)(lens(data, paths), nodeType));
                 }
 
