@@ -4,6 +4,7 @@ import { v4 } from 'uuid';
 import { shallow } from 'zustand/shallow';
 
 import { columnIdSelector } from '../../../helpers/components';
+import { AutosizeTextArea } from '../../autosize-text-area';
 import type { TableSchemaItem } from '../context/dt-store.context';
 import { useDecisionTableStore } from '../context/dt-store.context';
 
@@ -62,20 +63,6 @@ export type TableCellProps = {
   disabled?: boolean;
 };
 
-const recalculateRows = (node: HTMLTextAreaElement) => {
-  const computedStyles = getComputedStyle(node);
-  const lineHeight = parseInt(computedStyles.lineHeight);
-  const paddingTop = parseInt(computedStyles.paddingTop);
-  const paddingBottom = parseInt(computedStyles.paddingBottom);
-
-  node.rows = 1;
-
-  const contentHeight = node.scrollHeight - paddingTop - paddingBottom;
-  const calculatedRows = Math.floor(contentHeight / lineHeight);
-
-  node.rows = Math.min(calculatedRows, 3);
-};
-
 const TableInputCell: React.FC<TableCellProps> = ({ value, onChange, disabled }) => {
   const id = useMemo(() => v4(), []);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -84,17 +71,6 @@ const TableInputCell: React.FC<TableCellProps> = ({ value, onChange, disabled })
     if (!textareaRef.current) {
       return;
     }
-
-    const observerCallback: ResizeObserverCallback = (entries: ResizeObserverEntry[]) => {
-      window.requestAnimationFrame((): void | undefined => {
-        if (!Array.isArray(entries) || entries.length === 0) {
-          return;
-        }
-        recalculateRows(entries[0].target as HTMLTextAreaElement);
-      });
-    };
-
-    const resizeObserver = new ResizeObserver(observerCallback);
 
     const parentContainer = textareaRef.current.closest('div.cell-wrapper')! as HTMLElement;
     const eventListener = (e: Event) => {
@@ -108,28 +84,19 @@ const TableInputCell: React.FC<TableCellProps> = ({ value, onChange, disabled })
 
     parentContainer.style.cursor = 'text';
     parentContainer.addEventListener('click', eventListener);
-    resizeObserver.observe(textareaRef.current);
 
     return () => {
       parentContainer.style.cursor = '';
       parentContainer.removeEventListener('click', eventListener);
-      resizeObserver.disconnect();
     };
   }, []);
 
-  useEffect(() => {
-    if (!textareaRef.current) {
-      return;
-    }
-
-    recalculateRows(textareaRef.current);
-  }, [value]);
-
   return (
-    <textarea
+    <AutosizeTextArea
       id={id}
-      className={'grl-dt__cell__input textarea-input'}
       ref={textareaRef}
+      className='grl-dt__cell__input'
+      maxRows={3}
       value={value}
       disabled={disabled}
       onChange={(e) => onChange(e.target.value)}

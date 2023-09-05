@@ -243,27 +243,5 @@ const StyledTable: React.FC<React.HTMLAttributes<HTMLTableElement> & { width: nu
   width,
   ...props
 }) => {
-  const { token } = theme.useToken();
-
-  return (
-    <table
-      className={clsx('table', className)}
-      style={
-        {
-          width,
-          '--border-color': token.colorBorder,
-          '--primary-color': token.colorPrimary,
-          '--primary-color-bg': token.colorPrimaryBg,
-          '--color-bg-layout': token.colorBgLayout,
-          '--color-bg-elevated': token.colorBgElevated,
-          '--color-bg-container': token.colorBgContainer,
-          '--color-text': token.colorText,
-          '--font-family': token.fontFamily,
-          '--line-height': token.lineHeight,
-          ...style,
-        } as any
-      }
-      {...props}
-    />
-  );
+  return <table className={clsx('table', className)} style={{ width, ...style }} {...props} />;
 };

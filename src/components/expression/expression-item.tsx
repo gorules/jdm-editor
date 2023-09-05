@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import React, { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
+import { AutosizeTextArea } from '../autosize-text-area';
 import type { ExpressionEntry } from './context/expression-store.context';
 import { useExpressionStore } from './context/expression-store.context';
 
@@ -79,10 +80,10 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
         />
       </div>
       <div>
-        <Input.TextArea
+        <AutosizeTextArea
           placeholder='Expression'
+          maxRows={4}
           disabled={disabled}
-          autoSize={{ maxRows: 4 }}
           value={expression?.value}
           onChange={(e) => onChange({ value: e.target.value })}
           autoComplete='off'

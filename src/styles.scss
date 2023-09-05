@@ -1,9 +1,33 @@
 :root {
-  --border-color: #f0f2f5;
-  --primary-color: #1677ff;
   --mono-font-family: 'SF Mono', SFMono-Regular, ui-monospace, 'DejaVu Sans Mono', Menlo, Consolas, monospace;
 }
 
 .full-width {
   width: 100%;
+}
+
+.textarea-input {
+  line-height: var(--grl-line-height);
+  color: var(--grl-color-text);
+  resize: none;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: var(--grl-font-family);
+  border-radius: var(--grl-border-radius);
+  border: 1px solid var(--grl-color-border);
+  background: var(--grl-color-bg-container);
+  padding: 4px 11px;
+  font-size: 14px;
+
+  transition: .2s cubic-bezier(0.645, 0.045, 0.355, 1);
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--grl-control-outline);
+  }
+
+  &:hover {
+    border-color: var(--grl-color-primary-hover);
+    border-inline-end-width: 1px;
+  }
 }
