@@ -58,7 +58,7 @@ export const AutosizeTextArea = React.forwardRef<HTMLTextAreaElement, AutosizeTe
 
     return (
       <textarea
-        className={clsx('textarea-input', className)}
+        className={clsx('grl-textarea-input', className)}
         ref={composeRefs(textareaRef, ref)}
         value={value}
         {...props}

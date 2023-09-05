@@ -64,10 +64,11 @@
       td {
         min-height: 36px;
         padding: 0;
+        outline: 2px solid transparent;
+        outline-offset: -2px;
 
         &:focus-within {
-          outline: 2px solid var(--grl-color-primary);
-          outline-offset: -2px;
+          outline-color: var(--grl-color-primary-hover);
         }
 
         &.sort-handler {

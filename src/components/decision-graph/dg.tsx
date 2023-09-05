@@ -1,4 +1,3 @@
-import { theme } from 'antd';
 import type { DragDropManager } from 'dnd-core';
 import React, { forwardRef } from 'react';
 
@@ -19,30 +18,8 @@ export type DecisionGraphProps = {
 
 export const DecisionGraph = forwardRef<GraphRef, DecisionGraphProps>(
   ({ manager: _, reactFlowProOptions, hideExportImport, ...props }, ref) => {
-    const { token } = theme.useToken();
-
     return (
-      <div
-        className={'grl-dg'}
-        style={
-          {
-            '--color-border': token.colorBorder,
-            '--color-primary': token.colorPrimary,
-            '--color-primary-bg': token.colorPrimaryBg,
-            '--color-primary-border': token.colorPrimaryBorder,
-            '--color-primary-border-hover': token.colorPrimaryBorderHover,
-            '--color-bg-layout': token.colorBgLayout,
-            '--color-bg-elevated': token.colorBgElevated,
-            '--color-bg-container': token.colorBgContainer,
-            '--color-bg-container-disabled': token.colorBgContainerDisabled,
-            '--color-error-bg': token.colorErrorBg,
-            '--color-error-border': token.colorErrorBorder,
-            '--color-primary-hover': token.colorPrimaryHover,
-            '--color-primary-active': token.colorPrimaryActive,
-            '--color-text': token.colorText,
-          } as any
-        }
-      >
+      <div className={'grl-dg'}>
         <DecisionGraphProvider>
           <DecisionGraphWrapper
             reactFlowProOptions={reactFlowProOptions}

@@ -494,7 +494,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(
               }}
             >
               <Controls showInteractive={false} />
-              <Background color='var(--color-border)' gap={20} />
+              <Background color='var(--grl-color-border)' gap={20} />
             </ReactFlow>
           </div>
           {editGraph && (

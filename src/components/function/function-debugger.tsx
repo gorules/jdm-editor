@@ -15,8 +15,8 @@ export const FunctionDebugger: React.FC<FunctionDebuggerProps> = ({ trace }) => 
   const traceLog = trace?.traceData?.log || [];
 
   return (
-    <div className='function-debugger'>
-      <div className='function-debugger__panel'>
+    <div className='grl-function__debugger'>
+      <div className='grl-function__debugger__panel'>
         <div
           className='function-debugger__panel-header'
           onClick={() => setOpen(!open)}

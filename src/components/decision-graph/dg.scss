@@ -15,7 +15,7 @@
     gap: 0.5rem;
     width: 100%;
     padding: 0.5rem;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--grl-color-border);
   }
 
   &__graph {
@@ -26,7 +26,7 @@
 
     .tabs {
       max-width: 100%;
-      background-color: var(--color-bg-container);
+      background-color: var(--grl-color-bg-container);
 
       .ant-tabs-nav {
         margin: 0 !important;
@@ -39,7 +39,7 @@
       height: 100%;
       position: relative;
       display: none;
-      background-color: var(--color-bg-container);
+      background-color: var(--grl-color-bg-container);
 
       &.active {
         display: flex;
@@ -59,7 +59,7 @@
       flex: 1;
       height: 100%;
       width: 100%;
-      background-color: var(--color-bg-container);
+      background-color: var(--grl-color-bg-container);
     }
 
     .node {
@@ -70,29 +70,29 @@
       justify-content: center;
       box-sizing: border-box;
       padding: 0 8px;
-      border: 1px solid var(--color-border);
+      border: 1px solid var(--grl-color-border);
       border-radius: 4px;
       position: relative;
-      background-color: var(--color-bg-elevated);
-      transition: all 0.2s;
+      background-color: var(--grl-color-bg-elevated);
+      transition: var(--grl-transition);
 
       &:hover {
-        border-color: var(--color-primary-hover);
+        border-color: var(--grl-color-primary-hover);
         cursor: pointer;
       }
 
       &.selected {
-        border-color: var(--color-primary-active);
+        border-color: var(--grl-color-primary-active);
       }
 
       &.simulated {
-        background-color: var(--color-primary-bg);
-        border-color: var(--color-primary-active);
+        background-color: var(--grl-color-primary-bg);
+        border-color: var(--grl-color-primary-active);
       }
 
       &.error {
-        background-color: var(--color-error-bg);
-        border-color: var(--color-error-border);
+        background-color: var(--grl-color-error-bg);
+        border-color: var(--grl-color-error-border);
       }
 
       &.input,
@@ -109,12 +109,12 @@
   }
 
   &__aside {
-    background-color: var(--color-bg-container);
+    background-color: var(--grl-color-bg-container);
     width: 240px;
     min-width: 240px;
     height: 100%;
     overflow-y: auto;
-    border-left: 1px solid var(--color-border);
+    border-left: 1px solid var(--grl-color-border);
 
     .wrapper {
       display: flex;
@@ -136,12 +136,12 @@
       align-items: center;
       justify-content: center;
       padding: 8px;
-      border: 1px solid var(--color-border);
+      border: 1px solid var(--grl-color-border);
       cursor: grab;
       border-radius: 6px;
 
       &.disabled {
-        background-color: var(--color-bg-container-disabled);
+        background-color: var(--grl-color-bg-container-disabled);
         cursor: not-allowed;
         user-select: none;
       }
@@ -167,8 +167,8 @@
 
   .react-flow {
     &__handle {
-      border: 1px solid var(--color-primary-border) !important;
-      background-color: var(--color-primary-bg) !important;
+      border: 1px solid var(--grl-color-primary-border) !important;
+      background-color: var(--grl-color-primary-bg) !important;
       height: 7px !important;
       width: 7px !important;
       border-radius: 50% !important;
@@ -215,23 +215,23 @@
 
   .react-flow__edge-path-selector:hover + .react-flow__edge-path,
   .react-flow__edge-path:hover {
-    stroke: var(--color-primary-border-hover);
+    stroke: var(--grl-color-primary-border-hover);
     cursor: pointer;
   }
 
   .react-flow__panel {
     box-shadow: none;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--grl-color-border);
   }
 
   .react-flow__controls-button {
-    background: var(--color-bg-elevated);
-    color: var(--color-text);
-    border-color: var(--color-border);
-    transition: .15s background-color ease-in-out;
+    background: var(--grl-color-bg-elevated);
+    color: var(--grl-color-text);
+    border-color: var(--grl-color-border);
+    transition: var(--grl-transition);
 
     &:hover {
-      background: var(--color-primary-hover);
+      background: var(--grl-color-primary-hover);
     }
 
     svg {
@@ -240,7 +240,7 @@
   }
 
   .react-flow__attribution {
-    color: var(--color-text);
+    color: var(--grl-color-text);
     border: none;
     background: transparent;
   }

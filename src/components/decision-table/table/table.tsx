@@ -2,7 +2,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import type { ColumnDef, Table as ReactTable } from '@tanstack/react-table';
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { Button, Typography, theme } from 'antd';
+import { Button, Typography } from 'antd';
 import clsx from 'clsx';
 import equal from 'fast-deep-equal/es6/react';
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';

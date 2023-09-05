@@ -34,8 +34,8 @@ export const FunctionDebuggerLog: React.FC<FunctionDebuggerLogProps> = ({ lines,
   const jsonTheme = themes[token.mode ?? 'light'];
 
   return (
-    <div className='function-debugger-log'>
-      <div className='function-debugger-log__values'>
+    <div className='grl-function__debugger__log'>
+      <div className='grl-function__debugger__log__values'>
         {lines.map((line, i) => {
           const data = JSON.parse(line);
 
@@ -78,7 +78,7 @@ export const FunctionDebuggerLog: React.FC<FunctionDebuggerLogProps> = ({ lines,
           );
         })}
       </div>
-      <div className='function-debugger-log__time'>
+      <div className='grl-function__debugger__log__time'>
         <Tooltip title='Time since start of execution of script.'>{msSinceRun} ms</Tooltip>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, Typography, theme } from 'antd';
+import { Button, Typography } from 'antd';
 import clsx from 'clsx';
 import equal from 'fast-deep-equal/es6/react';
 import React from 'react';
@@ -12,7 +12,6 @@ export type ExpressionListProps = {
 };
 
 export const ExpressionList: React.FC<ExpressionListProps> = ({}) => {
-  const { token } = theme.useToken();
   const { expressions, addRowBelow, configurable } = useExpressionStore(
     ({ expressions, addRowBelow, configurable, disabled }) => ({
       expressions,
@@ -24,16 +23,7 @@ export const ExpressionList: React.FC<ExpressionListProps> = ({}) => {
   );
 
   return (
-    <div
-      className={'expression-list'}
-      style={
-        {
-          '--color-border': token.colorBorder,
-          '--color-text-secondary': token.colorTextSecondary,
-          '--color-background': token.colorBgElevated,
-        } as any
-      }
-    >
+    <div className={'expression-list'}>
       <div className={clsx('expression-list__item', 'expression-list__item--heading')}>
         <div />
         <Typography.Text type='secondary'>Key</Typography.Text>

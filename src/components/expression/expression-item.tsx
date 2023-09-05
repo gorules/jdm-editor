@@ -46,7 +46,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
   });
 
   const [{ isDragging }, dragRef, previewRef] = useDrag({
-    canDrag: configurable,
+    canDrag: configurable && !disabled,
     item: () => ({ ...expression, index }),
     type: 'row',
     collect: (monitor) => ({
@@ -73,7 +73,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
       <div>
         <Input
           placeholder='Key'
-          disabled={!configurable}
+          disabled={!configurable || disabled}
           value={expression?.key}
           onChange={(e) => onChange({ key: e.target.value })}
           autoComplete='off'
