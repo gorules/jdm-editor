@@ -67,7 +67,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
       )}
       style={{ opacity: !isDragging ? 1 : 0.5 }}
     >
-      <div ref={dragRef} className='expression-list-item__drag' aria-disabled={!configurable}>
+      <div ref={dragRef} className='expression-list-item__drag' aria-disabled={!configurable || disabled}>
         <MenuOutlined />
       </div>
       <div>
@@ -90,8 +90,13 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
         />
       </div>
       <div>
-        <Popconfirm title='Remove selected row?' okText='Remove' onConfirm={onRemove} disabled={!configurable}>
-          <Button type='text' icon={<MinusCircleOutlined />} disabled={!configurable} />
+        <Popconfirm
+          title='Remove selected row?'
+          okText='Remove'
+          onConfirm={onRemove}
+          disabled={!configurable || disabled}
+        >
+          <Button type='text' icon={<MinusCircleOutlined />} disabled={!configurable || disabled} />
         </Popconfirm>
       </div>
     </div>

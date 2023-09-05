@@ -12,7 +12,7 @@ export type ExpressionListProps = {
 };
 
 export const ExpressionList: React.FC<ExpressionListProps> = ({}) => {
-  const { expressions, addRowBelow, configurable } = useExpressionStore(
+  const { expressions, addRowBelow, configurable, disabled } = useExpressionStore(
     ({ expressions, addRowBelow, configurable, disabled }) => ({
       expressions,
       addRowBelow,
@@ -33,7 +33,7 @@ export const ExpressionList: React.FC<ExpressionListProps> = ({}) => {
       {(expressions || []).map((expression, index) => (
         <ExpressionItem key={expression.id} expression={expression} index={index} />
       ))}
-      {configurable && (
+      {configurable && !disabled && (
         <div className={clsx('expression-list__item')}>
           <Button
             className='expression-list__button'

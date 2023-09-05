@@ -59,6 +59,13 @@
         &.selected > td:first-of-type {
           background-color: var(--grl-color-primary-bg);
         }
+
+        &.disabled {
+          background-color: var(--grl-color-bg-container-disabled);
+          textarea {
+            background-color: transparent;
+          }
+        }
       }
 
       td {
