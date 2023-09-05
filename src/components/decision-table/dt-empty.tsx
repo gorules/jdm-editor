@@ -46,7 +46,7 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
 
   const innerChange = useDebouncedCallback((table: DecisionTableType) => {
     onChange?.(table);
-  }, 50);
+  }, 100);
 
   useEffect(() => {
     store.setState({

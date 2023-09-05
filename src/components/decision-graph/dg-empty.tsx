@@ -51,7 +51,7 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
 
   const innerChange = useDebouncedCallback((graph: DecisionGraphType) => {
     onChange?.(graph);
-  }, 50);
+  }, 100);
 
   useEffect(() => {
     store.setState({

@@ -37,7 +37,7 @@ export const Function: React.FC<FunctionProps> = ({
 
   const innerChange = useDebouncedCallback((val: string) => {
     onChange?.(val);
-  }, 50);
+  }, 100);
 
   const [editor, setEditor] = useState<editor.IStandaloneCodeEditor>();
   const resizeEditor = useThrottledCallback(() => editor?.layout(), 100, { trailing: true });
