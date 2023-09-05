@@ -190,7 +190,6 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
           });
           set({
             decisionTable: updatedDecisionTable,
-            cursor: null,
           });
           getState()?.onChange?.(updatedDecisionTable);
         },

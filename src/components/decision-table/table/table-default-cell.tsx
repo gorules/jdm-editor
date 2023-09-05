@@ -45,7 +45,14 @@ export const TableDefaultCell = memo<TableDefaultCellProps>(({ context, ...props
   };
 
   return (
-    <div className='cell-wrapper' onFocus={() => setCursor({ x: id, y: index })} {...props}>
+    <div
+      className='cell-wrapper'
+      onFocus={() => setCursor({ x: id, y: index })}
+      onContextMenu={() => {
+        setCursor({ x: id, y: index });
+      }}
+      {...props}
+    >
       {(table.options.meta as any)?.getCell?.({
         disabled,
         column,

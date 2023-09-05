@@ -9,6 +9,7 @@ import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 
 import type { DecisionTableType } from '../context/dt-store.context';
 import { useDecisionTableStore } from '../context/dt-store.context';
+import { TableContextMenu } from './table-context-menu';
 import { TableDefaultCell } from './table-default-cell';
 import {
   TableHeadCellInput,
@@ -198,41 +199,43 @@ const TableBody = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(
     const paddingBottom = virtualItems.length > 0 ? totalSize - (virtualItems?.[virtualItems.length - 1]?.end || 0) : 0;
 
     return (
-      <tbody
-        ref={ref}
-        {...props}
-        onKeyDown={(e) => {
-          if (disabled) {
-            return;
-          }
+      <TableContextMenu>
+        <tbody
+          ref={ref}
+          {...props}
+          onKeyDown={(e) => {
+            if (disabled) {
+              return;
+            }
 
-          if (e.code === 'ArrowUp' && (e.metaKey || e.altKey)) {
-            if (cursor) addRowAbove(cursor.y);
-          }
-          if (e.code === 'ArrowDown' && (e.metaKey || e.altKey)) {
-            if (cursor) addRowBelow(cursor.y);
-          }
-          if (e.code === 'Backspace' && (e.metaKey || e.altKey)) {
-            if (cursor) removeRow(cursor.y);
-          }
-        }}
-      >
-        {paddingTop > 0 && (
-          <tr>
-            <td style={{ height: `${paddingTop}px` }} />
-          </tr>
-        )}
-        {virtualItems.map((item) => {
-          const row = rows[item.index];
+            if (e.code === 'ArrowUp' && (e.metaKey || e.altKey)) {
+              if (cursor) addRowAbove(cursor.y);
+            }
+            if (e.code === 'ArrowDown' && (e.metaKey || e.altKey)) {
+              if (cursor) addRowBelow(cursor.y);
+            }
+            if (e.code === 'Backspace' && (e.metaKey || e.altKey)) {
+              if (cursor) removeRow(cursor.y);
+            }
+          }}
+        >
+          {paddingTop > 0 && (
+            <tr>
+              <td style={{ height: `${paddingTop}px` }} />
+            </tr>
+          )}
+          {virtualItems.map((item) => {
+            const row = rows[item.index];
 
-          return <TableRow key={row.id} index={item.index} row={row} reorderRow={swapRows} disabled={disabled} />;
-        })}
-        {paddingBottom > 0 && (
-          <tr>
-            <td style={{ height: `${paddingBottom}px` }} />
-          </tr>
-        )}
-      </tbody>
+            return <TableRow key={row.id} index={item.index} row={row} reorderRow={swapRows} disabled={disabled} />;
+          })}
+          {paddingBottom > 0 && (
+            <tr>
+              <td style={{ height: `${paddingBottom}px` }} />
+            </tr>
+          )}
+        </tbody>
+      </TableContextMenu>
     );
   },
 );

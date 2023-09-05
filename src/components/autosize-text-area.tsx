@@ -18,7 +18,7 @@ const recalculateRows = (node: HTMLTextAreaElement, maxRows: number) => {
   const contentHeight = node.scrollHeight - paddingTop - paddingBottom;
   const calculatedRows = Math.floor(contentHeight / lineHeight);
 
-  node.rows = Math.min(calculatedRows, maxRows);
+  node.rows = Math.min(Math.max(calculatedRows, 1), maxRows);
 };
 
 export const AutosizeTextArea = React.forwardRef<HTMLTextAreaElement, AutosizeTextAreaProps>(
