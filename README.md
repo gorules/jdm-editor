@@ -1,6 +1,7 @@
 ## BETA JDM Editor
 
 JDM Editor is an open-source React component for crafting and designing JDM (JSON Decision model) files.
+Whether you’re a developer, data analyst, or decision model expert, JDM Editor can help you harness the full potential of decision modeling, making it more accessible and manageable than ever before
 
 > A JDM Editor
 > Live demo and usage at https://gorules.github.io/jdm-editor/
