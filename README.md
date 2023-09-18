@@ -11,8 +11,14 @@ Whether you’re a developer, data analyst, or decision model expert, JDM Editor
 npm i @gorules/jdm-editor
 ```
 
+
 ## Usage
 ```typescript
+...
+import '@gorules/jdm-editor/dist/style.css';
+import { DecisionGraph, JdmConfigProvider } from '@gorules/jdm-editor';
+...
+
 <JdmConfigProvider>
   <DecisionGraph
     value={graph}
