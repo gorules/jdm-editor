@@ -1,64 +1,57 @@
-import { ExportOutlined, ImportOutlined } from '@ant-design/icons'
-import { Button, Select } from 'antd'
-import Papa from 'papaparse'
-import React, { useRef } from 'react'
-import { v4 } from 'uuid'
+import { ExportOutlined, ImportOutlined } from '@ant-design/icons';
+import { Button, Select } from 'antd';
+import Papa from 'papaparse';
+import React, { useRef } from 'react';
+import { v4 } from 'uuid';
 
-import { saveFile } from '../../helpers/file-helpers'
-import { Stack } from '../stack'
-import {
-  TableExportOptions,
-  TableSchemaItem,
-  parseDecisionTable,
-  useDecisionTableRaw,
-  useDecisionTableStore,
-} from './context/dt-store.context'
+import { saveFile } from '../../helpers/file-helpers';
+import { Stack } from '../stack';
+import type { TableExportOptions, TableSchemaItem } from './context/dt-store.context';
+import { parseDecisionTable, useDecisionTableRaw, useDecisionTableStore } from './context/dt-store.context';
 
 const parserOptions = {
   delimiter: ';',
-}
+};
 
-const parserPipe = ' | '
+const parserPipe = '|';
 
 export const DecisionTableCommandBar: React.FC = () => {
-  const { disableHitPolicy, updateHitPolicy, disabled, configurable } = useDecisionTableStore(
-    (store) => ({
-      disableHitPolicy: store.disableHitPolicy,
-      updateHitPolicy: store.updateHitPolicy,
-      disabled: store.disabled,
-      configurable: store.configurable,
-    })
-  )
+  const { disableHitPolicy, updateHitPolicy, disabled, configurable } = useDecisionTableStore((store) => ({
+    disableHitPolicy: store.disableHitPolicy,
+    updateHitPolicy: store.updateHitPolicy,
+    disabled: store.disabled,
+    configurable: store.configurable,
+  }));
 
-  const store = useDecisionTableRaw()
+  const store = useDecisionTableRaw();
 
-  const decisionTable = useDecisionTableStore((store) => store.decisionTable)
+  const decisionTable = useDecisionTableStore((store) => store.decisionTable);
 
-  const fileInput = useRef<HTMLInputElement>(null)
+  const fileInput = useRef<HTMLInputElement>(null);
 
   const exportCsv = async (options: TableExportOptions) => {
-    const { name } = options
+    const { name } = options;
     const schemaMeta = [
       ...decisionTable.inputs.map((input: any) =>
-        [input.name, input.field, 'INPUT', input.id, input.defaultValue].join(parserPipe)
+        [input.name, input.field, 'INPUT', input.id, input.defaultValue].join(` ${parserPipe} `),
       ),
       ...decisionTable.outputs.map((output: any) =>
-        [output.name, output.field, 'OUTPUT', output.id, output.defaultValue].join(parserPipe)
+        [output.name, output.field, 'OUTPUT', output.id, output.defaultValue].join(` ${parserPipe} `),
       ),
       'DESCRIPTION',
-    ]
+    ];
 
-    const schemaItems = [...decisionTable.inputs, ...decisionTable.outputs]
+    const schemaItems = [...decisionTable.inputs, ...decisionTable.outputs];
     const formatted = decisionTable?.rules.map((record: any) => {
-      const newDataPoint: string[] = []
+      const newDataPoint: string[] = [];
       schemaItems.forEach((schemaItem) => {
-        const val = record?.[schemaItem.id || '']
-        const formattedVal = typeof val === 'object' && val !== null ? JSON.stringify(val) : val
-        newDataPoint.push(formattedVal || '')
-      })
-      newDataPoint.push(record?.['_description'] || '')
-      return newDataPoint
-    })
+        const val = record?.[schemaItem.id || ''];
+        const formattedVal = typeof val === 'object' && val !== null ? JSON.stringify(val) : val;
+        newDataPoint.push(formattedVal || '');
+      });
+      newDataPoint.push(record?.['_description'] || '');
+      return newDataPoint;
+    });
 
     const csv = Papa.unparse(
       {
@@ -68,16 +61,16 @@ export const DecisionTableCommandBar: React.FC = () => {
       {
         ...parserOptions,
         header: true,
-      }
-    )
+      },
+    );
 
-    const blob = new Blob([csv], { type: 'text/csv' })
-    saveFile(`${name}.csv`, blob)
-  }
+    const blob = new Blob([csv], { type: 'text/csv' });
+    saveFile(`${name}.csv`, blob);
+  };
 
   const importCsv = () => {
-    fileInput?.current?.click?.()
-  }
+    fileInput?.current?.click?.();
+  };
 
   const handleCsv = async (content: string) => {
     const spreadsheetData = await new Promise<any[]>((resolve, reject) =>
@@ -86,24 +79,22 @@ export const DecisionTableCommandBar: React.FC = () => {
         header: false,
         complete: (results: Papa.ParseResult<Record<string, string>>) => {
           if (results.errors.length) {
-            return reject('failed to parse csv file')
+            return reject('failed to parse csv file');
           }
 
-          resolve(results.data)
+          resolve(results.data);
         },
-      })
-    )
+      }),
+    );
 
-    const headers: any[] = spreadsheetData?.splice(0, 1)?.[0]
+    const headers: any[] = spreadsheetData?.splice(0, 1)?.[0];
     const columns = headers.map((header: string) => {
-      const [name, field, _type, id, defaultValue] = header
-        .split(parserPipe)
-        .map((s) => (s || '').trim())
+      const [name, field, _type, id, defaultValue] = header.split(parserPipe).map((s) => (s || '').trim());
       if (name.toLowerCase() === 'description') {
         return {
           name,
           id: '_description',
-        }
+        };
       }
       return {
         name,
@@ -112,8 +103,8 @@ export const DecisionTableCommandBar: React.FC = () => {
         type: 'expression',
         id,
         defaultValue,
-      }
-    })
+      };
+    });
 
     const inputs = columns
       .filter((column) => column._type === 'INPUT')
@@ -123,7 +114,7 @@ export const DecisionTableCommandBar: React.FC = () => {
         field: column?.field,
         type: column?.type,
         defaultValue: column?.defaultValue,
-      })) as TableSchemaItem[]
+      })) as TableSchemaItem[];
 
     const outputs = columns
       .filter((column) => column._type === 'OUTPUT')
@@ -133,47 +124,42 @@ export const DecisionTableCommandBar: React.FC = () => {
         field: column?.field,
         type: column?.type,
         defaultValue: column?.defaultValue,
-      })) as TableSchemaItem[]
+      })) as TableSchemaItem[];
 
     const rules = spreadsheetData.map((data) => {
       const dataPoint: Record<string, string> = {
         _id: v4(),
-      }
+      };
 
       columns.forEach((col, index) => {
-        dataPoint[col.id] = data?.[index] || ''
-      })
-      return dataPoint
-    })
+        dataPoint[col.id] = data?.[index] || '';
+      });
+      return dataPoint;
+    });
 
     const newTable = parseDecisionTable({
       inputs,
       outputs,
       rules,
       hitPolicy: 'first',
-    })
-    store.getState().setDecisionTable?.(newTable)
-    store.getState().onChange?.(newTable)
-  }
+    });
+    store.getState().setDecisionTable?.(newTable);
+    store.getState().onChange?.(newTable);
+  };
 
   const handleUploadInput = async (event: any) => {
-    const fileList = event?.target?.files as FileList
-    const reader = new FileReader()
+    const fileList = event?.target?.files as FileList;
+    const reader = new FileReader();
     reader.onload = function (e) {
-      handleCsv((e as any)?.target?.result)
-    }
+      handleCsv((e as any)?.target?.result);
+    };
 
-    reader.readAsText(Array.from(fileList)?.[0])
-  }
+    reader.readAsText(Array.from(fileList)?.[0]);
+  };
 
   return (
     <>
-      <Stack
-        horizontal
-        horizontalAlign={'space-between'}
-        verticalAlign={'center'}
-        className={'grl-dt__command-bar'}
-      >
+      <Stack horizontal horizontalAlign={'space-between'} verticalAlign={'center'} className={'grl-dt__command-bar'}>
         <Stack gap={8} horizontal className='full-width'>
           <Button
             type='default'
@@ -223,9 +209,9 @@ export const DecisionTableCommandBar: React.FC = () => {
         ref={fileInput}
         onChange={handleUploadInput}
         onClick={(event) => {
-          ;(event.target as any).value = null
+          (event.target as any).value = null;
         }}
       />
     </>
-  )
-}
+  );
+};

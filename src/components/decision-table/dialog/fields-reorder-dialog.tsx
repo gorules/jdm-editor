@@ -1,77 +1,78 @@
-import { Card, Form, Modal, Typography } from 'antd'
-import React, { useEffect, useRef, useState } from 'react'
-import { XYCoord, useDrag, useDrop } from 'react-dnd'
+import { Card, Form, Modal, Typography } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
+import type { XYCoord } from 'react-dnd';
+import { useDrag, useDrop } from 'react-dnd';
 
-import { Stack } from '../../stack'
-import { TableSchemaItem } from '../context/dt-store.context'
+import { Stack } from '../../stack';
+import type { TableSchemaItem } from '../context/dt-store.context';
 
 export type FieldsReorderProps = {
-  fields?: TableSchemaItem[]
-  onSuccess?: (columns: TableSchemaItem[]) => void
-  onDismiss?: () => void
-  isOpen?: boolean
-  getContainer?: () => HTMLElement
-}
+  fields?: TableSchemaItem[];
+  onSuccess?: (columns: TableSchemaItem[]) => void;
+  onDismiss?: () => void;
+  isOpen?: boolean;
+  getContainer?: () => HTMLElement;
+};
 
 interface DragItem {
-  index: number
-  id: string
-  type: string
+  index: number;
+  id: string;
+  type: string;
 }
 
 const FieldCard: React.FC<{
-  col: TableSchemaItem
-  index: number
-  moveCard: (dragIndex: number, hoverIndex: number) => void
+  col: TableSchemaItem;
+  index: number;
+  moveCard: (dragIndex: number, hoverIndex: number) => void;
 }> = ({ col, index, moveCard }) => {
-  const ref = useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLDivElement>(null);
   const [, drop] = useDrop<DragItem, void>({
     accept: 'col',
     collect(monitor) {
       return {
         handlerId: monitor.getHandlerId(),
-      }
+      };
     },
     hover(item: DragItem, monitor) {
       if (!ref.current) {
-        return
+        return;
       }
-      const dragIndex = item.index
-      const hoverIndex = index
+      const dragIndex = item.index;
+      const hoverIndex = index;
 
       if (dragIndex === hoverIndex) {
-        return
+        return;
       }
 
-      const hoverBoundingRect = ref.current?.getBoundingClientRect()
-      const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
+      const hoverBoundingRect = ref.current?.getBoundingClientRect();
+      const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
 
-      const clientOffset = monitor.getClientOffset()
-      const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top
+      const clientOffset = monitor.getClientOffset();
+      const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top;
       if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
-        return
+        return;
       }
 
       if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
-        return
+        return;
       }
 
-      moveCard(dragIndex, hoverIndex)
-      item.index = hoverIndex
+      moveCard(dragIndex, hoverIndex);
+      item.index = hoverIndex;
     },
-  })
+  });
 
   const [{ isDragging }, drag] = useDrag({
     type: 'col',
     item: () => {
-      return { id: col.id, index }
+      return { id: col.id, index };
     },
     collect: (monitor: any) => ({
       isDragging: monitor.isDragging(),
     }),
-  })
+  });
 
-  drag(drop(ref))
+  drag(drop(ref));
   return (
     <Card ref={ref} style={{ opacity: isDragging ? 0 : 1 }} bodyStyle={{ padding: '0.5rem' }}>
       <div className='grl-dt__fields-reorder__item'>
@@ -86,30 +87,30 @@ const FieldCard: React.FC<{
         </Stack>
       </div>
     </Card>
-  )
-}
+  );
+};
 
 export const FieldsReorder: React.FC<FieldsReorderProps> = (props) => {
-  const { isOpen, onDismiss, onSuccess, fields, getContainer } = props
+  const { isOpen, onDismiss, onSuccess, fields, getContainer } = props;
 
-  const [columns, setColumns] = useState<TableSchemaItem[]>([])
+  const [columns, setColumns] = useState<TableSchemaItem[]>([]);
 
   useEffect(() => {
     if (isOpen) {
-      setColumns([...(fields || [])])
+      setColumns([...(fields || [])]);
     }
-  }, [isOpen, fields])
+  }, [isOpen, fields]);
 
   const moveCard = (from: number, to?: number) => {
     if (to === undefined) {
-      return
+      return;
     }
 
-    const tmpList = [...columns]
-    const element = tmpList.splice(from, 1)[0]
-    tmpList.splice(to, 0, element)
-    setColumns(tmpList)
-  }
+    const tmpList = [...columns];
+    const element = tmpList.splice(from, 1)[0];
+    tmpList.splice(to, 0, element);
+    setColumns(tmpList);
+  };
 
   return (
     <Modal
@@ -134,5 +135,5 @@ export const FieldsReorder: React.FC<FieldsReorderProps> = (props) => {
         </Stack>
       </Form>
     </Modal>
-  )
-}
+  );
+};

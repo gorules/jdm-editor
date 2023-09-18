@@ -1,32 +1,33 @@
-import { Cascader, Form, Input, Modal } from 'antd'
-import React, { useEffect } from 'react'
-import slugify from 'slugify'
-import { v4 } from 'uuid'
+import { Cascader, Form, Input, Modal } from 'antd';
+import React, { useEffect } from 'react';
+import slugify from 'slugify';
+import { v4 } from 'uuid';
 
-import { SchemaSelectProps, recursiveSelect } from '../../../helpers/components'
-import { ColumnType, TableSchemaItem } from '../context/dt-store.context'
+import type { SchemaSelectProps } from '../../../helpers/components';
+import { recursiveSelect } from '../../../helpers/components';
+import type { ColumnType, TableSchemaItem } from '../context/dt-store.context';
 
 export type FieldAddProps = {
-  id?: string
-  onSuccess?: (column: TableSchemaItem) => void
-  onDismiss?: () => void
-  isOpen?: boolean
-  schema?: SchemaSelectProps[]
-  columnType?: ColumnType
-  getContainer?: () => HTMLElement
-}
+  id?: string;
+  onSuccess?: (column: TableSchemaItem) => void;
+  onDismiss?: () => void;
+  isOpen?: boolean;
+  schema?: SchemaSelectProps[];
+  columnType?: ColumnType;
+  getContainer?: () => HTMLElement;
+};
 
 export const FieldAdd: React.FC<FieldAddProps> = (props) => {
-  const { isOpen, onDismiss, onSuccess, schema, getContainer } = props
-  const [form] = Form.useForm<TableSchemaItem>()
-  const name = Form.useWatch('name', form)
-  const type = Form.useWatch('type', form)
+  const { isOpen, onDismiss, onSuccess, schema, getContainer } = props;
+  const [form] = Form.useForm<TableSchemaItem>();
+  const name = Form.useWatch('name', form);
+  const type = Form.useWatch('type', form);
 
   useEffect(() => {
     if (isOpen) {
-      form.resetFields()
+      form.resetFields();
     }
-  }, [isOpen, form])
+  }, [isOpen, form]);
 
   useEffect(() => {
     if (!form.isFieldTouched('field') && name) {
@@ -34,11 +35,11 @@ export const FieldAdd: React.FC<FieldAddProps> = (props) => {
         replacement: '.',
         remove: undefined,
         lower: true,
-      })
+      });
 
-      form.setFields([{ name: 'field', value: parsed, touched: false }])
+      form.setFields([{ name: 'field', value: parsed, touched: false }]);
     }
-  }, [name, form])
+  }, [name, form]);
 
   return (
     <Modal
@@ -67,7 +68,7 @@ export const FieldAdd: React.FC<FieldAddProps> = (props) => {
             field: (field || '')?.trim?.()?.length > 0 ? field : undefined,
             name,
             defaultValue,
-          })
+          });
         }}
       >
         {schema && (
@@ -76,12 +77,12 @@ export const FieldAdd: React.FC<FieldAddProps> = (props) => {
               fieldNames={{ label: 'name', value: 'field', children: 'items' }}
               options={schema}
               onChange={(val) => {
-                const field = recursiveSelect(val as string[], schema)
+                const field = recursiveSelect(val as string[], schema);
                 if (field) {
                   form.setFieldsValue({
                     name: field?.name,
                     field: field?.field,
-                  })
+                  });
                 }
               }}
             ></Cascader>
@@ -102,5 +103,5 @@ export const FieldAdd: React.FC<FieldAddProps> = (props) => {
         </Form.Item>
       </Form>
     </Modal>
-  )
-}
+  );
+};

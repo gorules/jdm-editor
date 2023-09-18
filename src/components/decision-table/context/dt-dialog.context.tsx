@@ -1,32 +1,32 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 
-import { ColumnType, TableSchemaItem } from './dt-store.context'
+import type { ColumnType, TableSchemaItem } from './dt-store.context';
 
-export type TableDialogType = 'add' | 'reorder' | 'edit'
+export type TableDialogType = 'add' | 'reorder' | 'edit';
 export type TableDialogState = {
-  type: TableDialogType
-  item: TableSchemaItem | null
-  columnType: ColumnType
-}
+  type: TableDialogType;
+  item: TableSchemaItem | null;
+  columnType: ColumnType;
+};
 
 export type TableDialogContextState = {
-  setDialog: React.Dispatch<React.SetStateAction<TableDialogState | undefined>>
-  dialog: TableDialogState | undefined
-  isDialogActive: (type: TableDialogType) => boolean
-  getContainer?: () => HTMLElement
-}
+  setDialog: React.Dispatch<React.SetStateAction<TableDialogState | undefined>>;
+  dialog: TableDialogState | undefined;
+  isDialogActive: (type: TableDialogType) => boolean;
+  getContainer?: () => HTMLElement;
+};
 
-export const TableDialogContext = React.createContext<TableDialogContextState>({} as any)
+export const TableDialogContext = React.createContext<TableDialogContextState>({} as any);
 
 export const DecisionTableDialogProvider: React.FC<
   React.PropsWithChildren<{
-    getContainer?: () => HTMLElement
+    getContainer?: () => HTMLElement;
   }>
 > = ({ children, getContainer }) => {
-  const [dialog, setDialog] = useState<TableDialogState | undefined>(undefined)
+  const [dialog, setDialog] = useState<TableDialogState | undefined>(undefined);
   const isDialogActive = (type: TableDialogType) => {
-    return dialog?.type === type
-  }
+    return dialog?.type === type;
+  };
 
   return (
     <TableDialogContext.Provider
@@ -39,7 +39,7 @@ export const DecisionTableDialogProvider: React.FC<
     >
       {children}
     </TableDialogContext.Provider>
-  )
-}
+  );
+};
 
-export const useDecisionTableDialog = () => React.useContext(TableDialogContext)
+export const useDecisionTableDialog = () => React.useContext(TableDialogContext);

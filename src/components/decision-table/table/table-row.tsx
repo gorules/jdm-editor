@@ -1,21 +1,23 @@
-import { Row, flexRender } from '@tanstack/react-table'
-import { Typography } from 'antd'
-import clsx from 'clsx'
-import React, { useMemo, useRef } from 'react'
-import { useDrag, useDrop } from 'react-dnd'
-import { shallow } from 'zustand/shallow'
+import type { Row } from '@tanstack/react-table';
+import { flexRender } from '@tanstack/react-table';
+import { Typography } from 'antd';
+import clsx from 'clsx';
+import React, { useMemo, useRef } from 'react';
+import { useDrag, useDrop } from 'react-dnd';
+import { shallow } from 'zustand/shallow';
 
-import { useDecisionTableStore } from '../context/dt-store.context'
+import { useDecisionTableStore } from '../context/dt-store.context';
 
 const InnerTableRow: React.FC<{
-  index: number
-  row: Row<Record<string, string>>
-  reorderRow: (draggedRowIndex: number, targetRowIndex: number) => void
-  disabled?: boolean
+  index: number;
+  row: Row<Record<string, string>>;
+  reorderRow: (draggedRowIndex: number, targetRowIndex: number) => void;
+  disabled?: boolean;
 }> = ({ index, row, reorderRow, disabled }) => {
-  const setCursor = useDecisionTableStore((store) => store.setCursor)
-  const activeRules = useDecisionTableStore((store) => store.activeRules, shallow)
-  const trRef = useRef<HTMLTableRowElement>(null)
+  const setCursor = useDecisionTableStore((store) => store.setCursor);
+  const cursor = useDecisionTableStore((store) => store.cursor, shallow);
+  const activeRules = useDecisionTableStore((store) => store.activeRules, shallow);
+  const trRef = useRef<HTMLTableRowElement>(null);
   const [{ isDropping, direction }, dropRef] = useDrop({
     accept: 'row',
     collect: (monitor) => ({
@@ -23,7 +25,7 @@ const InnerTableRow: React.FC<{
       direction: (monitor.getDifferenceFromInitialOffset()?.y || 0) > 0 ? 'down' : 'up',
     }),
     drop: (draggedRow: Row<Record<string, string>>) => reorderRow(draggedRow.index, row.index),
-  })
+  });
 
   const [{ isDragging }, dragRef, previewRef] = useDrag({
     collect: (monitor) => ({
@@ -31,13 +33,13 @@ const InnerTableRow: React.FC<{
     }),
     item: () => row,
     type: 'row',
-  })
+  });
 
-  previewRef(dropRef(trRef))
+  previewRef(dropRef(trRef));
 
   const isActive = useMemo(() => {
-    return Array.isArray(activeRules) && activeRules.indexOf(row.id) > -1
-  }, [row.id, activeRules])
+    return Array.isArray(activeRules) && activeRules.indexOf(row.id) > -1;
+  }, [row.id, activeRules]);
 
   return (
     <tr
@@ -46,7 +48,9 @@ const InnerTableRow: React.FC<{
         'table-row',
         isDropping && direction === 'down' && 'dropping-down',
         isDropping && direction === 'up' && 'dropping-up',
-        isActive && 'active'
+        isActive && 'active',
+        disabled && 'disabled',
+        cursor?.y === index && !disabled && 'selected',
       )}
       style={{
         opacity: isDragging ? 0.5 : 1,
@@ -59,7 +63,7 @@ const InnerTableRow: React.FC<{
           setCursor({
             x: 'id',
             y: index,
-          })
+          });
         }}
       >
         <div className={'text'}>
@@ -67,12 +71,16 @@ const InnerTableRow: React.FC<{
         </div>
       </td>
       {row.getVisibleCells().map((cell) => (
-        <td key={cell.id} style={{ width: cell.column.getSize() }}>
+        <td
+          key={cell.id}
+          className={clsx(!disabled && cursor?.x === cell.column.id && cursor?.y === index && 'selected')}
+          style={{ width: cell.column.getSize() }}
+        >
           {flexRender(cell.column.columnDef.cell, cell.getContext())}
         </td>
       ))}
     </tr>
-  )
-}
+  );
+};
 
-export const TableRow = React.memo(InnerTableRow)
+export const TableRow = React.memo(InnerTableRow);

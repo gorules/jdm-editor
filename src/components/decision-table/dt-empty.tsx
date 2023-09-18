@@ -1,31 +1,29 @@
-import equal from 'fast-deep-equal/es6/react'
-import React, { useEffect, useRef } from 'react'
-import { shallow } from 'zustand/shallow'
+import equal from 'fast-deep-equal/es6/react';
+import type React from 'react';
+import { useEffect, useRef } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
+import { shallow } from 'zustand/shallow';
 
-import { SchemaSelectProps } from '../../helpers/components'
-import {
-  DecisionTableType,
-  parseDecisionTable,
-  useDecisionTableRaw,
-  useDecisionTableStore,
-} from './context/dt-store.context'
-import { TableCellProps } from './table/table-default-cell'
+import type { SchemaSelectProps } from '../../helpers/components';
+import type { DecisionTableType } from './context/dt-store.context';
+import { parseDecisionTable, useDecisionTableRaw, useDecisionTableStore } from './context/dt-store.context';
+import type { TableCellProps } from './table/table-default-cell';
 
 export type DecisionTableEmptyType = {
-  id?: string
-  defaultValue?: DecisionTableType
-  value?: DecisionTableType
-  disabled?: boolean
-  configurable?: boolean
-  disableHitPolicy?: boolean
-  activeRules?: string[]
-  cellRenderer?: (props: TableCellProps) => JSX.Element | null | undefined
-  inputsSchema?: SchemaSelectProps[]
-  outputsSchema?: SchemaSelectProps[]
-  minColWidth?: number
-  colWidth?: number
-  onChange?: (val: DecisionTableType) => void
-}
+  id?: string;
+  defaultValue?: DecisionTableType;
+  value?: DecisionTableType;
+  disabled?: boolean;
+  configurable?: boolean;
+  disableHitPolicy?: boolean;
+  activeRules?: string[];
+  cellRenderer?: (props: TableCellProps) => JSX.Element | null | undefined;
+  inputsSchema?: SchemaSelectProps[];
+  outputsSchema?: SchemaSelectProps[];
+  minColWidth?: number;
+  colWidth?: number;
+  onChange?: (val: DecisionTableType) => void;
+};
 export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
   id,
   defaultValue,
@@ -41,10 +39,14 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
   cellRenderer,
   onChange,
 }) => {
-  const mountedRef = useRef(false)
-  const store = useDecisionTableRaw()
-  const setDecisionTable = useDecisionTableStore((store) => store.setDecisionTable, shallow)
-  const decisionTable = useDecisionTableStore((store) => store.decisionTable, shallow)
+  const mountedRef = useRef(false);
+  const store = useDecisionTableRaw();
+  const setDecisionTable = useDecisionTableStore((store) => store.setDecisionTable, shallow);
+  const decisionTable = useDecisionTableStore((store) => store.decisionTable, shallow);
+
+  const innerChange = useDebouncedCallback((table: DecisionTableType) => {
+    onChange?.(table);
+  }, 100);
 
   useEffect(() => {
     store.setState({
@@ -58,8 +60,8 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
       colWidth: colWidth || 200,
       minColWidth: minColWidth || 150,
       cellRenderer,
-      onChange,
-    })
+      onChange: innerChange,
+    });
   }, [
     id,
     disabled,
@@ -71,18 +73,17 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
     colWidth,
     outputsSchema,
     cellRenderer,
-    onChange,
-  ])
+  ]);
 
   useEffect(() => {
-    if (mountedRef.current && !equal(value, decisionTable)) {
-      setDecisionTable(parseDecisionTable(value))
+    if (mountedRef.current && value !== undefined && !equal(value, decisionTable)) {
+      setDecisionTable(parseDecisionTable(value));
     }
-  }, [value])
+  }, [value]);
 
   useEffect(() => {
-    setDecisionTable(parseDecisionTable(value === undefined ? defaultValue : value))
-    mountedRef.current = true
-  }, [])
-  return null
-}
+    setDecisionTable(parseDecisionTable(value === undefined ? defaultValue : value));
+    mountedRef.current = true;
+  }, []);
+  return null;
+};

@@ -1,6 +1,6 @@
 .grl-dt {
   font-size: 14px;
-  height: calc(100% - 36px);
+  height: 100%;
   display: flex;
   flex-direction: column;
 
@@ -9,7 +9,7 @@
     table-layout: fixed;
     font-family: arial, sans-serif;
     width: fit-content;
-    background-color: var(--color-bg-container);
+    background-color: var(--grl-color-bg-container);
     height: 1px;
 
     .cell-wrapper {
@@ -17,24 +17,9 @@
       height: 100%;
     }
 
-    .textarea-input {
-      line-height: var(--line-height);
-      color: var(--color-text);
-      resize: none;
-      width: 100%;
-      box-sizing: border-box;
-      font-family: var(--font-family);
-
-      &:focus {
-        border-color: var(--border-color);
-        border-inline-end-width: 1px;
-        outline: none;
-      }
-    }
-
     thead {
-      background-color: var(--color-bg-layout);
-      border-color: var(--border-color);
+      background-color: var(--grl-color-bg-layout);
+      border-color: var(--grl-color-border);
       margin: 0;
       position: sticky;
       top: 0;
@@ -65,24 +50,32 @@
     }
 
     tbody {
-      background-color: var(--color-bg-container);
+      background-color: var(--grl-color-bg-container);
 
       tr {
         width: fit-content;
         min-height: 36px;
 
-        &:focus-within > td:first-of-type {
-          background-color: var(--primary-color-bg);
+        &.selected > td:first-of-type {
+          background-color: var(--grl-color-primary-bg);
+        }
+
+        &.disabled {
+          background-color: var(--grl-color-bg-container-disabled);
+          textarea {
+            background-color: transparent;
+          }
         }
       }
 
       td {
         min-height: 36px;
         padding: 0;
+        outline: 2px solid transparent;
+        outline-offset: -2px;
 
-        &:focus-within {
-          outline: 2px solid var(--primary-color);
-          outline-offset: -2px;
+        &.selected {
+          outline-color: var(--grl-color-primary-hover);
         }
 
         &.sort-handler {
@@ -104,7 +97,7 @@
     }
 
     tfoot {
-      background-color: var(--color-bg-elevated);
+      background-color: var(--grl-color-bg-elevated);
     }
 
     .add-row {
@@ -131,7 +124,7 @@
 
     th,
     td {
-      box-shadow: inset 0 0 0 0.5px var(--border-color);
+      box-shadow: inset 0 0 0 0.5px var(--grl-color-border);
     }
 
     .table-row {
@@ -142,7 +135,7 @@
         position: absolute;
         left: 0;
         right: 0;
-        background: var(--primary-color);
+        background: var(--grl-color-primary);
       }
 
       &.dropping-up:after {
@@ -156,7 +149,7 @@
       }
 
       &.active {
-        background-color: var(--primary-color-bg);
+        background-color: var(--grl-color-primary-bg);
       }
     }
   }
@@ -181,5 +174,6 @@
 
   &__command-bar {
     padding: 0.5rem;
+    box-sizing: border-box;
   }
 }
