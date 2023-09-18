@@ -1,6 +1,6 @@
-import { CellContext } from '@tanstack/react-table';
+import type { CellContext } from '@tanstack/react-table';
 import React from 'react';
-import { TableSchemaItem } from '../context/dt-store.context';
+import type { TableSchemaItem } from '../context/dt-store.context';
 export type TableDefaultCellProps = {
     context: CellContext<Record<string, string>, string>;
 } & React.HTMLAttributes<HTMLDivElement>;

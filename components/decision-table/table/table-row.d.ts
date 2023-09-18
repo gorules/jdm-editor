@@ -1,4 +1,4 @@
-import { Row } from '@tanstack/react-table';
+import type { Row } from '@tanstack/react-table';
 import React from 'react';
 export declare const TableRow: React.NamedExoticComponent<{
     index: number;

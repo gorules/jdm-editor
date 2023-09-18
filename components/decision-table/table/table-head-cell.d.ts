@@ -1,5 +1,5 @@
 import React from 'react';
-import { TableSchemaItem } from '../context/dt-store.context';
+import type { TableSchemaItem } from '../context/dt-store.context';
 export type TableHeadCellProps = {
     configurable?: boolean;
     disabled?: boolean;

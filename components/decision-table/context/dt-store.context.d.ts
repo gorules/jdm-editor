@@ -1,7 +1,7 @@
 import React from 'react';
-import { StoreApi } from 'zustand';
-import { SchemaSelectProps } from '../../../helpers/components';
-import { TableCellProps } from '../table/table-default-cell';
+import type { StoreApi } from 'zustand';
+import type { SchemaSelectProps } from '../../../helpers/components';
+import type { TableCellProps } from '../table/table-default-cell';
 export type TableExportOptions = {
     name?: string;
 };
@@ -57,18 +57,13 @@ export type DecisionTableStoreType = {
     onChange?: (val: DecisionTableType) => void;
     cellRenderer?: (props: TableCellProps) => JSX.Element | null | undefined;
 };
-export declare const DecisionTableStoreContext: React.Context<{
-    (): DecisionTableStoreType;
-    <U>(selector: (state: DecisionTableStoreType) => U, equals?: ((a: U, b: U) => boolean) | undefined): U;
-} & StoreApi<DecisionTableStoreType> & {
-    setState: (partial: Partial<DecisionTableStoreType>) => void;
-}>;
 export type DecisionTableContextProps = {};
 export declare const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTableContextProps>>;
-export declare const useDecisionTableStore: (selector: (state: DecisionTableStoreType) => any, equals?: ((a: any, b: any) => boolean) | undefined) => any;
+export declare function useDecisionTableStore<T>(selector: (state: DecisionTableStoreType) => T, equals?: (a: any, b: any) => boolean): T;
 export declare const useDecisionTableRaw: () => {
     (): DecisionTableStoreType;
-    <U>(selector: (state: DecisionTableStoreType) => U, equals?: ((a: U, b: U) => boolean) | undefined): U;
+    <U>(selector: (state: DecisionTableStoreType) => U): U;
+    <U_1>(selector: (state: DecisionTableStoreType) => U_1, equalityFn: (a: U_1, b: U_1) => boolean): U_1;
 } & StoreApi<DecisionTableStoreType> & {
     setState: (partial: Partial<DecisionTableStoreType>) => void;
 };

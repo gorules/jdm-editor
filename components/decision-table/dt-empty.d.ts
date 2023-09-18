@@ -1,7 +1,7 @@
-import React from 'react';
-import { SchemaSelectProps } from '../../helpers/components';
-import { DecisionTableType } from './context/dt-store.context';
-import { TableCellProps } from './table/table-default-cell';
+import type React from 'react';
+import type { SchemaSelectProps } from '../../helpers/components';
+import type { DecisionTableType } from './context/dt-store.context';
+import type { TableCellProps } from './table/table-default-cell';
 export type DecisionTableEmptyType = {
     id?: string;
     defaultValue?: DecisionTableType;
