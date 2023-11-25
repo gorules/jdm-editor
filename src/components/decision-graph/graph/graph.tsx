@@ -20,7 +20,7 @@ import { useGraphClipboard } from '../hooks/use-graph-clipboard';
 import { GraphComponents } from './graph-components';
 import { MultiNodeForm } from './multi-node-form';
 import { NodeForm } from './node-form';
-import { GraphNode, GraphNodeEdit } from './nodes';
+import { GraphNode, GraphNodeEdit, GraphSwitchNode } from './nodes';
 
 export const DecisionContentType = 'application/vnd.gorules.decision';
 
@@ -100,6 +100,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(
         type !== 'decisionTableNode' &&
         type !== 'functionNode' &&
         type !== 'expressionNode' &&
+        type !== 'switchNode' &&
         type !== 'inputNode' &&
         type !== 'outputNode'
       ) {
@@ -136,6 +137,10 @@ export const Graph = forwardRef<GraphRef, GraphProps>(
       } else if (type === 'expressionNode') {
         data.content = {
           expressions: [],
+        };
+      } else if (type === 'switchNode') {
+        data.content = {
+          statements: [],
         };
       }
 
@@ -230,6 +235,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(
         decisionNode: GraphNode,
         functionNode: GraphNode,
         expressionNode: GraphNode,
+        switchNode: GraphSwitchNode,
         inputNode: GraphNode,
         outputNode: GraphNode,
       };
@@ -241,6 +247,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(
         decisionNode: GraphNodeEdit,
         functionNode: GraphNodeEdit,
         expressionNode: GraphNodeEdit,
+        switchNode: GraphSwitchNode,
         inputNode: GraphNodeEdit,
         outputNode: GraphNodeEdit,
       };

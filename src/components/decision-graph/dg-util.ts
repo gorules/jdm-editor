@@ -24,6 +24,8 @@ export const mapToDecisionEdges = (edges: Edge[]): DecisionEdge[] => {
       type: edge?.type,
       targetId: edge?.target,
       name: edge?.label as string,
+      sourceHandle: edge.sourceHandle ?? undefined,
+      targetHandle: edge.targetHandle ?? undefined,
     };
   });
 };
@@ -54,6 +56,8 @@ export const mapToGraphEdges = (edges: DecisionEdge[]): Edge[] => {
         type: edge?.type || 'edge',
         target: edge.targetId,
         label: edge.name,
+        sourceHandle: edge.sourceHandle,
+        targetHandle: edge.targetHandle,
       };
     });
 };

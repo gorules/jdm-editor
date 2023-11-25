@@ -28,6 +28,9 @@ export type DecisionEdge = {
   sourceId: string;
   targetId: string;
 
+  sourceHandle?: string;
+  targetHandle?: string;
+
   type?: string;
 };
 

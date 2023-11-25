@@ -67,6 +67,9 @@ export const GraphComponents: React.FC<GraphComponentsProps> = ({ inputDisabled,
         <div className={clsx(['component'])} onDragStart={(event) => onDragStart(event, 'expressionNode')} draggable>
           <Typography.Text strong>Expression</Typography.Text>
         </div>
+        <div className={clsx(['component'])} onDragStart={(event) => onDragStart(event, 'switchNode')} draggable>
+          <Typography.Text strong>Switch</Typography.Text>
+        </div>
         {customComponents.map((component) => (
           <div
             key={component.type}
