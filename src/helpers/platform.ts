@@ -3,6 +3,7 @@ const isMac = navigator.platform.includes('Mac');
 const keyMaps: Record<string, string> = {
   Ctrl: '⌘',
   Backspace: '⌫',
+  Alt: '⌥',
 };
 
 export const platform = {

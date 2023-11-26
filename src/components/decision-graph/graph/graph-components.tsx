@@ -9,12 +9,11 @@ import { useDecisionGraphStore } from '../context/dg-store.context';
 
 export type GraphComponentsProps = {
   inputDisabled?: boolean;
-  outputDisabled?: boolean;
   onPaste?: () => void;
   components?: React.ReactNode[];
 };
 
-export const GraphComponents: React.FC<GraphComponentsProps> = ({ inputDisabled, outputDisabled, onPaste }) => {
+export const GraphComponents: React.FC<GraphComponentsProps> = ({ inputDisabled, onPaste }) => {
   const customComponents: CustomNodeType[] = useDecisionGraphStore((store) => store.components || [], equal);
 
   const onDragStart = useCallback((event: React.DragEvent, nodeType: string) => {
@@ -49,14 +48,8 @@ export const GraphComponents: React.FC<GraphComponentsProps> = ({ inputDisabled,
             Input
           </Typography.Text>
         </div>
-        <div
-          className={clsx(['component', outputDisabled && 'disabled'])}
-          onDragStart={(event) => onDragStart(event, 'outputNode')}
-          draggable={!outputDisabled}
-        >
-          <Typography.Text strong type={outputDisabled ? 'secondary' : undefined}>
-            Output
-          </Typography.Text>
+        <div className={clsx(['component'])} onDragStart={(event) => onDragStart(event, 'outputNode')} draggable>
+          <Typography.Text strong>Output</Typography.Text>
         </div>
         <div className={clsx(['component'])} onDragStart={(event) => onDragStart(event, 'decisionTableNode')} draggable>
           <Typography.Text strong>Decision Table</Typography.Text>

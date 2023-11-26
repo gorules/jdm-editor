@@ -103,37 +103,63 @@
       &.switch {
         width: 250px;
         height: auto;
-        padding: 10px 0;
-        border-radius: 30px;
+        padding: 0;
+        border-radius: 0;
 
-        .statementList {
-          margin: 16px 0;
-        }
-
-        .switchWrapper {
+        .switchNode {
           display: flex;
-          gap: 6px;
-          position: relative;
-          padding: 4px 10px;
-          color: var(--grl-color-text);
-          align-items: center;
+          flex-direction: column;
+          align-items: stretch;
+          width: 100%;
 
-          &:after {
-            content: '';
-            position: absolute;
-            left: 0;
-            right: 0;
-            background: var(--grl-color-primary);
+          .react-flow__handle {
+            z-index: 20;
+            top: calc(50% - 1px);
           }
 
-          &.dropping-up:after {
-            top: -1px;
-            height: 2px;
+          &__title {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 80px;
+            text-align: center;
+            position: relative;
           }
 
-          &.dropping-down:after {
-            bottom: -1px;
-            height: 2px;
+          &__body {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+          }
+
+          &__addButton {
+            width: 100%;
+            border-radius: 0;
+            height: 40px;
+          }
+
+          &__statement {
+            position: relative;
+
+            &__more {
+              position: absolute;
+              right: 5px;
+              top: 50%;
+              transform: translateY(-50%);
+              z-index: 10;
+            }
+
+            input {
+              border-radius: 0;
+              border-left: none;
+              border-right: none;
+              height: 40px;
+
+              &:hover, &:active, &:focus {
+                z-index: 1;
+              }
+            }
           }
         }
       }
