@@ -101,10 +101,10 @@
       }
 
       &.switch {
-        width: 250px;
+        width: 240px;
         height: auto;
         padding: 0;
-        border-radius: 0;
+        border-radius: 4px;
 
         .switchNode {
           display: flex;
@@ -127,10 +127,21 @@
             position: relative;
           }
 
+          &__conditionsText {
+            height: 20px;
+            padding: 0 8px;
+          }
+
           &__body {
             display: flex;
             flex-direction: column;
             width: 100%;
+            box-sizing: border-box;
+            padding: 0 0 4px 0;
+
+            &.edit {
+              padding: 0;
+            }
           }
 
           &__addButton {
@@ -144,19 +155,24 @@
 
             &__more {
               position: absolute;
-              right: 5px;
-              top: 50%;
+              right: 12px;
+              top: 20px;
               transform: translateY(-50%);
               z-index: 10;
             }
 
-            input {
-              border-radius: 0;
-              border-left: none;
-              border-right: none;
-              height: 40px;
+            &__inputArea {
+              padding: 5px 8px;
+              display: flex;
+            }
 
-              &:hover, &:active, &:focus {
+            textarea {
+              border-radius: 0;
+              padding-right: 32px;
+
+              &:hover,
+              &:active,
+              &:focus {
                 z-index: 1;
               }
             }

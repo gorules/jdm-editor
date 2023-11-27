@@ -21,7 +21,7 @@ import { GraphComponents } from './graph-components';
 import { MultiNodeForm } from './multi-node-form';
 import { NodeForm } from './node-form';
 import { GraphNode, GraphNodeEdit } from './nodes';
-import { GraphSwitchNode } from './switch-node';
+import { GraphSwitchNode, GraphSwitchNodeEdit } from './switch-node';
 
 export const DecisionContentType = 'application/vnd.gorules.decision';
 
@@ -247,7 +247,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(
         decisionNode: GraphNodeEdit,
         functionNode: GraphNodeEdit,
         expressionNode: GraphNodeEdit,
-        switchNode: GraphSwitchNode,
+        switchNode: GraphSwitchNodeEdit,
         inputNode: GraphNodeEdit,
         outputNode: GraphNodeEdit,
       };

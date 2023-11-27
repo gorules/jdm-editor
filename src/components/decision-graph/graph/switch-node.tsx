@@ -1,16 +1,15 @@
-import { BranchesOutlined, MoreOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Dropdown, Input, Space, Typography } from 'antd';
+import { BranchesOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Space, Typography } from 'antd';
 import clsx from 'clsx';
 import equal from 'fast-deep-equal/es6/react';
-import React, { useMemo, useRef } from 'react';
+import { produce } from 'immer';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import type { NodeProps } from 'reactflow';
 import { Handle, Position, useReactFlow } from 'reactflow';
 import { v4 } from 'uuid';
 
-import { platform } from '../../../helpers/platform';
-import { SpacedText } from '../../spaced-text';
+import { AutosizeTextArea } from '../../autosize-text-area';
 import { useDecisionGraphStore } from '../context/dg-store.context';
-import { mapToDecisionNode } from '../dg-util';
 import { useNodeError } from './nodes';
 
 type SwitchStatement = {
@@ -19,59 +18,99 @@ type SwitchStatement = {
 };
 
 export const GraphSwitchNode: React.FC<NodeProps> = (props) => {
-  const { id, data, isConnectable, type } = props;
-  const doubleClickTimer = useRef<number>();
-  const { setNodes } = useReactFlow();
+  const { id } = props;
   const rootRef = useRef<HTMLDivElement>(null);
 
-  const { openTab, simulate, customComponents } = useDecisionGraphStore(
-    ({ simulate, openTab, components }) => ({
-      openTab,
+  const { node, nodeTrace, updateNode, disabled, simulate } = useDecisionGraphStore(
+    ({ decisionGraph, simulate, updateNode, disabled, configurable }) => ({
+      node: (decisionGraph?.nodes ?? []).find((node) => node.id === id),
+      nodeTrace: simulate?.result?.trace?.[id],
+      updateNode,
+      disabled,
+      configurable,
       simulate,
-      customComponents: components ?? [],
     }),
     equal,
   );
 
-  const component = useMemo(() => {
-    return customComponents.find((component) => component.type === type);
-  }, [customComponents, type]);
-
-  const trace = useMemo(() => {
-    return simulate?.result?.trace?.[id];
-  }, [simulate]);
-
   const error = useNodeError(id, simulate);
 
-  const innerOpen = () => {
-    if (component) {
-      component?.onOpen?.(mapToDecisionNode(props as any));
-    } else {
-      openTab?.(id);
-    }
-  };
+  const statements: SwitchStatement[] = node?.content?.statements || [];
+
+  return (
+    <div ref={rootRef} className={clsx(['node', 'switch', nodeTrace && 'simulated', error && 'error'])}>
+      {nodeTrace && (
+        <div className={'performance'}>
+          <Typography.Text style={{ fontSize: 10 }}>{nodeTrace?.performance || null}</Typography.Text>
+        </div>
+      )}
+      <div className='switchNode'>
+        <div className='switchNode__title'>
+          <div className={'text-ellipsis'}>
+            <Typography.Text strong>{node?.name}</Typography.Text>
+          </div>
+          <div className={'text-ellipsis'}>
+            <Typography.Text style={{ fontSize: 12 }}>
+              <Space size={4} style={{ maxWidth: '100%' }}>
+                <BranchesOutlined />
+                <span>Switch Node</span>
+              </Space>
+            </Typography.Text>
+          </div>
+          <Handle type='target' position={Position.Left} isConnectable={false} />
+        </div>
+        <div className={'switchNode__conditionsText'}>
+          <Typography.Text
+            style={{
+              fontSize: 12,
+            }}
+          >
+            Conditions
+          </Typography.Text>
+        </div>
+        <div className='switchNode__body nodrag'>
+          {statements.map((statement) => (
+            <SwitchHandle
+              key={statement.id}
+              value={statement.condition}
+              id={statement.id}
+              isConnectable={false}
+              configurable={false}
+              disabled={disabled}
+              onChange={(condition) => {
+                updateNode(
+                  id,
+                  produce(node?.content, (draft: any) => {
+                    draft.statements = (draft.statements || []).map((s: any) => {
+                      if (statement.id === s.id) {
+                        return {
+                          id: s.id,
+                          condition,
+                        };
+                      }
+                      return s;
+                    });
+                  }),
+                );
+                console.log(condition);
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const GraphSwitchNodeEdit: React.FC<NodeProps> = (props) => {
+  const { id, data, isConnectable } = props;
+  const { setNodes } = useReactFlow();
+  const rootRef = useRef<HTMLDivElement>(null);
 
   const statements: SwitchStatement[] = data?.content?.statements || [];
 
   return (
-    <div
-      ref={rootRef}
-      className={clsx(['node', 'switch', trace && 'simulated', error && 'error'])}
-      onClick={() => {
-        if (doubleClickTimer.current && performance.now() - doubleClickTimer.current < 250) {
-          if (type !== 'inputNode' && type !== 'outputNode' && type !== 'switchNode') {
-            innerOpen();
-          }
-        }
-
-        doubleClickTimer.current = performance.now();
-      }}
-    >
-      {trace && (
-        <div className={'performance'}>
-          <Typography.Text style={{ fontSize: 10 }}>{trace?.performance || null}</Typography.Text>
-        </div>
-      )}
+    <div ref={rootRef} className={clsx(['node', 'switch'])}>
       <div className='switchNode'>
         <div className='switchNode__title'>
           <div className={'text-ellipsis'}>
@@ -87,12 +126,41 @@ export const GraphSwitchNode: React.FC<NodeProps> = (props) => {
           </div>
           <Handle type='target' position={Position.Left} isConnectable={isConnectable} />
         </div>
-        <div className='switchNode__body'>
+        <div className={'switchNode__conditionsText'}>
+          <Typography.Text
+            style={{
+              fontSize: 12,
+            }}
+          >
+            Conditions
+          </Typography.Text>
+        </div>
+        <div className='switchNode__body edit nodrag'>
           {statements.map((statement) => (
-            <HandleThing
+            <SwitchHandle
               key={statement.id}
-              statement={statement}
+              value={statement.condition}
+              id={statement.id}
               isConnectable={isConnectable}
+              onDelete={() => {
+                setNodes((nodes) =>
+                  nodes.map((node) => {
+                    if (node.id !== id) return node;
+                    return {
+                      ...node,
+                      data: {
+                        ...(node?.data ?? {}),
+                        content: {
+                          ...(node?.data?.content ?? {}),
+                          statements: (node?.data?.content?.statements || []).filter(
+                            (s: SwitchStatement) => s?.id !== statement?.id,
+                          ),
+                        },
+                      },
+                    };
+                  }),
+                );
+              }}
               onChange={(condition) => {
                 setNodes((nodes) =>
                   nodes.map((node) => {
@@ -144,53 +212,51 @@ export const GraphSwitchNode: React.FC<NodeProps> = (props) => {
   );
 };
 
-const HandleThing: React.FC<{
-  statement: SwitchStatement;
+const SwitchHandle: React.FC<{
+  id: string;
+  value?: string;
   isConnectable: boolean;
-  onChange?: (condition: string) => void;
-}> = ({ statement, isConnectable, onChange }) => {
+  onChange?: (value: string) => void;
+  onDelete?: () => void;
+  disabled?: boolean;
+  configurable?: boolean;
+}> = ({ id, value, isConnectable, onChange, disabled, configurable = true, onDelete }) => {
+  const [inner, setInner] = useState(value);
+  useLayoutEffect(() => {
+    if (inner !== value) {
+      setInner(value);
+    }
+  }, [value]);
+
+  const handleChange = (val: string) => {
+    setInner(val);
+    onChange?.(val);
+  };
+
   return (
     <div className={clsx('switchNode__statement')}>
-      <div className='inputArea'>
-        <Input
-          value={statement.condition}
-          onChange={(e) => onChange?.(typeof e.target.value === 'string' ? e.target.value : '')}
-        />
-        <Dropdown
-          trigger={['click']}
-          placement='bottomRight'
-          overlayStyle={{ maxWidth: 250 }}
-          menu={{
-            items: [
-              {
-                key: 'move-up',
-                label: <SpacedText left='Move up' right={platform.shortcut('Alt + Up')} />,
-              },
-              {
-                key: 'move-down',
-                label: <SpacedText left='Move down' right={platform.shortcut('Alt + Down')} />,
-              },
-              { type: 'divider' },
-              {
-                key: 'add-up',
-                label: <SpacedText left='Add above' right={platform.shortcut('Ctrl + Up')} />,
-              },
-              {
-                key: 'add-down',
-                label: <SpacedText left='Add below' right={platform.shortcut('Ctrl + Down')} />,
-              },
-              { type: 'divider' },
-              {
-                key: 'delete',
-                label: <SpacedText left='Remove' right={platform.shortcut('Ctrl + Backspace')} />,
-              },
-            ],
+      <div className='switchNode__statement__inputArea'>
+        <AutosizeTextArea
+          style={{
+            fontSize: 12,
+            lineHeight: '20px',
           }}
-        >
-          <Button className='switchNode__statement__more' size='small' type='text' icon={<MoreOutlined />} />
-        </Dropdown>
+          value={inner}
+          maxRows={4}
+          readOnly={disabled}
+          onChange={(e) => handleChange?.(typeof e.target.value === 'string' ? e.target.value : '')}
+        />
+        {!disabled && configurable && (
+          <Button
+            className='switchNode__statement__more'
+            size='small'
+            type='text'
+            icon={<DeleteOutlined />}
+            onClick={() => onDelete?.()}
+          />
+        )}
       </div>
-      <Handle id={statement.id} type='source' position={Position.Right} isConnectable={isConnectable} />
+      <Handle id={id} type='source' position={Position.Right} isConnectable={isConnectable} />
     </div>
   );
 };

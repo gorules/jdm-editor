@@ -1,6 +1,6 @@
 {
   "name": "@gorules/jdm-editor",
-  "version": "0.4.0-beta.0",
+  "version": "0.4.0-beta.1",
   "description": "",
   "author": "GoRules <hi@gorules.io> (https://gorules.io)",
   "homepage": "https://github.com/gorules/jdm-editor",
@@ -23,9 +23,9 @@
     "storybook": "storybook dev -p 9009",
     "build-storybook": "storybook build -o docs",
     "lint": "eslint 'src/**/*.ts?(x)'",
-    "lint:fix": "yarn lint --fix",
+    "lint:fix": "pnpm lint --fix",
     "prettier": "prettier --check 'src/**/*.{ts?(x),css}'",
-    "prettier:fix": "yarn prettier --write",
+    "prettier:fix": "pnpm prettier --write",
     "format": "run-s lint prettier",
     "format:fix": "run-s lint:fix prettier:fix",
     "vite": "vite build"
