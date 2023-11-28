@@ -117,7 +117,9 @@ export const GraphSwitchNode: React.FC<NodeProps> = (props) => {
               isConnectable={false}
               configurable={false}
               disabled={disabled}
-              isActive={(nodeTrace?.statements || []).some((s: SwitchStatement) => s?.id && s?.id === statement?.id)}
+              isActive={(nodeTrace?.traceData?.statements || []).some(
+                (s: SwitchStatement) => s?.id && s?.id === statement?.id,
+              )}
               onChange={(condition) => {
                 updateNode(
                   id,
