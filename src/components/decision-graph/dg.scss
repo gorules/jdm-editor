@@ -130,6 +130,9 @@
           &__conditionsText {
             height: 20px;
             padding: 0 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
           }
 
           &__body {
@@ -152,6 +155,17 @@
 
           &__statement {
             position: relative;
+
+            &__activeIndicator {
+              height: 14px;
+              width: 14px;
+              position: absolute;
+              color: var(--grl-primary-color);
+              right: 14px;
+              top: 50%;
+              z-index: 1;
+              transform: translateY(-50%);
+            }
 
             &__more {
               position: absolute;

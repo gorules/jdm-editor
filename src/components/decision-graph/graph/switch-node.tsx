@@ -1,5 +1,11 @@
-import { BranchesOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Space, Typography } from 'antd';
+import {
+  BranchesOutlined,
+  CaretRightOutlined,
+  DeleteOutlined,
+  DownOutlined,
+  PlusOutlined,
+} from '@ant-design/icons';
+import { Button, Dropdown, Space, Typography } from 'antd';
 import clsx from 'clsx';
 import equal from 'fast-deep-equal/es6/react';
 import { produce } from 'immer';
@@ -36,6 +42,15 @@ export const GraphSwitchNode: React.FC<NodeProps> = (props) => {
   const error = useNodeError(id, simulate);
 
   const statements: SwitchStatement[] = node?.content?.statements || [];
+  const hitPolicy = node?.content?.hitPolicy || 'first';
+  const changeHitPolicy = (value: string) => {
+    updateNode(
+      id,
+      produce(node?.content, (draft: any) => {
+        draft.hitPolicy = value;
+      }),
+    );
+  };
 
   return (
     <div ref={rootRef} className={clsx(['node', 'switch', nodeTrace && 'simulated', error && 'error'])}>
@@ -67,6 +82,37 @@ export const GraphSwitchNode: React.FC<NodeProps> = (props) => {
           >
             Conditions
           </Typography.Text>
+          <Dropdown
+            trigger={['click']}
+            placement='bottomRight'
+            menu={{
+              items: [
+                {
+                  key: 'first',
+                  label: 'First',
+                  onClick: () => {
+                    changeHitPolicy('first');
+                  },
+                },
+                {
+                  key: 'collect',
+                  label: 'Collect',
+                  onClick: () => {
+                    changeHitPolicy('collect');
+                  },
+                },
+              ],
+            }}
+          >
+            <Typography.Link
+              style={{
+                fontSize: 12,
+                textTransform: 'capitalize',
+              }}
+            >
+              {hitPolicy} <DownOutlined />
+            </Typography.Link>
+          </Dropdown>
         </div>
         <div className='switchNode__body nodrag'>
           {statements.map((statement) => (
@@ -77,6 +123,7 @@ export const GraphSwitchNode: React.FC<NodeProps> = (props) => {
               isConnectable={false}
               configurable={false}
               disabled={disabled}
+              isActive={(nodeTrace?.statements || []).some((s: SwitchStatement) => s?.id && s?.id === statement?.id)}
               onChange={(condition) => {
                 updateNode(
                   id,
@@ -92,7 +139,6 @@ export const GraphSwitchNode: React.FC<NodeProps> = (props) => {
                     });
                   }),
                 );
-                console.log(condition);
               }}
             />
           ))}
@@ -108,6 +154,25 @@ export const GraphSwitchNodeEdit: React.FC<NodeProps> = (props) => {
   const rootRef = useRef<HTMLDivElement>(null);
 
   const statements: SwitchStatement[] = data?.content?.statements || [];
+  const hitPolicy = data?.content?.hitPolicy || 'first';
+
+  const changeHitPolicy = (value: string) => {
+    setNodes((nodes) =>
+      nodes.map((node) => {
+        if (node.id !== id) return node;
+        return {
+          ...node,
+          data: {
+            ...(node?.data ?? {}),
+            content: {
+              ...(node?.data?.content ?? {}),
+              hitPolicy: value,
+            },
+          },
+        };
+      }),
+    );
+  };
 
   return (
     <div ref={rootRef} className={clsx(['node', 'switch'])}>
@@ -134,6 +199,37 @@ export const GraphSwitchNodeEdit: React.FC<NodeProps> = (props) => {
           >
             Conditions
           </Typography.Text>
+          <Dropdown
+            trigger={['click']}
+            placement='bottomRight'
+            menu={{
+              items: [
+                {
+                  key: 'first',
+                  label: 'First',
+                  onClick: () => {
+                    changeHitPolicy('first');
+                  },
+                },
+                {
+                  key: 'collect',
+                  label: 'Collect',
+                  onClick: () => {
+                    changeHitPolicy('collect');
+                  },
+                },
+              ],
+            }}
+          >
+            <Typography.Link
+              style={{
+                fontSize: 12,
+                textTransform: 'capitalize',
+              }}
+            >
+              {hitPolicy} <DownOutlined />
+            </Typography.Link>
+          </Dropdown>
         </div>
         <div className='switchNode__body edit nodrag'>
           {statements.map((statement) => (
@@ -219,8 +315,9 @@ const SwitchHandle: React.FC<{
   onChange?: (value: string) => void;
   onDelete?: () => void;
   disabled?: boolean;
+  isActive?: boolean;
   configurable?: boolean;
-}> = ({ id, value, isConnectable, onChange, disabled, configurable = true, onDelete }) => {
+}> = ({ id, value, isConnectable, onChange, disabled, configurable = true, onDelete, isActive }) => {
   const [inner, setInner] = useState(value);
   useLayoutEffect(() => {
     if (inner !== value) {
@@ -255,6 +352,7 @@ const SwitchHandle: React.FC<{
             onClick={() => onDelete?.()}
           />
         )}
+        {isActive && <CaretRightOutlined className={'switchNode__statement__activeIndicator'} />}
       </div>
       <Handle id={id} type='source' position={Position.Right} isConnectable={isConnectable} />
     </div>
