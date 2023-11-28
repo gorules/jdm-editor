@@ -1,10 +1,4 @@
-import {
-  BranchesOutlined,
-  CaretRightOutlined,
-  DeleteOutlined,
-  DownOutlined,
-  PlusOutlined,
-} from '@ant-design/icons';
+import { BranchesOutlined, CaretRightOutlined, DeleteOutlined, DownOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Space, Typography } from 'antd';
 import clsx from 'clsx';
 import equal from 'fast-deep-equal/es6/react';
