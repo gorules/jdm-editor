@@ -6,6 +6,9 @@ settings:
 
 overrides:
   enhanced-resolve: 5.10.0
+  semver@<5.7.2: '>=5.7.2'
+  '@babel/traverse@<7.23.2': '>=7.23.2'
+  word-wrap@<1.2.4: '>=1.2.4'
 
 dependencies:
   '@ant-design/cssinjs':
@@ -320,7 +323,7 @@ packages:
       '@babel/helpers': 7.22.11
       '@babel/parser': 7.22.11
       '@babel/template': 7.22.5
-      '@babel/traverse': 7.22.11
+      '@babel/traverse': 7.23.5
       '@babel/types': 7.22.11
       convert-source-map: 1.9.0
       debug: 4.3.4
@@ -696,7 +699,7 @@ packages:
     engines: {node: '>=6.9.0'}
     dependencies:
       '@babel/template': 7.22.5
-      '@babel/traverse': 7.22.11
+      '@babel/traverse': 7.23.5
       '@babel/types': 7.22.11
     transitivePeerDependencies:
       - supports-color
@@ -1778,24 +1781,6 @@ packages:
       '@babel/code-frame': 7.22.10
       '@babel/parser': 7.22.11
       '@babel/types': 7.22.11
-    dev: true
-
-  /@babel/traverse@7.22.11:
-    resolution: {integrity: sha512-mzAenteTfomcB7mfPtyi+4oe5BZ6MXxWcn4CX+h4IRJ+OOGXBrWU6jDQavkQI9Vuc5P+donFabBfFCcmWka9lQ==}
-    engines: {node: '>=6.9.0'}
-    dependencies:
-      '@babel/code-frame': 7.22.10
-      '@babel/generator': 7.22.10
-      '@babel/helper-environment-visitor': 7.22.5
-      '@babel/helper-function-name': 7.22.5
-      '@babel/helper-hoist-variables': 7.22.5
-      '@babel/helper-split-export-declaration': 7.22.6
-      '@babel/parser': 7.22.11
-      '@babel/types': 7.22.11
-      debug: 4.3.4
-      globals: 11.12.0
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /@babel/traverse@7.23.2:
@@ -6009,7 +5994,7 @@ packages:
       normalize-path: 3.0.0
       readdirp: 3.6.0
     optionalDependencies:
-      fsevents: 2.3.2
+      fsevents: 2.3.3
     dev: true
 
   /chownr@1.1.4:
@@ -6312,7 +6297,7 @@ packages:
     dependencies:
       nice-try: 1.0.5
       path-key: 2.0.1
-      semver: 5.7.1
+      semver: 7.5.4
       shebang-command: 1.2.0
       which: 1.3.1
     dev: true
@@ -6347,7 +6332,7 @@ packages:
       conventional-commit-types: 3.0.0
       lodash.map: 4.6.0
       longest: 2.0.1
-      word-wrap: 1.2.3
+      word-wrap: 1.2.5
     optionalDependencies:
       '@commitlint/load': 17.5.0
     transitivePeerDependencies:
@@ -7447,14 +7432,6 @@ packages:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
     dev: true
 
-  /fsevents@2.3.2:
-    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
-    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
-    os: [darwin]
-    requiresBuild: true
-    dev: true
-    optional: true
-
   /fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
@@ -8291,7 +8268,7 @@ packages:
       micromatch: 4.0.5
       walker: 1.0.8
     optionalDependencies:
-      fsevents: 2.3.2
+      fsevents: 2.3.3
     dev: true
 
   /jest-mock@27.5.1:
@@ -8633,7 +8610,7 @@ packages:
     engines: {node: '>=6'}
     dependencies:
       pify: 4.0.1
-      semver: 5.7.1
+      semver: 7.5.4
     dev: true
 
   /make-dir@3.1.0:
@@ -8917,7 +8894,7 @@ packages:
     dependencies:
       hosted-git-info: 2.8.9
       resolve: 1.22.2
-      semver: 5.7.1
+      semver: 7.5.4
       validate-npm-package-license: 3.0.4
     dev: true
 
@@ -10083,7 +10060,7 @@ packages:
     engines: {node: '>=16.14.0'}
     dependencies:
       '@babel/core': 7.22.11
-      '@babel/traverse': 7.22.11
+      '@babel/traverse': 7.23.5
       '@babel/types': 7.22.11
       '@types/babel__core': 7.20.0
       '@types/babel__traverse': 7.18.5
@@ -10513,7 +10490,7 @@ packages:
     engines: {node: '>=14.18.0', npm: '>=8.0.0'}
     hasBin: true
     optionalDependencies:
-      fsevents: 2.3.2
+      fsevents: 2.3.3
     dev: true
 
   /rollup@4.6.1:
@@ -10603,11 +10580,6 @@ packages:
     dependencies:
       compute-scroll-into-view: 3.0.3
     dev: false
-
-  /semver@5.7.1:
-    resolution: {integrity: sha512-sauaDf/PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ==}
-    hasBin: true
-    dev: true
 
   /semver@6.3.1:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
@@ -11728,8 +11700,8 @@ packages:
       isexe: 2.0.0
     dev: true
 
-  /word-wrap@1.2.3:
-    resolution: {integrity: sha512-Hz/mrNwitNRh/HUAtM/VT/5VH+ygD6DV7mYKZAtHOrbs8U7lvPS6xf7EJKMF0uW1KJCl0H701g3ZGus+muE5vQ==}
+  /word-wrap@1.2.5:
+    resolution: {integrity: sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==}
     engines: {node: '>=0.10.0'}
     dev: true
 
