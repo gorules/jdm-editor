@@ -18,6 +18,8 @@ export type DecisionEdge = {
     name?: string;
     sourceId: string;
     targetId: string;
+    sourceHandle?: string;
+    targetHandle?: string;
     type?: string;
 };
 export type DecisionGraphType = {
