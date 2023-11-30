@@ -57,6 +57,8 @@ export const NodeForm: FC<NodeFormProps> = ({ node, onChange, removeNode, onClos
         return 'Function';
       case 'expressionNode':
         return 'Expression';
+      case 'switchNode':
+        return 'Switch';
     }
 
     return 'Unknown';

@@ -21,6 +21,7 @@ import { GraphComponents } from './graph-components';
 import { MultiNodeForm } from './multi-node-form';
 import { NodeForm } from './node-form';
 import { GraphNode, GraphNodeEdit } from './nodes';
+import { GraphSwitchNode, GraphSwitchNodeEdit } from './switch-node';
 
 export const DecisionContentType = 'application/vnd.gorules.decision';
 
@@ -52,7 +53,6 @@ export const Graph = forwardRef<GraphRef, GraphProps>(
     const [editEdges, setEditEdges, onEditEdgesChange] = useEdgesState([]);
 
     const inputNodes = editNodes?.filter?.((node) => node.type === 'inputNode');
-    const outputNodes = editNodes?.filter?.((node) => node.type === 'outputNode');
 
     const selected = editNodes?.filter?.((node) => node?.selected);
     const selectedEdges = editEdges?.filter?.((edge) => edge?.selected);
@@ -100,6 +100,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(
         type !== 'decisionTableNode' &&
         type !== 'functionNode' &&
         type !== 'expressionNode' &&
+        type !== 'switchNode' &&
         type !== 'inputNode' &&
         type !== 'outputNode'
       ) {
@@ -136,6 +137,10 @@ export const Graph = forwardRef<GraphRef, GraphProps>(
       } else if (type === 'expressionNode') {
         data.content = {
           expressions: [],
+        };
+      } else if (type === 'switchNode') {
+        data.content = {
+          statements: [{ id: v4(), condition: '' }],
         };
       }
 
@@ -230,6 +235,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(
         decisionNode: GraphNode,
         functionNode: GraphNode,
         expressionNode: GraphNode,
+        switchNode: GraphSwitchNode,
         inputNode: GraphNode,
         outputNode: GraphNode,
       };
@@ -241,6 +247,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(
         decisionNode: GraphNodeEdit,
         functionNode: GraphNodeEdit,
         expressionNode: GraphNodeEdit,
+        switchNode: GraphSwitchNodeEdit,
         inputNode: GraphNodeEdit,
         outputNode: GraphNodeEdit,
       };
@@ -253,10 +260,6 @@ export const Graph = forwardRef<GraphRef, GraphProps>(
 
         if (nodes.filter((node) => node?.type === 'inputNode')?.length > 1) {
           message.error('Maximum 1 input');
-          return;
-        }
-        if (nodes.filter((node) => node?.type === 'outputNode')?.length > 1) {
-          message.error('Maximum 1 output');
           return;
         }
 
@@ -502,7 +505,6 @@ export const Graph = forwardRef<GraphRef, GraphProps>(
               {!selected?.length && !selectedEdges?.length && (
                 <GraphComponents
                   inputDisabled={inputNodes.length > 0}
-                  outputDisabled={outputNodes.length > 0}
                   onPaste={async () => {
                     if (editGraph) {
                       try {

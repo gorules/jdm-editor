@@ -100,6 +100,100 @@
         border-radius: 100px;
       }
 
+      &.switch {
+        width: 240px;
+        height: auto;
+        padding: 0;
+        border-radius: 4px;
+
+        .switchNode {
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+          width: 100%;
+
+          .react-flow__handle {
+            z-index: 20;
+            top: calc(50% - 1px);
+          }
+
+          &__title {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 80px;
+            text-align: center;
+            position: relative;
+          }
+
+          &__conditionsText {
+            height: 20px;
+            padding: 0 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+          }
+
+          &__body {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0 0 4px 0;
+
+            &.edit {
+              padding: 0;
+            }
+          }
+
+          &__addButton {
+            width: 100%;
+            border-radius: 0;
+            height: 40px;
+          }
+
+          &__statement {
+            position: relative;
+
+            &__activeIndicator {
+              height: 14px;
+              width: 14px;
+              position: absolute;
+              color: var(--grl-primary-color);
+              right: 14px;
+              top: 50%;
+              z-index: 1;
+              transform: translateY(-50%);
+            }
+
+            &__more {
+              position: absolute;
+              right: 12px;
+              top: 20px;
+              transform: translateY(-50%);
+              z-index: 10;
+            }
+
+            &__inputArea {
+              padding: 5px 8px;
+              display: flex;
+            }
+
+            textarea {
+              border-radius: 0;
+              padding-right: 32px;
+
+              &:hover,
+              &:active,
+              &:focus {
+                z-index: 1;
+              }
+            }
+          }
+        }
+      }
+
       .performance {
         position: absolute;
         top: -20px;

@@ -17,7 +17,7 @@ import type { CustomNodeType } from '../context/dg-store.context';
 import { useDecisionGraphStore } from '../context/dg-store.context';
 import { mapToDecisionNode } from '../dg-util';
 
-const useNodeError = (id: string, simulate: any) => {
+export const useNodeError = (id: string, simulate: any) => {
   if (simulate?.error?.data?.nodeId === id) {
     return simulate?.error?.data;
   }
@@ -67,7 +67,7 @@ export const GraphNode: FC<NodeProps> = (props) => {
       ])}
       onClick={() => {
         if (doubleClickTimer.current && performance.now() - doubleClickTimer.current < 250) {
-          if (type !== 'inputNode' && type !== 'outputNode') {
+          if (type !== 'inputNode' && type !== 'outputNode' && type !== 'switchNode') {
             innerOpen();
           }
         }
