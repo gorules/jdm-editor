@@ -9,6 +9,7 @@ import { Stack } from '../stack';
 import { FunctionDebugger } from './function-debugger';
 import './function.scss';
 import { functionDefinitions } from './helpers/libs';
+import './monaco';
 import type { FunctionDebuggerTrace } from './types';
 
 export type FunctionProps = {
