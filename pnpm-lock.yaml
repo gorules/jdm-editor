@@ -14,6 +14,9 @@ dependencies:
   '@ant-design/icons':
     specifier: 5.2.5
     version: 5.2.5(react-dom@18.2.0)(react@18.2.0)
+  '@monaco-editor/react':
+    specifier: ^4.6.0
+    version: 4.6.0(monaco-editor@0.45.0)(react-dom@18.2.0)(react@18.2.0)
   '@tanstack/react-table':
     specifier: 8.9.3
     version: 8.9.3(react-dom@18.2.0)(react@18.2.0)
@@ -41,6 +44,9 @@ dependencies:
   immer:
     specifier: 10.0.2
     version: 10.0.2
+  monaco-editor:
+    specifier: ^0.45.0
+    version: 0.45.0
   papaparse:
     specifier: 5.4.1
     version: 5.4.1
@@ -70,9 +76,6 @@ dependencies:
     version: 4.4.1(@types/react@18.2.21)(immer@10.0.2)(react@18.2.0)
 
 devDependencies:
-  '@monaco-editor/react':
-    specifier: ^4.6.0
-    version: 4.6.0(monaco-editor@0.45.0)(react-dom@18.2.0)(react@18.2.0)
   '@storybook/addon-actions':
     specifier: 7.3.2
     version: 7.3.2(@types/react-dom@18.2.7)(@types/react@18.2.21)(react-dom@18.2.0)(react@18.2.0)
@@ -166,9 +169,6 @@ devDependencies:
   eslint-plugin-react-hooks:
     specifier: 4.6.0
     version: 4.6.0(eslint@8.47.0)
-  monaco-editor:
-    specifier: ^0.45.0
-    version: 0.45.0
   npm-run-all:
     specifier: 4.1.5
     version: 4.1.5
@@ -2461,7 +2461,7 @@ packages:
     dependencies:
       monaco-editor: 0.45.0
       state-local: 1.0.7
-    dev: true
+    dev: false
 
   /@monaco-editor/react@4.6.0(monaco-editor@0.45.0)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-RFkU9/i7cN2bsq/iTkurMWOEErmYcY6JiQI3Jn+WeR/FGISH8JbHERjpS9oRuSOPvDMJI0Z8nJeKkbOs9sBYQw==}
@@ -2474,7 +2474,7 @@ packages:
       monaco-editor: 0.45.0
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
-    dev: true
+    dev: false
 
   /@ndelangen/get-tarball@3.0.7:
     resolution: {integrity: sha512-NqGfTZIZpRFef1GoVaShSSRwDC3vde3ThtTeqFdcYd6ipKqnfEVhjK2hUeHjCQUcptyZr2TONqcloFXM+5QBrQ==}
@@ -8869,7 +8869,7 @@ packages:
 
   /monaco-editor@0.45.0:
     resolution: {integrity: sha512-mjv1G1ZzfEE3k9HZN0dQ2olMdwIfaeAAjFiwNprLfYNRSz7ctv9XuCT7gPtBGrMUeV1/iZzYKj17Khu1hxoHOA==}
-    dev: true
+    dev: false
 
   /mri@1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
@@ -10917,7 +10917,7 @@ packages:
 
   /state-local@1.0.7:
     resolution: {integrity: sha512-HTEHMNieakEnoe33shBYcZ7NX83ACUjCu8c40iOGEZsngj9zRnkqS9j1pqQPXwobB0ZcVTk27REb7COQ0UR59w==}
-    dev: true
+    dev: false
 
   /statuses@2.0.1:
     resolution: {integrity: sha512-RwNA9Z/7PrK06rYLIzFMlaF+l73iwpzsqRIFgbMLbTcLD6cOao82TaWefPXQvB2fOC4AjuYSEndS7N/mTCbkdQ==}
