@@ -35,6 +35,10 @@
         position: relative;
         font-weight: normal;
 
+        &[data-self="output"], &[data-parent="output"], &[data-self="description"] {
+          background: var(--grl-decision-table-output);
+        }
+
         .text-wrapper {
           overflow: hidden;
           .span-overflow {
@@ -60,6 +64,10 @@
 
         &.selected > td:first-of-type {
           background-color: var(--grl-color-primary-bg);
+        }
+
+        &.selected {
+          background-color: var(--grl-decision-table-selected-row);
         }
 
         &.disabled {

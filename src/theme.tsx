@@ -19,7 +19,7 @@ export type JdmConfigProviderProps = {
 };
 
 export const JdmConfigProvider: React.FC<JdmConfigProviderProps> = ({
-  theme: { mode, ...theme } = {},
+  theme: { mode = 'light', ...theme } = {},
   prefixCls,
   children,
 }) => {
@@ -35,26 +35,26 @@ export const JdmConfigProvider: React.FC<JdmConfigProviderProps> = ({
 
   return (
     <ConfigProvider prefixCls={prefixCls} theme={{ ...theme, algorithm, token: { mode } }}>
-      <GlobalCssVariables />
+      <GlobalCssVariables mode={mode} />
       {children}
     </ConfigProvider>
   );
 };
 
-const GlobalCssVariables = () => {
+const GlobalCssVariables: React.FC<{ mode: 'light' | 'dark' }> = ({ mode }) => {
   const { token } = theme.useToken();
-
-  console.log(token);
 
   const exposedTokens = useMemo(
     () => ({
       '--grl-color-border': token.colorBorder,
       '--grl-color-primary': token.colorPrimary,
       '--grl-color-primary-bg': token.colorPrimaryBg,
+      '--grl-color-primary-bg-hover': token.colorPrimaryBgHover,
       '--grl-color-primary-border': token.colorPrimaryBorder,
       '--grl-color-primary-border-hover': token.colorPrimaryBorderHover,
       '--grl-color-primary-text-hover': token.colorPrimaryTextHover,
       '--grl-color-bg-layout': token.colorBgLayout,
+      '--grl-color-bg-mask': token.colorBgMask,
       '--grl-color-bg-elevated': token.colorBgElevated,
       '--grl-color-bg-container': token.colorBgContainer,
       '--grl-color-bg-container-disabled': token.colorBgContainerDisabled,
@@ -73,8 +73,11 @@ const GlobalCssVariables = () => {
       '--grl-font-family': token.fontFamily,
       '--grl-line-height': token.lineHeight,
       '--grl-border-radius': `${token.borderRadius}px`,
+
+      '--grl-decision-table-output': mode === 'light' ? '#eaeaea' : '#091422',
+      '--grl-decision-table-selected-row': mode === 'light' ? '#f4faff' : '#121720',
     }),
-    [token],
+    [token, mode],
   );
 
   const cssBlock = Object.entries(exposedTokens)

@@ -8,7 +8,7 @@ import { shallow } from 'zustand/shallow';
 
 import { useDecisionTableStore } from '../context/dt-store.context';
 
-const InnerTableRow: React.FC<{
+export const TableRow: React.FC<{
   index: number;
   row: Row<Record<string, string>>;
   reorderRow: (draggedRowIndex: number, targetRowIndex: number) => void;
@@ -82,5 +82,3 @@ const InnerTableRow: React.FC<{
     </tr>
   );
 };
-
-export const TableRow = React.memo(InnerTableRow);
