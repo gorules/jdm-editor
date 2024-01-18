@@ -65,6 +65,9 @@ dependencies:
   slugify:
     specifier: 1.6.6
     version: 1.6.6
+  ts-pattern:
+    specifier: ^5.0.6
+    version: 5.0.6
   use-debounce:
     specifier: ^9.0.4
     version: 9.0.4(react@18.2.0)
@@ -11315,6 +11318,10 @@ packages:
       yn: 3.1.1
     dev: true
     optional: true
+
+  /ts-pattern@5.0.6:
+    resolution: {integrity: sha512-Y+jOjihlFriWzcBjncPCf2/am+Hgz7LtsWs77pWg5vQQKLQj07oNrJryo/wK2G0ndNaoVn2ownFMeoeAuReu3Q==}
+    dev: false
 
   /tslib@1.14.1:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}

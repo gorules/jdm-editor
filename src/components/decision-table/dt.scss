@@ -13,6 +13,8 @@
     height: 1px;
 
     .cell-wrapper {
+      display: flex;
+      align-items: flex-start;
       width: 100%;
       height: 100%;
     }
@@ -32,6 +34,10 @@
         text-align: left;
         position: relative;
         font-weight: normal;
+
+        &[data-self="output"], &[data-parent="output"], &[data-self="description"] {
+          background: var(--grl-decision-table-output);
+        }
 
         .text-wrapper {
           overflow: hidden;
@@ -58,6 +64,10 @@
 
         &.selected > td:first-of-type {
           background-color: var(--grl-color-primary-bg);
+        }
+
+        &.selected {
+          background-color: var(--grl-decision-table-selected-row);
         }
 
         &.disabled {
@@ -158,7 +168,7 @@
     border: 0;
     width: 100%;
     background-color: transparent;
-    padding: 0.5rem 0.75rem;
+    padding: 9px 0.75rem;
     font-size: 14px;
 
     &:focus {

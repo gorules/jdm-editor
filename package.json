@@ -1,6 +1,6 @@
 {
   "name": "@gorules/jdm-editor",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "",
   "author": "GoRules <hi@gorules.io> (https://gorules.io)",
   "homepage": "https://github.com/gorules/jdm-editor",
@@ -53,6 +53,7 @@
     "react-json-tree": "^0.18.0",
     "reactflow": "11.8.3",
     "slugify": "1.6.6",
+    "ts-pattern": "^5.0.6",
     "use-debounce": "^9.0.4",
     "uuid": "9.0.0",
     "zustand": "^4.4.1"
