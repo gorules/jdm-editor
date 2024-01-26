@@ -10,18 +10,16 @@ import ReactFlow, { Background, Controls, addEdge, useEdgesState, useNodesState 
 import 'reactflow/dist/style.css';
 import { v4 } from 'uuid';
 
-import { defaultFunctionValue } from '../../function/helpers/libs';
 import type { DecisionEdge, DecisionGraphType, DecisionNode } from '../context/dg-store.context';
 import { useDecisionGraphStore } from '../context/dg-store.context';
 import { edgeFunction } from '../custom-edge';
 import { mapToDecisionEdges, mapToDecisionNodes, mapToGraphEdges, mapToGraphNode, mapToGraphNodes } from '../dg-util';
 import '../dg.scss';
 import { useGraphClipboard } from '../hooks/use-graph-clipboard';
+import { NodeKind, nodeSpecification } from '../nodes/kinds';
 import { GraphComponents } from './graph-components';
 import { MultiNodeForm } from './multi-node-form';
 import { NodeForm } from './node-form';
-import { GraphNode, GraphNodeEdit } from './nodes';
-import { GraphSwitchNode, GraphSwitchNodeEdit } from './switch-node';
 
 export const DecisionContentType = 'application/vnd.gorules.decision';
 
@@ -96,62 +94,15 @@ export const Graph = forwardRef<GraphRef, GraphProps>(
         position = reactFlowInstance?.project(rectCenter);
       }
 
-      if (
-        type !== 'decisionTableNode' &&
-        type !== 'functionNode' &&
-        type !== 'expressionNode' &&
-        type !== 'switchNode' &&
-        type !== 'inputNode' &&
-        type !== 'outputNode'
-      ) {
+      if (!(type in nodeSpecification)) {
         return onAddNode?.(type, position);
       }
 
-      const count = (nodes || []).filter((node) => node?.type === type)?.length;
-
-      const data: any = {};
-      if (type === 'decisionTableNode') {
-        const inputField = {
-          id: v4(),
-          name: 'Input',
-          type: 'expression',
-        };
-        const outputField = {
-          field: 'output',
-          id: v4(),
-          name: 'Output',
-          type: 'expression',
-        };
-        data.content = {
-          hitPolicy: 'first',
-          inputs: [inputField],
-          outputs: [outputField],
-          rules: [],
-        };
-      } else if (type === 'functionNode') {
-        data.content = defaultFunctionValue;
-      } else if (type === 'inputNode') {
-        data.name = 'Request';
-      } else if (type === 'outputNode') {
-        data.name = 'Response';
-      } else if (type === 'expressionNode') {
-        data.content = {
-          expressions: [],
-        };
-      } else if (type === 'switchNode') {
-        data.content = {
-          statements: [{ id: v4(), condition: '' }],
-        };
-      }
-
+      const partialNode = nodeSpecification[type as NodeKind].generateNode();
       const newNode: Node = {
+        ...partialNode,
         id: v4(),
-        type,
         position,
-        data: {
-          name: `${type} ${count + 1}`,
-          ...data,
-        },
       };
 
       setEditNodes((nodes) => nodes.concat(newNode));
@@ -230,27 +181,13 @@ export const Graph = forwardRef<GraphRef, GraphProps>(
     );
 
     const nodeTypes = useMemo(() => {
-      return {
-        decisionTableNode: GraphNode,
-        decisionNode: GraphNode,
-        functionNode: GraphNode,
-        expressionNode: GraphNode,
-        switchNode: GraphSwitchNode,
-        inputNode: GraphNode,
-        outputNode: GraphNode,
-      };
-    }, []);
-
-    const editNodeTypes = useMemo(() => {
-      return {
-        decisionTableNode: GraphNodeEdit,
-        decisionNode: GraphNodeEdit,
-        functionNode: GraphNodeEdit,
-        expressionNode: GraphNodeEdit,
-        switchNode: GraphSwitchNodeEdit,
-        inputNode: GraphNodeEdit,
-        outputNode: GraphNodeEdit,
-      };
+      return Object.entries(nodeSpecification).reduce(
+        (acc, [key, value]) => ({
+          ...acc,
+          [key]: value.renderNode({ specification: value }),
+        }),
+        {},
+      );
     }, []);
 
     const confirmEdit = () => {
@@ -482,7 +419,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(
               onInit={(instance) => setReactFlowInstance(instance)}
               snapToGrid={true}
               snapGrid={[10, 10]}
-              nodeTypes={editGraph ? editNodeTypes : nodeTypes}
+              nodeTypes={nodeTypes}
               edgeTypes={edgeTypes}
               onDrop={(e) => (editGraph ? onDrop(e) : undefined)}
               onDragOver={editGraph ? onDragOver : undefined}
