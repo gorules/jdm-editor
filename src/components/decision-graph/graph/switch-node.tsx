@@ -344,6 +344,7 @@ const SwitchHandle: React.FC<{
             className='switchNode__statement__more'
             size='small'
             type='text'
+            danger
             icon={<DeleteOutlined />}
             onClick={() => onDelete?.()}
           />

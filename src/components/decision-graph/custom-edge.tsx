@@ -1,11 +1,12 @@
-import clsx from 'clsx';
+import { DeleteOutlined } from '@ant-design/icons';
+import { Button } from 'antd';
 import React from 'react';
-import { getBezierPath } from 'reactflow';
+import { BaseEdge, EdgeLabelRenderer, getBezierPath } from 'reactflow';
 
 export const CustomEdge: React.FC<any> = (props) => {
   const { sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, style = {}, markerEnd } = props;
 
-  const [edgePath] = getBezierPath({
+  const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
     sourceY,
     sourcePosition,
@@ -16,20 +17,24 @@ export const CustomEdge: React.FC<any> = (props) => {
 
   return (
     <>
-      <path
-        style={style}
-        className={clsx(['react-flow__edge-path-selector'])}
-        d={edgePath}
-        markerEnd={markerEnd}
-        fillRule='evenodd'
-      />
-      <path
-        style={style}
-        className={clsx(['react-flow__edge-path'])}
-        d={edgePath}
-        markerEnd={markerEnd}
-        fillRule='evenodd'
-      />
+      <BaseEdge path={edgePath} markerEnd={markerEnd} style={style} />
+      <EdgeLabelRenderer>
+        <div
+          className={'nodrag nopan edge-renderer'}
+          style={{
+            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+          }}
+        >
+          <button
+            className='edgebutton'
+            onClick={() => {
+              console.log();
+            }}
+          >
+            ×
+          </button>
+        </div>
+      </EdgeLabelRenderer>
     </>
   );
 };

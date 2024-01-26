@@ -1,3 +1,11 @@
+import {
+  ArrowDownOutlined,
+  ArrowUpOutlined,
+  BranchesOutlined,
+  CodeOutlined,
+  FunctionOutlined,
+  TableOutlined,
+} from '@ant-design/icons';
 import { Button, Typography } from 'antd';
 import clsx from 'clsx';
 import equal from 'fast-deep-equal/es6/react';
@@ -37,46 +45,76 @@ export const GraphComponents: React.FC<GraphComponentsProps> = ({ inputDisabled,
 
   return (
     <div className={'wrapper'}>
-      <Typography.Text style={{ marginBottom: '1rem' }}>Drag and Drop components</Typography.Text>
-      <div className={'list'}>
-        <div
-          className={clsx(['component', inputDisabled && 'disabled'])}
-          onDragStart={(event) => onDragStart(event, 'inputNode')}
-          draggable={!inputDisabled}
-        >
-          <Typography.Text strong type={inputDisabled ? 'secondary' : undefined}>
-            Input
-          </Typography.Text>
-        </div>
-        <div className={clsx(['component'])} onDragStart={(event) => onDragStart(event, 'outputNode')} draggable>
-          <Typography.Text strong>Output</Typography.Text>
-        </div>
-        <div className={clsx(['component'])} onDragStart={(event) => onDragStart(event, 'decisionTableNode')} draggable>
-          <Typography.Text strong>Decision Table</Typography.Text>
-        </div>
-        <div className={clsx(['component'])} onDragStart={(event) => onDragStart(event, 'functionNode')} draggable>
-          <Typography.Text strong>Function</Typography.Text>
-        </div>
-        <div className={clsx(['component'])} onDragStart={(event) => onDragStart(event, 'expressionNode')} draggable>
-          <Typography.Text strong>Expression</Typography.Text>
-        </div>
-        <div className={clsx(['component'])} onDragStart={(event) => onDragStart(event, 'switchNode')} draggable>
-          <Typography.Text strong>Switch</Typography.Text>
-        </div>
-        {customComponents.map((component) => (
-          <div
-            key={component.type}
-            className={clsx(['component'])}
-            onDragStart={(event) => onDragStart(event, component.type)}
-            draggable
-          >
-            <Typography.Text strong>{component.name}</Typography.Text>
-          </div>
-        ))}
+      <div className={'wrapper__heading'}>
+        <Typography.Text strong style={{ marginBottom: '1rem' }}>
+          Components
+        </Typography.Text>
       </div>
-      <Button onClick={onPaste} type='default' style={{ marginTop: 'auto' }}>
-        Paste from clipboard
-      </Button>
+      <div className={'wrapper__list-wrapper'}>
+        <div className={'wrapper__list'}>
+          <div className={'component'}>
+            <div
+              className={clsx(['icon', inputDisabled && 'disabled'])}
+              onDragStart={(event) => onDragStart(event, 'inputNode')}
+              draggable={!inputDisabled}
+            >
+              <ArrowUpOutlined />
+            </div>
+            <Typography.Text type={'secondary'}>Request</Typography.Text>
+          </div>
+          <div className={'component'}>
+            <div className={'icon'} onDragStart={(event) => onDragStart(event, 'outputNode')} draggable>
+              <ArrowDownOutlined />
+            </div>
+            <Typography.Text type={'secondary'}>Response</Typography.Text>
+          </div>
+
+          <div className={'divider'} />
+
+          <div className={'component'}>
+            <div className={'icon'} onDragStart={(event) => onDragStart(event, 'decisionTableNode')} draggable>
+              <TableOutlined />
+            </div>
+            <Typography.Text type={'secondary'}>Table</Typography.Text>
+          </div>
+
+          <div className={'component'}>
+            <div className={'icon'} onDragStart={(event) => onDragStart(event, 'functionNode')} draggable>
+              <FunctionOutlined />
+            </div>
+            <Typography.Text type={'secondary'}>Function</Typography.Text>
+          </div>
+
+          <div className={'component'}>
+            <div className={'icon'} onDragStart={(event) => onDragStart(event, 'expressionNode')} draggable>
+              <CodeOutlined />
+            </div>
+            <Typography.Text type={'secondary'}>Expression</Typography.Text>
+          </div>
+
+          <div className={'component'}>
+            <div className={'icon'} onDragStart={(event) => onDragStart(event, 'switchNode')} draggable>
+              <BranchesOutlined />
+            </div>
+            <Typography.Text type={'secondary'}>Switch</Typography.Text>
+          </div>
+
+          {customComponents?.length > 0 && <div className={'divider'} />}
+          {customComponents.map((component) => (
+            <div key={component.type} className={'component'}>
+              <div className={'icon'} onDragStart={(event) => onDragStart(event, component.type)} draggable>
+                {component?.renderIcon?.()}
+              </div>
+              <Typography.Text type={'secondary'}>{component.name}</Typography.Text>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className={'wrapper__actions'}>
+        <Button onClick={onPaste} type='default' style={{ marginTop: 'auto', width: '100%' }}>
+          Paste
+        </Button>
+      </div>
     </div>
   );
 };

@@ -458,10 +458,22 @@ export const Graph = forwardRef<GraphRef, GraphProps>(
           )}
         </div>
         <div className={'content-wrapper'}>
+          <div className={'grl-dg__aside'}>
+            <GraphComponents
+              inputDisabled={inputNodes.length > 0}
+              onPaste={async () => {
+                if (editGraph) {
+                  try {
+                    await graphClipboard.pasteNodes();
+                  } catch (e) {
+                    message.error(e?.message);
+                  }
+                }
+              }}
+            />
+          </div>
           <div className={clsx(['react-flow'])} ref={reactFlowWrapper}>
             <ReactFlow
-              nodesConnectable={editGraph}
-              nodesDraggable={editGraph}
               elevateEdgesOnSelect={editGraph}
               elevateNodesOnSelect={editGraph}
               zoomOnDoubleClick={false}
