@@ -1,21 +1,32 @@
 .grl-dn {
-  --border-radius: 8px;
-  --horizontal-padding: 16px;
+  --node-border-radius: 8px;
+  --node-horizontal-padding: 16px;
+  --node-color: var(--grl-color-primary);
 
   display: flex;
   flex-direction: column;
   border: 1px solid var(--grl-color-border);
   background: var(--grl-color-bg-container);
   cursor: grab;
-  border-radius: var(--border-radius);
+  border-radius: var(--node-border-radius);
 
   &:hover {
     border-color: var(--grl-color-primary-hover);
   }
 
+  &--color {
+    &--primary {
+      --node-color: var(--grl-color-primary);
+    }
+
+    &--secondary {
+      --node-color: #722ed1;
+    }
+  }
+
   &__header {
     display: grid;
-    padding: 12px var(--horizontal-padding);
+    padding: 12px var(--node-horizontal-padding);
     gap: 16px;
     grid-template-columns: min-content 1fr min-content;
     align-items: center;
@@ -24,7 +35,7 @@
       font-size: 24px;
       border-radius: 4px;
       padding: 6px;
-      background-color: var(--grl-color-primary);
+      background-color: var(--node-color);
       color: white;
 
       //background-color: #e6f4ff;
@@ -34,6 +45,15 @@
     &__text {
       display: flex;
       flex-direction: column;
+
+      &__name {
+        padding: 2px;
+        border-radius: 4px;
+
+        &:hover {
+
+        }
+      }
 
       > span {
         line-height: 1.35;
@@ -51,17 +71,21 @@
   }
 
   &__body {
-    padding: 16px var(--horizontal-padding);
+    padding: 16px var(--node-horizontal-padding);
     border-top: 1px solid var(--grl-color-border);
 
     &--no-footer {
-      border-radius: 0 0 var(--border-radius) var(--border-radius);
+      border-radius: 0 0 var(--node-border-radius) var(--node-border-radius);
+    }
+
+    &--no-padding {
+      padding: 0;
     }
   }
 
   &__footer {
     background: #f7f9fc;
-    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    border-radius: 0 0 var(--node-border-radius) var(--node-border-radius);
     border-top: 1px solid var(--grl-color-border);
 
     &__actions {

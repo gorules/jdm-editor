@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React from 'react';
 import type { HandleProps } from 'reactflow';
 import { Handle, Position } from 'reactflow';
@@ -8,21 +9,33 @@ import { DecisionNode } from '../../decision-node/decision-node';
 export type GraphNodeProps = {
   handleLeft?: boolean | Partial<HandleProps>;
   handleRight?: boolean | Partial<HandleProps>;
+  className?: string;
 } & DecisionNodeProps;
 
 export const GraphNode: React.FC<GraphNodeProps> = ({
   handleLeft = true,
   handleRight = true,
+  className,
   ...decisionNodeProps
 }) => {
   return (
-    <div style={{ minWidth: 250 }}>
+    <div className={clsx('grl-graph-node', className)} style={{ minWidth: 250 }}>
       {handleLeft && (
-        <Handle type='target' position={Position.Left} {...(typeof handleLeft !== 'boolean' ? handleLeft : {})} />
+        <Handle
+          className='grl-graph-node__handle-left'
+          type='target'
+          position={Position.Left}
+          {...(typeof handleLeft !== 'boolean' ? handleLeft : {})}
+        />
       )}
       <DecisionNode {...decisionNodeProps} />
       {handleRight && (
-        <Handle type='source' position={Position.Right} {...(typeof handleRight !== 'boolean' ? handleRight : {})} />
+        <Handle
+          className='grl-graph-node__handle-right'
+          type='source'
+          position={Position.Right}
+          {...(typeof handleRight !== 'boolean' ? handleRight : {})}
+        />
       )}
     </div>
   );
