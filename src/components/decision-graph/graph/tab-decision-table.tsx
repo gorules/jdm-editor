@@ -39,7 +39,12 @@ export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager 
     <DecisionTable
       tableHeight={'100%'}
       value={content as any}
-      onChange={(val) => updateNode(id, val)}
+      onChange={(val) => {
+        updateNode(id, (draft) => {
+          draft.content = val;
+          return draft;
+        });
+      }}
       manager={manager}
       disabled={disabled}
       configurable={configurable}

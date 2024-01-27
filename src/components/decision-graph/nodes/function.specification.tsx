@@ -6,7 +6,8 @@ import React from 'react';
 import { defaultFunctionValue } from '../../function/helpers/libs';
 import { useDecisionGraphStore } from '../context/dg-store.context';
 import { GraphNode } from './graph-node';
-import { NodeKind, NodeSpecification } from './specifications';
+import type { NodeSpecification } from './specification-types';
+import { NodeKind } from './specification-types';
 
 export type NodeFunctionData = {
   name?: string;
@@ -16,6 +17,7 @@ export type NodeFunctionData = {
 export const functionSpecification: NodeSpecification<NodeFunctionData> = {
   icon: <FunctionOutlined />,
   displayName: 'Function',
+  documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/functions',
   generateNode: () => ({
     type: NodeKind.Function,
     data: {

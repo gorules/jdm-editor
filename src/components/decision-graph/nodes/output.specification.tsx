@@ -2,8 +2,8 @@ import { LogoutOutlined } from '@ant-design/icons';
 import React from 'react';
 
 import { GraphNode } from './graph-node';
-import type { NodeSpecification } from './specifications';
-import { NodeKind } from './specifications';
+import type { NodeSpecification } from './specification-types';
+import { NodeKind } from './specification-types';
 
 export type OutputNodeData = {
   name?: string;
@@ -12,6 +12,7 @@ export type OutputNodeData = {
 export const outputSpecification: NodeSpecification<OutputNodeData> = {
   icon: <LogoutOutlined />,
   displayName: 'Response',
+  documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions',
   generateNode: () => ({
     type: NodeKind.Output,
     data: {

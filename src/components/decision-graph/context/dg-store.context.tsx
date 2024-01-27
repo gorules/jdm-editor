@@ -1,4 +1,5 @@
 import { produce } from 'immer';
+import type { WritableDraft } from 'immer/src/types/types-external';
 import React, { type MutableRefObject, createRef, useMemo } from 'react';
 import type { EdgeChange, NodeChange, XYPosition, useEdgesState, useNodesState } from 'reactflow';
 import type { StoreApi, UseBoundStore } from 'zustand';
@@ -48,6 +49,8 @@ export type CustomNodeType = {
   renderIcon?: () => React.ReactNode;
 };
 
+type DraftUpdateCallback<T> = (draft: WritableDraft<T>) => WritableDraft<T>;
+
 export type DecisionGraphStoreType = {
   id?: string;
 
@@ -61,7 +64,7 @@ export type DecisionGraphStoreType = {
 
   simulate?: any;
 
-  updateNode: (id: string, content: any) => void;
+  updateNode: (id: string, updater: DraftUpdateCallback<DecisionNode>) => void;
 
   nodesState: MutableRefObject<ReturnType<typeof useNodesState>>;
   edgesState: MutableRefObject<ReturnType<typeof useEdgesState>>;
@@ -73,9 +76,8 @@ export type DecisionGraphStoreType = {
   addNode: (node: DecisionNode) => void;
   addNodes: (nodes: DecisionNode[]) => void;
   removeNode: (id: string) => void;
+  getNodeContent: (id: string) => any | undefined;
   // removeNodes(ids: string[]) => void;
-  updateNodeContent: (id: string, content: any) => void;
-  updateNodeName: (id: string, name: string) => void;
   setEdges: (edges: DecisionEdge[]) => void;
   addEdge: (edge: DecisionEdge) => void;
   removeEdge: (id: string) => void;
@@ -217,35 +219,9 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
           });
           getState()?.onChange?.(decisionGraph);
         },
-        updateNodeContent: (id, content) => {
-          const decisionGraph = produce(getState().decisionGraph, (draft) => {
-            const nodes = (draft.nodes || []).map((node) => {
-              if (node.id === id) {
-                node.content = content;
-              }
-              return node;
-            });
-            draft.nodes = nodes;
-          });
-          set({
-            decisionGraph,
-          });
-          getState()?.onChange?.(decisionGraph);
-        },
-        updateNodeName: (id, name) => {
-          const decisionGraph = produce(getState().decisionGraph, (draft) => {
-            const nodes = (draft.nodes || []).map((node) => {
-              if (node.id === id) {
-                node.name = name;
-              }
-              return node;
-            });
-            draft.nodes = nodes;
-          });
-          set({
-            decisionGraph,
-          });
-          getState()?.onChange?.(decisionGraph);
+        getNodeContent: (id) => {
+          const decisionNodes = getState().decisionGraph.nodes;
+          return decisionNodes.find((node) => node.id === id)?.content;
         },
         addEdge: (edge: DecisionEdge) => {
           getState().edgesState?.current?.[1]?.((els) => {
@@ -282,19 +258,17 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
           });
           getState()?.onChange?.(decisionGraph);
         },
-        updateNode: (id, content) => {
+        updateNode: (id, updater) => {
           const decisionGraph = produce(getState().decisionGraph, (draft) => {
-            const nodes = (draft.nodes || []).map((node) => {
-              if (id === node?.id) {
-                node.content = content;
-              }
-              return node;
-            });
-            draft.nodes = nodes;
+            const node = (draft.nodes ?? []).find((node) => node?.id === id);
+            if (!node) {
+              return;
+            }
+
+            updater(node);
           });
-          set({
-            decisionGraph,
-          });
+
+          set({ decisionGraph });
           getState()?.onChange?.(decisionGraph);
         },
         hoveredEdgeId: null,

@@ -5,7 +5,8 @@ import React from 'react';
 
 import { useDecisionGraphStore } from '../context/dg-store.context';
 import { GraphNode } from './graph-node';
-import { NodeKind, NodeSpecification } from './specifications';
+import type { NodeSpecification } from './specification-types';
+import { NodeKind } from './specification-types';
 
 export type Expression = {
   id?: string;
@@ -23,6 +24,7 @@ export type NodeExpressionData = {
 export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
   icon: <NumberOutlined />,
   displayName: 'Expression',
+  documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/expression',
   generateNode: () => ({
     type: NodeKind.Expression,
     data: {

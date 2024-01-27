@@ -14,7 +14,8 @@ import { edgeFunction } from '../custom-edge';
 import { mapToDecisionEdge, mapToDecisionNode } from '../dg-util';
 import '../dg.scss';
 import { useGraphClipboard } from '../hooks/use-graph-clipboard';
-import { type NodeKind, nodeSpecification } from '../nodes/specifications';
+import type { NodeKind } from '../nodes/specification-types';
+import { nodeSpecification } from '../nodes/specifications';
 import { GraphComponents } from './graph-components';
 
 export const DecisionContentType = 'application/vnd.gorules.decision';

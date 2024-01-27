@@ -3,13 +3,14 @@ import { Button, Dropdown, Typography } from 'antd';
 import clsx from 'clsx';
 import React, { useLayoutEffect, useState } from 'react';
 import type { NodeProps } from 'reactflow';
-import { Handle, Position, useReactFlow } from 'reactflow';
+import { Handle, Position } from 'reactflow';
 import { v4 } from 'uuid';
 
 import { AutosizeTextArea } from '../../autosize-text-area';
+import { useDecisionGraphStore } from '../context/dg-store.context';
 import { GraphNode } from './graph-node';
-import type { NodeSpecification } from './specifications';
-import { NodeKind } from './specifications';
+import type { NodeSpecification } from './specification-types';
+import { NodeKind } from './specification-types';
 
 export type SwitchStatement = {
   id?: string;
@@ -27,6 +28,7 @@ export type NodeSwitchData = {
 export const switchSpecification: NodeSpecification<NodeSwitchData> = {
   icon: <BranchesOutlined />,
   displayName: 'Switch',
+  documentationUrl: '',
   generateNode: () => ({
     type: NodeKind.Switch,
     data: {
@@ -46,27 +48,20 @@ const SwitchNode: React.FC<
     specification: Pick<NodeSpecification, 'displayName' | 'icon'>;
   }
 > = ({ id, data, specification }) => {
-  const { setNodes } = useReactFlow();
   const isConnectable = true;
-  const statements: SwitchStatement[] = data?.content?.statements || [];
-  const hitPolicy = data?.content?.hitPolicy || 'first';
+  const { content, updateNode } = useDecisionGraphStore(({ getNodeContent, updateNode }) => ({
+    content: getNodeContent(id) as NodeSwitchData['content'],
+    updateNode: updateNode,
+  }));
 
-  const changeHitPolicy = (value: string) => {
-    setNodes((nodes) =>
-      nodes.map((node) => {
-        if (node.id !== id) return node;
-        return {
-          ...node,
-          data: {
-            ...(node?.data ?? {}),
-            content: {
-              ...(node?.data?.content ?? {}),
-              hitPolicy: value,
-            },
-          },
-        };
-      }),
-    );
+  const statements: SwitchStatement[] = content?.statements || [];
+  const hitPolicy = content?.hitPolicy || 'first';
+
+  const changeHitPolicy = (hitPolicy: string) => {
+    updateNode(id, (node) => {
+      node.content.hitPolicy = hitPolicy;
+      return node;
+    });
   };
 
   return (
@@ -83,21 +78,10 @@ const SwitchNode: React.FC<
           key='add row'
           type='link'
           onClick={() => {
-            setNodes((nodes) =>
-              nodes.map((node) => {
-                if (node.id !== id) return node;
-                return {
-                  ...node,
-                  data: {
-                    ...(node?.data ?? {}),
-                    content: {
-                      ...(node?.data?.content ?? {}),
-                      statements: [...(node?.data?.content?.statements ?? []), { id: v4(), condition: '' }],
-                    },
-                  },
-                };
-              }),
-            );
+            updateNode(id, (draft) => {
+              draft.content.statements.push({ id: v4(), condition: '' });
+              return draft;
+            });
           }}
         >
           Add row
@@ -141,43 +125,23 @@ const SwitchNode: React.FC<
               id={statement.id}
               isConnectable={isConnectable}
               onDelete={() => {
-                setNodes((nodes) =>
-                  nodes.map((node) => {
-                    if (node.id !== id) return node;
-                    return {
-                      ...node,
-                      data: {
-                        ...(node?.data ?? {}),
-                        content: {
-                          ...(node?.data?.content ?? {}),
-                          statements: (node?.data?.content?.statements || []).filter(
-                            (s: SwitchStatement) => s?.id !== statement?.id,
-                          ),
-                        },
-                      },
-                    };
-                  }),
-                );
+                updateNode(id, (draft) => {
+                  draft.content.statements = draft.content.statements.filter(
+                    (s: SwitchStatement) => s?.id !== statement?.id,
+                  );
+
+                  return draft;
+                });
               }}
               onChange={(condition) => {
-                setNodes((nodes) =>
-                  nodes.map((node) => {
-                    if (node.id !== id) return node;
-                    return {
-                      ...node,
-                      data: {
-                        ...(node?.data ?? {}),
-                        content: {
-                          ...(node?.data?.content ?? {}),
-                          statements: (node?.data?.content?.statements ?? []).map((s: SwitchStatement) => {
-                            if (s?.id !== statement.id) return s;
-                            return { ...s, condition };
-                          }),
-                        },
-                      },
-                    };
-                  }),
-                );
+                updateNode(id, (draft) => {
+                  const draftStatement = draft.content.statements.find((s: SwitchStatement) => {
+                    return s.id === statement.id;
+                  });
+
+                  draftStatement.condition = condition;
+                  return draft;
+                });
               }}
             />
           ))}

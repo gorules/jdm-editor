@@ -29,11 +29,12 @@ export const TabExpression: React.FC<TabExpressionProps> = ({ id, manager }) => 
     <div style={{ maxWidth: 900, height: '100%', overflowY: 'auto', boxSizing: 'border-box', paddingBottom: '1.5rem' }}>
       <Expression
         value={content?.expressions}
-        onChange={(val) =>
-          updateNode(id, {
-            expressions: val,
-          })
-        }
+        onChange={(val) => {
+          updateNode(id, (draft) => {
+            draft.content.expressions = val;
+            return draft;
+          });
+        }}
         disabled={disabled}
         configurable={configurable}
         manager={manager}

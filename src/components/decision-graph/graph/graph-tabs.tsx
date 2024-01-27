@@ -1,10 +1,12 @@
 import { DeploymentUnitOutlined } from '@ant-design/icons';
-import { Avatar, Tabs, TabsProps } from 'antd';
+import type { TabsProps } from 'antd';
+import { Avatar, Tabs } from 'antd';
 import equal from 'fast-deep-equal/es6/react';
 import React, { useEffect } from 'react';
 
 import { useDecisionGraphStore } from '../context/dg-store.context';
-import { NodeKind, nodeSpecification } from '../nodes/specifications';
+import type { NodeKind } from '../nodes/specification-types';
+import { nodeSpecification } from '../nodes/specifications';
 
 export type GraphTabsProps = {
   disabled?: boolean;

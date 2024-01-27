@@ -32,7 +32,12 @@ export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
     <Suspense fallback={<Spin />}>
       <Function
         value={typeof content === 'string' ? content : ''}
-        onChange={(val) => updateNode(id, val)}
+        onChange={(val) => {
+          updateNode(id, (draft) => {
+            draft.content = val;
+            return draft;
+          });
+        }}
         disabled={disabled}
         trace={nodeTrace}
       />

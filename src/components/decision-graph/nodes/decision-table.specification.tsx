@@ -6,7 +6,8 @@ import { v4 } from 'uuid';
 
 import { useDecisionGraphStore } from '../context/dg-store.context';
 import { GraphNode } from './graph-node';
-import { NodeKind, NodeSpecification } from './specifications';
+import type { NodeSpecification } from './specification-types';
+import { NodeKind } from './specification-types';
 
 export type DecisionTableInput = {
   id?: string;
@@ -33,6 +34,7 @@ export type NodeDecisionTableData = {
 export const decisionTableSpecification: NodeSpecification = {
   icon: <TableOutlined />,
   displayName: 'Decision table',
+  documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/decision-tables',
   generateNode: () => ({
     type: NodeKind.DecisionTable,
     data: {
