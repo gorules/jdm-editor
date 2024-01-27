@@ -102,7 +102,7 @@
   }
 
   &__footer {
-    background: #f7f9fc;
+    background: var(--grl-color-primary-bg-fade);
     border-radius: 0 0 var(--node-border-radius) var(--node-border-radius);
     border-top: 1px solid var(--grl-color-border);
 

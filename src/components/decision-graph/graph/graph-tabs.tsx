@@ -1,9 +1,10 @@
-import type { TabsProps } from 'antd';
-import { Tabs } from 'antd';
+import { DeploymentUnitOutlined } from '@ant-design/icons';
+import { Avatar, Tabs, TabsProps } from 'antd';
 import equal from 'fast-deep-equal/es6/react';
 import React, { useEffect } from 'react';
 
 import { useDecisionGraphStore } from '../context/dg-store.context';
+import { NodeKind, nodeSpecification } from '../nodes/specifications';
 
 export type GraphTabsProps = {
   disabled?: boolean;
@@ -42,17 +43,38 @@ export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled, onTabChange }) =
       }}
       onChange={(val) => openTab(val)}
       items={[
-        { closable: false, label: 'Graph', key: 'graph' },
-        ...openNodes.map(
-          (node) =>
-            ({
-              disabled,
-              key: node.id,
-              label: node?.name ?? node?.type,
-              closable: true,
-            }) satisfies TabItem,
-        ),
+        { closable: false, key: 'graph', label: <TabLabel icon={<DeploymentUnitOutlined />} name='Graph' /> },
+        ...openNodes.map((node) => {
+          const specification = nodeSpecification[node.type as NodeKind];
+
+          return {
+            disabled,
+            key: node.id,
+            label: <TabLabel icon={specification?.icon} name={node?.name ?? node?.type} />,
+            closable: true,
+          } satisfies TabItem;
+        }),
       ]}
     />
+  );
+};
+
+const TabLabel: React.FC<{ icon?: React.ReactNode; name?: string }> = ({ icon, name }) => {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+      <Avatar
+        size='small'
+        shape='square'
+        style={{
+          background: 'var(--grl-color-primary-hover)',
+          fontSize: 12,
+          width: 20,
+          height: 20,
+          lineHeight: '18px',
+        }}
+        icon={icon}
+      />
+      {name}
+    </div>
   );
 };

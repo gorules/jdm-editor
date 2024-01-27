@@ -26,10 +26,45 @@
 
     .tabs {
       max-width: 100%;
-      background-color: var(--grl-color-bg-container);
+      background-color: var(--grl-color-bg-elevated);
+      box-sizing: content-box;
 
       .ant-tabs-nav {
         margin: 0 !important;
+
+        &::before {
+          border-bottom: 1px solid var(--grl-color-border);
+        }
+      }
+
+      .ant-tabs-tab {
+        position: relative;
+        margin: 0 !important;
+        border-radius: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        padding: 12px 12px !important;
+
+        .anticon {
+          margin: 0;
+        }
+
+        &::after {
+          transition: var(--grl-transition-quick);
+          opacity: 0;
+          display: block;
+          position: absolute;
+          content: '';
+          inset: auto 0 0;
+          height: 4px;
+          background: var(--grl-color-primary);
+          z-index: 99;
+          border-radius: 3px;
+        }
+      }
+
+      .ant-tabs-tab-active::after {
+        opacity: 1;
       }
     }
 

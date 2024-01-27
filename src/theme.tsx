@@ -47,9 +47,10 @@ const GlobalCssVariables: React.FC<{ mode: 'light' | 'dark' }> = ({ mode }) => {
   const exposedTokens = useMemo(
     () => ({
       '--grl-color-border': token.colorBorder,
-      '--grl-color-border-hover': '#c3c3c3',
+      '--grl-color-border-hover': mode === 'light' ? '#c3c3c3' : '#555555',
       '--grl-color-primary': token.colorPrimary,
       '--grl-color-primary-bg': token.colorPrimaryBg,
+      '--grl-color-primary-bg-fade': mode === 'light' ? '#f7f9fc' : '#141414',
       '--grl-color-primary-bg-hover': token.colorPrimaryBgHover,
       '--grl-color-primary-border': token.colorPrimaryBorder,
       '--grl-color-primary-border-hover': token.colorPrimaryBorderHover,

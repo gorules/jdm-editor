@@ -16,7 +16,7 @@ import { edgeFunction } from '../custom-edge';
 import { mapToDecisionEdges, mapToDecisionNodes, mapToGraphEdges, mapToGraphNode, mapToGraphNodes } from '../dg-util';
 import '../dg.scss';
 import { useGraphClipboard } from '../hooks/use-graph-clipboard';
-import { NodeKind, nodeSpecification } from '../nodes/kinds';
+import { NodeKind, nodeSpecification } from '../nodes/specifications';
 import { GraphComponents } from './graph-components';
 import { MultiNodeForm } from './multi-node-form';
 import { NodeForm } from './node-form';
