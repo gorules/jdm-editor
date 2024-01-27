@@ -21,13 +21,14 @@ export const outputSpecification: NodeSpecification<OutputNodeData> = {
   }),
   renderNode:
     ({ specification }) =>
-    ({ id, data }) => (
+    ({ id, data, selected }) => (
       <GraphNode
         id={id}
         color='secondary'
         icon={specification.icon}
         type={specification.displayName}
         name={data.name}
+        isSelected={selected}
         handleRight={false}
       />
     ),

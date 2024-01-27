@@ -31,7 +31,7 @@ export type NodeDecisionTableData = {
   };
 };
 
-export const decisionTableSpecification: NodeSpecification = {
+export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData> = {
   icon: <TableOutlined />,
   displayName: 'Decision table',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/decision-tables',
@@ -62,7 +62,7 @@ export const decisionTableSpecification: NodeSpecification = {
   }),
   renderNode:
     ({ specification }) =>
-    ({ id, data }) => {
+    ({ id, data, selected }) => {
       const { openTab } = useDecisionGraphStore(
         ({ openTab }) => ({
           openTab,
@@ -76,6 +76,7 @@ export const decisionTableSpecification: NodeSpecification = {
           icon={specification.icon}
           type={specification.displayName}
           name={data.name}
+          isSelected={selected}
           actions={[
             <Button key='edit-table' type='link' onClick={() => openTab(id)}>
               Edit Table

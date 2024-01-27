@@ -21,7 +21,7 @@ export type GraphComponentsProps = {
   components?: React.ReactNode[];
 };
 
-export const GraphComponents: React.FC<GraphComponentsProps> = ({ inputDisabled, onPaste }) => {
+export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inputDisabled, onPaste }) => {
   const customComponents: CustomNodeType[] = useDecisionGraphStore((store) => store.components || [], equal);
 
   const onDragStart = useCallback((event: React.DragEvent, nodeType: string) => {
@@ -117,4 +117,4 @@ export const GraphComponents: React.FC<GraphComponentsProps> = ({ inputDisabled,
       </div>
     </div>
   );
-};
+});

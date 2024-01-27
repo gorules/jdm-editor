@@ -10,6 +10,8 @@ export enum NodeKind {
   Switch = 'switchNode',
 }
 
+export type MinimalNodeProps = Pick<NodeProps, 'id' | 'data' | 'selected'>;
+
 export type NodeSpecification<T = any> = {
   icon: React.ReactNode;
   displayName: string;
@@ -17,5 +19,5 @@ export type NodeSpecification<T = any> = {
   generateNode: () => Omit<Node<T>, 'position' | 'id'>;
   renderNode: (data: {
     specification: Pick<NodeSpecification, 'icon' | 'displayName' | 'documentationUrl'>;
-  }) => React.FC<NodeProps>;
+  }) => React.FC<MinimalNodeProps>;
 };

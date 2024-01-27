@@ -36,7 +36,7 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
   }),
   renderNode:
     ({ specification }) =>
-    ({ id, data }) => {
+    ({ id, data, selected }) => {
       const { openTab } = useDecisionGraphStore(
         ({ openTab }) => ({
           openTab,
@@ -50,6 +50,7 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
           icon={specification.icon}
           type={specification.displayName}
           name={data.name}
+          isSelected={selected}
           actions={[
             <Button key='edit-table' type='link' onClick={() => openTab(id)}>
               Edit Expression

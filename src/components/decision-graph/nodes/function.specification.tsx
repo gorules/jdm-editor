@@ -27,7 +27,7 @@ export const functionSpecification: NodeSpecification<NodeFunctionData> = {
   }),
   renderNode:
     ({ specification }) =>
-    ({ id, data }) => {
+    ({ id, data, selected }) => {
       const { openTab } = useDecisionGraphStore(
         ({ openTab }) => ({
           openTab,
@@ -41,6 +41,7 @@ export const functionSpecification: NodeSpecification<NodeFunctionData> = {
           icon={specification.icon}
           type={specification.displayName}
           name={data.name}
+          isSelected={selected}
           actions={[
             <Button key='edit-function' type='link' onClick={() => openTab(id)}>
               Edit Function

@@ -17,10 +17,16 @@ type NonUndefined<T> = T extends undefined ? never : T;
 type TabItem = NonUndefined<TabsProps['items']>[number];
 
 export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled, onTabChange }) => {
-  const { activeNode, openNodes, openTab, closeTab } = useDecisionGraphStore(
+  const { activeNodeId, openNodes, openTab, closeTab } = useDecisionGraphStore(
     ({ decisionGraph, openTab, closeTab, activeTab, openTabs }) => ({
-      activeNode: (decisionGraph?.nodes ?? []).find((node) => node.id === activeTab),
-      openNodes: (decisionGraph?.nodes ?? []).filter((node) => openTabs.includes(node.id)),
+      activeNodeId: (decisionGraph?.nodes ?? []).find((node) => node.id === activeTab)?.id,
+      openNodes: (decisionGraph?.nodes ?? [])
+        .filter((node) => openTabs.includes(node.id))
+        .map(({ id, name, type }) => ({
+          id,
+          name,
+          type,
+        })),
       openTab,
       closeTab,
     }),
@@ -28,8 +34,8 @@ export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled, onTabChange }) =
   );
 
   useEffect(() => {
-    onTabChange?.(activeNode?.id || 'graph');
-  }, [activeNode]);
+    onTabChange?.(activeNodeId || 'graph');
+  }, [activeNodeId]);
 
   return (
     <Tabs
@@ -37,7 +43,7 @@ export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled, onTabChange }) =
       type={'editable-card'}
       size='small'
       className={'tabs'}
-      activeKey={activeNode?.id || 'graph'}
+      activeKey={activeNodeId || 'graph'}
       onEdit={(targetKey: any, action: 'add' | 'remove') => {
         if (action === 'remove') {
           closeTab(targetKey);

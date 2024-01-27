@@ -1,6 +1,6 @@
 import { message } from 'antd';
 import equal from 'fast-deep-equal/es6/react';
-import { useCallback } from 'react';
+import { type RefObject, useCallback, useMemo } from 'react';
 import type { Node, ReactFlowInstance, XYPosition } from 'reactflow';
 import { v4 } from 'uuid';
 
@@ -22,7 +22,10 @@ const isClipboardData = (data: any): data is ClipboardData => {
   return Array.isArray(data?.nodes);
 };
 
-export const useGraphClipboard = (reactFlow?: ReactFlowInstance, wrapper?: HTMLDivElement) => {
+export const useGraphClipboard = (
+  reactFlow: RefObject<ReactFlowInstance | null>,
+  wrapper: RefObject<HTMLDivElement | null>,
+) => {
   const raw = useDecisionGraphRaw();
 
   const { addNodes } = useDecisionGraphStore(
@@ -35,8 +38,6 @@ export const useGraphClipboard = (reactFlow?: ReactFlowInstance, wrapper?: HTMLD
   const copyNodes = useCallback(
     async (nodes: Node[]) => {
       try {
-        if (!reactFlow) return;
-
         const copyNodes = (raw.getState()?.decisionGraph?.nodes || []).filter((n) =>
           nodes.some((node) => node.id === n.id),
         );
@@ -50,11 +51,13 @@ export const useGraphClipboard = (reactFlow?: ReactFlowInstance, wrapper?: HTMLD
         message.error(e.message);
       }
     },
-    [reactFlow],
+    [raw],
   );
 
   const pasteNodes = useCallback(async () => {
-    if (!reactFlow) return;
+    if (!reactFlow?.current) {
+      return;
+    }
 
     const clipboardText = await pasteFromClipboard();
     if (!clipboardText) return;
@@ -73,7 +76,7 @@ export const useGraphClipboard = (reactFlow?: ReactFlowInstance, wrapper?: HTMLD
     );
 
     const copyNodeIds = Object.keys(nodeIds);
-    const anchor = reactFlow.getNodes().find((n) => copyNodeIds.includes(n.id));
+    const anchor = reactFlow.current.getNodes().find((n) => copyNodeIds.includes(n.id));
     const copyAnchor = clipboardData.nodes.find((n) => n.id === anchor?.id);
     const gravityCenter = {
       x: clipboardData.nodes.reduce((acc, n) => acc + n.position.x, 0) / clipboardData.nodes.length,
@@ -96,14 +99,14 @@ export const useGraphClipboard = (reactFlow?: ReactFlowInstance, wrapper?: HTMLD
           position.x = anchor.position.x - copyAnchor.position.x + n.position.x;
           position.y = anchor.position.y - copyAnchor.position.y + n.position.y - 20;
         }
-      } else if (wrapper) {
-        const rect = wrapper.getBoundingClientRect();
+      } else if (wrapper.current) {
+        const rect = wrapper.current.getBoundingClientRect();
         const rectCenter = {
           x: rect.width / 2,
           y: rect.height / 2,
         };
 
-        const projection = reactFlow.project(rectCenter);
+        const projection = reactFlow.current!.project(rectCenter);
 
         position.x = n.position.x + projection.x - gravityCenter.x / 2;
         position.y = n.position.y + projection.y - gravityCenter.y / 2;
@@ -125,7 +128,7 @@ export const useGraphClipboard = (reactFlow?: ReactFlowInstance, wrapper?: HTMLD
         //
       }
     }
-  }, [reactFlow]);
+  }, [reactFlow, wrapper]);
 
   const register = useCallback(
     (selected?: Node[]) => {
@@ -151,9 +154,12 @@ export const useGraphClipboard = (reactFlow?: ReactFlowInstance, wrapper?: HTMLD
     [copyNodes, pasteNodes],
   );
 
-  return {
-    copyNodes,
-    pasteNodes,
-    register,
-  };
+  return useMemo(
+    () => ({
+      copyNodes,
+      pasteNodes,
+      register,
+    }),
+    [copyNodes, pasteNodes, register],
+  );
 };

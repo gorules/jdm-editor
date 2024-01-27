@@ -112,6 +112,8 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
   const store = useMemo(
     () =>
       create<DecisionGraphStoreType>((set, getState) => ({
+        nodesState: createRef() as MutableRefObject<ReturnType<typeof useNodesState>>,
+        edgesState: createRef() as MutableRefObject<ReturnType<typeof useEdgesState>>,
         decisionGraph: {
           nodes: [],
           edges: [],
@@ -119,12 +121,8 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         setDecisionGraph: (graph) => {
           getState()?.edgesState?.current?.[1](mapToGraphEdges(graph?.edges || []));
           getState()?.nodesState?.current?.[1](mapToGraphNodes(graph?.nodes || []));
-          set({
-            decisionGraph: graph,
-          });
+          set({ decisionGraph: graph });
         },
-        nodesState: createRef() as MutableRefObject<ReturnType<typeof useNodesState>>,
-        edgesState: createRef() as MutableRefObject<ReturnType<typeof useEdgesState>>,
         nodesChange: (changes = []) => {
           getState()?.nodesState.current[2]?.(changes);
           if (changes.find((c) => c.type === 'position')) {
@@ -170,9 +168,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
           const decisionGraph = produce(getState().decisionGraph, (draft) => {
             draft.nodes = nodes;
           });
-          set({
-            decisionGraph,
-          });
+          set({ decisionGraph });
           getState()?.onChange?.(decisionGraph);
         },
         addNode: (node: DecisionNode) => {
@@ -183,9 +179,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
             const nodes = draft.nodes || [];
             draft.nodes = nodes.concat(node);
           });
-          set({
-            decisionGraph,
-          });
+          set({ decisionGraph });
           getState()?.onChange?.(decisionGraph);
         },
         addNodes: (nodes: DecisionNode[]) => {

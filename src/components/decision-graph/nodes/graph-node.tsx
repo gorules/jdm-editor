@@ -1,7 +1,8 @@
 import clsx from 'clsx';
+import equal from 'fast-deep-equal/es6/react';
 import React from 'react';
 import type { HandleProps } from 'reactflow';
-import { Handle, Position, useStore as useReactFlow } from 'reactflow';
+import { Handle, Position } from 'reactflow';
 
 import type { DecisionNodeProps } from '../../decision-node/decision-node';
 import { DecisionNode } from '../../decision-node/decision-node';
@@ -21,11 +22,13 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
   className,
   ...decisionNodeProps
 }) => {
-  const isSelected = useReactFlow(({ getNodes }) => getNodes().some((node) => node.id === id && node.selected));
-  const { updateNode, removeNode } = useDecisionGraphStore(({ updateNode, removeNode }) => ({
-    updateNode,
-    removeNode,
-  }));
+  const { updateNode, removeNode } = useDecisionGraphStore(
+    ({ updateNode, removeNode }) => ({
+      updateNode,
+      removeNode,
+    }),
+    equal,
+  );
 
   return (
     <div className={clsx('grl-graph-node', className)} style={{ minWidth: 250 }}>
@@ -39,7 +42,6 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
       )}
       <DecisionNode
         {...decisionNodeProps}
-        isSelected={isSelected}
         onDelete={() => removeNode(id)}
         onNameChange={(name) => {
           updateNode(id, (draft) => {

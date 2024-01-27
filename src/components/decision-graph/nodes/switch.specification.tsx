@@ -2,14 +2,13 @@ import { BranchesOutlined, CaretRightOutlined, DeleteOutlined, DownOutlined } fr
 import { Button, Dropdown, Typography } from 'antd';
 import clsx from 'clsx';
 import React, { useLayoutEffect, useState } from 'react';
-import type { NodeProps } from 'reactflow';
 import { Handle, Position } from 'reactflow';
 import { v4 } from 'uuid';
 
 import { AutosizeTextArea } from '../../autosize-text-area';
 import { useDecisionGraphStore } from '../context/dg-store.context';
 import { GraphNode } from './graph-node';
-import type { NodeSpecification } from './specification-types';
+import type { MinimalNodeProps, NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
 
 export type SwitchStatement = {
@@ -44,10 +43,10 @@ export const switchSpecification: NodeSpecification<NodeSwitchData> = {
 };
 
 const SwitchNode: React.FC<
-  NodeProps & {
+  MinimalNodeProps & {
     specification: Pick<NodeSpecification, 'displayName' | 'icon'>;
   }
-> = ({ id, data, specification }) => {
+> = ({ id, data, selected, specification }) => {
   const isConnectable = true;
   const { content, updateNode } = useDecisionGraphStore(({ getNodeContent, updateNode }) => ({
     content: getNodeContent(id) as NodeSwitchData['content'],
@@ -73,6 +72,7 @@ const SwitchNode: React.FC<
       name={data.name}
       handleRight={false}
       noBodyPadding
+      isSelected={selected}
       actions={[
         <Button
           key='add row'

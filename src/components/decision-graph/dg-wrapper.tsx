@@ -20,37 +20,18 @@ export type DecisionGraphWrapperProps = {
   hideExportImport?: boolean;
 };
 
-export const DecisionGraphWrapper = forwardRef<GraphRef, DecisionGraphWrapperProps>(
-  ({ reactFlowProOptions, hideExportImport }, ref) => {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const { activeNode, openNodes, onTabChange } = useDecisionGraphStore(
-      ({ decisionGraph, activeTab, openTabs, onTabChange }) => {
-        const activeNode = (decisionGraph?.nodes ?? []).find((node) => node.id === activeTab);
-        const openNodes = (decisionGraph?.nodes ?? []).filter((node) => openTabs.includes(node.id));
+export const DecisionGraphWrapper = React.memo(
+  forwardRef<GraphRef, DecisionGraphWrapperProps>(({ reactFlowProOptions, hideExportImport }, ref) => {
+    const { hasActiveNode, onTabChange } = useDecisionGraphStore(({ decisionGraph, activeTab, onTabChange }) => {
+      const hasActiveNode = (decisionGraph?.nodes ?? []).some((node) => node.id === activeTab);
 
-        let restActiveNode = activeNode;
-        if (activeNode) {
-          const { position: _, ...aaa } = activeNode ?? {};
-          restActiveNode = aaa;
-        }
-        const restOpenNodes = openNodes.map(({ position: _, ...restNode }) => restNode);
-
-        return {
-          onTabChange,
-          activeNode: restActiveNode,
-          openNodes: restOpenNodes,
-        };
-      },
-      equal,
-    );
+      return {
+        onTabChange,
+        hasActiveNode,
+      };
+    }, equal);
 
     const [disableTabs, setDisableTabs] = useState(false);
-
-    const dndManager = useMemo(() => {
-      return createDragDropManager(HTML5Backend, undefined, {
-        rootElement: containerRef.current,
-      });
-    }, [containerRef.current]);
 
     return (
       <div className={'grl-dg__wrapper'}>
@@ -58,22 +39,45 @@ export const DecisionGraphWrapper = forwardRef<GraphRef, DecisionGraphWrapperPro
           <GraphTabs disabled={disableTabs} onTabChange={onTabChange} />
           <Graph
             ref={ref}
-            className={clsx([!activeNode && 'active'])}
+            className={clsx([!hasActiveNode && 'active'])}
             hideExportImport={hideExportImport}
             reactFlowProOptions={reactFlowProOptions}
             onDisableTabs={setDisableTabs}
           />
-          <div style={{ display: 'contents' }} ref={containerRef}>
-            {openNodes.map((node) => (
-              <div key={node?.id} className={clsx(['tab-content', activeNode?.id === node?.id && 'active'])}>
-                {node?.type === 'decisionTableNode' && <TabDecisionTable id={node.id} manager={dndManager} />}
-                {node?.type === 'expressionNode' && <TabExpression id={node.id} manager={dndManager} />}
-                {node?.type === 'functionNode' && <TabFunction id={node.id} />}
-              </div>
-            ))}
-          </div>
+          <TabContents />
         </div>
       </div>
     );
-  },
+  }),
 );
+
+const TabContents: React.FC = React.memo(() => {
+  const { openNodes, activeNodeId } = useDecisionGraphStore(({ decisionGraph, openTabs, activeTab }) => {
+    const activeNodeId = (decisionGraph?.nodes ?? []).find((node) => node.id === activeTab)?.id;
+    const openNodes = (decisionGraph?.nodes ?? []).filter((node) => openTabs.includes(node.id));
+
+    return {
+      openNodes: openNodes.map(({ id, type }) => ({ id, type })),
+      activeNodeId,
+    };
+  }, equal);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const dndManager = useMemo(() => {
+    return createDragDropManager(HTML5Backend, undefined, {
+      rootElement: containerRef.current,
+    });
+  }, [containerRef.current]);
+
+  return (
+    <div style={{ display: 'contents' }} ref={containerRef}>
+      {openNodes.map((node) => (
+        <div key={node?.id} className={clsx(['tab-content', activeNodeId === node?.id && 'active'])}>
+          {node?.type === 'decisionTableNode' && <TabDecisionTable id={node.id} manager={dndManager} />}
+          {node?.type === 'expressionNode' && <TabExpression id={node.id} manager={dndManager} />}
+          {node?.type === 'functionNode' && <TabFunction id={node.id} />}
+        </div>
+      ))}
+    </div>
+  );
+});
