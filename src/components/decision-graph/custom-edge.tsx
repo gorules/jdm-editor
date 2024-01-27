@@ -5,11 +5,12 @@ import React from 'react';
 import type { EdgeProps } from 'reactflow';
 import { BaseEdge, EdgeLabelRenderer, getBezierPath } from 'reactflow';
 
-import { useDecisionGraphState } from './context/dg-store.context';
+import { useDecisionGraphActions, useDecisionGraphState } from './context/dg-store.context';
 
 export const CustomEdge: React.FC<EdgeProps> = (props) => {
   const { id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, style = {}, markerEnd } = props;
   const { hoveredEdgeId } = useDecisionGraphState(({ hoveredEdgeId }) => ({ hoveredEdgeId }));
+  const graphActions = useDecisionGraphActions();
 
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
@@ -37,9 +38,7 @@ export const CustomEdge: React.FC<EdgeProps> = (props) => {
             danger
             className={clsx('grl-edge-delete-button')}
             data-visible={id === hoveredEdgeId}
-            onClick={() => {
-              console.log();
-            }}
+            onClick={() => graphActions.removeEdge(id)}
           />
         </div>
       </EdgeLabelRenderer>

@@ -175,7 +175,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
           });
 
           stateStore.setState({ decisionGraph: newDecisionGraph });
-          listenerStore.getState().onChange?.(decisionGraph);
+          listenerStore.getState().onChange?.(newDecisionGraph);
         }
       },
       handleEdgesChange: (changes = []) => {
@@ -199,7 +199,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
           });
 
           stateStore.setState({ decisionGraph: newDecisionGraph });
-          listenerStore.getState().onChange?.(decisionGraph);
+          listenerStore.getState().onChange?.(newDecisionGraph);
         }
       },
       setNodes: (nodes: DecisionNode[] = []) => {
@@ -212,7 +212,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         });
 
         stateStore.setState({ decisionGraph: newDecisionGraph });
-        listenerStore.getState().onChange?.(decisionGraph);
+        listenerStore.getState().onChange?.(newDecisionGraph);
       },
       addNode: (node: DecisionNode) => {
         const { nodesState } = referenceStore.getState();
@@ -225,7 +225,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         });
 
         stateStore.setState({ decisionGraph: newDecisionGraph });
-        listenerStore.getState().onChange?.(decisionGraph);
+        listenerStore.getState().onChange?.(newDecisionGraph);
       },
       addNodes: (nodes: DecisionNode[]) => {
         const { nodesState } = referenceStore.getState();
@@ -238,7 +238,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         });
 
         stateStore.setState({ decisionGraph: newDecisionGraph });
-        listenerStore.getState().onChange?.(decisionGraph);
+        listenerStore.getState().onChange?.(newDecisionGraph);
       },
       removeNode: (id) => {
         const { nodesState, edgesState } = referenceStore.getState();
@@ -255,7 +255,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         });
 
         stateStore.setState({ decisionGraph: newDecisionGraph });
-        listenerStore.getState().onChange?.(decisionGraph);
+        listenerStore.getState().onChange?.(newDecisionGraph);
       },
       addEdge: (edge: DecisionEdge) => {
         const { edgesState } = referenceStore.getState();
@@ -268,7 +268,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         });
 
         stateStore.setState({ decisionGraph: newDecisionGraph });
-        listenerStore.getState().onChange?.(decisionGraph);
+        listenerStore.getState().onChange?.(newDecisionGraph);
       },
       setEdges: (edges = []) => {
         const { edgesState } = referenceStore.getState();
@@ -280,7 +280,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         });
 
         stateStore.setState({ decisionGraph: newDecisionGraph });
-        listenerStore.getState().onChange?.(decisionGraph);
+        listenerStore.getState().onChange?.(newDecisionGraph);
       },
       removeEdge: (id) => {
         const { edgesState } = referenceStore.getState();
@@ -292,7 +292,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         });
 
         stateStore.setState({ decisionGraph: newDecisionGraph });
-        listenerStore.getState().onChange?.(decisionGraph);
+        listenerStore.getState().onChange?.(newDecisionGraph);
       },
       updateNode: (id, updater) => {
         // TODO: Update nodeState
