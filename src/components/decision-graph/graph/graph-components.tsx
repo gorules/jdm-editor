@@ -1,9 +1,9 @@
 import {
-  ArrowDownOutlined,
-  ArrowUpOutlined,
   BranchesOutlined,
   CodeOutlined,
   FunctionOutlined,
+  LoginOutlined,
+  LogoutOutlined,
   TableOutlined,
 } from '@ant-design/icons';
 import { Button, Typography } from 'antd';
@@ -58,13 +58,13 @@ export const GraphComponents: React.FC<GraphComponentsProps> = ({ inputDisabled,
               onDragStart={(event) => onDragStart(event, 'inputNode')}
               draggable={!inputDisabled}
             >
-              <ArrowUpOutlined />
+              <LoginOutlined />
             </div>
             <Typography.Text type={'secondary'}>Request</Typography.Text>
           </div>
           <div className={'component'}>
             <div className={'icon'} onDragStart={(event) => onDragStart(event, 'outputNode')} draggable>
-              <ArrowDownOutlined />
+              <LogoutOutlined />
             </div>
             <Typography.Text type={'secondary'}>Response</Typography.Text>
           </div>

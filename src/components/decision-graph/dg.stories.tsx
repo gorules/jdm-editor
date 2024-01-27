@@ -28,11 +28,6 @@ type Story = StoryObj<typeof DecisionGraph>;
 export const Controlled: Story = {
   render: (args) => {
     const [value, setValue] = useState<any>(defaultGraph);
-    useEffect(() => {
-      if (args.value) {
-        setValue(args.value);
-      }
-    }, [args.value]);
     return (
       <div
         style={{
@@ -43,9 +38,7 @@ export const Controlled: Story = {
           {...args}
           value={value}
           onChange={(val) => {
-            console.log(val);
-            setValue(val);
-            args?.onChange?.(val);
+            setValue?.(val);
           }}
         />
       </div>

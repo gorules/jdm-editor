@@ -14,9 +14,8 @@ export type TabFunctionProps = {
 };
 
 export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
-  const { node, nodeTrace, updateNode, disabled } = useDecisionGraphStore(
-    ({ decisionGraph, simulate, updateNode, disabled }) => ({
-      node: (decisionGraph?.nodes ?? []).find((node) => node.id === id),
+  const { nodeTrace, updateNode, disabled } = useDecisionGraphStore(
+    ({ simulate, updateNode, disabled }) => ({
       nodeTrace: simulate?.result?.trace?.[id],
       updateNode,
       disabled,
@@ -24,12 +23,15 @@ export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
     equal,
   );
 
-  if (!node) return null;
+  const content = useDecisionGraphStore(
+    ({ decisionGraph }) => (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content,
+    equal,
+  );
 
   return (
     <Suspense fallback={<Spin />}>
       <Function
-        value={typeof node?.content === 'string' ? node?.content : ''}
+        value={typeof content === 'string' ? content : ''}
         onChange={(val) => updateNode(id, val)}
         disabled={disabled}
         trace={nodeTrace}
