@@ -24,11 +24,23 @@ export const DecisionGraphWrapper = forwardRef<GraphRef, DecisionGraphWrapperPro
   ({ reactFlowProOptions, hideExportImport }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const { activeNode, openNodes, onTabChange } = useDecisionGraphStore(
-      ({ decisionGraph, activeTab, openTabs, onTabChange }) => ({
-        onTabChange,
-        activeNode: (decisionGraph?.nodes ?? []).find((node) => node.id === activeTab),
-        openNodes: (decisionGraph?.nodes ?? []).filter((node) => openTabs.includes(node.id)),
-      }),
+      ({ decisionGraph, activeTab, openTabs, onTabChange }) => {
+        const activeNode = (decisionGraph?.nodes ?? []).find((node) => node.id === activeTab);
+        const openNodes = (decisionGraph?.nodes ?? []).filter((node) => openTabs.includes(node.id));
+
+        let restActiveNode = activeNode;
+        if (activeNode) {
+          const { position: _, ...aaa } = activeNode ?? {};
+          restActiveNode = aaa;
+        }
+        const restOpenNodes = openNodes.map(({ position: _, ...restNode }) => restNode);
+
+        return {
+          onTabChange,
+          activeNode: restActiveNode,
+          openNodes: restOpenNodes,
+        };
+      },
       equal,
     );
 

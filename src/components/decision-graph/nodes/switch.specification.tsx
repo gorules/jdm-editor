@@ -1,5 +1,5 @@
 import { BranchesOutlined, CaretRightOutlined, DeleteOutlined, DownOutlined } from '@ant-design/icons';
-import { Button, Dropdown } from 'antd';
+import { Button, Dropdown, Typography } from 'antd';
 import clsx from 'clsx';
 import React, { useLayoutEffect, useState } from 'react';
 import type { NodeProps } from 'reactflow';
@@ -129,6 +129,11 @@ const SwitchNode: React.FC<
     >
       <div className='switchNode'>
         <div className='switchNode__body edit nodrag'>
+          {!(statements?.length > 0) && (
+            <Typography.Text type={'secondary'} className={'no-conditions'}>
+              No conditions
+            </Typography.Text>
+          )}
           {statements.map((statement) => (
             <SwitchHandle
               key={statement.id}
@@ -208,7 +213,7 @@ const SwitchHandle: React.FC<{
     <div className={clsx('switchNode__statement')}>
       <div className='switchNode__statement__inputArea'>
         <AutosizeTextArea
-          placeholder='Enter condition'
+          placeholder={`Enter condition (e.g. x > 10)`}
           style={{
             fontSize: 12,
             lineHeight: '20px',

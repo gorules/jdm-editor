@@ -11,14 +11,18 @@ export type TabDecisionTableProps = {
 };
 
 export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager }) => {
-  const { node, nodeTrace, updateNode, disabled, configurable } = useDecisionGraphStore(
-    ({ decisionGraph, simulate, updateNode, disabled, configurable }) => ({
-      node: (decisionGraph?.nodes ?? []).find((node) => node.id === id),
+  const { nodeTrace, updateNode, disabled, configurable } = useDecisionGraphStore(
+    ({ simulate, updateNode, disabled, configurable }) => ({
       nodeTrace: simulate?.result?.trace?.[id],
       updateNode,
       disabled,
       configurable,
     }),
+    equal,
+  );
+
+  const content = useDecisionGraphStore(
+    ({ decisionGraph }) => (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content,
     equal,
   );
 
@@ -29,12 +33,12 @@ export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager 
         : [nodeTrace?.traceData?.rule?._id]
       : [];
 
-  if (!node) return null;
+  // if (!content) return null;
 
   return (
     <DecisionTable
       tableHeight={'100%'}
-      value={node?.content as any}
+      value={content as any}
       onChange={(val) => updateNode(id, val)}
       manager={manager}
       disabled={disabled}

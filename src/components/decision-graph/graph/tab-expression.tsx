@@ -11,9 +11,8 @@ export type TabExpressionProps = {
 };
 
 export const TabExpression: React.FC<TabExpressionProps> = ({ id, manager }) => {
-  const { node, updateNode, disabled, configurable } = useDecisionGraphStore(
-    ({ decisionGraph, updateNode, disabled, configurable }) => ({
-      node: (decisionGraph?.nodes ?? []).find((node) => node.id === id),
+  const { updateNode, disabled, configurable } = useDecisionGraphStore(
+    ({ updateNode, disabled, configurable }) => ({
       updateNode,
       disabled,
       configurable,
@@ -21,12 +20,15 @@ export const TabExpression: React.FC<TabExpressionProps> = ({ id, manager }) => 
     equal,
   );
 
-  if (!node) return null;
+  const content = useDecisionGraphStore(
+    ({ decisionGraph }) => (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content,
+    equal,
+  );
 
   return (
     <div style={{ maxWidth: 900, height: '100%', overflowY: 'auto', boxSizing: 'border-box', paddingBottom: '1.5rem' }}>
       <Expression
-        value={node?.content?.expressions}
+        value={content?.expressions}
         onChange={(val) =>
           updateNode(id, {
             expressions: val,
