@@ -25,8 +25,7 @@ export const outputSpecification: NodeSpecification<OutputNodeData> = {
       <GraphNode
         id={id}
         color='secondary'
-        icon={specification.icon}
-        type={specification.displayName}
+        specification={specification}
         name={data.name}
         isSelected={selected}
         handleRight={false}

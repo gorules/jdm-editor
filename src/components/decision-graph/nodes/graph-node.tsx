@@ -6,19 +6,22 @@ import { Handle, Position } from 'reactflow';
 import type { DecisionNodeProps } from '../../decision-node/decision-node';
 import { DecisionNode } from '../../decision-node/decision-node';
 import { useDecisionGraphActions } from '../context/dg-store.context';
+import type { MinimalNodeSpecification } from './specification-types';
 
 export type GraphNodeProps = {
   id: string;
   handleLeft?: boolean | Partial<HandleProps>;
   handleRight?: boolean | Partial<HandleProps>;
   className?: string;
-} & DecisionNodeProps;
+  specification: MinimalNodeSpecification;
+} & Partial<DecisionNodeProps>;
 
 export const GraphNode: React.FC<GraphNodeProps> = ({
   id,
   handleLeft = true,
   handleRight = true,
   className,
+  specification,
   ...decisionNodeProps
 }) => {
   const graphActions = useDecisionGraphActions();
@@ -35,7 +38,12 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
       )}
       <DecisionNode
         {...decisionNodeProps}
+        icon={specification.icon}
+        type={specification.displayName}
         onDelete={() => graphActions.removeNode(id)}
+        onViewDocumentation={() => {
+          window.open(specification.documentationUrl, '_href');
+        }}
         onNameChange={(name) => {
           graphActions.updateNode(id, (draft) => {
             draft.name = name;

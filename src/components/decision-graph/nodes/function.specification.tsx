@@ -32,8 +32,7 @@ export const functionSpecification: NodeSpecification<NodeFunctionData> = {
       return (
         <GraphNode
           id={id}
-          icon={specification.icon}
-          type={specification.displayName}
+          specification={specification}
           name={data.name}
           isSelected={selected}
           actions={[

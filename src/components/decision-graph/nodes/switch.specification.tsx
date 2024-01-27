@@ -27,7 +27,7 @@ export type NodeSwitchData = {
 export const switchSpecification: NodeSpecification<NodeSwitchData> = {
   icon: <BranchesOutlined />,
   displayName: 'Switch',
-  documentationUrl: '',
+  documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/switch',
   generateNode: () => ({
     type: NodeKind.Switch,
     data: {
@@ -44,7 +44,7 @@ export const switchSpecification: NodeSpecification<NodeSwitchData> = {
 
 const SwitchNode: React.FC<
   MinimalNodeProps & {
-    specification: Pick<NodeSpecification, 'displayName' | 'icon'>;
+    specification: Pick<NodeSpecification, 'displayName' | 'icon' | 'documentationUrl'>;
   }
 > = ({ id, data, selected, specification }) => {
   const isConnectable = true;
@@ -68,8 +68,7 @@ const SwitchNode: React.FC<
     <GraphNode
       id={id}
       className={clsx(['switch'])}
-      icon={specification.icon}
-      type={specification.displayName}
+      specification={specification}
       name={data.name}
       handleRight={false}
       noBodyPadding
