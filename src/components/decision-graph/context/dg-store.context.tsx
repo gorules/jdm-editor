@@ -77,6 +77,9 @@ export type DecisionGraphStoreType = {
   onEditGraph?: (edit: boolean) => void;
   onAddNode?: (type: string, position?: XYPosition) => void;
   onTabChange?: (tab?: string) => void;
+
+  hoveredEdgeId: string | null;
+  setHoveredEdgeId: (edgeId: string | null) => void;
 };
 
 export const DecisionGraphStoreContext = React.createContext<
@@ -103,6 +106,8 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
             decisionGraph: graph,
           });
         },
+        hoveredEdgeId: null,
+        setHoveredEdgeId: (edgeId) => set({ hoveredEdgeId: edgeId }),
         updateNode: (id, content) => {
           const decisionGraph = produce(getState().decisionGraph, (draft) => {
             const nodes = (draft.nodes || []).map((node) => {
@@ -161,7 +166,7 @@ export function useDecisionGraphStore<T>(
   selector: (state: DecisionGraphStoreType) => T,
   equals?: (a: any, b: any) => boolean,
 ): T {
-  return React.useContext(DecisionGraphStoreContext)(selector, equals);
+  return React.useContext(DecisionGraphStoreContext)(selector, equals as any);
 }
 
 export const useDecisionGraphRaw = () => React.useContext(DecisionGraphStoreContext);

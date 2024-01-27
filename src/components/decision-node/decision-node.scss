@@ -1,6 +1,6 @@
 .grl-dn {
   --node-border-radius: 8px;
-  --node-horizontal-padding: 16px;
+  --node-horizontal-padding: 12px;
   --node-color: var(--grl-color-primary);
 
   display: flex;
@@ -9,9 +9,14 @@
   background: var(--grl-color-bg-container);
   cursor: grab;
   border-radius: var(--node-border-radius);
+  transition: var(--grl-transition);
 
   &:hover {
-    border-color: var(--grl-color-primary-hover);
+    border-color: var(--grl-color-border-hover);
+  }
+
+  &--selected {
+    border-color: var(--grl-color-primary-active) !important;
   }
 
   &--color {
@@ -26,10 +31,12 @@
 
   &__header {
     display: grid;
-    padding: 12px var(--node-horizontal-padding);
-    gap: 16px;
+    padding: 4px var(--node-horizontal-padding);
+    gap: 8px;
     grid-template-columns: min-content 1fr min-content;
     align-items: center;
+    box-sizing: border-box;
+    height: 60px;
 
     &__icon {
       font-size: 24px;
@@ -45,18 +52,29 @@
     &__text {
       display: flex;
       flex-direction: column;
+      margin-right: 8px;
 
       &__name {
-        padding: 2px;
+        min-height: 23px;
         border-radius: 4px;
+        transition: var(--grl-transition);
 
-        &:hover {
+        &[contenteditable="true"] {
+          cursor: text;
+        }
 
+        &:hover:not(:focus-within) {
+          background-color: var(--grl-color-bg-text-hover);
+        }
+
+        &:focus-within {
+          box-shadow: 0 0 0 1px var(--grl-color-border);
         }
       }
 
       > span {
         line-height: 1.35;
+        padding: 2px 6px;
       }
 
       > [contenteditable]:focus-within {

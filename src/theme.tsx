@@ -47,6 +47,7 @@ const GlobalCssVariables: React.FC<{ mode: 'light' | 'dark' }> = ({ mode }) => {
   const exposedTokens = useMemo(
     () => ({
       '--grl-color-border': token.colorBorder,
+      '--grl-color-border-hover': '#c3c3c3',
       '--grl-color-primary': token.colorPrimary,
       '--grl-color-primary-bg': token.colorPrimaryBg,
       '--grl-color-primary-bg-hover': token.colorPrimaryBgHover,
@@ -58,6 +59,7 @@ const GlobalCssVariables: React.FC<{ mode: 'light' | 'dark' }> = ({ mode }) => {
       '--grl-color-bg-elevated': token.colorBgElevated,
       '--grl-color-bg-container': token.colorBgContainer,
       '--grl-color-bg-container-disabled': token.colorBgContainerDisabled,
+      '--grl-color-bg-text-hover': token.colorBgTextHover,
       '--grl-color-error-bg': token.colorErrorBg,
       '--grl-color-error-border': token.colorErrorBorder,
       '--grl-color-primary-hover': token.colorPrimaryHover,

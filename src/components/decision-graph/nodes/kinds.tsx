@@ -54,8 +54,9 @@ export const nodeSpecification = makeNodeSpecification({
     }),
     renderNode:
       ({ specification }) =>
-      ({ data }) => (
+      ({ id, data }) => (
         <GraphNode
+          id={id}
           color='secondary'
           icon={specification.icon}
           type={specification.displayName}
@@ -75,8 +76,9 @@ export const nodeSpecification = makeNodeSpecification({
     }),
     renderNode:
       ({ specification }) =>
-      ({ data }) => (
+      ({ id, data }) => (
         <GraphNode
+          id={id}
           color='secondary'
           icon={specification.icon}
           type={specification.displayName}
@@ -125,6 +127,7 @@ export const nodeSpecification = makeNodeSpecification({
 
         return (
           <GraphNode
+            id={id}
             icon={specification.icon}
             type={specification.displayName}
             name={data.name}
@@ -159,6 +162,7 @@ export const nodeSpecification = makeNodeSpecification({
 
         return (
           <GraphNode
+            id={id}
             icon={specification.icon}
             type={specification.displayName}
             name={data.name}
@@ -195,6 +199,7 @@ export const nodeSpecification = makeNodeSpecification({
 
         return (
           <GraphNode
+            id={id}
             icon={specification.icon}
             type={specification.displayName}
             name={data.name}
@@ -258,19 +263,9 @@ export const SwitchNode: React.FC<
     );
   };
 
-  //<div className={'switchNode__conditionsText'}>
-  //           <Typography.Text
-  //             style={{
-  //               fontSize: 12,
-  //             }}
-  //           >
-  //             Conditions
-  //           </Typography.Text>
-
-  //         </div>
-
   return (
     <GraphNode
+      id={id}
       className={clsx(['switch'])}
       icon={specification.icon}
       type={specification.displayName}
@@ -310,16 +305,12 @@ export const SwitchNode: React.FC<
               {
                 key: 'first',
                 label: 'First',
-                onClick: () => {
-                  changeHitPolicy('first');
-                },
+                onClick: () => changeHitPolicy('first'),
               },
               {
                 key: 'collect',
                 label: 'Collect',
-                onClick: () => {
-                  changeHitPolicy('collect');
-                },
+                onClick: () => changeHitPolicy('collect'),
               },
             ],
           }}

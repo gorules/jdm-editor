@@ -55,21 +55,42 @@ export const Graph = forwardRef<GraphRef, GraphProps>(
     const selected = editNodes?.filter?.((node) => node?.selected);
     const selectedEdges = editEdges?.filter?.((edge) => edge?.selected);
 
-    const { nodes, edges, setDecisionGraph, disabled, closeTab, openTab, onAddNode, onEditGraph, onChange } =
-      useDecisionGraphStore(
-        ({ decisionGraph, setDecisionGraph, disabled, closeTab, openTab, onChange, onAddNode, onEditGraph }) => ({
-          nodes: decisionGraph?.nodes ?? [],
-          edges: decisionGraph?.edges ?? [],
-          setDecisionGraph,
-          disabled,
-          closeTab,
-          openTab,
-          onChange,
-          onAddNode,
-          onEditGraph,
-        }),
-        equal,
-      );
+    const {
+      nodes,
+      edges,
+      setDecisionGraph,
+      disabled,
+      closeTab,
+      openTab,
+      onAddNode,
+      onEditGraph,
+      onChange,
+      setHoveredEdgeId,
+    } = useDecisionGraphStore(
+      ({
+        decisionGraph,
+        setDecisionGraph,
+        disabled,
+        closeTab,
+        openTab,
+        onChange,
+        onAddNode,
+        onEditGraph,
+        setHoveredEdgeId,
+      }) => ({
+        nodes: decisionGraph?.nodes ?? [],
+        edges: decisionGraph?.edges ?? [],
+        setDecisionGraph,
+        disabled,
+        closeTab,
+        openTab,
+        onChange,
+        onAddNode,
+        onEditGraph,
+        setHoveredEdgeId,
+      }),
+      equal,
+    );
 
     const graphClipboard = useGraphClipboard(reactFlowInstance, reactFlowWrapper.current || undefined);
 
@@ -444,6 +465,8 @@ export const Graph = forwardRef<GraphRef, GraphProps>(
               onEdgeClick={() => {
                 //
               }}
+              onEdgeMouseEnter={(_, edge) => setHoveredEdgeId(edge.id)}
+              onEdgeMouseLeave={() => setHoveredEdgeId(null)}
             >
               <Controls showInteractive={false} />
               <Background color='var(--grl-color-border)' gap={20} />

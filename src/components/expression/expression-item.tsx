@@ -1,4 +1,4 @@
-import { MenuOutlined, MinusCircleOutlined } from '@ant-design/icons';
+import { DeleteOutlined, MenuOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import type { Row } from '@tanstack/react-table';
 import { Button, Input, Popconfirm } from 'antd';
 import clsx from 'clsx';
@@ -96,7 +96,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
           onConfirm={onRemove}
           disabled={!configurable || disabled}
         >
-          <Button type='text' icon={<MinusCircleOutlined />} disabled={!configurable || disabled} />
+          <Button type='text' icon={<DeleteOutlined />} danger disabled={!configurable || disabled} />
         </Popconfirm>
       </div>
     </div>

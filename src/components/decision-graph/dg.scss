@@ -249,6 +249,10 @@
       }
     }
 
+    &__edge-interaction {
+      stroke-width: 50;
+    }
+
     &__edge-path-selector {
       fill: none;
       stroke: transparent;
@@ -303,22 +307,24 @@
     justify-content: center;
     font-size: 12px;
     pointer-events: all;
+    z-index: 1000;
+  }
+}
 
-    .edgebutton {
-      width: 20px;
-      height: 20px;
-      background: #eee;
-      border: 1px solid var(--grl-color-border);
-      cursor: pointer;
-      border-radius: 50%;
-      font-size: 12px;
-      line-height: 1;
-    }
+.grl-edge-delete-button {
+  opacity: 0;
+  pointer-events: none;
+  transition: var(--grl-transition);
+  padding: 0 !important;
+  width: 32px !important;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-    .edgebutton:hover {
-      box-shadow: 0 0 6px 2px rgba(0, 0, 0, 0.08);
-    }
-
+  &[data-visible="true"] {
+    opacity: 1;
+    pointer-events: all;
   }
 }
 
@@ -346,8 +352,8 @@
     flex-direction: column;
     align-items: stretch;
     width: 100%;
-    padding-top: 12px;
-    padding-bottom: 12px;
+    padding-top: 9px;
+    padding-bottom: 9px;
 
     .react-flow__handle {
       z-index: 20;
