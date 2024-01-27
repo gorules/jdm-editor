@@ -1,3 +1,4 @@
+import equal from 'fast-deep-equal/es6/react';
 import { produce } from 'immer';
 import type { WritableDraft } from 'immer/src/types/types-external';
 import React, { type MutableRefObject, createRef, useMemo } from 'react';
@@ -52,56 +53,63 @@ export type CustomNodeType = {
 type DraftUpdateCallback<T> = (draft: WritableDraft<T>) => WritableDraft<T>;
 
 export type DecisionGraphStoreType = {
-  id?: string;
+  state: {
+    id?: string;
+    components?: CustomNodeType[];
+    disabled?: boolean;
+    configurable?: boolean;
+    simulate?: any;
+    decisionGraph: DecisionGraphType;
+    hoveredEdgeId: string | null;
+    openTabs: string[];
+    activeTab: string;
+  };
 
-  components?: CustomNodeType[];
+  references: {
+    nodesState: MutableRefObject<ReturnType<typeof useNodesState>>;
+    edgesState: MutableRefObject<ReturnType<typeof useEdgesState>>;
+  };
 
-  decisionGraph: DecisionGraphType;
-  setDecisionGraph: (val: DecisionGraphType) => void;
+  actions: {
+    setDecisionGraph: (val: DecisionGraphType) => void;
 
-  disabled?: boolean;
-  configurable?: boolean;
+    handleNodesChange: (nodesChange: NodeChange[]) => void;
+    handleEdgesChange: (edgesChange: EdgeChange[]) => void;
 
-  simulate?: any;
+    setNodes: (nodes: DecisionNode[]) => void;
+    addNode: (node: DecisionNode) => void;
+    addNodes: (nodes: DecisionNode[]) => void;
+    updateNode: (id: string, updater: DraftUpdateCallback<DecisionNode>) => void;
+    removeNode: (id: string) => void;
 
-  updateNode: (id: string, updater: DraftUpdateCallback<DecisionNode>) => void;
+    setEdges: (edges: DecisionEdge[]) => void;
+    addEdge: (edge: DecisionEdge) => void;
+    removeEdge: (id: string) => void;
+    setHoveredEdgeId: (edgeId: string | null) => void;
 
-  nodesState: MutableRefObject<ReturnType<typeof useNodesState>>;
-  edgesState: MutableRefObject<ReturnType<typeof useEdgesState>>;
+    closeTab: (id: string) => void;
+    openTab: (id: string) => void;
+  };
 
-  nodesChange: (nodesChange: NodeChange[]) => void;
-  edgesChange: (edgesChange: EdgeChange[]) => void;
-
-  setNodes: (nodes: DecisionNode[]) => void;
-  addNode: (node: DecisionNode) => void;
-  addNodes: (nodes: DecisionNode[]) => void;
-  removeNode: (id: string) => void;
-  getNodeContent: (id: string) => any | undefined;
-  // removeNodes(ids: string[]) => void;
-  setEdges: (edges: DecisionEdge[]) => void;
-  addEdge: (edge: DecisionEdge) => void;
-  removeEdge: (id: string) => void;
-
-  hoveredEdgeId: string | null;
-  setHoveredEdgeId: (edgeId: string | null) => void;
-
-  openTabs: string[];
-  activeTab: string;
-  closeTab: (id: string) => void;
-  openTab: (id: string) => void;
-
-  onChange?: (val: DecisionGraphType) => void;
-  onOpenNode?: (node: DecisionNode) => void;
-  onEditGraph?: (edit: boolean) => void;
-  onAddNode?: (type: string, position?: XYPosition) => void;
-  onTabChange?: (tab?: string) => void;
+  listeners: {
+    onChange?: (val: DecisionGraphType) => void;
+    onOpenNode?: (node: DecisionNode) => void;
+    onEditGraph?: (edit: boolean) => void;
+    onAddNode?: (type: string, position?: XYPosition) => void;
+    onTabChange?: (tab?: string) => void;
+  };
 };
 
-export const DecisionGraphStoreContext = React.createContext<
-  UseBoundStore<StoreApi<DecisionGraphStoreType>> & {
-    setState: (partial: Partial<DecisionGraphStoreType>) => void;
-  }
->({} as any);
+type ExposedStore<T> = UseBoundStore<StoreApi<T>> & {
+  setState: (partial: Partial<T>) => void;
+};
+
+export const DecisionGraphStoreContext = React.createContext<{
+  stateStore: ExposedStore<DecisionGraphStoreType['state']>;
+  listenerStore: ExposedStore<DecisionGraphStoreType['listeners']>;
+  referenceStore: ExposedStore<DecisionGraphStoreType['references']>;
+  actions: DecisionGraphStoreType['actions'];
+}>({} as any);
 
 export type DecisionGraphContextProps = {
   //
@@ -109,209 +117,279 @@ export type DecisionGraphContextProps = {
 
 export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGraphContextProps>> = (props) => {
   const { children } = props;
-  const store = useMemo(
+
+  const stateStore = useMemo(
     () =>
-      create<DecisionGraphStoreType>((set, getState) => ({
-        nodesState: createRef() as MutableRefObject<ReturnType<typeof useNodesState>>,
-        edgesState: createRef() as MutableRefObject<ReturnType<typeof useEdgesState>>,
-        decisionGraph: {
-          nodes: [],
-          edges: [],
-        },
-        setDecisionGraph: (graph) => {
-          getState()?.edgesState?.current?.[1](mapToGraphEdges(graph?.edges || []));
-          getState()?.nodesState?.current?.[1](mapToGraphNodes(graph?.nodes || []));
-          set({ decisionGraph: graph });
-        },
-        nodesChange: (changes = []) => {
-          getState()?.nodesState.current[2]?.(changes);
-          if (changes.find((c) => c.type === 'position')) {
-            const decisionGraph = produce(getState().decisionGraph, (draft) => {
-              const nodes = (draft.nodes || []).map((node) => {
-                const change = changes.find((change: NodeChange & { id: string }) => change.id === node.id);
-                if (change?.type === 'position' && change?.position) {
-                  node.position = change.position as Position;
-                }
-                return node;
-              });
-              draft.nodes = nodes;
-            });
-            set({
-              decisionGraph,
-            });
-            getState()?.onChange?.(decisionGraph);
-          }
-        },
-        edgesChange: (changes = []) => {
-          getState()?.edgesState?.current?.[2](changes);
-          if (changes.find((c) => c.type === 'remove')) {
-            const decisionGraph = produce(getState().decisionGraph, (draft) => {
-              const edges = (draft.edges || [])
-                .map((edge) => {
-                  const change = changes.find((change: EdgeChange & { id: string }) => change.id === edge.id);
-                  if (change?.type === 'remove') {
-                    return null;
-                  }
-                  return edge;
-                })
-                .filter((node) => !!node) as DecisionEdge[];
-              draft.edges = edges;
-            });
-            set({
-              decisionGraph,
-            });
-            getState()?.onChange?.(decisionGraph);
-          }
-        },
-        setNodes: (nodes: DecisionNode[] = []) => {
-          getState()?.nodesState?.current?.[1](mapToGraphNodes(nodes));
-          const decisionGraph = produce(getState().decisionGraph, (draft) => {
-            draft.nodes = nodes;
-          });
-          set({ decisionGraph });
-          getState()?.onChange?.(decisionGraph);
-        },
-        addNode: (node: DecisionNode) => {
-          getState().nodesState.current[1]?.((nodes) => {
-            return nodes.concat(mapToGraphNode(node));
-          });
-          const decisionGraph = produce(getState().decisionGraph, (draft) => {
-            const nodes = draft.nodes || [];
-            draft.nodes = nodes.concat(node);
-          });
-          set({ decisionGraph });
-          getState()?.onChange?.(decisionGraph);
-        },
-        addNodes: (nodes: DecisionNode[]) => {
-          getState().nodesState.current[1]?.((n) => {
-            return n.concat(mapToGraphNodes(nodes));
-          });
-          const decisionGraph = produce(getState().decisionGraph, (draft) => {
-            const n = draft.nodes || [];
-            draft.nodes = n.concat(nodes);
-          });
-          set({
-            decisionGraph,
-          });
-          getState()?.onChange?.(decisionGraph);
-        },
-        removeNode: (id) => {
-          getState().nodesState.current[1]?.((nodes) => {
-            return nodes.filter((n) => n.id !== id);
-          });
-          getState().edgesState.current[1]?.((edges) => {
-            return edges.filter(
-              (e) => e.source !== id && e.target !== id && e.sourceHandle !== id && e.targetHandle !== id,
-            );
-          });
-          const decisionGraph = produce(getState().decisionGraph, (draft) => {
-            const nodes = draft.nodes || [];
-            draft.nodes = nodes.filter((n) => n.id !== id);
-          });
-          set({
-            decisionGraph,
-          });
-          getState()?.onChange?.(decisionGraph);
-        },
-        getNodeContent: (id) => {
-          const decisionNodes = getState().decisionGraph.nodes;
-          return decisionNodes.find((node) => node.id === id)?.content;
-        },
-        addEdge: (edge: DecisionEdge) => {
-          getState().edgesState?.current?.[1]?.((els) => {
-            return els.concat(mapToGraphEdge(edge));
-          });
-          const decisionGraph = produce(getState().decisionGraph, (draft) => {
-            const edges = draft.edges || [];
-            draft.edges = edges.concat(edge);
-          });
-          set({
-            decisionGraph,
-          });
-          getState()?.onChange?.(decisionGraph);
-        },
-        setEdges: (edges = []) => {
-          getState()?.edgesState?.current?.[1]?.(mapToGraphEdges(edges));
-          const decisionGraph = produce(getState().decisionGraph, (draft) => {
-            draft.edges = edges;
-          });
-          set({
-            decisionGraph,
-          });
-          getState()?.onChange?.(decisionGraph);
-        },
-        removeEdge: (id) => {
-          getState()?.edgesState?.current?.[1]?.((edges) => {
-            return edges.filter((e) => e.id !== id);
-          });
-          const decisionGraph = produce(getState().decisionGraph, (draft) => {
-            draft.edges = draft.edges.filter((e) => e.id !== id);
-          });
-          set({
-            decisionGraph,
-          });
-          getState()?.onChange?.(decisionGraph);
-        },
-        updateNode: (id, updater) => {
-          const decisionGraph = produce(getState().decisionGraph, (draft) => {
-            const node = (draft.nodes ?? []).find((node) => node?.id === id);
-            if (!node) {
-              return;
-            }
-
-            updater(node);
-          });
-
-          set({ decisionGraph });
-          getState()?.onChange?.(decisionGraph);
-        },
+      create<DecisionGraphStoreType['state']>(() => ({
+        id: undefined,
+        simulate: undefined,
+        decisionGraph: { nodes: [], edges: [] },
         hoveredEdgeId: null,
-        setHoveredEdgeId: (edgeId) => set({ hoveredEdgeId: edgeId }),
         openTabs: [],
         activeTab: 'graph',
-        openTab: (id: string) => {
-          const openTabs = getState().openTabs;
-          const nodeId = openTabs.find((i) => i === id);
-          if (nodeId) {
-            set({
-              activeTab: nodeId,
-            });
-          } else {
-            set({
-              openTabs: [...openTabs, id],
-              activeTab: id,
-            });
-          }
-        },
-        closeTab: (id: string) => {
-          const openTabs = getState().openTabs;
-          const activeTab = getState().activeTab;
-          const index = openTabs?.findIndex((i) => i === id);
-          const tab = openTabs?.[index];
-          set({
-            openTabs: openTabs.filter((id) => id !== tab),
-          });
-          if (activeTab === id) {
-            set({
-              activeTab: index > 0 ? openTabs?.[index - 1] : 'graph',
-            });
-          }
-        },
         disabled: false,
         configurable: true,
         components: [],
       })),
     [],
   );
-  return <DecisionGraphStoreContext.Provider value={store}>{children}</DecisionGraphStoreContext.Provider>;
+
+  const listenerStore = useMemo(
+    () =>
+      create<DecisionGraphStoreType['listeners']>(() => ({
+        onChange: undefined,
+        onOpenNode: undefined,
+        onEditGraph: undefined,
+        onAddNode: undefined,
+        onTabChange: undefined,
+      })),
+    [],
+  );
+
+  const referenceStore = useMemo(
+    () =>
+      create<DecisionGraphStoreType['references']>(() => ({
+        nodesState: createRef() as MutableRefObject<ReturnType<typeof useNodesState>>,
+        edgesState: createRef() as MutableRefObject<ReturnType<typeof useEdgesState>>,
+      })),
+    [],
+  );
+
+  const actions = useMemo<DecisionGraphStoreType['actions']>(
+    () => ({
+      handleNodesChange: (changes = []) => {
+        const { decisionGraph } = stateStore.getState();
+        const { nodesState } = referenceStore.getState();
+
+        nodesState.current[2]?.(changes);
+        if (changes.find((c) => c.type === 'position')) {
+          const newDecisionGraph = produce(decisionGraph, (draft) => {
+            const nodes = (draft.nodes || []).map((node) => {
+              const change = changes.find((change: NodeChange & { id: string }) => change.id === node.id);
+              if (change?.type === 'position' && change?.position) {
+                node.position = change.position as Position;
+              }
+              return node;
+            });
+            draft.nodes = nodes;
+          });
+
+          stateStore.setState({ decisionGraph: newDecisionGraph });
+          listenerStore.getState().onChange?.(decisionGraph);
+        }
+      },
+      handleEdgesChange: (changes = []) => {
+        const { decisionGraph } = stateStore.getState();
+        const { edgesState } = referenceStore.getState();
+
+        edgesState?.current?.[2](changes);
+
+        if (changes.find((c) => c.type === 'remove')) {
+          const newDecisionGraph = produce(decisionGraph, (draft) => {
+            const edges = (draft.edges || [])
+              .map((edge) => {
+                const change = changes.find((change: EdgeChange & { id: string }) => change.id === edge.id);
+                if (change?.type === 'remove') {
+                  return null;
+                }
+                return edge;
+              })
+              .filter((node) => !!node) as DecisionEdge[];
+            draft.edges = edges;
+          });
+
+          stateStore.setState({ decisionGraph: newDecisionGraph });
+          listenerStore.getState().onChange?.(decisionGraph);
+        }
+      },
+      setNodes: (nodes: DecisionNode[] = []) => {
+        const { nodesState } = referenceStore.getState();
+        const { decisionGraph } = stateStore.getState();
+        nodesState?.current?.[1](mapToGraphNodes(nodes));
+
+        const newDecisionGraph = produce(decisionGraph, (draft) => {
+          draft.nodes = nodes;
+        });
+
+        stateStore.setState({ decisionGraph: newDecisionGraph });
+        listenerStore.getState().onChange?.(decisionGraph);
+      },
+      addNode: (node: DecisionNode) => {
+        const { nodesState } = referenceStore.getState();
+        const { decisionGraph } = stateStore.getState();
+
+        nodesState.current[1]?.((nodes) => nodes.concat(mapToGraphNode(node)));
+        const newDecisionGraph = produce(decisionGraph, (draft) => {
+          const nodes = draft.nodes || [];
+          draft.nodes = nodes.concat(node);
+        });
+
+        stateStore.setState({ decisionGraph: newDecisionGraph });
+        listenerStore.getState().onChange?.(decisionGraph);
+      },
+      addNodes: (nodes: DecisionNode[]) => {
+        const { nodesState } = referenceStore.getState();
+        const { decisionGraph } = stateStore.getState();
+
+        nodesState.current[1]?.((n) => n.concat(mapToGraphNodes(nodes)));
+        const newDecisionGraph = produce(decisionGraph, (draft) => {
+          const n = draft.nodes || [];
+          draft.nodes = n.concat(nodes);
+        });
+
+        stateStore.setState({ decisionGraph: newDecisionGraph });
+        listenerStore.getState().onChange?.(decisionGraph);
+      },
+      removeNode: (id) => {
+        const { nodesState, edgesState } = referenceStore.getState();
+        const { decisionGraph } = stateStore.getState();
+
+        nodesState.current[1]?.((nodes) => nodes.filter((n) => n.id !== id));
+        edgesState.current[1]?.((edges) =>
+          edges.filter((e) => e.source !== id && e.target !== id && e.sourceHandle !== id && e.targetHandle !== id),
+        );
+
+        const newDecisionGraph = produce(decisionGraph, (draft) => {
+          const nodes = draft.nodes || [];
+          draft.nodes = nodes.filter((n) => n.id !== id);
+        });
+
+        stateStore.setState({ decisionGraph: newDecisionGraph });
+        listenerStore.getState().onChange?.(decisionGraph);
+      },
+      addEdge: (edge: DecisionEdge) => {
+        const { edgesState } = referenceStore.getState();
+        const { decisionGraph } = stateStore.getState();
+
+        edgesState.current?.[1]?.((els) => els.concat(mapToGraphEdge(edge)));
+        const newDecisionGraph = produce(decisionGraph, (draft) => {
+          const edges = draft.edges || [];
+          draft.edges = edges.concat(edge);
+        });
+
+        stateStore.setState({ decisionGraph: newDecisionGraph });
+        listenerStore.getState().onChange?.(decisionGraph);
+      },
+      setEdges: (edges = []) => {
+        const { edgesState } = referenceStore.getState();
+        const { decisionGraph } = stateStore.getState();
+
+        edgesState?.current?.[1]?.(mapToGraphEdges(edges));
+        const newDecisionGraph = produce(decisionGraph, (draft) => {
+          draft.edges = edges;
+        });
+
+        stateStore.setState({ decisionGraph: newDecisionGraph });
+        listenerStore.getState().onChange?.(decisionGraph);
+      },
+      removeEdge: (id) => {
+        const { edgesState } = referenceStore.getState();
+        const { decisionGraph } = stateStore.getState();
+
+        edgesState?.current?.[1]?.((edges) => edges.filter((e) => e.id !== id));
+        const newDecisionGraph = produce(decisionGraph, (draft) => {
+          draft.edges = draft.edges.filter((e) => e.id !== id);
+        });
+
+        stateStore.setState({ decisionGraph: newDecisionGraph });
+        listenerStore.getState().onChange?.(decisionGraph);
+      },
+      updateNode: (id, updater) => {
+        // TODO: Update nodeState
+        const { decisionGraph } = stateStore.getState();
+
+        const newDecisionGraph = produce(decisionGraph, (draft) => {
+          const node = (draft.nodes ?? []).find((node) => node?.id === id);
+          if (!node) {
+            return;
+          }
+
+          updater(node);
+        });
+
+        stateStore.setState({ decisionGraph: newDecisionGraph });
+        listenerStore.getState().onChange?.(newDecisionGraph);
+      },
+      setDecisionGraph: (graph) => {
+        const { edgesState, nodesState } = referenceStore.getState();
+
+        edgesState?.current?.[1](mapToGraphEdges(graph?.edges || []));
+        nodesState?.current?.[1](mapToGraphNodes(graph?.nodes || []));
+
+        stateStore.setState({ decisionGraph: graph });
+        listenerStore.getState().onChange?.(graph);
+      },
+      setHoveredEdgeId: (edgeId) => stateStore.setState({ hoveredEdgeId: edgeId }),
+      openTab: (id: string) => {
+        const { openTabs } = stateStore.getState();
+        const nodeId = openTabs.find((i) => i === id);
+
+        if (nodeId) {
+          stateStore.setState({ activeTab: nodeId });
+        } else {
+          stateStore.setState({ openTabs: [...openTabs, id], activeTab: id });
+        }
+      },
+      closeTab: (id: string) => {
+        const { openTabs, activeTab } = stateStore.getState();
+        const index = openTabs?.findIndex((i) => i === id);
+        const tab = openTabs?.[index];
+
+        stateStore.setState({
+          openTabs: openTabs.filter((id) => id !== tab),
+        });
+
+        if (activeTab === id) {
+          stateStore.setState({
+            activeTab: index > 0 ? openTabs?.[index - 1] : 'graph',
+          });
+        }
+      },
+    }),
+    [],
+  );
+
+  return (
+    <DecisionGraphStoreContext.Provider
+      value={{
+        stateStore,
+        referenceStore,
+        listenerStore,
+        actions,
+      }}
+    >
+      {children}
+    </DecisionGraphStoreContext.Provider>
+  );
 };
 
-export function useDecisionGraphStore<T>(
-  selector: (state: DecisionGraphStoreType) => T,
-  equals?: (a: any, b: any) => boolean,
+export function useDecisionGraphState<T>(
+  selector: (state: DecisionGraphStoreType['state']) => T,
+  equals: (a: any, b: any) => boolean = equal,
 ): T {
-  return React.useContext(DecisionGraphStoreContext)(selector, equals as any);
+  return React.useContext(DecisionGraphStoreContext).stateStore(selector, equals);
 }
 
-export const useDecisionGraphRaw = () => React.useContext(DecisionGraphStoreContext);
+export function useDecisionGraphListeners<T>(
+  selector: (state: DecisionGraphStoreType['listeners']) => T,
+  equals: (a: any, b: any) => boolean = equal,
+): T {
+  return React.useContext(DecisionGraphStoreContext).listenerStore(selector, equals);
+}
+
+export function useDecisionGraphReferences<T>(
+  selector: (state: DecisionGraphStoreType['references']) => T,
+  equals: (a: any, b: any) => boolean = equal,
+): T {
+  return React.useContext(DecisionGraphStoreContext).referenceStore(selector, equals);
+}
+
+export function useDecisionGraphActions(): DecisionGraphStoreType['actions'] {
+  return React.useContext(DecisionGraphStoreContext).actions;
+}
+
+export function useDecisionGraphRaw() {
+  return React.useContext(DecisionGraphStoreContext);
+}
+
 export default DecisionGraphProvider;

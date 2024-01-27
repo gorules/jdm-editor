@@ -5,11 +5,11 @@ import React from 'react';
 import type { EdgeProps } from 'reactflow';
 import { BaseEdge, EdgeLabelRenderer, getBezierPath } from 'reactflow';
 
-import { useDecisionGraphStore } from './context/dg-store.context';
+import { useDecisionGraphState } from './context/dg-store.context';
 
 export const CustomEdge: React.FC<EdgeProps> = (props) => {
   const { id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, style = {}, markerEnd } = props;
-  const { hoveredEdgeId } = useDecisionGraphStore(({ hoveredEdgeId }) => ({ hoveredEdgeId }));
+  const { hoveredEdgeId } = useDecisionGraphState(({ hoveredEdgeId }) => ({ hoveredEdgeId }));
 
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,

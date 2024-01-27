@@ -8,12 +8,10 @@ import {
 } from '@ant-design/icons';
 import { Button, Typography } from 'antd';
 import clsx from 'clsx';
-import equal from 'fast-deep-equal/es6/react';
 import React, { useCallback } from 'react';
 import type { XYPosition } from 'reactflow';
 
-import type { CustomNodeType } from '../context/dg-store.context';
-import { useDecisionGraphStore } from '../context/dg-store.context';
+import { useDecisionGraphState } from '../context/dg-store.context';
 
 export type GraphComponentsProps = {
   inputDisabled?: boolean;
@@ -22,7 +20,7 @@ export type GraphComponentsProps = {
 };
 
 export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inputDisabled, onPaste }) => {
-  const customComponents: CustomNodeType[] = useDecisionGraphStore((store) => store.components || [], equal);
+  const customComponents = useDecisionGraphState((store) => store.components || []);
 
   const onDragStart = useCallback((event: React.DragEvent, nodeType: string) => {
     const target = event.target as HTMLDivElement;

@@ -1,10 +1,9 @@
 import { TableOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
-import equal from 'fast-deep-equal/es6/react';
 import React from 'react';
 import { v4 } from 'uuid';
 
-import { useDecisionGraphStore } from '../context/dg-store.context';
+import { useDecisionGraphActions } from '../context/dg-store.context';
 import { GraphNode } from './graph-node';
 import type { NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
@@ -63,12 +62,7 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
   renderNode:
     ({ specification }) =>
     ({ id, data, selected }) => {
-      const { openTab } = useDecisionGraphStore(
-        ({ openTab }) => ({
-          openTab,
-        }),
-        equal,
-      );
+      const graphActions = useDecisionGraphActions();
 
       return (
         <GraphNode
@@ -78,7 +72,7 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
           name={data.name}
           isSelected={selected}
           actions={[
-            <Button key='edit-table' type='link' onClick={() => openTab(id)}>
+            <Button key='edit-table' type='link' onClick={() => graphActions.openTab(id)}>
               Edit Table
             </Button>,
           ]}

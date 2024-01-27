@@ -1,10 +1,9 @@
 import { DeploymentUnitOutlined } from '@ant-design/icons';
 import type { TabsProps } from 'antd';
 import { Avatar, Tabs } from 'antd';
-import equal from 'fast-deep-equal/es6/react';
 import React, { useEffect } from 'react';
 
-import { useDecisionGraphStore } from '../context/dg-store.context';
+import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
 import type { NodeKind } from '../nodes/specification-types';
 import { nodeSpecification } from '../nodes/specifications';
 
@@ -17,21 +16,17 @@ type NonUndefined<T> = T extends undefined ? never : T;
 type TabItem = NonUndefined<TabsProps['items']>[number];
 
 export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled, onTabChange }) => {
-  const { activeNodeId, openNodes, openTab, closeTab } = useDecisionGraphStore(
-    ({ decisionGraph, openTab, closeTab, activeTab, openTabs }) => ({
-      activeNodeId: (decisionGraph?.nodes ?? []).find((node) => node.id === activeTab)?.id,
-      openNodes: (decisionGraph?.nodes ?? [])
-        .filter((node) => openTabs.includes(node.id))
-        .map(({ id, name, type }) => ({
-          id,
-          name,
-          type,
-        })),
-      openTab,
-      closeTab,
-    }),
-    equal,
-  );
+  const graphActions = useDecisionGraphActions();
+  const { openNodes, activeNodeId } = useDecisionGraphState(({ decisionGraph, activeTab, openTabs }) => ({
+    activeNodeId: (decisionGraph?.nodes ?? []).find((node) => node.id === activeTab)?.id,
+    openNodes: (decisionGraph?.nodes ?? [])
+      .filter((node) => openTabs.includes(node.id))
+      .map(({ id, name, type }) => ({
+        id,
+        name,
+        type,
+      })),
+  }));
 
   useEffect(() => {
     onTabChange?.(activeNodeId || 'graph');
@@ -46,10 +41,10 @@ export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled, onTabChange }) =
       activeKey={activeNodeId || 'graph'}
       onEdit={(targetKey: any, action: 'add' | 'remove') => {
         if (action === 'remove') {
-          closeTab(targetKey);
+          graphActions.closeTab(targetKey);
         }
       }}
-      onChange={(val) => openTab(val)}
+      onChange={(val) => graphActions.openTab(val)}
       items={[
         { closable: false, key: 'graph', label: <TabLabel icon={<DeploymentUnitOutlined />} name='Graph' /> },
         ...openNodes.map((node) => {

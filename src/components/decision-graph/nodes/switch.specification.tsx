@@ -6,7 +6,7 @@ import { Handle, Position } from 'reactflow';
 import { v4 } from 'uuid';
 
 import { AutosizeTextArea } from '../../autosize-text-area';
-import { useDecisionGraphStore } from '../context/dg-store.context';
+import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
 import { GraphNode } from './graph-node';
 import type { MinimalNodeProps, NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
@@ -48,16 +48,17 @@ const SwitchNode: React.FC<
   }
 > = ({ id, data, selected, specification }) => {
   const isConnectable = true;
-  const { content, updateNode } = useDecisionGraphStore(({ getNodeContent, updateNode }) => ({
-    content: getNodeContent(id) as NodeSwitchData['content'],
-    updateNode: updateNode,
-  }));
+  const graphActions = useDecisionGraphActions();
+  const content = useDecisionGraphState(
+    ({ decisionGraph }) =>
+      (decisionGraph?.nodes || []).find((n) => n?.id === id)?.content as NodeSwitchData['content'] | undefined,
+  );
 
   const statements: SwitchStatement[] = content?.statements || [];
   const hitPolicy = content?.hitPolicy || 'first';
 
   const changeHitPolicy = (hitPolicy: string) => {
-    updateNode(id, (node) => {
+    graphActions.updateNode(id, (node) => {
       node.content.hitPolicy = hitPolicy;
       return node;
     });
@@ -78,7 +79,7 @@ const SwitchNode: React.FC<
           key='add row'
           type='link'
           onClick={() => {
-            updateNode(id, (draft) => {
+            graphActions.updateNode(id, (draft) => {
               draft.content.statements.push({ id: v4(), condition: '' });
               return draft;
             });
@@ -125,7 +126,7 @@ const SwitchNode: React.FC<
               id={statement.id}
               isConnectable={isConnectable}
               onDelete={() => {
-                updateNode(id, (draft) => {
+                graphActions.updateNode(id, (draft) => {
                   draft.content.statements = draft.content.statements.filter(
                     (s: SwitchStatement) => s?.id !== statement?.id,
                   );
@@ -134,7 +135,7 @@ const SwitchNode: React.FC<
                 });
               }}
               onChange={(condition) => {
-                updateNode(id, (draft) => {
+                graphActions.updateNode(id, (draft) => {
                   const draftStatement = draft.content.statements.find((s: SwitchStatement) => {
                     return s.id === statement.id;
                   });

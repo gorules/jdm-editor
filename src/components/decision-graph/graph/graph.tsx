@@ -6,7 +6,12 @@ import ReactFlow, { Background, Controls, useEdgesState, useNodesState } from 'r
 import 'reactflow/dist/style.css';
 import { v4 } from 'uuid';
 
-import { type DecisionGraphType, type DecisionNode, useDecisionGraphRaw } from '../context/dg-store.context';
+import {
+  type DecisionGraphStoreType,
+  useDecisionGraphActions,
+  useDecisionGraphListeners,
+  useDecisionGraphReferences,
+} from '../context/dg-store.context';
 import { edgeFunction } from '../custom-edge';
 import { mapToDecisionEdge, mapToDecisionNode } from '../dg-util';
 import '../dg.scss';
@@ -22,14 +27,7 @@ export type GraphProps = {
   reactFlowProOptions?: ProOptions;
 };
 
-export type GraphRef = {
-  openEdit?: () => void;
-  closeEdit?: () => void;
-  confirmEdit?: () => void;
-  openNode?: (id: string) => void;
-  addNode?: (node: DecisionNode) => void;
-  setDecisionGraph?: (decisionGraph: DecisionGraphType) => void;
-};
+export type GraphRef = DecisionGraphStoreType['actions'];
 
 const nodeTypes = Object.entries(nodeSpecification).reduce(
   (acc, [key, value]) => ({
@@ -54,9 +52,11 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
   const nodesState = useNodesState([]);
   const edgesState = useEdgesState([]);
 
-  const decisionStoreState = useDecisionGraphRaw().getState();
-  decisionStoreState.nodesState.current = nodesState;
-  decisionStoreState.edgesState.current = edgesState;
+  const graphActions = useDecisionGraphActions();
+  const graphListeners = useDecisionGraphListeners(({ onAddNode }) => ({ onAddNode }));
+  const graphReferences = useDecisionGraphReferences((s) => s);
+  graphReferences.nodesState.current = nodesState;
+  graphReferences.edgesState.current = edgesState;
 
   const inputNodes = nodesState[0].filter((node) => node.type === 'inputNode');
   const selected = nodesState[0].filter((node) => node?.selected);
@@ -83,7 +83,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
     }
 
     if (!(type in nodeSpecification)) {
-      return decisionStoreState.onAddNode?.(type, position);
+      return graphListeners.onAddNode?.(type, position);
     }
 
     const partialNode = nodeSpecification[type as NodeKind].generateNode();
@@ -95,7 +95,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
       position,
     };
 
-    decisionStoreState.addNode(mapToDecisionNode(newNode));
+    graphActions.addNode(mapToDecisionNode(newNode));
   };
 
   const onDrop = (event: React.DragEvent) => {
@@ -137,18 +137,10 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
       id: v4(),
     };
 
-    decisionStoreState.addEdge(mapToDecisionEdge(edge));
+    graphActions.addEdge(mapToDecisionEdge(edge));
   };
 
-  useImperativeHandle(ref, () => ({
-    addNode: (node: DecisionNode) => {
-      decisionStoreState.addNode(node);
-    },
-    openNode: (id: string) => {
-      decisionStoreState.openTab(id);
-    },
-    setDecisionGraph: decisionStoreState.setDecisionGraph,
-  }));
+  useImperativeHandle(ref, () => graphActions);
 
   const onPaste = useCallback(async () => {
     try {
@@ -182,15 +174,15 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
             onDragOver={onDragOver}
             onConnect={onConnect}
             proOptions={reactFlowProOptions}
-            onNodesChange={decisionStoreState.nodesChange}
-            onEdgesChange={decisionStoreState.edgesChange}
+            onNodesChange={graphActions.handleNodesChange}
+            onEdgesChange={graphActions.handleEdgesChange}
             onNodesDelete={(e) => {
               e.forEach((node) => {
-                decisionStoreState.closeTab(node?.id);
+                graphActions.closeTab(node?.id);
               });
             }}
-            onEdgeMouseEnter={(_, edge) => decisionStoreState.setHoveredEdgeId(edge.id)}
-            onEdgeMouseLeave={() => decisionStoreState.setHoveredEdgeId(null)}
+            onEdgeMouseEnter={(_, edge) => graphActions.setHoveredEdgeId(edge.id)}
+            onEdgeMouseLeave={() => graphActions.setHoveredEdgeId(null)}
           >
             <Controls showInteractive={false} />
             <Background color='var(--grl-color-border)' gap={20} />

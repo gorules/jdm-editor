@@ -1,7 +1,7 @@
 import { ApartmentOutlined } from '@ant-design/icons';
 import type { Meta, StoryObj } from '@storybook/react';
 import { Form, Input } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { v4 } from 'uuid';
 
 import { DecisionGraph } from './dg';
@@ -58,7 +58,6 @@ export const Uncontrolled: Story = {
           {...args}
           defaultValue={defaultGraph}
           onChange={(val) => {
-            console.log(val);
             args?.onChange?.(val);
           }}
         />

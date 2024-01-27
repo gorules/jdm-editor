@@ -1,5 +1,4 @@
 import { message } from 'antd';
-import equal from 'fast-deep-equal/es6/react';
 import { type RefObject, useCallback, useMemo } from 'react';
 import type { Node, ReactFlowInstance, XYPosition } from 'reactflow';
 import { v4 } from 'uuid';
@@ -8,8 +7,8 @@ import { copyToClipboard, pasteFromClipboard } from '../../../helpers/utility';
 import {
   type DecisionEdge,
   type DecisionNode,
+  useDecisionGraphActions,
   useDecisionGraphRaw,
-  useDecisionGraphStore,
 } from '../context/dg-store.context';
 
 type ClipboardData = {
@@ -27,18 +26,12 @@ export const useGraphClipboard = (
   wrapper: RefObject<HTMLDivElement | null>,
 ) => {
   const raw = useDecisionGraphRaw();
-
-  const { addNodes } = useDecisionGraphStore(
-    ({ addNodes }) => ({
-      addNodes,
-    }),
-    equal,
-  );
+  const { addNodes } = useDecisionGraphActions();
 
   const copyNodes = useCallback(
     async (nodes: Node[]) => {
       try {
-        const copyNodes = (raw.getState()?.decisionGraph?.nodes || []).filter((n) =>
+        const copyNodes = (raw.stateStore.getState()?.decisionGraph?.nodes || []).filter((n) =>
           nodes.some((node) => node.id === n.id),
         );
 

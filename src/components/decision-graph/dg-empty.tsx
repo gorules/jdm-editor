@@ -4,8 +4,14 @@ import { useEffect, useRef } from 'react';
 import type { XYPosition } from 'reactflow';
 import { useDebouncedCallback } from 'use-debounce';
 
-import type { CustomNodeType, DecisionGraphType, DecisionNode } from './context/dg-store.context';
-import { useDecisionGraphRaw, useDecisionGraphStore } from './context/dg-store.context';
+import {
+  type CustomNodeType,
+  type DecisionGraphType,
+  type DecisionNode,
+  useDecisionGraphActions,
+  useDecisionGraphRaw,
+  useDecisionGraphState,
+} from './context/dg-store.context';
 
 export type DecisionGraphEmptyType = {
   id?: string;
@@ -40,48 +46,54 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
   simulate,
 }) => {
   const mountedRef = useRef(false);
-  const store = useDecisionGraphRaw();
-  const { setDecisionGraph, decisionGraph } = useDecisionGraphStore(
-    ({ setDecisionGraph, decisionGraph }) => ({
-      setDecisionGraph,
-      decisionGraph,
-    }),
-    equal,
-  );
+  const graphActions = useDecisionGraphActions();
+  const { stateStore, listenerStore } = useDecisionGraphRaw();
+  const { decisionGraph } = useDecisionGraphState(({ decisionGraph }) => ({
+    decisionGraph,
+  }));
 
   const innerChange = useDebouncedCallback((graph: DecisionGraphType) => {
     onChange?.(graph);
   }, 100);
 
   useEffect(() => {
-    store.setState({
+    stateStore.setState({
       id,
       disabled,
       configurable,
       components,
       simulate,
-      onChange: innerChange,
+    });
+  }, [id, disabled, configurable, components, simulate]);
+
+  useEffect(() => {
+    listenerStore.setState({
       onAddNode,
       onOpenNode,
       onTabChange,
       onEditGraph,
     });
-  }, [id, disabled, configurable, components, simulate, onAddNode, onOpenNode, onTabChange, onEditGraph]);
+  }, [onAddNode, onOpenNode, onTabChange, onEditGraph]);
+
+  useEffect(() => {
+    listenerStore.setState({ onChange: innerChange });
+  }, [innerChange]);
 
   useEffect(() => {
     if (mountedRef.current && value !== undefined && !equal(value, decisionGraph)) {
-      setDecisionGraph(value);
+      graphActions.setDecisionGraph(value);
     }
   }, [value]);
 
   useEffect(() => {
     if (value !== undefined) {
-      setDecisionGraph(value);
+      graphActions.setDecisionGraph(value);
     } else if (defaultValue !== undefined) {
-      setDecisionGraph(defaultValue);
+      graphActions.setDecisionGraph(defaultValue);
     }
 
     mountedRef.current = true;
   }, []);
+
   return null;
 };

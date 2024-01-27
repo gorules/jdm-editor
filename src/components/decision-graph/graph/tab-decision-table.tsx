@@ -1,9 +1,8 @@
 import type { DragDropManager } from 'dnd-core';
-import equal from 'fast-deep-equal/es6/react';
 import React from 'react';
 
 import { DecisionTable } from '../../decision-table';
-import { useDecisionGraphStore } from '../context/dg-store.context';
+import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
 
 export type TabDecisionTableProps = {
   id: string;
@@ -11,19 +10,14 @@ export type TabDecisionTableProps = {
 };
 
 export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager }) => {
-  const { nodeTrace, updateNode, disabled, configurable } = useDecisionGraphStore(
-    ({ simulate, updateNode, disabled, configurable }) => ({
+  const graphActions = useDecisionGraphActions();
+  const { nodeTrace, disabled, configurable, content } = useDecisionGraphState(
+    ({ simulate, disabled, configurable, decisionGraph }) => ({
       nodeTrace: simulate?.result?.trace?.[id],
-      updateNode,
       disabled,
       configurable,
+      content: (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content,
     }),
-    equal,
-  );
-
-  const content = useDecisionGraphStore(
-    ({ decisionGraph }) => (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content,
-    equal,
   );
 
   const activeRules: string[] =
@@ -40,7 +34,7 @@ export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager 
       tableHeight={'100%'}
       value={content as any}
       onChange={(val) => {
-        updateNode(id, (draft) => {
+        graphActions.updateNode(id, (draft) => {
           draft.content = val;
           return draft;
         });

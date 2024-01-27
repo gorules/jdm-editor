@@ -1,12 +1,11 @@
 import clsx from 'clsx';
 import { createDragDropManager } from 'dnd-core';
-import equal from 'fast-deep-equal/es6/react';
 import React, { forwardRef, useMemo, useRef, useState } from 'react';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import type { ProOptions } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-import { useDecisionGraphStore } from './context/dg-store.context';
+import { useDecisionGraphListeners, useDecisionGraphState } from './context/dg-store.context';
 import './dg.scss';
 import type { GraphRef } from './graph/graph';
 import { Graph } from './graph/graph';
@@ -22,16 +21,11 @@ export type DecisionGraphWrapperProps = {
 
 export const DecisionGraphWrapper = React.memo(
   forwardRef<GraphRef, DecisionGraphWrapperProps>(({ reactFlowProOptions, hideExportImport }, ref) => {
-    const { hasActiveNode, onTabChange } = useDecisionGraphStore(({ decisionGraph, activeTab, onTabChange }) => {
-      const hasActiveNode = (decisionGraph?.nodes ?? []).some((node) => node.id === activeTab);
-
-      return {
-        onTabChange,
-        hasActiveNode,
-      };
-    }, equal);
-
     const [disableTabs, setDisableTabs] = useState(false);
+    const onTabChange = useDecisionGraphListeners(({ onTabChange }) => onTabChange);
+    const hasActiveNode = useDecisionGraphState(({ decisionGraph, activeTab }) => {
+      return (decisionGraph?.nodes ?? []).some((node) => node.id === activeTab);
+    });
 
     return (
       <div className={'grl-dg__wrapper'}>
@@ -52,7 +46,7 @@ export const DecisionGraphWrapper = React.memo(
 );
 
 const TabContents: React.FC = React.memo(() => {
-  const { openNodes, activeNodeId } = useDecisionGraphStore(({ decisionGraph, openTabs, activeTab }) => {
+  const { openNodes, activeNodeId } = useDecisionGraphState(({ decisionGraph, openTabs, activeTab }) => {
     const activeNodeId = (decisionGraph?.nodes ?? []).find((node) => node.id === activeTab)?.id;
     const openNodes = (decisionGraph?.nodes ?? []).filter((node) => openTabs.includes(node.id));
 
@@ -60,7 +54,7 @@ const TabContents: React.FC = React.memo(() => {
       openNodes: openNodes.map(({ id, type }) => ({ id, type })),
       activeNodeId,
     };
-  }, equal);
+  });
 
   const containerRef = useRef<HTMLDivElement>(null);
   const dndManager = useMemo(() => {

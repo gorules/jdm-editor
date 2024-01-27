@@ -1,8 +1,7 @@
 import { Spin } from 'antd';
-import equal from 'fast-deep-equal/es6/react';
 import React, { Suspense } from 'react';
 
-import { useDecisionGraphStore } from '../context/dg-store.context';
+import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
 
 const Function = React.lazy(async () => {
   const functionImport = await import('../../function');
@@ -14,18 +13,14 @@ export type TabFunctionProps = {
 };
 
 export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
-  const { nodeTrace, updateNode, disabled } = useDecisionGraphStore(
-    ({ simulate, updateNode, disabled }) => ({
+  const graphActions = useDecisionGraphActions();
+  const { nodeTrace, disabled, content } = useDecisionGraphState(
+    ({ simulate, disabled, configurable, decisionGraph }) => ({
       nodeTrace: simulate?.result?.trace?.[id],
-      updateNode,
       disabled,
+      configurable,
+      content: (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content,
     }),
-    equal,
-  );
-
-  const content = useDecisionGraphStore(
-    ({ decisionGraph }) => (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content,
-    equal,
   );
 
   return (
@@ -33,7 +28,7 @@ export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
       <Function
         value={typeof content === 'string' ? content : ''}
         onChange={(val) => {
-          updateNode(id, (draft) => {
+          graphActions.updateNode(id, (draft) => {
             draft.content = val;
             return draft;
           });
