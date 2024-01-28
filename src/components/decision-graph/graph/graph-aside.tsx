@@ -45,7 +45,7 @@ export const GraphAside = () => {
                     Components
                   </Typography.Text>
                 </div>
-                <Button type={'text'} icon={<CloseOutlined />} onClick={() => setMenu(undefined)}></Button>
+                <Button type={'text'} size='small' icon={<CloseOutlined />} onClick={() => setMenu(undefined)}></Button>
               </div>
               <div className={'grl-dg__aside__menu__content'}>
                 <div className={'grl-dg__aside__menu__content__inner'}>

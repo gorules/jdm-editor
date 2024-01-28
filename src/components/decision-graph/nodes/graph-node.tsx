@@ -39,6 +39,7 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
       <DecisionNode
         {...decisionNodeProps}
         icon={specification.icon}
+        color={specification.color}
         type={specification.displayName}
         onDelete={() => graphActions.removeNode(id)}
         onViewDocumentation={() => {

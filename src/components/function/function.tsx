@@ -93,7 +93,7 @@ export const Function: React.FC<FunctionProps> = ({
       >
         <Stack gap={8} horizontal className='full-width'>
           <Button
-            type='default'
+            type='text'
             size={'small'}
             color='secondary'
             icon={<FormatPainterOutlined />}

@@ -12,7 +12,9 @@ export type NodeInputData = {
 export const inputSpecification: NodeSpecification<NodeInputData> = {
   icon: <LoginOutlined />,
   displayName: 'Request',
+  color: 'secondary',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions',
+  shortDescription: 'Provides input context',
   generateNode: () => ({
     type: NodeKind.Input,
     data: {
@@ -22,13 +24,6 @@ export const inputSpecification: NodeSpecification<NodeInputData> = {
   renderNode:
     ({ specification }) =>
     ({ id, data, selected }) => (
-      <GraphNode
-        id={id}
-        color='secondary'
-        specification={specification}
-        name={data.name}
-        isSelected={selected}
-        handleLeft={false}
-      />
+      <GraphNode id={id} specification={specification} name={data.name} isSelected={selected} handleLeft={false} />
     ),
 };

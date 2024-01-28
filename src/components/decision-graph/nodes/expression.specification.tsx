@@ -24,6 +24,7 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
   icon: <NumberOutlined />,
   displayName: 'Expression',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/expression',
+  shortDescription: 'Mapping utility',
   generateNode: () => ({
     type: NodeKind.Expression,
     data: {

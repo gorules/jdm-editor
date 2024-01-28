@@ -46,7 +46,11 @@ export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled, onTabChange }) =
       }}
       onChange={(val) => graphActions.openTab(val)}
       items={[
-        { closable: false, key: 'graph', label: <TabLabel icon={<DeploymentUnitOutlined />} name='Graph' /> },
+        {
+          closable: false,
+          key: 'graph',
+          label: <TabLabel icon={<DeploymentUnitOutlined />} name='Graph' />,
+        },
         ...openNodes.map((node) => {
           const specification = nodeSpecification[node.type as NodeKind];
 
@@ -69,8 +73,9 @@ const TabLabel: React.FC<{ icon?: React.ReactNode; name?: string }> = ({ icon, n
         size='small'
         shape='square'
         style={{
-          background: 'var(--grl-color-primary-hover)',
-          fontSize: 12,
+          color: 'var(--grl-color-primary)',
+          background: 'transparent',
+          fontSize: 16,
           width: 20,
           height: 20,
           lineHeight: '18px',

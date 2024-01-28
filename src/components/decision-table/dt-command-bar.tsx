@@ -162,7 +162,7 @@ export const DecisionTableCommandBar: React.FC = () => {
       <Stack horizontal horizontalAlign={'space-between'} verticalAlign={'center'} className={'grl-dt__command-bar'}>
         <Stack gap={8} horizontal className='full-width'>
           <Button
-            type='default'
+            type='text'
             size={'small'}
             color='secondary'
             icon={<ExportOutlined />}
@@ -171,7 +171,7 @@ export const DecisionTableCommandBar: React.FC = () => {
             Export CSV
           </Button>
           <Button
-            type='default'
+            type='text'
             size={'small'}
             color='secondary'
             disabled={disabled}

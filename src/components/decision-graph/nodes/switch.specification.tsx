@@ -28,6 +28,7 @@ export const switchSpecification: NodeSpecification<NodeSwitchData> = {
   icon: <BranchesOutlined />,
   displayName: 'Switch',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/switch',
+  shortDescription: 'Conditional branching',
   generateNode: () => ({
     type: NodeKind.Switch,
     data: {

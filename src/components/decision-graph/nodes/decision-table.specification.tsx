@@ -34,6 +34,7 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
   icon: <TableOutlined />,
   displayName: 'Decision table',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/decision-tables',
+  shortDescription: 'Rules spreadsheet',
   generateNode: () => ({
     type: NodeKind.DecisionTable,
     data: {

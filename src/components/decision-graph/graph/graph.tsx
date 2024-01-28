@@ -118,8 +118,8 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
       y: event.clientY - reactFlowBounds.top,
     }) as XYPosition;
 
-    position.x -= Math.round((elementPosition.x * 180) / 10) * 10;
-    position.y -= Math.round((elementPosition.y * 80) / 10) * 10;
+    position.x -= Math.round((elementPosition.x * 226) / 10) * 10;
+    position.y -= Math.round((elementPosition.y * 60) / 10) * 10;
 
     addNodeInner(type, position);
   };

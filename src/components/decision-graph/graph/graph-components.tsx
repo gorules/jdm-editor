@@ -1,18 +1,13 @@
-import {
-  BranchesOutlined,
-  CloseOutlined,
-  CodeOutlined,
-  FunctionOutlined,
-  LoginOutlined,
-  LogoutOutlined,
-  TableOutlined,
-} from '@ant-design/icons';
-import { Button, Typography } from 'antd';
+import { Divider, Typography } from 'antd';
 import clsx from 'clsx';
 import React, { useCallback } from 'react';
 import type { XYPosition } from 'reactflow';
+import { match } from 'ts-pattern';
 
+import { DecisionNode } from '../../decision-node/decision-node';
 import { useDecisionGraphState } from '../context/dg-store.context';
+import { NodeKind } from '../nodes/specification-types';
+import { nodeSpecification } from '../nodes/specifications';
 
 export type GraphComponentsProps = {
   inputDisabled?: boolean;
@@ -49,74 +44,21 @@ export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(
       <div className={'wrapper'}>
         <div className={'wrapper__list-wrapper'}>
           <div className={'wrapper__list'}>
-            <div className={'component'}>
-              <div
-                className={clsx(['icon', (inputDisabled || disabled) && 'disabled'])}
-                onDragStart={(event) => onDragStart(event, 'inputNode')}
-                draggable={!inputDisabled || disabled}
-              >
-                <LoginOutlined />
-              </div>
-              <Typography.Text type={'secondary'}>Request</Typography.Text>
-            </div>
-            <div className={'component'}>
-              <div
-                className={clsx(['icon', disabled && 'disabled'])}
-                onDragStart={(event) => onDragStart(event, 'outputNode')}
-                draggable={!disabled}
-              >
-                <LogoutOutlined />
-              </div>
-              <Typography.Text type={'secondary'}>Response</Typography.Text>
-            </div>
+            {Object.keys(nodeSpecification).map((kind: NodeKind) => (
+              <>
+                <DragDecisionNode
+                  key={kind}
+                  disabled={match(kind)
+                    .with(NodeKind.Input, () => disabled || inputDisabled)
+                    .otherwise(() => disabled)}
+                  kind={kind}
+                  onDragStart={(event) => onDragStart(event, kind)}
+                />
+                {kind === NodeKind.Output && <Divider style={{ margin: '4px 0' }} />}
+              </>
+            ))}
 
-            <div className={'divider'} />
-
-            <div className={'component'}>
-              <div
-                className={clsx(['icon', disabled && 'disabled'])}
-                onDragStart={(event) => onDragStart(event, 'decisionTableNode')}
-                draggable={!disabled}
-              >
-                <TableOutlined />
-              </div>
-              <Typography.Text type={'secondary'}>Table</Typography.Text>
-            </div>
-
-            <div className={'component'}>
-              <div
-                className={clsx(['icon', disabled && 'disabled'])}
-                onDragStart={(event) => onDragStart(event, 'functionNode')}
-                draggable={!disabled}
-              >
-                <FunctionOutlined />
-              </div>
-              <Typography.Text type={'secondary'}>Function</Typography.Text>
-            </div>
-
-            <div className={'component'}>
-              <div
-                className={clsx(['icon', disabled && 'disabled'])}
-                onDragStart={(event) => onDragStart(event, 'expressionNode')}
-                draggable={!disabled}
-              >
-                <CodeOutlined />
-              </div>
-              <Typography.Text type={'secondary'}>Expression</Typography.Text>
-            </div>
-
-            <div className={'component'}>
-              <div
-                className={clsx(['icon', disabled && 'disabled'])}
-                onDragStart={(event) => onDragStart(event, 'switchNode')}
-                draggable={!disabled}
-              >
-                <BranchesOutlined />
-              </div>
-              <Typography.Text type={'secondary'}>Switch</Typography.Text>
-            </div>
-
-            {customComponents?.length > 0 && <div className={'divider'} />}
+            {customComponents?.length > 0 && <Divider style={{ margin: '4px 0' }} />}
             {customComponents.map((component) => (
               <div key={component.type} className={'component'}>
                 <div
@@ -131,12 +73,30 @@ export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(
             ))}
           </div>
         </div>
-        <div className={'wrapper__actions'}>
-          <Button onClick={onPaste} type='default' style={{ marginTop: 'auto', width: '100%' }}>
-            Paste
-          </Button>
-        </div>
       </div>
     );
   },
 );
+
+const DragDecisionNode: React.FC<
+  {
+    kind: NodeKind;
+    disabled?: boolean;
+  } & React.HTMLAttributes<HTMLDivElement>
+> = ({ kind, disabled = false, ...props }) => {
+  const specification = nodeSpecification[kind];
+
+  return (
+    <div className={clsx('draggable-component')} draggable={!disabled} {...props}>
+      <div style={{ pointerEvents: 'none' }}>
+        <DecisionNode
+          color={specification.color}
+          icon={specification.icon}
+          name={specification.displayName}
+          type={specification.shortDescription}
+          mapActionMenu={() => []}
+        />
+      </div>
+    </div>
+  );
+};

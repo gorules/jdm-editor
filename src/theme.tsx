@@ -56,6 +56,7 @@ const GlobalCssVariables: React.FC<{ mode: 'light' | 'dark' }> = ({ mode }) => {
       '--grl-color-primary-border-hover': token.colorPrimaryBorderHover,
       '--grl-color-primary-text-hover': token.colorPrimaryTextHover,
       '--grl-color-bg-layout': token.colorBgLayout,
+      '--grl-color-bg-layout-fade': '#f8f8f8',
       '--grl-color-bg-mask': token.colorBgMask,
       '--grl-color-bg-elevated': token.colorBgElevated,
       '--grl-color-bg-container': token.colorBgContainer,

@@ -17,6 +17,7 @@ export const functionSpecification: NodeSpecification<NodeFunctionData> = {
   icon: <FunctionOutlined />,
   displayName: 'Function',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/functions',
+  shortDescription: 'Javascript lambda',
   generateNode: () => ({
     type: NodeKind.Function,
     data: {

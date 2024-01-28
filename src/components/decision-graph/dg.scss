@@ -63,6 +63,10 @@
         }
       }
 
+      .ant-tabs-tab-btn {
+        color: var(--grl-color-text-secondary) !important;
+      }
+
       .ant-tabs-tab-active::after {
         opacity: 1;
       }
@@ -160,7 +164,7 @@
 
     &__menu {
       background-color: var(--grl-color-bg-container);
-      width: 220px;
+      width: 260px;
       min-width: 220px;
       height: 100%;
       border-right: 1px solid var(--grl-color-border);
@@ -224,7 +228,7 @@
 
         &__list {
           display: grid;
-          grid-template-columns: 1fr 1fr;
+          grid-template-columns: 1fr;
           gap: 16px;
           padding: 1rem;
 
@@ -236,34 +240,34 @@
             margin-bottom: 0.25rem;
           }
 
-          .component {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            gap: 0.25rem;
+          .draggable-component {
+            cursor: grab;
+            transform: translate(0);
 
-            .icon {
-              width: 48px;
-              height: 48px;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              border-radius: 8px;
-              cursor: grab;
-              background-color: var(--grl-color-primary-bg);
-              transform: translate(0, 0);
+            &[draggable="false"] {
+              cursor: not-allowed;
+              user-select: none;
 
-              &.disabled {
+              .grl-dn {
                 background-color: var(--grl-color-bg-container-disabled);
-                cursor: not-allowed;
-                user-select: none;
               }
 
-              &:hover:not(.disabled) {
-                background-color: var(--grl-color-primary-bg-hover);
+              .grl-dn__header__icon {
+                filter: grayscale(1) opacity(0.3);
               }
+            }
+
+            &[draggable="true"] {
+              &:hover, &:active {
+                .grl-dn__header__icon {
+                  filter: none;
+                }
+              }
+            }
+
+            .grl-dn__header__icon {
+              transition: var(--grl-transition);
+              filter: opacity(0.5) grayscale(0.3);
             }
           }
         }
@@ -520,16 +524,16 @@
 
 .single-line {
   white-space: nowrap;
-  width:140px;
+  width: 140px;
   overflow: hidden;
 }
 
 .single-line br {
-  display:none;
+  display: none;
 }
 
 .single-line * {
-  display:inline;
-  white-space:nowrap;
+  display: inline;
+  white-space: nowrap;
 }
 

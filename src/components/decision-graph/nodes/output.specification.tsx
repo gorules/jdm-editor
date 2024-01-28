@@ -11,8 +11,10 @@ export type OutputNodeData = {
 
 export const outputSpecification: NodeSpecification<OutputNodeData> = {
   icon: <LogoutOutlined />,
+  color: 'secondary',
   displayName: 'Response',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions',
+  shortDescription: 'Outputs the context',
   generateNode: () => ({
     type: NodeKind.Output,
     data: {
@@ -22,13 +24,6 @@ export const outputSpecification: NodeSpecification<OutputNodeData> = {
   renderNode:
     ({ specification }) =>
     ({ id, data, selected }) => (
-      <GraphNode
-        id={id}
-        color='secondary'
-        specification={specification}
-        name={data.name}
-        isSelected={selected}
-        handleRight={false}
-      />
+      <GraphNode id={id} specification={specification} name={data.name} isSelected={selected} handleRight={false} />
     ),
 };

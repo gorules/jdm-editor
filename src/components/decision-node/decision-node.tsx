@@ -10,7 +10,7 @@ import './decision-node.scss';
 export type DecisionNodeProps = {
   name?: string;
   icon: React.ReactNode;
-  type: string;
+  type: React.ReactNode;
   isSelected?: boolean;
   children?: React.ReactNode;
   actions?: React.ReactNode[];
@@ -43,6 +43,41 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
   const { token } = theme.useToken();
   const [contentEditing, setContentEditing] = useState(false);
   const nameRef = useRef<HTMLSpanElement>(null);
+  const actionMenuItems = mapActionMenu([
+    { key: 'documentation', icon: <BookOutlined />, label: 'Documentation', onClick: onViewDocumentation },
+    { type: 'divider' },
+    {
+      key: 'copy-clipboard',
+      icon: <BookOutlined />,
+      label: <SpacedText left='Copy to clipboard' right={platform.shortcut('Ctrl + C')} />,
+      onClick: onCopyToClipboard,
+    },
+    {
+      key: 'duplicate',
+      icon: <CopyOutlined />,
+      label: <SpacedText left='Duplicate' right={platform.shortcut('Ctrl + D')} />,
+      onClick: onDuplicate,
+    },
+    { type: 'divider' },
+    {
+      key: 'delete',
+      icon: <DeleteOutlined />,
+      danger: true,
+      label: <SpacedText left='Delete' right={platform.shortcut('Backspace')} />,
+      onClick: () =>
+        Modal.confirm({
+          icon: null,
+          title: 'Delete node',
+          content: (
+            <Typography.Text>
+              Are you sure you want to delete <Typography.Text strong>{name}</Typography.Text> node.
+            </Typography.Text>
+          ),
+          okButtonProps: { danger: true },
+          onOk: onDelete,
+        }),
+    },
+  ]);
 
   useEffect(() => {
     if (nameRef.current && contentEditing) {
@@ -86,51 +121,19 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
             {type}
           </Typography.Text>
         </div>
-        <div className='grl-dn__header__actions'>
-          <Dropdown
-            trigger={['click']}
-            overlayStyle={{ minWidth: 250 }}
-            menu={{
-              items: mapActionMenu([
-                { key: 'documentation', icon: <BookOutlined />, label: 'Documentation', onClick: onViewDocumentation },
-                { type: 'divider' },
-                {
-                  key: 'copy-clipboard',
-                  icon: <BookOutlined />,
-                  label: <SpacedText left='Copy to clipboard' right={platform.shortcut('Ctrl + C')} />,
-                  onClick: onCopyToClipboard,
-                },
-                {
-                  key: 'duplicate',
-                  icon: <CopyOutlined />,
-                  label: <SpacedText left='Duplicate' right={platform.shortcut('Ctrl + D')} />,
-                  onClick: onDuplicate,
-                },
-                { type: 'divider' },
-                {
-                  key: 'delete',
-                  icon: <DeleteOutlined />,
-                  danger: true,
-                  label: <SpacedText left='Delete' right={platform.shortcut('Backspace')} />,
-                  onClick: () =>
-                    Modal.confirm({
-                      icon: null,
-                      title: 'Delete node',
-                      content: (
-                        <Typography.Text>
-                          Are you sure you want to delete <Typography.Text strong>{name}</Typography.Text> node.
-                        </Typography.Text>
-                      ),
-                      okButtonProps: { danger: true },
-                      onOk: onDelete,
-                    }),
-                },
-              ]),
-            }}
-          >
-            <Button type='text' icon={<MoreOutlined />} />
-          </Dropdown>
-        </div>
+        {(actionMenuItems?.length ?? 0) > 0 && (
+          <div className='grl-dn__header__actions'>
+            <Dropdown
+              trigger={['click']}
+              overlayStyle={{ minWidth: 250 }}
+              menu={{
+                items: actionMenuItems,
+              }}
+            >
+              <Button type='text' icon={<MoreOutlined />} />
+            </Dropdown>
+          </div>
+        )}
       </div>
       {children && (
         <div

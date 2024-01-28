@@ -1,5 +1,5 @@
-import { DownOutlined } from '@ant-design/icons';
-import { Button, Dropdown, Modal, Typography } from 'antd';
+import { MoreOutlined, PlusOutlined, SwapOutlined } from '@ant-design/icons';
+import { Button, Dropdown, Modal, Tooltip, Typography } from 'antd';
 import React from 'react';
 
 import { Stack } from '../../stack';
@@ -25,40 +25,44 @@ export const TableHeadCellInput: React.FC<TableHeadCellProps> = ({ configurable,
   return (
     <Stack horizontal horizontalAlign='space-between' verticalAlign='center'>
       <Stack gap={0} className={'text-wrapper'} verticalAlign={'center'}>
-        <Typography.Text className={'span-overflow'}>Inputs</Typography.Text>
+        <Typography.Text className={'span-overflow grl-dt-text-primary'}>Inputs</Typography.Text>
       </Stack>
       {configurable && (
         <div className={'cta-wrapper'}>
           {inputs?.length > 1 && (
+            <Tooltip title='Reorder fields'>
+              <Button
+                className='grl-dt-text-secondary'
+                icon={<SwapOutlined />}
+                size={'small'}
+                type={'text'}
+                disabled={disabled}
+                onClick={() => {
+                  setDialog({
+                    type: 'reorder',
+                    columnType: 'inputs',
+                    item: null,
+                  });
+                }}
+              />
+            </Tooltip>
+          )}
+          <Tooltip title='Add input'>
             <Button
+              className='grl-dt-text-secondary'
               size={'small'}
-              type={'link'}
+              type={'text'}
+              icon={<PlusOutlined />}
               disabled={disabled}
               onClick={() => {
                 setDialog({
-                  type: 'reorder',
+                  type: 'add',
                   columnType: 'inputs',
                   item: null,
                 });
               }}
-            >
-              Reorder
-            </Button>
-          )}
-          <Button
-            size={'small'}
-            type={'link'}
-            disabled={disabled}
-            onClick={() => {
-              setDialog({
-                type: 'add',
-                columnType: 'inputs',
-                item: null,
-              });
-            }}
-          >
-            Add
-          </Button>
+            />
+          </Tooltip>
         </div>
       )}
     </Stack>
@@ -72,40 +76,44 @@ export const TableHeadCellOutput: React.FC<TableHeadCellProps> = ({ configurable
   return (
     <Stack horizontal horizontalAlign={'space-between'} verticalAlign={'center'}>
       <Stack gap={0} className={'text-wrapper'} verticalAlign={'center'}>
-        <Typography.Text className={'span-overflow'}>Outputs</Typography.Text>
+        <Typography.Text className={'span-overflow grl-dt-text-primary'}>Outputs</Typography.Text>
       </Stack>
       {configurable && (
         <div className={'cta-wrapper'}>
-          <Button
-            size={'small'}
-            type={'link'}
-            disabled={disabled}
-            onClick={() => {
-              setDialog({
-                type: 'add',
-                columnType: 'outputs',
-                item: null,
-              });
-            }}
-          >
-            Add
-          </Button>
           {outputs?.length > 1 && (
+            <Tooltip title='Reorder fields'>
+              <Button
+                className='grl-dt-text-secondary'
+                icon={<SwapOutlined />}
+                size={'small'}
+                type={'text'}
+                disabled={disabled}
+                onClick={() => {
+                  setDialog({
+                    type: 'reorder',
+                    columnType: 'outputs',
+                    item: null,
+                  });
+                }}
+              />
+            </Tooltip>
+          )}
+          <Tooltip title='Add output'>
             <Button
+              className='grl-dt-text-secondary'
               size={'small'}
-              type={'link'}
+              type={'text'}
+              icon={<PlusOutlined />}
               disabled={disabled}
               onClick={() => {
                 setDialog({
-                  type: 'reorder',
+                  type: 'add',
                   columnType: 'outputs',
                   item: null,
                 });
               }}
-            >
-              Reorder
-            </Button>
-          )}
+            />
+          </Tooltip>
         </div>
       )}
     </Stack>
@@ -120,8 +128,8 @@ export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({ con
   return (
     <Stack horizontal horizontalAlign={'space-between'} verticalAlign={'center'}>
       <Stack gap={0} className={'text-wrapper'}>
-        <Typography.Text className={'span-overflow'}>{schema.name}</Typography.Text>
-        <Typography.Text className={'span-overflow'} type='secondary' style={{ fontSize: 12 }}>
+        <Typography.Text className={'span-overflow grl-dt-text-primary'}>{schema.name}</Typography.Text>
+        <Typography.Text className={'span-overflow grl-dt-text-secondary'} type='secondary' style={{ fontSize: 12 }}>
           {schema.field}
         </Typography.Text>
       </Stack>
@@ -166,7 +174,9 @@ export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({ con
               ],
             }}
           >
-            <Button type='link' size={'small'} icon={<DownOutlined />} />
+            <Tooltip title='Settings'>
+              <Button className='grl-dt-text-secondary' type='text' size={'small'} icon={<MoreOutlined />} />
+            </Tooltip>
           </Dropdown>
         </div>
       )}
@@ -181,8 +191,8 @@ export const TableHeadCellOutputField: React.FC<TableHeadCellFieldProps> = ({ co
   return (
     <Stack horizontal horizontalAlign='space-between' verticalAlign={'center'}>
       <Stack gap={0} className={'text-wrapper'} verticalAlign={'center'}>
-        <Typography.Text className={'span-overflow'}>{schema.name}</Typography.Text>
-        <Typography.Text className={'span-overflow'} type='secondary' style={{ fontSize: 12 }}>
+        <Typography.Text className={'span-overflow grl-dt-text-primary'}>{schema.name}</Typography.Text>
+        <Typography.Text className={'span-overflow grl-dt-text-secondary'} type='secondary' style={{ fontSize: 12 }}>
           {schema.field}
         </Typography.Text>
       </Stack>
@@ -231,7 +241,9 @@ export const TableHeadCellOutputField: React.FC<TableHeadCellFieldProps> = ({ co
               ],
             }}
           >
-            <Button type='link' size={'small'} icon={<DownOutlined />} />
+            <Tooltip title='Settings'>
+              <Button className='grl-dt-text-secondary' type='text' size={'small'} icon={<MoreOutlined />} />
+            </Tooltip>
           </Dropdown>
         </div>
       )}
