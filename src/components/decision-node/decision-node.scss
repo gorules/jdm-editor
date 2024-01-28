@@ -61,6 +61,18 @@
 
         &[contenteditable="true"] {
           cursor: text;
+          white-space: nowrap;
+          width:140px;
+          overflow: hidden;
+        }
+
+        &[contenteditable="true"] br {
+          display:none;
+        }
+
+        &[contenteditable="true"] * {
+          display:inline;
+          white-space:nowrap;
         }
 
         &:hover:not(:focus-within) {

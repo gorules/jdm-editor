@@ -9,6 +9,7 @@ import { useDecisionGraphListeners, useDecisionGraphState } from './context/dg-s
 import './dg.scss';
 import type { GraphRef } from './graph/graph';
 import { Graph } from './graph/graph';
+import { GraphAside } from './graph/graph-aside';
 import { GraphTabs } from './graph/graph-tabs';
 import { TabDecisionTable } from './graph/tab-decision-table';
 import { TabExpression } from './graph/tab-expression';
@@ -29,6 +30,7 @@ export const DecisionGraphWrapper = React.memo(
 
     return (
       <div className={'grl-dg__wrapper'}>
+        <GraphAside />
         <div className={'grl-dg__graph'}>
           <GraphTabs disabled={disableTabs} onTabChange={onTabChange} />
           <Graph

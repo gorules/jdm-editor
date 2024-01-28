@@ -58,7 +58,6 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
   graphReferences.nodesState.current = nodesState;
   graphReferences.edgesState.current = edgesState;
 
-  const inputNodes = nodesState[0].filter((node) => node.type === 'inputNode');
   const selected = nodesState[0].filter((node) => node?.selected);
 
   const graphClipboard = useGraphClipboard(reactFlowInstance, reactFlowWrapper);
@@ -142,20 +141,9 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
 
   useImperativeHandle(ref, () => graphActions);
 
-  const onPaste = useCallback(async () => {
-    try {
-      await graphClipboard.pasteNodes();
-    } catch (e) {
-      message.error(e?.message);
-    }
-  }, [graphClipboard]);
-
   return (
     <div className={clsx(['tab-content', className])}>
       <div className={'content-wrapper'}>
-        <div className={'grl-dg__aside'}>
-          <GraphComponents inputDisabled={inputNodes.length > 0} onPaste={onPaste} />
-        </div>
         <div className={clsx(['react-flow'])} ref={reactFlowWrapper}>
           <ReactFlow
             elevateEdgesOnSelect={false}
