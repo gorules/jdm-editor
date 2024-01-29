@@ -5,7 +5,7 @@ import { Handle, Position } from 'reactflow';
 
 import type { DecisionNodeProps } from '../../decision-node/decision-node';
 import { DecisionNode } from '../../decision-node/decision-node';
-import { useDecisionGraphActions } from '../context/dg-store.context';
+import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
 import type { MinimalNodeSpecification } from './specification-types';
 
 export type GraphNodeProps = {
@@ -25,6 +25,7 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
   ...decisionNodeProps
 }) => {
   const graphActions = useDecisionGraphActions();
+  const { disabled } = useDecisionGraphState(({ disabled }) => ({ disabled }));
 
   return (
     <div className={clsx('grl-graph-node', className)} style={{ minWidth: 250 }}>
@@ -38,6 +39,7 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
       )}
       <DecisionNode
         {...decisionNodeProps}
+        disabled={disabled}
         icon={specification.icon}
         color={specification.color}
         type={specification.displayName}

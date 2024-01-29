@@ -1,5 +1,5 @@
-import { BookOutlined, CopyOutlined, DeleteOutlined, MoreOutlined } from '@ant-design/icons';
-import { Button, Dropdown, MenuProps, Modal, Typography, theme } from 'antd';
+import { BookOutlined, CheckCircleOutlined, CopyOutlined, DeleteOutlined, MoreOutlined } from '@ant-design/icons';
+import { Button, Dropdown, type MenuProps, Modal, Typography, theme } from 'antd';
 import clsx from 'clsx';
 import React, { useEffect, useRef, useState } from 'react';
 
@@ -11,6 +11,7 @@ export type DecisionNodeProps = {
   name?: string;
   icon: React.ReactNode;
   type: React.ReactNode;
+  disabled?: boolean;
   isSelected?: boolean;
   children?: React.ReactNode;
   actions?: React.ReactNode[];
@@ -30,6 +31,7 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
   type,
   children,
   actions = [],
+  disabled = false,
   isSelected = false,
   noBodyPadding = false,
   color = 'primary',
@@ -96,7 +98,12 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
         <div className='grl-dn__header__icon'>{icon}</div>
         <div className='grl-dn__header__text'>
           {!contentEditing && (
-            <Typography.Text className={clsx('grl-dn__header__text__name')} onClick={() => setContentEditing(true)}>
+            <Typography.Text
+              className={clsx('grl-dn__header__text__name')}
+              onClick={() => {
+                !disabled && setContentEditing(true);
+              }}
+            >
               {name}
             </Typography.Text>
           )}

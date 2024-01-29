@@ -83,11 +83,6 @@
         line-height: 1.35;
         padding: 2px 6px;
       }
-
-      > [contenteditable]:focus-within {
-        outline: none;
-        cursor: text;
-      }
     }
 
     &__actions {

@@ -1,5 +1,11 @@
-import { CloseOutlined, CloudDownloadOutlined, CloudUploadOutlined, PlusCircleOutlined } from '@ant-design/icons';
-import { Button, Tooltip, Typography, message } from 'antd';
+import {
+  CloseOutlined,
+  CloudDownloadOutlined,
+  CloudUploadOutlined,
+  PlayCircleOutlined,
+  PlusCircleOutlined,
+} from '@ant-design/icons';
+import { Button, Divider, Tooltip, Typography, message } from 'antd';
 import React, { useRef, useState } from 'react';
 
 import {
@@ -103,10 +109,18 @@ export const GraphAside = () => {
 
       <div className={'grl-dg__aside'}>
         <div className={'grl-dg__aside__side-bar'}>
-          <Tooltip placement='right' title={<span style={{ fontSize: 12 }}>Components</span>}>
+          <Tooltip placement='right' title='Components'>
             <Button type={'primary'} icon={<PlusCircleOutlined />} onClick={() => setMenu('components')} />
           </Tooltip>
-          <Tooltip placement='right' title={<span style={{ fontSize: 12 }}>Upload JSON</span>}>
+          {/*<Tooltip placement={'right'} title={'Simulator'}>*/}
+          {/*  <Button type={'text'} icon={<PlayCircleOutlined />} onClick={() => {}} />*/}
+          {/*</Tooltip>*/}
+          <Divider
+            style={{
+              margin: 0,
+            }}
+          />
+          <Tooltip placement='right' title='Upload JSON'>
             <Button
               type={'text'}
               icon={<CloudUploadOutlined />}
@@ -115,7 +129,7 @@ export const GraphAside = () => {
               }}
             />
           </Tooltip>
-          <Tooltip placement='right' title={<span style={{ fontSize: 12 }}>Download JSON</span>}>
+          <Tooltip placement='right' title='Download JSON'>
             <Button
               type={'text'}
               icon={<CloudDownloadOutlined />}
