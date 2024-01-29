@@ -115,11 +115,11 @@ export const GraphAside = () => {
           {/*<Tooltip placement={'right'} title={'Simulator'}>*/}
           {/*  <Button type={'text'} icon={<PlayCircleOutlined />} onClick={() => {}} />*/}
           {/*</Tooltip>*/}
-          <Divider
-            style={{
-              margin: 0,
-            }}
-          />
+          {/*<Divider*/}
+          {/*  style={{*/}
+          {/*    margin: 0,*/}
+          {/*  }}*/}
+          {/*/>*/}
           <Tooltip placement='right' title='Upload JSON'>
             <Button
               type={'text'}
