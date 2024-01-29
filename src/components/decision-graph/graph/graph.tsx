@@ -1,6 +1,6 @@
-import { message } from 'antd';
+import { Modal, Typography } from 'antd';
 import clsx from 'clsx';
-import React, { type MutableRefObject, forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
+import React, { type MutableRefObject, forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import type { Node, ProOptions, ReactFlowInstance, XYPosition } from 'reactflow';
 import ReactFlow, { Background, Controls, useEdgesState, useNodesState } from 'reactflow';
 import 'reactflow/dist/style.css';
@@ -18,7 +18,6 @@ import '../dg.scss';
 import { useGraphClipboard } from '../hooks/use-graph-clipboard';
 import type { NodeKind } from '../nodes/specification-types';
 import { nodeSpecification } from '../nodes/specifications';
-import { GraphComponents } from './graph-components';
 
 export type GraphProps = {
   className?: string;
@@ -168,6 +167,34 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
               e.forEach((node) => {
                 graphActions.closeTab(node?.id);
               });
+            }}
+            onKeyDown={(e) => {
+              // HANDLE COPY
+              if (e.key === 'c' && e.metaKey) {
+                const selectedNodes = nodesState[0].filter((n) => n.selected);
+                const selectedEdges = edgesState[0].filter((e) => e.selected);
+              } else if (e.key === 'Backspace') {
+                const selectedNodes = nodesState[0].filter((n) => n.selected);
+                const selectedEdges = edgesState[0].filter((e) => e.selected);
+                if (selectedNodes.length > 0) {
+                  Modal.confirm({
+                    icon: null,
+                    title: 'Delete node(s)',
+                    content: <Typography.Text>Are you sure you want to delete selected node(s)?</Typography.Text>,
+                    okButtonProps: { danger: true },
+                    onOk: () => {
+                      if (selectedEdges.length > 0) {
+                        graphActions.removeEdges(selectedEdges.map((e) => e.id));
+                      }
+                      graphActions.removeNodes(selectedNodes.map((n) => n.id));
+                    },
+                  });
+                  e.stopPropagation();
+                } else if (selectedEdges.length > 0) {
+                  graphActions.removeEdges(selectedEdges.map((e) => e.id));
+                  e.stopPropagation();
+                }
+              }
             }}
             onEdgeMouseEnter={(_, edge) => graphActions.setHoveredEdgeId(edge.id)}
             onEdgeMouseLeave={() => graphActions.setHoveredEdgeId(null)}

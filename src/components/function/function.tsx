@@ -116,12 +116,13 @@ export const Function: React.FC<FunctionProps> = ({
             setInnerValue(value ?? '');
             innerChange(value ?? '');
           }}
+
           theme={token.mode === 'dark' ? 'vs-dark' : 'light'}
           height='100%'
           options={{
             automaticLayout: true,
             contextmenu: false,
-            fontSize: 14,
+            fontSize: 13,
             fontFamily: 'var(--mono-font-family)',
             readOnly: disabled,
             tabSize: 2,

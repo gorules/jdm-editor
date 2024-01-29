@@ -81,10 +81,12 @@ export type DecisionGraphStoreType = {
     addNodes: (nodes: DecisionNode[]) => void;
     updateNode: (id: string, updater: DraftUpdateCallback<DecisionNode>) => void;
     removeNode: (id: string) => void;
+    removeNodes: (ids: string[]) => void;
 
     setEdges: (edges: DecisionEdge[]) => void;
     addEdge: (edge: DecisionEdge) => void;
     removeEdge: (id: string) => void;
+    removeEdges: (ids: string[]) => void;
     setHoveredEdgeId: (edgeId: string | null) => void;
 
     closeTab: (id: string) => void;
@@ -251,7 +253,34 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
 
         const newDecisionGraph = produce(decisionGraph, (draft) => {
           const nodes = draft.nodes || [];
+          const edges = draft.edges || [];
           draft.nodes = nodes.filter((n) => n.id !== id);
+          draft.edges = edges.filter(
+            (e) => e.sourceId !== id && e.targetId !== id && e.sourceHandle !== id && e.targetHandle !== id,
+          );
+        });
+
+        stateStore.setState({ decisionGraph: newDecisionGraph });
+        listenerStore.getState().onChange?.(newDecisionGraph);
+      },
+      removeNodes: (ids = []) => {
+        const { nodesState, edgesState } = referenceStore.getState();
+        const { decisionGraph } = stateStore.getState();
+
+        nodesState.current[1]?.((nodes) => nodes.filter((n) => ids.every((id) => n.id !== id)));
+        edgesState.current[1]?.((edges) =>
+          edges.filter((e) =>
+            ids.every((id) => e.source !== id && e.target !== id && e.sourceHandle !== id && e.targetHandle !== id),
+          ),
+        );
+
+        const newDecisionGraph = produce(decisionGraph, (draft) => {
+          const nodes = draft.nodes || [];
+          const edges = draft.edges || [];
+          draft.nodes = nodes.filter((n) => ids.every((id) => n.id !== id));
+          draft.edges = edges.filter((e) =>
+            ids.every((id) => e.sourceId !== id && e.targetId !== id && e.sourceHandle !== id && e.targetHandle !== id),
+          );
         });
 
         stateStore.setState({ decisionGraph: newDecisionGraph });
@@ -289,6 +318,18 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         edgesState?.current?.[1]?.((edges) => edges.filter((e) => e.id !== id));
         const newDecisionGraph = produce(decisionGraph, (draft) => {
           draft.edges = draft.edges.filter((e) => e.id !== id);
+        });
+
+        stateStore.setState({ decisionGraph: newDecisionGraph });
+        listenerStore.getState().onChange?.(newDecisionGraph);
+      },
+      removeEdges: (ids) => {
+        const { edgesState } = referenceStore.getState();
+        const { decisionGraph } = stateStore.getState();
+
+        edgesState?.current?.[1]?.((edges) => edges.filter((e) => !ids.find((id) => e.id === id)));
+        const newDecisionGraph = produce(decisionGraph, (draft) => {
+          draft.edges = draft.edges.filter((e) => !ids.find((id) => e.id === id));
         });
 
         stateStore.setState({ decisionGraph: newDecisionGraph });

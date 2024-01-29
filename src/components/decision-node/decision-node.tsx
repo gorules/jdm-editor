@@ -97,7 +97,10 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
   }, [contentEditing]);
 
   return (
-    <div className={clsx('grl-dn', `grl-dn--color--${color}`, isSelected && `grl-dn--selected`)}>
+    <div
+      className={clsx('grl-dn', `grl-dn--color--${color}`, isSelected && `grl-dn--selected`)}
+      onKeyDown={(e) => e.stopPropagation()}
+    >
       <div className='grl-dn__header'>
         <div className='grl-dn__header__icon'>{icon}</div>
         <div className='grl-dn__header__text'>
