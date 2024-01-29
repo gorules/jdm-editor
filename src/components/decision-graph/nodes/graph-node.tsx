@@ -51,6 +51,9 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
             return draft;
           });
         }}
+        onDuplicate={() => {
+          graphActions.duplicateNode(id);
+        }}
       />
       {handleRight && (
         <Handle

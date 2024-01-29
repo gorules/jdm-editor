@@ -42,7 +42,7 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
 }) => {
   const { token } = theme.useToken();
   const [contentEditing, setContentEditing] = useState(false);
-  const nameRef = useRef<HTMLSpanElement>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
   const actionMenuItems = mapActionMenu([
     { key: 'documentation', icon: <BookOutlined />, label: 'Documentation', onClick: onViewDocumentation },
     { type: 'divider' },
@@ -81,18 +81,9 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
 
   useEffect(() => {
     if (nameRef.current && contentEditing) {
+      nameRef.current.value = name as string;
       nameRef.current.focus();
-
-      const selection = document.getSelection();
-      if (!selection) {
-        return;
-      }
-
-      const range = document.createRange();
-      range.selectNodeContents(nameRef.current);
-
-      selection.removeAllRanges();
-      selection.addRange(range);
+      nameRef.current.select();
     }
   }, [contentEditing]);
 
@@ -104,22 +95,36 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
       <div className='grl-dn__header'>
         <div className='grl-dn__header__icon'>{icon}</div>
         <div className='grl-dn__header__text'>
-          <Typography.Text
-            ref={nameRef}
-            className={clsx('grl-dn__header__text__name', contentEditing && 'nodrag')}
-            contentEditable={contentEditing}
-            onClick={() => setContentEditing(true)}
-            onBlur={() => setContentEditing(false)}
-            onInput={(e) => onNameChange?.(e.currentTarget.textContent ?? '')}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.currentTarget.blur();
+          {!contentEditing && (
+            <Typography.Text className={clsx('grl-dn__header__text__name')} onClick={() => setContentEditing(true)}>
+              {name}
+            </Typography.Text>
+          )}
+          {contentEditing && (
+            <input
+              ref={nameRef}
+              className={clsx('grl-dn__header__text__name-input', 'nodrag')}
+              onBlur={(e) => {
+                if (e.target.value?.trim?.()?.length > 0) {
+                  onNameChange?.(nameRef?.current?.value as string);
+                }
                 e.preventDefault();
-              }
-            }}
-          >
-            {name}
-          </Typography.Text>
+                setContentEditing(false);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.currentTarget.blur();
+                  e.preventDefault();
+                } else if (e.key === 'Escape') {
+                  if (nameRef.current) {
+                    nameRef.current.value = name as string;
+                  }
+                  setContentEditing(false);
+                  e.preventDefault();
+                }
+              }}
+            />
+          )}
           <Typography.Text type='secondary' style={{ fontSize: token.fontSizeSM }}>
             {type}
           </Typography.Text>

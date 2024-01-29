@@ -3,6 +3,7 @@ import { produce } from 'immer';
 import type { WritableDraft } from 'immer/src/types/types-external';
 import React, { type MutableRefObject, createRef, useMemo } from 'react';
 import type { EdgeChange, NodeChange, XYPosition, useEdgesState, useNodesState } from 'reactflow';
+import { v4 } from 'uuid';
 import type { StoreApi, UseBoundStore } from 'zustand';
 import { create } from 'zustand';
 
@@ -79,6 +80,7 @@ export type DecisionGraphStoreType = {
     setNodes: (nodes: DecisionNode[]) => void;
     addNode: (node: DecisionNode) => void;
     addNodes: (nodes: DecisionNode[]) => void;
+    duplicateNode: (id: string) => void;
     updateNode: (id: string, updater: DraftUpdateCallback<DecisionNode>) => void;
     removeNode: (id: string) => void;
     removeNodes: (ids: string[]) => void;
@@ -242,6 +244,31 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         stateStore.setState({ decisionGraph: newDecisionGraph });
         listenerStore.getState().onChange?.(newDecisionGraph);
       },
+      duplicateNode: (id) => {
+        const { nodesState } = referenceStore.getState();
+        const { decisionGraph } = stateStore.getState();
+
+        const node = (decisionGraph?.nodes || []).find((n) => n.id === id);
+        if (!node) return;
+
+        const newNode: DecisionNode = {
+          ...node,
+          position: {
+            x: (node.position?.x || 0) + 20,
+            y: (node.position?.y || 0) + 20,
+          },
+          id: v4(),
+        };
+
+        nodesState.current[1]?.((n) => n.concat(mapToGraphNode(newNode)));
+        const newDecisionGraph = produce(decisionGraph, (draft) => {
+          const n = draft.nodes || [];
+          draft.nodes = n.concat(newNode);
+        });
+
+        stateStore.setState({ decisionGraph: newDecisionGraph });
+        listenerStore.getState().onChange?.(newDecisionGraph);
+      },
       removeNode: (id) => {
         const { nodesState, edgesState } = referenceStore.getState();
         const { decisionGraph } = stateStore.getState();
@@ -336,8 +363,8 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         listenerStore.getState().onChange?.(newDecisionGraph);
       },
       updateNode: (id, updater) => {
-        // TODO: Update nodeState
         const { decisionGraph } = stateStore.getState();
+        const { nodesState } = referenceStore.getState();
 
         const newDecisionGraph = produce(decisionGraph, (draft) => {
           const node = (draft.nodes ?? []).find((node) => node?.id === id);
@@ -347,6 +374,15 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
 
           updater(node);
         });
+
+        nodesState.current[1]?.((nodes) =>
+          nodes.map((n) => {
+            if (n.id === id) {
+              return mapToGraphNode((newDecisionGraph.nodes || []).find((node) => node.id === id) as DecisionNode);
+            }
+            return n;
+          }),
+        );
 
         stateStore.setState({ decisionGraph: newDecisionGraph });
         listenerStore.getState().onChange?.(newDecisionGraph);

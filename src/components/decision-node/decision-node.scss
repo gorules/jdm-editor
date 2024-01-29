@@ -53,27 +53,22 @@
       display: flex;
       flex-direction: column;
       margin-right: 8px;
+      max-width: 140px;
+
+      &__name-input {
+        height: 19px;
+        width: 120px;
+        padding: 0 4px;
+        font-size: 14px;
+      }
 
       &__name {
         min-height: 23px;
         border-radius: 4px;
+        max-width: 132px;
         transition: var(--grl-transition);
-
-        &[contenteditable="true"] {
-          cursor: text;
-          white-space: nowrap;
-          width:140px;
-          overflow: hidden;
-        }
-
-        &[contenteditable="true"] br {
-          display:none;
-        }
-
-        &[contenteditable="true"] * {
-          display:inline;
-          white-space:nowrap;
-        }
+        overflow: hidden;
+        white-space: nowrap;
 
         &:hover:not(:focus-within) {
           background-color: var(--grl-color-bg-text-hover);
