@@ -254,8 +254,8 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         const newNode: DecisionNode = {
           ...node,
           position: {
-            x: (node.position?.x || 0) + 20,
-            y: (node.position?.y || 0) + 20,
+            x: node.position?.x || 0,
+            y: (node.position?.y || 0) + 140,
           },
           id: v4(),
         };

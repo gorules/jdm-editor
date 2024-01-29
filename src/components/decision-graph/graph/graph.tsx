@@ -169,18 +169,30 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
               });
             }}
             onKeyDown={(e) => {
-              // HANDLE COPY
               if (e.key === 'c' && e.metaKey) {
                 const selectedNodes = nodesState[0].filter((n) => n.selected);
                 const selectedEdges = edgesState[0].filter((e) => e.selected);
+                // TODO HANDLE COPY
+              } else if (e.key === 'd' && e.metaKey) {
+                const selectedNodes = nodesState[0].filter((n) => n.selected);
+                if (selectedNodes.length === 1) {
+                  graphActions.duplicateNode(selectedNodes[0].id);
+                  e.preventDefault();
+                }
               } else if (e.key === 'Backspace') {
                 const selectedNodes = nodesState[0].filter((n) => n.selected);
                 const selectedEdges = edgesState[0].filter((e) => e.selected);
                 if (selectedNodes.length > 0) {
+                  const length = selectedNodes.length;
+                  const text = length > 1 ? 'nodes' : 'node';
                   Modal.confirm({
                     icon: null,
-                    title: 'Delete node(s)',
-                    content: <Typography.Text>Are you sure you want to delete selected node(s)?</Typography.Text>,
+                    title: `Delete ${text}`,
+                    content: (
+                      <Typography.Text>
+                        Are you sure you want to delete {length > 1 ? `${length} ${text}` : text}?
+                      </Typography.Text>
+                    ),
                     okButtonProps: { danger: true },
                     onOk: () => {
                       if (selectedEdges.length > 0) {
@@ -190,9 +202,11 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
                     },
                   });
                   e.stopPropagation();
+                  e.preventDefault();
                 } else if (selectedEdges.length > 0) {
                   graphActions.removeEdges(selectedEdges.map((e) => e.id));
                   e.stopPropagation();
+                  e.preventDefault();
                 }
               }
             }}

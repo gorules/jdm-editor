@@ -1,4 +1,12 @@
-import { BookOutlined, CheckCircleOutlined, CopyOutlined, DeleteOutlined, MoreOutlined } from '@ant-design/icons';
+import {
+  BookOutlined,
+  CheckCircleOutlined,
+  CheckOutlined,
+  CloseOutlined,
+  CopyOutlined,
+  DeleteOutlined,
+  MoreOutlined,
+} from '@ant-design/icons';
 import { Button, Dropdown, type MenuProps, Modal, Typography, theme } from 'antd';
 import clsx from 'clsx';
 import React, { useEffect, useRef, useState } from 'react';
@@ -89,11 +97,30 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
     }
   }, [contentEditing]);
 
+  const success = false;
+  const error = false;
+
   return (
     <div
-      className={clsx('grl-dn', `grl-dn--color--${color}`, isSelected && `grl-dn--selected`)}
+      className={clsx(
+        'grl-dn',
+        `grl-dn--color--${color}`,
+        isSelected && `grl-dn--selected`,
+        success && `grl-dn--success`,
+        error && `grl-dn--error`,
+      )}
       onKeyDown={(e) => e.stopPropagation()}
     >
+      {success && (
+        <div className={clsx('grl-dn__status-icon', 'grl-dn__status-icon--success')}>
+          <CheckOutlined />
+        </div>
+      )}
+      {error && (
+        <div className={clsx('grl-dn__status-icon', 'grl-dn__status-icon--error')}>
+          <CloseOutlined />
+        </div>
+      )}
       <div className='grl-dn__header'>
         <div className='grl-dn__header__icon'>{icon}</div>
         <div className='grl-dn__header__text'>

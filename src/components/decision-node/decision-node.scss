@@ -10,6 +10,38 @@
   cursor: grab;
   border-radius: var(--node-border-radius);
   transition: var(--grl-transition);
+  position: relative;
+
+  &--success {
+    background: var(--grl-color-success-bg);
+  }
+
+  &--error {
+    background: var(--grl-color-error-bg);
+  }
+
+  &__status-icon {
+    position: absolute;
+    color: #fff;
+    top: -20px;
+    right: 0;
+    border-radius: 16px;
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &--success {
+      background-color: var(--grl-color-success);
+    }
+
+    &--error {
+      background-color: var(--grl-color-error);
+    }
+  }
 
   &:hover {
     border-color: var(--grl-color-border-hover);
@@ -60,6 +92,7 @@
         width: 120px;
         padding: 0 4px;
         font-size: 14px;
+        font-family: var(--grl-font-family);
       }
 
       &__name {
@@ -86,7 +119,6 @@
     }
 
     &__actions {
-
     }
   }
 
