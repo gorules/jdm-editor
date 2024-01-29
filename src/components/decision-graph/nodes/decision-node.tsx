@@ -1,18 +1,11 @@
 import {
-  BookOutlined,
-  CheckOutlined,
   CloseOutlined,
-  CopyOutlined,
-  DeleteOutlined,
   MoreOutlined,
 } from '@ant-design/icons';
-import { Button, Dropdown, type MenuProps, Modal, Typography, theme } from 'antd';
+import { Button, Dropdown, type MenuProps, Typography, theme } from 'antd';
 import clsx from 'clsx';
 import React, { useEffect, useRef, useState } from 'react';
-import { match } from 'ts-pattern';
 
-import { platform } from '../../../helpers/platform';
-import { SpacedText } from '../../spaced-text';
 import './decision-node.scss';
 
 export type DecisionNodeProps = {
@@ -66,12 +59,9 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
       )}
       onKeyDown={(e) => e.stopPropagation()}
     >
-      {status && (
+      {status === 'error' && (
         <div className={clsx('grl-dn__status-icon', `grl-dn__status-icon--${status}`)}>
-          {match(status)
-            .with('error', () => <CloseOutlined />)
-            .with('success', () => <CheckOutlined />)
-            .exhaustive()}
+          <CloseOutlined />
         </div>
       )}
       <div className='grl-dn__header'>
