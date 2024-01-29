@@ -3,16 +3,16 @@ import React from 'react';
 
 import { platform } from '../../../helpers/platform';
 import { SpacedText } from '../../spaced-text';
-import { useDecisionTableStore } from '../context/dt-store.context';
+import { useDecisionTableActions, useDecisionTableState } from '../context/dt-store.context';
 
 const ContextMenu: React.FC<React.PropsWithChildren> = (props) => {
   const { children } = props;
 
-  const cursor = useDecisionTableStore((store) => store.cursor);
-  const removeRow = useDecisionTableStore((store) => store.removeRow);
-  const addRowAbove = useDecisionTableStore((store) => store.addRowAbove);
-  const addRowBelow = useDecisionTableStore((store) => store.addRowBelow);
-  const disabled = useDecisionTableStore((store) => store.disabled);
+  const tableActions = useDecisionTableActions();
+  const { cursor, disabled } = useDecisionTableState(({ cursor, disabled }) => ({
+    cursor,
+    disabled,
+  }));
 
   return (
     <Dropdown
@@ -28,14 +28,14 @@ const ContextMenu: React.FC<React.PropsWithChildren> = (props) => {
             key: 'addRowAbove',
             label: <SpacedText left='Add row above' right={platform.shortcut('Ctrl + Up')} />,
             onClick: () => {
-              if (cursor) addRowAbove(cursor?.y);
+              if (cursor) tableActions.addRowAbove(cursor?.y);
             },
           },
           {
             key: 'addRowBelow',
             label: <SpacedText left='Add row below' right={platform.shortcut('Ctrl + Down')} />,
             onClick: () => {
-              if (cursor) addRowBelow(cursor?.y);
+              if (cursor) tableActions.addRowBelow(cursor?.y);
             },
           },
           {
@@ -45,7 +45,7 @@ const ContextMenu: React.FC<React.PropsWithChildren> = (props) => {
             key: 'remove',
             label: <SpacedText left='Remove row' right={platform.shortcut('Ctrl + Backspace')} />,
             onClick: () => {
-              if (cursor) removeRow(cursor?.y);
+              if (cursor) tableActions.removeRow(cursor?.y);
             },
           },
         ],

@@ -119,9 +119,10 @@
         }
 
         &.disabled {
-          background-color: var(--grl-color-bg-container-disabled);
+          background-color: rgba(0, 0, 0, 0.02);
           textarea {
             background-color: transparent;
+            color: var(--grl-color-text-secondary);
           }
         }
       }
@@ -215,7 +216,7 @@
       }
 
       &.active {
-        background-color: var(--grl-color-primary-bg);
+        background-color: var(--grl-color-success-bg);
       }
     }
   }

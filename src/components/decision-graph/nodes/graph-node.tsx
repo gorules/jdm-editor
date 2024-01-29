@@ -2,10 +2,11 @@ import clsx from 'clsx';
 import React from 'react';
 import type { HandleProps } from 'reactflow';
 import { Handle, Position } from 'reactflow';
+import { P, match } from 'ts-pattern';
 
-import type { DecisionNodeProps } from '../../decision-node/decision-node';
-import { DecisionNode } from '../../decision-node/decision-node';
 import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
+import type { DecisionNodeProps } from './decision-node';
+import { DecisionNode } from './decision-node';
 import type { MinimalNodeSpecification } from './specification-types';
 
 export type GraphNodeProps = {
@@ -25,7 +26,11 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
   ...decisionNodeProps
 }) => {
   const graphActions = useDecisionGraphActions();
-  const { disabled } = useDecisionGraphState(({ disabled }) => ({ disabled }));
+  const { nodeError, nodeTrace, disabled } = useDecisionGraphState(({ simulate, disabled }) => ({
+    disabled,
+    nodeTrace: simulate?.result?.trace?.[id],
+    nodeError: simulate?.error?.data?.nodeId === id ? simulate?.error?.data : undefined,
+  }));
 
   return (
     <div className={clsx('grl-graph-node', className)} style={{ minWidth: 250 }}>
@@ -44,6 +49,10 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
         color={specification.color}
         type={specification.displayName}
         onDelete={() => graphActions.removeNode(id)}
+        status={match([nodeTrace, nodeError])
+          .with([P.not(P.nullish), P._], () => 'success' as const)
+          .with([P._, P.not(P.nullish)], () => 'error' as const)
+          .otherwise(() => undefined)}
         onViewDocumentation={() => {
           window.open(specification.documentationUrl, '_href');
         }}

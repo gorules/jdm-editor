@@ -1,7 +1,7 @@
 import type React from 'react';
 import type { Node, NodeProps } from 'reactflow';
 
-import type { DecisionNodeProps } from '../../decision-node/decision-node';
+import type { DecisionNodeProps } from './decision-node';
 
 export enum NodeKind {
   Input = 'inputNode',

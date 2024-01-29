@@ -27,8 +27,6 @@ export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager 
         : [nodeTrace?.traceData?.rule?._id]
       : [];
 
-  // if (!content) return null;
-
   return (
     <DecisionTable
       tableHeight={'100%'}

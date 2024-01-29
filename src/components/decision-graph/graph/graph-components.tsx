@@ -4,8 +4,8 @@ import React, { useCallback } from 'react';
 import type { XYPosition } from 'reactflow';
 import { match } from 'ts-pattern';
 
-import { DecisionNode } from '../../decision-node/decision-node';
 import { useDecisionGraphState } from '../context/dg-store.context';
+import { DecisionNode } from '../nodes/decision-node';
 import { NodeKind } from '../nodes/specification-types';
 import { nodeSpecification } from '../nodes/specifications';
 
@@ -45,9 +45,8 @@ export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(
         <div className={'wrapper__list-wrapper'}>
           <div className={'wrapper__list'}>
             {Object.keys(nodeSpecification).map((kind: NodeKind) => (
-              <>
+              <React.Fragment key={kind}>
                 <DragDecisionNode
-                  key={kind}
                   disabled={match(kind)
                     .with(NodeKind.Input, () => disabled || inputDisabled)
                     .otherwise(() => disabled)}
@@ -55,7 +54,7 @@ export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(
                   onDragStart={(event) => onDragStart(event, kind)}
                 />
                 {kind === NodeKind.Output && <Divider style={{ margin: '4px 0' }} />}
-              </>
+              </React.Fragment>
             ))}
 
             {customComponents?.length > 0 && <Divider style={{ margin: '4px 0' }} />}

@@ -4,8 +4,7 @@ import React from 'react';
 
 import { Stack } from '../../stack';
 import { useDecisionTableDialog } from '../context/dt-dialog.context';
-import type { TableSchemaItem } from '../context/dt-store.context';
-import { useDecisionTableStore } from '../context/dt-store.context';
+import { type TableSchemaItem, useDecisionTableActions, useDecisionTableState } from '../context/dt-store.context';
 
 export type TableHeadCellProps = {
   configurable?: boolean;
@@ -19,7 +18,7 @@ export type TableHeadCellFieldProps = {
 };
 
 export const TableHeadCellInput: React.FC<TableHeadCellProps> = ({ configurable, disabled }) => {
-  const inputs = useDecisionTableStore((store: any) => store.decisionTable?.inputs);
+  const inputs = useDecisionTableState((store) => store.decisionTable?.inputs);
   const { setDialog } = useDecisionTableDialog();
 
   return (
@@ -70,7 +69,7 @@ export const TableHeadCellInput: React.FC<TableHeadCellProps> = ({ configurable,
 };
 
 export const TableHeadCellOutput: React.FC<TableHeadCellProps> = ({ configurable, disabled }) => {
-  const outputs = useDecisionTableStore((store: any) => store.decisionTable?.outputs);
+  const outputs = useDecisionTableState((store) => store.decisionTable?.outputs);
   const { setDialog } = useDecisionTableDialog();
 
   return (
@@ -122,8 +121,7 @@ export const TableHeadCellOutput: React.FC<TableHeadCellProps> = ({ configurable
 
 export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({ configurable, disabled, schema }) => {
   const { setDialog, getContainer } = useDecisionTableDialog();
-
-  const removeColumn = useDecisionTableStore((store: any) => store.removeColumn);
+  const tableActions = useDecisionTableActions();
 
   return (
     <Stack horizontal horizontalAlign={'space-between'} verticalAlign={'center'}>
@@ -167,7 +165,7 @@ export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({ con
                       ),
                       okText: 'Remove',
                       okButtonProps: { danger: true },
-                      onOk: () => removeColumn('inputs', schema.id),
+                      onOk: () => tableActions.removeColumn('inputs', schema.id),
                     });
                   },
                 },
@@ -186,7 +184,7 @@ export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({ con
 
 export const TableHeadCellOutputField: React.FC<TableHeadCellFieldProps> = ({ configurable, disabled, schema }) => {
   const { setDialog, getContainer } = useDecisionTableDialog();
-  const removeColumn = useDecisionTableStore((store: any) => store.removeColumn);
+  const tableActions = useDecisionTableActions();
 
   return (
     <Stack horizontal horizontalAlign='space-between' verticalAlign={'center'}>
@@ -232,9 +230,7 @@ export const TableHeadCellOutputField: React.FC<TableHeadCellFieldProps> = ({ co
                       okButtonProps: {
                         danger: true,
                       },
-                      onOk: () => {
-                        removeColumn('outputs', schema.id);
-                      },
+                      onOk: () => tableActions.removeColumn('outputs', schema.id),
                     });
                   },
                 },

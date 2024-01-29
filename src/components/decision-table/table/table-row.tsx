@@ -4,9 +4,8 @@ import { Typography } from 'antd';
 import clsx from 'clsx';
 import React, { useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { shallow } from 'zustand/shallow';
 
-import { useDecisionTableStore } from '../context/dt-store.context';
+import { useDecisionTableActions, useDecisionTableState } from '../context/dt-store.context';
 
 export const TableRow: React.FC<{
   index: number;
@@ -14,9 +13,11 @@ export const TableRow: React.FC<{
   reorderRow: (draggedRowIndex: number, targetRowIndex: number) => void;
   disabled?: boolean;
 }> = ({ index, row, reorderRow, disabled }) => {
-  const setCursor = useDecisionTableStore((store) => store.setCursor);
-  const cursor = useDecisionTableStore((store) => store.cursor, shallow);
-  const activeRules = useDecisionTableStore((store) => store.activeRules, shallow);
+  const tableActions = useDecisionTableActions();
+  const { cursor, activeRules } = useDecisionTableState(({ cursor, activeRules }) => ({
+    cursor,
+    activeRules,
+  }));
   const trRef = useRef<HTMLTableRowElement>(null);
   const [{ isDropping, direction }, dropRef] = useDrop({
     accept: 'row',
@@ -59,12 +60,7 @@ export const TableRow: React.FC<{
       <td
         className={clsx('sort-handler', !disabled && 'draggable')}
         ref={disabled ? undefined : dragRef}
-        onContextMenuCapture={() => {
-          setCursor({
-            x: 'id',
-            y: index,
-          });
-        }}
+        onContextMenuCapture={() => tableActions.setCursor({ x: 'id', y: index })}
       >
         <div className={'text'}>
           <Typography>{index + 1}</Typography>

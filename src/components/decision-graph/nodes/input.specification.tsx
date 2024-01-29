@@ -24,6 +24,17 @@ export const inputSpecification: NodeSpecification<NodeInputData> = {
   renderNode:
     ({ specification }) =>
     ({ id, data, selected }) => (
-      <GraphNode id={id} specification={specification} name={data.name} isSelected={selected} handleLeft={false} />
+      <GraphNode
+        id={id}
+        specification={specification}
+        name={data.name}
+        isSelected={selected}
+        handleLeft={false}
+        mapActionMenu={(items) =>
+          (items || []).filter(
+            (item) => !['divider-1', 'copy-clipboard', 'duplicate'].includes(item?.key?.toString() ?? ''),
+          )
+        }
+      />
     ),
 };

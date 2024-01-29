@@ -1,12 +1,10 @@
 import type { CellContext } from '@tanstack/react-table';
 import React, { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { v4 } from 'uuid';
-import { shallow } from 'zustand/shallow';
 
 import { columnIdSelector } from '../../../helpers/components';
 import { AutosizeTextArea } from '../../autosize-text-area';
-import type { TableSchemaItem } from '../context/dt-store.context';
-import { useDecisionTableStore } from '../context/dt-store.context';
+import { type TableSchemaItem, useDecisionTableActions, useDecisionTableState } from '../context/dt-store.context';
 
 export type TableDefaultCellProps = {
   context: CellContext<Record<string, string>, string>;
@@ -18,7 +16,17 @@ export const TableDefaultCell = memo<TableDefaultCellProps>(({ context, ...props
     column: { id },
     table,
   } = context;
-  const value = useDecisionTableStore((store: any) => store.decisionTable?.rules?.[index]?.[id], shallow);
+
+  const tableActions = useDecisionTableActions();
+  const { disabled, value } = useDecisionTableState(({ decisionTable, disabled }) => ({
+    value: decisionTable?.rules?.[index]?.[id],
+    disabled,
+  }));
+
+  const column = useDecisionTableState(
+    columnIdSelector(id),
+    (a, b) => a?.id !== undefined && b?.id !== undefined && a?.id === b?.id,
+  );
 
   const [inner, setInner] = useState(value);
   useLayoutEffect(() => {
@@ -27,30 +35,16 @@ export const TableDefaultCell = memo<TableDefaultCellProps>(({ context, ...props
     }
   }, [value]);
 
-  const column = useDecisionTableStore(
-    columnIdSelector(id),
-    (a, b) => a?.id !== undefined && b?.id !== undefined && a?.id === b?.id,
-  );
-
-  const disabled = useDecisionTableStore((store) => store.disabled, shallow);
-  const commitData = useDecisionTableStore((store) => store.commitData, shallow);
-  const setCursor = useDecisionTableStore((store) => store.setCursor, shallow);
-
   const commit = (val: string) => {
     setInner(val);
-    commitData(val, {
-      x: id,
-      y: index,
-    });
+    tableActions.commitData(val, { x: id, y: index });
   };
 
   return (
     <div
       className='cell-wrapper'
-      onFocus={() => setCursor({ x: id, y: index })}
-      onContextMenu={() => {
-        setCursor({ x: id, y: index });
-      }}
+      onFocus={() => tableActions.setCursor({ x: id, y: index })}
+      onContextMenu={() => tableActions.setCursor({ x: id, y: index })}
       {...props}
     >
       {(table.options.meta as any)?.getCell?.({

@@ -1,3 +1,4 @@
+import equal from 'fast-deep-equal/es6/react';
 import { produce } from 'immer';
 import React, { useMemo } from 'react';
 import { v4 } from 'uuid';
@@ -22,11 +23,6 @@ export type TableSchemaItem = {
   field?: string;
   type: string;
   defaultValue?: string;
-};
-
-export type TableSchema = {
-  inputs: TableSchemaItem[];
-  outputs: TableSchemaItem[];
 };
 
 export type HitPolicy = 'first' | 'collect';
@@ -109,50 +105,55 @@ export const parseDecisionTable = (decisionTable?: DecisionTableType) => {
 };
 
 export type DecisionTableStoreType = {
-  id?: string;
-  name?: string;
+  state: {
+    id?: string;
+    name?: string;
+    decisionTable: DecisionTableType;
+    cursor: TableCursor | null;
+    activeRules: string[];
 
-  decisionTable: DecisionTableType;
-  setDecisionTable: (val: DecisionTableType) => void;
+    disabled: boolean;
+    configurable: boolean;
+    disableHitPolicy: boolean;
 
-  cursor: TableCursor | null;
-  setCursor: (cursor: TableCursor | null) => void;
+    minColWidth: number;
+    colWidth: number;
 
-  // Actions
-  commitData: (data: string, cursor: TableCursor) => void;
-  swapRows: (source: number, target: number) => void;
-  addRowAbove: (target?: number) => void;
-  addRowBelow: (target?: number) => void;
-  removeRow: (target?: number) => void;
-  addColumn: (type: ColumnType, column: TableSchemaItem) => void;
-  updateColumn: (type: ColumnType, id: string, column: TableSchemaItem) => void;
-  removeColumn: (type: ColumnType, id: string) => void;
-  reorderColumns: (type: ColumnType, columns: TableSchemaItem[]) => void;
-  updateHitPolicy: (hitPolicy: HitPolicy) => void;
+    inputsSchema?: SchemaSelectProps[];
+    outputsSchema?: SchemaSelectProps[];
+  };
 
-  activeRules?: string[];
+  actions: {
+    setDecisionTable: (val: DecisionTableType) => void;
+    setCursor: (cursor: TableCursor | null) => void;
+    commitData: (data: string, cursor: TableCursor) => void;
+    swapRows: (source: number, target: number) => void;
+    addRowAbove: (target?: number) => void;
+    addRowBelow: (target?: number) => void;
+    removeRow: (target?: number) => void;
+    addColumn: (type: ColumnType, column: TableSchemaItem) => void;
+    updateColumn: (type: ColumnType, id: string, column: TableSchemaItem) => void;
+    removeColumn: (type: ColumnType, id: string) => void;
+    reorderColumns: (type: ColumnType, columns: TableSchemaItem[]) => void;
+    updateHitPolicy: (hitPolicy: HitPolicy) => void;
+  };
 
-  inputsSchema?: SchemaSelectProps[];
-  outputsSchema?: SchemaSelectProps[];
-
-  // Props
-  disabled?: boolean;
-  configurable?: boolean;
-  disableHitPolicy?: boolean;
-
-  minColWidth?: number;
-  colWidth: number;
-
-  onChange?: (val: DecisionTableType) => void;
-
-  cellRenderer?: (props: TableCellProps) => JSX.Element | null | undefined;
+  listeners: {
+    onChange?: (val: DecisionTableType) => void;
+    cellRenderer?: (props: TableCellProps) => React.ReactNode | null | undefined;
+    onColumnResize?: () => void;
+  };
 };
 
-const DecisionTableStoreContext = React.createContext<
-  UseBoundStore<StoreApi<DecisionTableStoreType>> & {
-    setState: (partial: Partial<DecisionTableStoreType>) => void;
-  }
->({} as any);
+type ExposedStore<T> = UseBoundStore<StoreApi<T>> & {
+  setState: (partial: Partial<T>) => void;
+};
+
+const DecisionTableStoreContext = React.createContext<{
+  stateStore: ExposedStore<DecisionTableStoreType['state']>;
+  listenerStore: ExposedStore<DecisionTableStoreType['listeners']>;
+  actions: DecisionTableStoreType['actions'];
+}>({} as any);
 
 export type DecisionTableContextProps = {
   //
@@ -160,220 +161,231 @@ export type DecisionTableContextProps = {
 
 export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTableContextProps>> = (props) => {
   const { children } = props;
-  const store = useMemo(
+
+  const stateStore = useMemo(
     () =>
-      create<DecisionTableStoreType>((set, getState) => ({
+      create<DecisionTableStoreType['state']>(() => ({
+        id: undefined,
+        name: undefined,
         decisionTable: parseDecisionTable(),
-        setDecisionTable: (val) => {
-          set(
-            produce<DecisionTableStoreType>((draft) => {
-              draft.decisionTable = val;
-              return draft;
-            }),
-          );
-        },
         cursor: null,
-        colWidth: 200,
-        minColWidth: 150,
+        activeRules: [],
+
         disabled: false,
         configurable: true,
         disableHitPolicy: false,
-        setCursor: (cursor: TableCursor) =>
-          set({
-            cursor,
-          }),
-        commitData: (value: string, cursor: TableCursor) => {
-          const updatedDecisionTable = produce(getState().decisionTable, (draft) => {
-            const { x, y } = cursor;
-            draft.rules[y][x] = value;
-            return draft;
-          });
-          set({
-            decisionTable: updatedDecisionTable,
-          });
-          getState()?.onChange?.(updatedDecisionTable);
-        },
-        swapRows: (source: number, target: number) => {
-          const updatedDecisionTable = produce(getState().decisionTable, (draft) => {
-            const input = draft?.rules?.[source];
-            draft.rules.splice(source, 1);
-            draft.rules.splice(target, 0, input);
-            return draft;
-          });
-          set({
-            decisionTable: updatedDecisionTable,
-            cursor: null,
-          });
-          getState()?.onChange?.(updatedDecisionTable);
-        },
-        addRowAbove: (target?: number) => {
-          const updatedDecisionTable = produce(getState().decisionTable, (draft) => {
-            if (target === undefined) target = 0;
-            const _id = v4();
-            draft.rules.splice(
-              target,
-              0,
-              cleanupTableRule(
-                draft,
-                {
-                  _id,
-                },
-                _id,
-              ),
-            );
-            return draft;
-          });
-          set({
-            decisionTable: updatedDecisionTable,
-          });
-          getState()?.onChange?.(updatedDecisionTable);
 
-          const cursor = getState()?.cursor;
-          if (cursor && cursor?.y === target) {
-            set(
-              produce<DecisionTableStoreType>((draft) => {
-                if (draft.cursor) {
-                  draft.cursor = {
-                    y: draft.cursor.y + 1,
-                    x: draft.cursor.x,
-                  };
-                }
-                return draft;
-              }),
-            );
-          }
-        },
-        addRowBelow: (target?: number) => {
-          const updatedDecisionTable = produce(getState().decisionTable, (draft) => {
-            if (target === undefined) {
-              target = draft?.rules?.length;
-            } else {
-              target += 1;
-            }
-            const _id = v4();
-            draft.rules.splice(
-              target,
-              0,
-              cleanupTableRule(
-                draft,
-                {
-                  _id,
-                },
-                _id,
-              ),
-            );
-            return draft;
-          });
-          set({
-            decisionTable: updatedDecisionTable,
-          });
-          getState()?.onChange?.(updatedDecisionTable);
+        colWidth: 200,
+        minColWidth: 150,
 
-          const cursor = getState()?.cursor;
-          if (cursor && cursor?.y === target) {
-            set(
-              produce<DecisionTableStoreType>((draft) => {
-                if (draft.cursor) {
-                  draft.cursor = {
-                    y: draft.cursor.y - 1,
-                    x: draft.cursor.x,
-                  };
-                }
-                return draft;
-              }),
-            );
-          }
-        },
-        removeRow: (target?: number) => {
-          const updatedDecisionTable = produce(getState().decisionTable, (draft) => {
-            if (target === undefined) target = draft?.rules?.length || 0;
-            draft.rules.splice(target, 1);
-            return draft;
-          });
-          set({
-            decisionTable: updatedDecisionTable,
-            cursor: null,
-          });
-          getState()?.onChange?.(updatedDecisionTable);
-        },
-        addColumn: (type: ColumnType, column: TableSchemaItem) => {
-          const updatedDecisionTable = produce(getState().decisionTable, (draft) => {
-            draft[type].push(column);
-            draft.rules = cleanupTableRules(draft);
-            return draft;
-          });
-          set({
-            decisionTable: updatedDecisionTable,
-          });
-          getState()?.onChange?.(updatedDecisionTable);
-        },
-        updateColumn: (type: ColumnType, id: string, data: TableSchemaItem) => {
-          const updatedDecisionTable = produce(getState().decisionTable, (draft) => {
-            draft[type] = draft[type].map((item) => {
-              if (item.id === id) {
-                return {
-                  ...item,
-                  name: data?.name,
-                  field: data?.field,
-                  defaultValue: data?.defaultValue,
-                };
-              }
-              return item;
-            });
-            draft.rules = cleanupTableRules(draft);
-            return draft;
-          });
-          set({
-            decisionTable: updatedDecisionTable,
-          });
-          getState()?.onChange?.(updatedDecisionTable);
-        },
-        removeColumn: (type: ColumnType, id: string) => {
-          const updatedDecisionTable = parseDecisionTable(
-            produce(getState().decisionTable, (draft) => {
-              draft[type] = (draft?.[type] || []).filter((item) => item?.id !== id);
-              draft.rules = cleanupTableRules(draft);
-              return draft;
-            }),
-          );
-          set({
-            decisionTable: updatedDecisionTable,
-            cursor: null,
-          });
-          getState()?.onChange?.(updatedDecisionTable);
-        },
-        reorderColumns: (type: ColumnType, columns: TableSchemaItem[]) => {
-          const updatedDecisionTable = produce(getState().decisionTable, (draft) => {
-            draft[type] = columns;
-            draft.rules = cleanupTableRules(draft);
-            return draft;
-          });
-          set({
-            decisionTable: updatedDecisionTable,
-          });
-          getState()?.onChange?.(updatedDecisionTable);
-        },
-        updateHitPolicy: (hitPolicy: HitPolicy) => {
-          const updatedDecisionTable = produce(getState().decisionTable, (draft) => {
-            draft.hitPolicy = hitPolicy;
-            return draft;
-          });
-          set({
-            decisionTable: updatedDecisionTable,
-          });
-          getState()?.onChange?.(updatedDecisionTable);
-        },
+        inputsSchema: undefined,
+        outputsSchema: undefined,
       })),
     [],
   );
-  return <DecisionTableStoreContext.Provider value={store}>{children}</DecisionTableStoreContext.Provider>;
+
+  const listenerStore = useMemo(
+    () =>
+      create<DecisionTableStoreType['listeners']>(() => ({
+        onChange: undefined,
+        cellRenderer: undefined,
+      })),
+    [],
+  );
+
+  const actions = useMemo<DecisionTableStoreType['actions']>(
+    () => ({
+      setDecisionTable: (decisionTable) => stateStore.setState({ decisionTable }),
+      setCursor: (cursor: TableCursor) => stateStore.setState({ cursor }),
+      commitData: (value: string, cursor: TableCursor) => {
+        const { decisionTable } = stateStore.getState();
+
+        const updatedDecisionTable = produce(decisionTable, (draft) => {
+          const { x, y } = cursor;
+          draft.rules[y][x] = value;
+          return draft;
+        });
+
+        stateStore.setState({ decisionTable: updatedDecisionTable });
+        listenerStore.getState().onChange?.(updatedDecisionTable);
+      },
+      swapRows: (source: number, target: number) => {
+        const { decisionTable } = stateStore.getState();
+
+        const updatedDecisionTable = produce(decisionTable, (draft) => {
+          const input = draft?.rules?.[source];
+          draft.rules.splice(source, 1);
+          draft.rules.splice(target, 0, input);
+          return draft;
+        });
+
+        stateStore.setState({ decisionTable: updatedDecisionTable, cursor: null });
+        listenerStore.getState().onChange?.(updatedDecisionTable);
+      },
+      addRowAbove: (target?: number) => {
+        const { decisionTable } = stateStore.getState();
+
+        const updatedDecisionTable = produce(decisionTable, (draft) => {
+          if (target === undefined) {
+            target = 0;
+          }
+
+          const _id = v4();
+          draft.rules.splice(target, 0, cleanupTableRule(draft, { _id }, _id));
+
+          return draft;
+        });
+
+        stateStore.setState({ decisionTable: updatedDecisionTable });
+        listenerStore.getState().onChange?.(updatedDecisionTable);
+
+        const { cursor } = stateStore.getState();
+        if (cursor && cursor?.y === target) {
+          stateStore.setState({ cursor: { x: cursor.x, y: cursor.y + 1 } });
+        }
+      },
+      addRowBelow: (target?: number) => {
+        const { decisionTable } = stateStore.getState();
+
+        const updatedDecisionTable = produce(decisionTable, (draft) => {
+          if (target === undefined) {
+            target = draft?.rules?.length;
+          } else {
+            target += 1;
+          }
+
+          const _id = v4();
+          draft.rules.splice(target, 0, cleanupTableRule(draft, { _id }, _id));
+          return draft;
+        });
+        stateStore.setState({ decisionTable: updatedDecisionTable });
+        listenerStore.getState().onChange?.(updatedDecisionTable);
+
+        const { cursor } = stateStore.getState();
+        if (cursor && cursor?.y === target) {
+          stateStore.setState({ cursor: { x: cursor.x, y: cursor.y - 1 } });
+        }
+      },
+      removeRow: (target?: number) => {
+        const { decisionTable } = stateStore.getState();
+
+        const updatedDecisionTable = produce(decisionTable, (draft) => {
+          if (target === undefined) {
+            target = draft?.rules?.length || 0;
+          }
+
+          draft.rules.splice(target, 1);
+          return draft;
+        });
+
+        stateStore.setState({ decisionTable: updatedDecisionTable });
+        listenerStore.getState().onChange?.(updatedDecisionTable);
+      },
+      addColumn: (type: ColumnType, column: TableSchemaItem) => {
+        const { decisionTable } = stateStore.getState();
+
+        const updatedDecisionTable = produce(decisionTable, (draft) => {
+          draft[type].push(column);
+          draft.rules = cleanupTableRules(draft);
+          return draft;
+        });
+
+        stateStore.setState({ decisionTable: updatedDecisionTable });
+        listenerStore.getState().onChange?.(updatedDecisionTable);
+      },
+      updateColumn: (type: ColumnType, id: string, data: TableSchemaItem) => {
+        const { decisionTable } = stateStore.getState();
+
+        const updatedDecisionTable = produce(decisionTable, (draft) => {
+          draft[type] = draft[type].map((item) => {
+            if (item.id === id) {
+              return {
+                ...item,
+                name: data?.name,
+                field: data?.field,
+                defaultValue: data?.defaultValue,
+              };
+            }
+            return item;
+          });
+
+          draft.rules = cleanupTableRules(draft);
+          return draft;
+        });
+
+        stateStore.setState({ decisionTable: updatedDecisionTable });
+        listenerStore.getState().onChange?.(updatedDecisionTable);
+      },
+      removeColumn: (type: ColumnType, id: string) => {
+        const { decisionTable } = stateStore.getState();
+
+        const updatedDecisionTable = parseDecisionTable(
+          produce(decisionTable, (draft) => {
+            draft[type] = (draft?.[type] || []).filter((item) => item?.id !== id);
+            draft.rules = cleanupTableRules(draft);
+            return draft;
+          }),
+        );
+
+        stateStore.setState({ decisionTable: updatedDecisionTable, cursor: null });
+        listenerStore.getState().onChange?.(updatedDecisionTable);
+      },
+      reorderColumns: (type: ColumnType, columns: TableSchemaItem[]) => {
+        const { decisionTable } = stateStore.getState();
+
+        const updatedDecisionTable = produce(decisionTable, (draft) => {
+          draft[type] = columns;
+          draft.rules = cleanupTableRules(draft);
+          return draft;
+        });
+
+        stateStore.setState({ decisionTable: updatedDecisionTable });
+        listenerStore.getState().onChange?.(updatedDecisionTable);
+      },
+      updateHitPolicy: (hitPolicy: HitPolicy) => {
+        const { decisionTable } = stateStore.getState();
+
+        const updatedDecisionTable = produce(decisionTable, (draft) => {
+          draft.hitPolicy = hitPolicy;
+          return draft;
+        });
+
+        stateStore.setState({ decisionTable: updatedDecisionTable });
+        listenerStore.getState().onChange?.(updatedDecisionTable);
+      },
+    }),
+    [],
+  );
+
+  return (
+    <DecisionTableStoreContext.Provider
+      value={{
+        stateStore,
+        listenerStore,
+        actions,
+      }}
+    >
+      {children}
+    </DecisionTableStoreContext.Provider>
+  );
 };
 
-export function useDecisionTableStore<T>(
-  selector: (state: DecisionTableStoreType) => T,
-  equals?: (a: any, b: any) => boolean,
+export function useDecisionTableState<T>(
+  selector: (state: DecisionTableStoreType['state']) => T,
+  equals: (a: any, b: any) => boolean = equal,
 ): T {
-  return React.useContext(DecisionTableStoreContext)(selector, equals);
+  return React.useContext(DecisionTableStoreContext).stateStore(selector, equals);
+}
+
+export function useDecisionTableListeners<T>(
+  selector: (state: DecisionTableStoreType['listeners']) => T,
+  equals: (a: any, b: any) => boolean = equal,
+): T {
+  return React.useContext(DecisionTableStoreContext).listenerStore(selector, equals);
+}
+
+export function useDecisionTableActions(): DecisionTableStoreType['actions'] {
+  return React.useContext(DecisionTableStoreContext).actions;
 }
 
 export const useDecisionTableRaw = () => React.useContext(DecisionTableStoreContext);
