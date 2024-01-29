@@ -233,8 +233,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
 
         nodesState.current[1]?.((n) => n.concat(mapToGraphNodes(nodes)));
         const newDecisionGraph = produce(decisionGraph, (draft) => {
-          const n = draft.nodes || [];
-          draft.nodes = n.concat(nodes);
+          draft.nodes = (draft.nodes || []).concat(nodes);
         });
 
         stateStore.setState({ decisionGraph: newDecisionGraph });
@@ -345,8 +344,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
 
         edgesState.current?.[1]?.((els) => els.concat(edges.map(mapToGraphEdge)));
         const newDecisionGraph = produce(decisionGraph, (draft) => {
-          const edges = draft.edges || [];
-          draft.edges = edges.concat(edges);
+          draft.edges = (draft.edges || []).concat(edges);
         });
 
         stateStore.setState({ decisionGraph: newDecisionGraph });

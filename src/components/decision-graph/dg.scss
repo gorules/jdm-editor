@@ -298,10 +298,10 @@
 
   .react-flow {
     &__handle {
-      border: 1px solid var(--grl-color-primary-border) !important;
-      background-color: var(--grl-color-primary-bg) !important;
-      height: 7px !important;
-      width: 7px !important;
+      border: 1px solid var(--grl-color-primary-border);
+      background-color: var(--grl-color-primary-bg);
+      height: 9px;
+      width: 9px;
       border-radius: 50% !important;
 
       &::after {
@@ -317,7 +317,7 @@
     }
 
     &__handle-left {
-      left: -4px !important;
+      left: -5px !important;
 
       &::after {
         transform: translate(-80%, -50%);
@@ -327,7 +327,7 @@
     }
 
     &__handle-right {
-      right: -4px !important;
+      right: -5px !important;
 
       &::after {
         transform: translate(-20%, -50%);
@@ -442,6 +442,11 @@
     padding-top: 9px;
     padding-bottom: 9px;
 
+    &__activeHandle {
+      background-color: var(--grl-color-success-bg) !important;
+      border-color: var(--grl-color-success) !important;
+    }
+
     .react-flow__handle {
       z-index: 20;
       top: calc(50% - 1px);
@@ -491,17 +496,6 @@
 
     &__statement {
       position: relative;
-
-      &__activeIndicator {
-        height: 14px;
-        width: 14px;
-        position: absolute;
-        color: var(--grl-primary-color);
-        right: 14px;
-        top: 50%;
-        z-index: 1;
-        transform: translateY(-50%);
-      }
 
       &__more {
         position: absolute;

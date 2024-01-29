@@ -1,4 +1,4 @@
-import { BranchesOutlined, CaretRightOutlined, DeleteOutlined, DownOutlined } from '@ant-design/icons';
+import { BranchesOutlined, DeleteOutlined, DownOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Typography } from 'antd';
 import clsx from 'clsx';
 import React, { useLayoutEffect, useState } from 'react';
@@ -43,9 +43,9 @@ const SwitchNode: React.FC<
     specification: Pick<NodeSpecification, 'displayName' | 'icon' | 'documentationUrl'>;
   }
 > = ({ id, data, selected, specification }) => {
-  const isConnectable = true;
   const graphActions = useDecisionGraphActions();
-  const { content, disabled } = useDecisionGraphState(({ decisionGraph, disabled }) => ({
+  const { content, disabled, nodeTrace } = useDecisionGraphState(({ decisionGraph, disabled, simulate }) => ({
+    nodeTrace: simulate?.result?.trace?.[id],
     content: (decisionGraph?.nodes || []).find((n) => n?.id === id)?.content as NodeSwitchData | undefined,
     disabled,
   }));
@@ -121,8 +121,10 @@ const SwitchNode: React.FC<
               key={statement.id}
               value={statement.condition}
               id={statement.id}
-              isConnectable={isConnectable}
               disabled={disabled}
+              isActive={(nodeTrace?.traceData?.statements || []).some(
+                (s: SwitchStatement) => s?.id && s?.id === statement?.id,
+              )}
               onDelete={() => {
                 graphActions.updateNode(id, (draft) => {
                   draft.content.statements = draft.content.statements.filter(
@@ -153,13 +155,12 @@ const SwitchNode: React.FC<
 const SwitchHandle: React.FC<{
   id?: string;
   value?: string;
-  isConnectable: boolean;
   onChange?: (value: string) => void;
   onDelete?: () => void;
   disabled?: boolean;
   isActive?: boolean;
   configurable?: boolean;
-}> = ({ id, value, isConnectable, onChange, disabled, configurable = true, onDelete, isActive }) => {
+}> = ({ id, value, onChange, disabled, configurable = true, onDelete, isActive }) => {
   const [inner, setInner] = useState(value);
   useLayoutEffect(() => {
     if (inner !== value) {
@@ -196,9 +197,13 @@ const SwitchHandle: React.FC<{
             onClick={() => onDelete?.()}
           />
         )}
-        {isActive && <CaretRightOutlined className={'switchNode__statement__activeIndicator'} />}
       </div>
-      <Handle id={id} type='source' position={Position.Right} isConnectable={isConnectable} />
+      <Handle
+        id={id}
+        type='source'
+        position={Position.Right}
+        className={clsx(isActive && 'switchNode__activeHandle')}
+      />
     </div>
   );
 };
