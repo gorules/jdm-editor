@@ -1,3 +1,4 @@
+import equal from 'fast-deep-equal/es6/react';
 import { produce } from 'immer';
 import React, { useMemo } from 'react';
 import { v4 } from 'uuid';
@@ -111,7 +112,7 @@ export const ExpressionStoreProvider: React.FC<React.PropsWithChildren<Expressio
 
 export function useExpressionStore<T>(
   selector: (state: ExpressionStore) => T,
-  equals?: (a: any, b: any) => boolean,
+  equals: (a: any, b: any) => boolean = equal,
 ): T {
   return React.useContext(ExpressionStoreContext)(selector, equals);
 }

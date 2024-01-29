@@ -1,11 +1,5 @@
-import {
-  CloseOutlined,
-  CloudDownloadOutlined,
-  CloudUploadOutlined,
-  PlayCircleOutlined,
-  PlusCircleOutlined,
-} from '@ant-design/icons';
-import { Button, Divider, Tooltip, Typography, message } from 'antd';
+import { CloseOutlined, CloudDownloadOutlined, CloudUploadOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { Button, Tooltip, Typography, message } from 'antd';
 import React, { useRef, useState } from 'react';
 
 import {
@@ -14,28 +8,24 @@ import {
   useDecisionGraphActions,
   useDecisionGraphState,
 } from '../context/dg-store.context';
+import { NodeKind } from '../nodes/specification-types';
 import { GraphComponents } from './graph-components';
 
 const DecisionContentType = 'application/vnd.gorules.decision';
 
 export const GraphAside = () => {
-  const { decisionGraph, activeTab, disabled } = useDecisionGraphState(({ decisionGraph, activeTab, disabled }) => ({
-    decisionGraph,
-    activeTab,
-    disabled,
-  }));
-  const { setDecisionGraph } = useDecisionGraphActions();
   const fileInput = useRef<HTMLInputElement>(null);
-  const inputNodes = (decisionGraph?.nodes || []).filter((node) => node.type === 'inputNode');
   const [menu, setMenu] = useState<string | undefined>('components');
-  //
-  // const onPaste = useCallback(async () => {
-  //   try {
-  //     await graphClipboard.pasteNodes();
-  //   } catch (e) {
-  //     message.error(e?.message);
-  //   }
-  // }, [graphClipboard]);
+
+  const { setDecisionGraph } = useDecisionGraphActions();
+  const { decisionGraph, activeTab, disabled, hasInputNode } = useDecisionGraphState(
+    ({ decisionGraph, activeTab, disabled }) => ({
+      decisionGraph,
+      activeTab,
+      disabled,
+      hasInputNode: (decisionGraph?.nodes || []).some((n) => n.type === NodeKind.Input),
+    }),
+  );
 
   const handleUploadInput = async (event: any) => {
     const fileList = event?.target?.files as FileList;
@@ -110,19 +100,16 @@ export const GraphAside = () => {
       <div className={'grl-dg__aside'}>
         <div className={'grl-dg__aside__side-bar'}>
           <Tooltip placement='right' title='Components'>
-            <Button type={'primary'} icon={<PlusCircleOutlined />} onClick={() => setMenu('components')} />
+            <Button
+              type={'primary'}
+              icon={<PlusCircleOutlined />}
+              onClick={() => setMenu((m) => (m !== 'components' ? 'components' : undefined))}
+            />
           </Tooltip>
-          {/*<Tooltip placement={'right'} title={'Simulator'}>*/}
-          {/*  <Button type={'text'} icon={<PlayCircleOutlined />} onClick={() => {}} />*/}
-          {/*</Tooltip>*/}
-          {/*<Divider*/}
-          {/*  style={{*/}
-          {/*    margin: 0,*/}
-          {/*  }}*/}
-          {/*/>*/}
           <Tooltip placement='right' title='Upload JSON'>
             <Button
               type={'text'}
+              disabled={disabled}
               icon={<CloudUploadOutlined />}
               onClick={() => {
                 fileInput?.current?.click?.();
@@ -158,14 +145,7 @@ export const GraphAside = () => {
                 </div>
                 <div className={'grl-dg__aside__menu__content'}>
                   <div className={'grl-dg__aside__menu__content__inner'}>
-                    <GraphComponents
-                      inputDisabled={inputNodes.length > 0}
-                      onClose={() => setMenu(undefined)}
-                      disabled={activeTab !== 'graph' || disabled}
-                      onPaste={() => {
-                        // TODO
-                      }}
-                    />
+                    <GraphComponents inputDisabled={hasInputNode} disabled={activeTab !== 'graph' || disabled} />
                   </div>
                 </div>
               </>

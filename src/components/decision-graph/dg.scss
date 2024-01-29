@@ -84,6 +84,10 @@
         display: flex;
         flex-direction: column;
       }
+
+      &:focus, &:focus-within {
+        outline: none;
+      }
     }
 
     .content-wrapper {
@@ -313,18 +317,22 @@
     }
 
     &__handle-left {
-      left: -5px !important;
+      left: -4px !important;
 
       &::after {
-        transform: translate(-60%, -50%);
+        transform: translate(-80%, -50%);
+        width: 36px;
+        height: 36px;
       }
     }
 
     &__handle-right {
-      right: -5px !important;
+      right: -4px !important;
 
       &::after {
-        transform: translate(-40%, -50%);
+        transform: translate(-20%, -50%);
+        width: 36px;
+        height: 36px;
       }
     }
 

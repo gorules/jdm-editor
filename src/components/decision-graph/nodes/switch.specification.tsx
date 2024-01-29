@@ -17,11 +17,8 @@ export type SwitchStatement = {
 };
 
 export type NodeSwitchData = {
-  name?: string;
-  content?: {
-    hitPolicy?: 'first' | 'collect';
-    statements?: SwitchStatement[];
-  };
+  hitPolicy?: 'first' | 'collect';
+  statements?: SwitchStatement[];
 };
 
 export const switchSpecification: NodeSpecification<NodeSwitchData> = {
@@ -31,11 +28,9 @@ export const switchSpecification: NodeSpecification<NodeSwitchData> = {
   shortDescription: 'Conditional branching',
   generateNode: () => ({
     type: NodeKind.Switch,
-    data: {
-      name: 'mySwitch',
-      content: {
-        statements: [{ id: v4(), condition: '' }],
-      },
+    name: 'mySwitch',
+    content: {
+      statements: [{ id: v4(), condition: '' }],
     },
   }),
   renderNode:
@@ -50,10 +45,10 @@ const SwitchNode: React.FC<
 > = ({ id, data, selected, specification }) => {
   const isConnectable = true;
   const graphActions = useDecisionGraphActions();
-  const content = useDecisionGraphState(
-    ({ decisionGraph }) =>
-      (decisionGraph?.nodes || []).find((n) => n?.id === id)?.content as NodeSwitchData['content'] | undefined,
-  );
+  const { content, disabled } = useDecisionGraphState(({ decisionGraph, disabled }) => ({
+    content: (decisionGraph?.nodes || []).find((n) => n?.id === id)?.content as NodeSwitchData | undefined,
+    disabled,
+  }));
 
   const statements: SwitchStatement[] = content?.statements || [];
   const hitPolicy = content?.hitPolicy || 'first';
@@ -78,6 +73,7 @@ const SwitchNode: React.FC<
         <Button
           key='add row'
           type='link'
+          disabled={disabled}
           onClick={() => {
             graphActions.updateNode(id, (draft) => {
               draft.content.statements.push({ id: v4(), condition: '' });
@@ -91,6 +87,7 @@ const SwitchNode: React.FC<
           key='hitPolicy'
           trigger={['click']}
           placement='bottomRight'
+          disabled={disabled}
           menu={{
             items: [
               {
@@ -125,6 +122,7 @@ const SwitchNode: React.FC<
               value={statement.condition}
               id={statement.id}
               isConnectable={isConnectable}
+              disabled={disabled}
               onDelete={() => {
                 graphActions.updateNode(id, (draft) => {
                   draft.content.statements = draft.content.statements.filter(

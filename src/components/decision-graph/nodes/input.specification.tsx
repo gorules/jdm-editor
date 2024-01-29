@@ -1,13 +1,15 @@
-import { LoginOutlined } from '@ant-design/icons';
+import { BookOutlined, DeleteOutlined, LoginOutlined } from '@ant-design/icons';
+import { Modal, Typography } from 'antd';
 import React from 'react';
 
+import { platform } from '../../../helpers/platform';
+import { SpacedText } from '../../spaced-text';
+import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
 import { GraphNode } from './graph-node';
 import type { NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
 
-export type NodeInputData = {
-  name?: string;
-};
+export type NodeInputData = never;
 
 export const inputSpecification: NodeSpecification<NodeInputData> = {
   icon: <LoginOutlined />,
@@ -17,24 +19,51 @@ export const inputSpecification: NodeSpecification<NodeInputData> = {
   shortDescription: 'Provides input context',
   generateNode: () => ({
     type: NodeKind.Input,
-    data: {
-      name: 'myRequest',
-    },
+    name: 'myRequest',
   }),
   renderNode:
     ({ specification }) =>
-    ({ id, data, selected }) => (
-      <GraphNode
-        id={id}
-        specification={specification}
-        name={data.name}
-        isSelected={selected}
-        handleLeft={false}
-        mapActionMenu={(items) =>
-          (items || []).filter(
-            (item) => !['divider-1', 'copy-clipboard', 'duplicate'].includes(item?.key?.toString() ?? ''),
-          )
-        }
-      />
-    ),
+    ({ id, data, selected }) => {
+      const graphActions = useDecisionGraphActions();
+      const { disabled } = useDecisionGraphState(({ disabled }) => ({
+        disabled,
+      }));
+
+      return (
+        <GraphNode
+          id={id}
+          specification={specification}
+          name={data.name}
+          isSelected={selected}
+          handleLeft={false}
+          menuItems={[
+            {
+              key: 'documentation',
+              icon: <BookOutlined />,
+              label: 'Documentation',
+              onClick: () => window.open(specification.documentationUrl, '_href'),
+            },
+            {
+              key: 'delete',
+              icon: <DeleteOutlined />,
+              danger: true,
+              label: <SpacedText left='Delete' right={platform.shortcut('Backspace')} />,
+              disabled,
+              onClick: () =>
+                Modal.confirm({
+                  icon: null,
+                  title: 'Delete node',
+                  content: (
+                    <Typography.Text>
+                      Are you sure you want to delete <Typography.Text strong>{data.name}</Typography.Text> node.
+                    </Typography.Text>
+                  ),
+                  okButtonProps: { danger: true },
+                  onOk: () => graphActions.removeNodes([id]),
+                }),
+            },
+          ]}
+        />
+      );
+    },
 };

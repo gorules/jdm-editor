@@ -26,12 +26,8 @@ export type DecisionNodeProps = {
   status?: 'error' | 'success';
   noBodyPadding?: boolean;
   color?: 'primary' | 'secondary';
-  mapActionMenu?: (items: MenuProps['items']) => MenuProps['items'];
+  menuItems?: MenuProps['items'];
   onNameChange?: (name: string) => void;
-  onViewDocumentation?: () => void;
-  onCopyToClipboard?: () => void;
-  onDuplicate?: () => void;
-  onDelete?: () => void;
 };
 
 export const DecisionNode: React.FC<DecisionNodeProps> = ({
@@ -45,51 +41,12 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
   noBodyPadding = false,
   color = 'primary',
   onNameChange,
-  mapActionMenu = (items) => items,
-  onViewDocumentation,
-  onCopyToClipboard,
-  onDuplicate,
-  onDelete,
+  menuItems = [],
   status,
 }) => {
   const { token } = theme.useToken();
   const [contentEditing, setContentEditing] = useState(false);
   const nameRef = useRef<HTMLInputElement>(null);
-  const actionMenuItems = mapActionMenu([
-    { key: 'documentation', icon: <BookOutlined />, label: 'Documentation', onClick: onViewDocumentation },
-    { key: 'divider-1', type: 'divider' },
-    {
-      key: 'copy-clipboard',
-      icon: <BookOutlined />,
-      label: <SpacedText left='Copy to clipboard' right={platform.shortcut('Ctrl + C')} />,
-      onClick: onCopyToClipboard,
-    },
-    {
-      key: 'duplicate',
-      icon: <CopyOutlined />,
-      label: <SpacedText left='Duplicate' right={platform.shortcut('Ctrl + D')} />,
-      onClick: onDuplicate,
-    },
-    { key: 'divider-2', type: 'divider' },
-    {
-      key: 'delete',
-      icon: <DeleteOutlined />,
-      danger: true,
-      label: <SpacedText left='Delete' right={platform.shortcut('Backspace')} />,
-      onClick: () =>
-        Modal.confirm({
-          icon: null,
-          title: 'Delete node',
-          content: (
-            <Typography.Text>
-              Are you sure you want to delete <Typography.Text strong>{name}</Typography.Text> node.
-            </Typography.Text>
-          ),
-          okButtonProps: { danger: true },
-          onOk: onDelete,
-        }),
-    },
-  ]);
 
   useEffect(() => {
     if (nameRef.current && contentEditing) {
@@ -159,15 +116,9 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
             {type}
           </Typography.Text>
         </div>
-        {(actionMenuItems?.length ?? 0) > 0 && (
+        {menuItems.length > 0 && (
           <div className='grl-dn__header__actions'>
-            <Dropdown
-              trigger={['click']}
-              overlayStyle={{ minWidth: 250 }}
-              menu={{
-                items: actionMenuItems,
-              }}
-            >
+            <Dropdown trigger={['click']} overlayStyle={{ minWidth: 250 }} menu={{ items: menuItems }}>
               <Button type='text' icon={<MoreOutlined />} />
             </Dropdown>
           </div>

@@ -14,10 +14,7 @@ export type Expression = {
 };
 
 export type NodeExpressionData = {
-  name?: string;
-  content?: {
-    expressions?: Expression[];
-  };
+  expressions?: Expression[];
 };
 
 export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
@@ -27,11 +24,9 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
   shortDescription: 'Mapping utility',
   generateNode: () => ({
     type: NodeKind.Expression,
-    data: {
-      name: 'myExpression',
-      content: {
-        expressions: [],
-      },
+    name: 'myExpression',
+    content: {
+      expressions: [],
     },
   }),
   renderNode:

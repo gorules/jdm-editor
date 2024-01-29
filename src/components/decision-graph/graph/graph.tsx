@@ -1,19 +1,21 @@
 import { Modal, Typography } from 'antd';
 import clsx from 'clsx';
-import React, { type MutableRefObject, forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
-import type { Node, ProOptions, ReactFlowInstance, XYPosition } from 'reactflow';
+import React, { type MutableRefObject, forwardRef, useImperativeHandle, useRef } from 'react';
+import type { Connection, ProOptions, ReactFlowInstance, XYPosition } from 'reactflow';
 import ReactFlow, { Background, Controls, useEdgesState, useNodesState } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { v4 } from 'uuid';
 
 import {
   type DecisionGraphStoreType,
+  type DecisionNode,
   useDecisionGraphActions,
   useDecisionGraphListeners,
   useDecisionGraphReferences,
+  useDecisionGraphState,
 } from '../context/dg-store.context';
 import { edgeFunction } from '../custom-edge';
-import { mapToDecisionEdge, mapToDecisionNode } from '../dg-util';
+import { mapToDecisionEdge } from '../dg-util';
 import '../dg.scss';
 import { useGraphClipboard } from '../hooks/use-graph-clipboard';
 import type { NodeKind } from '../nodes/specification-types';
@@ -52,18 +54,13 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
   const edgesState = useEdgesState([]);
 
   const graphActions = useDecisionGraphActions();
+  const { disabled } = useDecisionGraphState(({ disabled }) => ({ disabled }));
   const graphListeners = useDecisionGraphListeners(({ onAddNode }) => ({ onAddNode }));
   const graphReferences = useDecisionGraphReferences((s) => s);
+
   graphReferences.nodesState.current = nodesState;
   graphReferences.edgesState.current = edgesState;
-
-  const selected = nodesState[0].filter((node) => node?.selected);
-
-  const graphClipboard = useGraphClipboard(reactFlowInstance, reactFlowWrapper);
-
-  useEffect(() => {
-    return graphClipboard.register(selected);
-  }, [selected, graphClipboard]);
+  graphReferences.graphClipboard.current = useGraphClipboard(reactFlowInstance, reactFlowWrapper);
 
   const addNodeInner = (type: string, position?: XYPosition) => {
     if (!reactFlowWrapper.current || !reactFlowInstance.current) {
@@ -85,15 +82,31 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
     }
 
     const partialNode = nodeSpecification[type as NodeKind].generateNode();
-
-    // TODO should be DecisionNode
-    const newNode: Node = {
+    const newNode: DecisionNode = {
       ...partialNode,
       id: v4(),
       position,
     };
 
-    graphActions.addNode(mapToDecisionNode(newNode));
+    graphActions.addNodes([newNode]);
+  };
+
+  const isValidConnection = (connection: Connection): boolean => {
+    // Disallow self-reference
+    if (connection.source === connection.target) {
+      return false;
+    }
+
+    const [edges] = edgesState;
+    const hasDuplicate = edges.some(
+      (edge) =>
+        edge.source === connection.source &&
+        edge.target === connection.target &&
+        (edge.sourceHandle ?? null) === (connection.sourceHandle ?? null) &&
+        (edge.targetHandle ?? null) === (connection.targetHandle ?? null),
+    );
+
+    return !hasDuplicate;
   };
 
   const onDrop = (event: React.DragEvent) => {
@@ -135,13 +148,21 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
       id: v4(),
     };
 
-    graphActions.addEdge(mapToDecisionEdge(edge));
+    graphActions.addEdges([mapToDecisionEdge(edge)]);
   };
 
   useImperativeHandle(ref, () => graphActions);
 
   return (
-    <div className={clsx(['tab-content', className])}>
+    <div
+      className={clsx(['tab-content', className])}
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'v' && e.metaKey) {
+          graphActions.pasteNodes();
+        }
+      }}
+    >
       <div className={'content-wrapper'}>
         <div className={clsx(['react-flow'])} ref={reactFlowWrapper}>
           <ReactFlow
@@ -160,7 +181,11 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
             onDrop={onDrop}
             onDragOver={onDragOver}
             onConnect={onConnect}
+            isValidConnection={isValidConnection}
             proOptions={reactFlowProOptions}
+            nodesConnectable={!disabled}
+            nodesDraggable={!disabled}
+            edgesUpdatable={!disabled}
             onNodesChange={graphActions.handleNodesChange}
             onEdgesChange={graphActions.handleEdgesChange}
             onNodesDelete={(e) => {
@@ -169,19 +194,29 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
               });
             }}
             onKeyDown={(e) => {
+              const [nodes] = nodesState;
+              const [edges] = edgesState;
+
               if (e.key === 'c' && e.metaKey) {
-                const selectedNodes = nodesState[0].filter((n) => n.selected);
-                const selectedEdges = edgesState[0].filter((e) => e.selected);
-                // TODO HANDLE COPY
-              } else if (e.key === 'd' && e.metaKey) {
-                const selectedNodes = nodesState[0].filter((n) => n.selected);
-                if (selectedNodes.length === 1) {
-                  graphActions.duplicateNode(selectedNodes[0].id);
-                  e.preventDefault();
+                const selectedNodeIds = nodesState[0].filter((n) => n.selected).map(({ id }) => id);
+                if (selectedNodeIds.length === 0) {
+                  return;
                 }
+
+                graphActions.copyNodes(selectedNodeIds);
+                e.preventDefault();
+              } else if (e.key === 'd' && e.metaKey) {
+                const selectedNodeIds = nodes.filter((n) => n.selected).map(({ id }) => id);
+                if (selectedNodeIds.length === 0) {
+                  return;
+                }
+
+                graphActions.duplicateNodes(selectedNodeIds);
+                e.preventDefault();
               } else if (e.key === 'Backspace') {
-                const selectedNodes = nodesState[0].filter((n) => n.selected);
-                const selectedEdges = edgesState[0].filter((e) => e.selected);
+                const selectedNodes = nodes.filter((n) => n.selected);
+                const selectedEdges = edges.filter((e) => e.selected);
+
                 if (selectedNodes.length > 0) {
                   const length = selectedNodes.length;
                   const text = length > 1 ? 'nodes' : 'node';

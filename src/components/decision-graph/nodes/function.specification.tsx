@@ -8,10 +8,7 @@ import { GraphNode } from './graph-node';
 import type { NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
 
-export type NodeFunctionData = {
-  name?: string;
-  content?: string;
-};
+export type NodeFunctionData = string;
 
 export const functionSpecification: NodeSpecification<NodeFunctionData> = {
   icon: <FunctionOutlined />,
@@ -20,10 +17,8 @@ export const functionSpecification: NodeSpecification<NodeFunctionData> = {
   shortDescription: 'Javascript lambda',
   generateNode: () => ({
     type: NodeKind.Function,
-    data: {
-      name: 'myFunction',
-      content: defaultFunctionValue,
-    },
+    name: 'myFunction',
+    content: defaultFunctionValue,
   }),
   renderNode:
     ({ specification }) =>

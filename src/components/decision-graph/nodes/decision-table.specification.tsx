@@ -21,13 +21,10 @@ export type DecisionTableOutput = {
 };
 
 export type NodeDecisionTableData = {
-  name?: string;
-  content?: {
-    hitPolicy?: 'first' | 'collect';
-    inputs?: DecisionTableInput[];
-    outputs?: DecisionTableOutput[];
-    rules?: Record<string, string>[];
-  };
+  hitPolicy?: 'first' | 'collect';
+  inputs?: DecisionTableInput[];
+  outputs?: DecisionTableOutput[];
+  rules?: Record<string, string>[];
 };
 
 export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData> = {
@@ -37,27 +34,25 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
   shortDescription: 'Rules spreadsheet',
   generateNode: () => ({
     type: NodeKind.DecisionTable,
-    data: {
-      name: 'myDecisionTable',
-      content: {
-        hitPolicy: 'first',
-        inputs: [
-          {
-            id: v4(),
-            name: 'Input',
-            type: 'expression',
-          },
-        ],
-        outputs: [
-          {
-            field: 'output',
-            id: v4(),
-            name: 'Output',
-            type: 'expression',
-          },
-        ],
-        rules: [],
-      },
+    name: 'myDecisionTable',
+    content: {
+      hitPolicy: 'first',
+      inputs: [
+        {
+          id: v4(),
+          name: 'Input',
+          type: 'expression',
+        },
+      ],
+      outputs: [
+        {
+          field: 'output',
+          id: v4(),
+          name: 'Output',
+          type: 'expression',
+        },
+      ],
+      rules: [],
     },
   }),
   renderNode:

@@ -71,11 +71,17 @@
     height: 60px;
 
     &__icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
       font-size: 24px;
       border-radius: 4px;
       padding: 6px;
       background-color: var(--node-color);
       color: white;
+      height: 26px;
+      width: 26px;
 
       //background-color: #e6f4ff;
       //color: black;
@@ -102,6 +108,7 @@
         transition: var(--grl-transition);
         overflow: hidden;
         white-space: nowrap;
+        width: min-content;
 
         &:hover:not(:focus-within) {
           background-color: var(--grl-color-bg-text-hover);

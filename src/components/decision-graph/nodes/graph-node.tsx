@@ -1,9 +1,13 @@
+import { BookOutlined, CopyOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Modal, Typography } from 'antd';
 import clsx from 'clsx';
 import React from 'react';
 import type { HandleProps } from 'reactflow';
 import { Handle, Position } from 'reactflow';
 import { P, match } from 'ts-pattern';
 
+import { platform } from '../../../helpers/platform';
+import { SpacedText } from '../../spaced-text';
 import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
 import type { DecisionNodeProps } from './decision-node';
 import { DecisionNode } from './decision-node';
@@ -23,6 +27,7 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
   handleRight = true,
   className,
   specification,
+  name,
   ...decisionNodeProps
 }) => {
   const graphActions = useDecisionGraphActions();
@@ -31,6 +36,49 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
     nodeTrace: simulate?.result?.trace?.[id],
     nodeError: simulate?.error?.data?.nodeId === id ? simulate?.error?.data : undefined,
   }));
+
+  const menuItems = [
+    {
+      key: 'documentation',
+      icon: <BookOutlined />,
+      label: 'Documentation',
+      onClick: () => window.open(specification.documentationUrl, '_href'),
+    },
+    { key: 'divider-1', type: 'divider' },
+    {
+      key: 'copy-clipboard',
+      icon: <BookOutlined />,
+      label: <SpacedText left='Copy to clipboard' right={platform.shortcut('Ctrl + C')} />,
+      onClick: () => {},
+    },
+    {
+      key: 'duplicate',
+      icon: <CopyOutlined />,
+      disabled,
+      label: <SpacedText left='Duplicate' right={platform.shortcut('Ctrl + D')} />,
+      onClick: () => graphActions.duplicateNodes([id]),
+    },
+    { key: 'divider-2', type: 'divider' },
+    {
+      key: 'delete',
+      icon: <DeleteOutlined />,
+      danger: true,
+      label: <SpacedText left='Delete' right={platform.shortcut('Backspace')} />,
+      disabled,
+      onClick: () =>
+        Modal.confirm({
+          icon: null,
+          title: 'Delete node',
+          content: (
+            <Typography.Text>
+              Are you sure you want to delete <Typography.Text strong>{name}</Typography.Text> node.
+            </Typography.Text>
+          ),
+          okButtonProps: { danger: true },
+          onOk: () => graphActions.removeNodes([id]),
+        }),
+    },
+  ];
 
   return (
     <div className={clsx('grl-graph-node', className)} style={{ minWidth: 250 }}>
@@ -43,27 +91,22 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
         />
       )}
       <DecisionNode
+        menuItems={menuItems}
         {...decisionNodeProps}
         disabled={disabled}
         icon={specification.icon}
         color={specification.color}
         type={specification.displayName}
-        onDelete={() => graphActions.removeNode(id)}
+        name={name}
         status={match([nodeTrace, nodeError])
           .with([P.not(P.nullish), P._], () => 'success' as const)
           .with([P._, P.not(P.nullish)], () => 'error' as const)
           .otherwise(() => undefined)}
-        onViewDocumentation={() => {
-          window.open(specification.documentationUrl, '_href');
-        }}
         onNameChange={(name) => {
           graphActions.updateNode(id, (draft) => {
             draft.name = name;
             return draft;
           });
-        }}
-        onDuplicate={() => {
-          graphActions.duplicateNode(id);
         }}
       />
       {handleRight && (

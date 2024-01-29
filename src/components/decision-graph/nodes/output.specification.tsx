@@ -5,11 +5,9 @@ import { GraphNode } from './graph-node';
 import type { NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
 
-export type OutputNodeData = {
-  name?: string;
-};
+export type NodeOutputData = never;
 
-export const outputSpecification: NodeSpecification<OutputNodeData> = {
+export const outputSpecification: NodeSpecification<NodeOutputData> = {
   icon: <LogoutOutlined />,
   color: 'secondary',
   displayName: 'Response',
@@ -17,9 +15,7 @@ export const outputSpecification: NodeSpecification<OutputNodeData> = {
   shortDescription: 'Outputs the context',
   generateNode: () => ({
     type: NodeKind.Output,
-    data: {
-      name: 'myResponse',
-    },
+    name: 'myResponse',
   }),
   renderNode:
     ({ specification }) =>

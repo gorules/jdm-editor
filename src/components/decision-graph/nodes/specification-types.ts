@@ -1,6 +1,7 @@
 import type React from 'react';
 import type { Node, NodeProps } from 'reactflow';
 
+import type { DecisionNode } from '../context/dg-store.context';
 import type { DecisionNodeProps } from './decision-node';
 
 export enum NodeKind {
@@ -21,6 +22,6 @@ export type NodeSpecification<T = any> = {
   displayName: string;
   documentationUrl: string;
   shortDescription: string;
-  generateNode: () => Omit<Node<T>, 'position' | 'id'>;
+  generateNode: () => Omit<DecisionNode<T>, 'position' | 'id'>;
   renderNode: (data: { specification: MinimalNodeSpecification }) => React.FC<MinimalNodeProps>;
 };

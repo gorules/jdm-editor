@@ -108,15 +108,17 @@ export const Extended: Story = {
             console.log(e);
           }}
           onAddNode={(type, position) => {
-            ref!.current!.addNode!({
-              id: v4(),
-              type,
-              position: position as any,
-              name: 'Decision',
-              content: {
-                key: 'test',
+            ref!.current!.addNodes!([
+              {
+                id: v4(),
+                type,
+                position: position as any,
+                name: 'Decision',
+                content: {
+                  key: 'test',
+                },
               },
-            });
+            ]);
           }}
         />
       </div>
