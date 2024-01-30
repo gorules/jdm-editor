@@ -58,7 +58,7 @@ export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inp
           key={component.displayName}
           disabled={disabled}
           specification={component}
-          // onDragStart={(event) => onDragStart(event, kind)}
+          onDragStart={(event) => onDragStart(event, component.type)}
         />
       ))}
     </>

@@ -1,11 +1,13 @@
 import { ApartmentOutlined } from '@ant-design/icons';
 import type { Meta, StoryObj } from '@storybook/react';
+import { Select } from 'antd';
 import React, { useRef, useState } from 'react';
-import { v4 } from 'uuid';
 
 import { DecisionGraph } from './dg';
 import { defaultGraph } from './dg.stories-values';
 import type { GraphRef } from './graph/graph';
+import { GraphNode } from './nodes/graph-node';
+import type { NodeSpecification } from './nodes/specification-types';
 
 const meta: Meta<typeof DecisionGraph> = {
   /* 👇 The title prop is optional.
@@ -65,18 +67,18 @@ export const Uncontrolled: Story = {
   },
 };
 
-const components = [
+const components: NodeSpecification[] = [
   {
+    type: 'decisionNode',
     displayName: 'Decision',
     shortDescription: 'Execute decisions',
     icon: <ApartmentOutlined />,
-    generateNode: () => ({
-      name: 'asd',
-      description: 'asd',
-      type: 'asd',
-      content: {},
-    }),
-    renderNode: () => () => <div>Hello</div>,
+    generateNode: () => ({ name: 'myDecision' }),
+    renderNode: ({ specification, id, selected, data }) => (
+      <GraphNode id={id} specification={specification} name={data.name} isSelected={selected}>
+        <Select placeholder='Select decision from list' />
+      </GraphNode>
+    ),
   },
 ];
 

@@ -50,7 +50,7 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
           onClick: () => window.open(specification.documentationUrl, '_href'),
         }
       : null,
-    { key: 'divider-1', type: 'divider' },
+    specification.documentationUrl ? { key: 'divider-1', type: 'divider' } : null,
     {
       key: 'copy-clipboard',
       icon: <BookOutlined />,

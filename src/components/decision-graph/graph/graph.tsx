@@ -1,6 +1,6 @@
-import { Modal, Typography } from 'antd';
+import { Modal, Typography, message } from 'antd';
 import clsx from 'clsx';
-import React, { type MutableRefObject, forwardRef, useImperativeHandle, useRef } from 'react';
+import React, { type MutableRefObject, forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
 import type { Connection, ProOptions, ReactFlowInstance, XYPosition } from 'reactflow';
 import ReactFlow, { Background, Controls, useEdgesState, useNodesState } from 'reactflow';
 import 'reactflow/dist/style.css';
@@ -18,7 +18,7 @@ import { edgeFunction } from '../custom-edge';
 import { mapToDecisionEdge } from '../dg-util';
 import '../dg.scss';
 import { useGraphClipboard } from '../hooks/use-graph-clipboard';
-import type { MinimalNodeProps, NodeKind } from '../nodes/specification-types';
+import type { MinimalNodeProps } from '../nodes/specification-types';
 import { nodeSpecification } from '../nodes/specifications';
 
 export type GraphProps = {
@@ -59,13 +59,32 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
   const edgesState = useEdgesState([]);
 
   const graphActions = useDecisionGraphActions();
-  const { disabled } = useDecisionGraphState(({ disabled }) => ({ disabled }));
+  const { disabled, components } = useDecisionGraphState(({ disabled, components }) => ({ disabled, components }));
   const graphListeners = useDecisionGraphListeners(({ onAddNode }) => ({ onAddNode }));
   const graphReferences = useDecisionGraphReferences((s) => s);
 
   graphReferences.nodesState.current = nodesState;
   graphReferences.edgesState.current = edgesState;
   graphReferences.graphClipboard.current = useGraphClipboard(reactFlowInstance, reactFlowWrapper);
+
+  const nodeTypes = useMemo<Record<string, React.FC>>(() => {
+    return components.reduce(
+      (acc, component) => ({
+        ...acc,
+        [component.type]: React.memo(
+          (props: MinimalNodeProps) => component.renderNode({ specification: component, ...props }),
+          (prevProps, nextProps) => {
+            return (
+              prevProps.id === nextProps.id &&
+              prevProps.selected === nextProps.selected &&
+              prevProps.data === nextProps.data
+            );
+          },
+        ),
+      }),
+      defaultNodeTypes,
+    );
+  }, [components]);
 
   const addNodeInner = (type: string, position?: XYPosition) => {
     if (!reactFlowWrapper.current || !reactFlowInstance.current) {
@@ -82,11 +101,13 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
       position = reactFlowInstance.current.project(rectCenter);
     }
 
-    if (!(type in nodeSpecification)) {
-      return graphListeners.onAddNode?.(type, position);
+    const allSpecifications = [...Object.values(nodeSpecification), ...components];
+    const specification = allSpecifications.find((s) => s.type === type);
+    if (!specification) {
+      message.error(`Unknown node type ${type}`);
+      return;
     }
 
-    const specification = nodeSpecification[type as NodeKind];
     const partialNode = specification.generateNode();
     const newNode: DecisionNode = {
       ...partialNode,
@@ -131,7 +152,6 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
     } catch (e) {
       return;
     }
-
     const position = reactFlowInstance.current.project({
       x: event.clientX - reactFlowBounds.left,
       y: event.clientY - reactFlowBounds.top,
@@ -183,7 +203,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
             }}
             snapToGrid={true}
             snapGrid={[5, 5]}
-            nodeTypes={defaultNodeTypes}
+            nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
             onDrop={onDrop}
             onDragOver={onDragOver}
