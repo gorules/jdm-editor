@@ -6,6 +6,7 @@ import type { ProOptions } from 'reactflow';
 import 'reactflow/dist/style.css';
 
 import { useDecisionGraphListeners, useDecisionGraphState } from './context/dg-store.context';
+import { GraphSimulator } from './dg-simulator';
 import './dg.scss';
 import type { GraphRef } from './graph/graph';
 import { Graph } from './graph/graph';
@@ -30,18 +31,21 @@ export const DecisionGraphWrapper = React.memo(
 
     return (
       <div className={'grl-dg__wrapper'}>
-        <GraphAside />
-        <div className={'grl-dg__graph'}>
-          <GraphTabs disabled={disableTabs} onTabChange={onTabChange} />
-          <Graph
-            ref={ref}
-            className={clsx([!hasActiveNode && 'active'])}
-            hideExportImport={hideExportImport}
-            reactFlowProOptions={reactFlowProOptions}
-            onDisableTabs={setDisableTabs}
-          />
-          <TabContents />
+        <div className={'grl-dg__content'}>
+          <GraphAside />
+          <div className={'grl-dg__graph'}>
+            <GraphTabs disabled={disableTabs} onTabChange={onTabChange} />
+            <Graph
+              ref={ref}
+              className={clsx([!hasActiveNode && 'active'])}
+              hideExportImport={hideExportImport}
+              reactFlowProOptions={reactFlowProOptions}
+              onDisableTabs={setDisableTabs}
+            />
+            <TabContents />
+          </div>
         </div>
+        <GraphSimulator />
       </div>
     );
   }),

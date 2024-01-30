@@ -1,5 +1,6 @@
 import type { DragDropManager } from 'dnd-core';
 import React, { forwardRef } from 'react';
+import 'react-ace';
 import { ReactFlowProvider } from 'reactflow';
 
 import type { DecisionGraphContextProps } from './context/dg-store.context';
