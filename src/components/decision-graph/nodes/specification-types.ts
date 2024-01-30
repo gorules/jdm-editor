@@ -25,4 +25,6 @@ export type NodeSpecification<T = any> = {
   shortDescription: string;
   generateNode: () => Omit<DecisionNode<T>, 'position' | 'id' | 'type'>;
   renderNode: React.FC<MinimalNodeProps & { specification: MinimalNodeSpecification }>;
+
+  onNodeAdd?: (node: DecisionNode<T>) => Promise<DecisionNode<T>>;
 };

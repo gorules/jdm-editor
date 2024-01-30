@@ -105,6 +105,7 @@ export type DecisionGraphStoreType = {
     onTabChange?: (tab?: string) => void;
 
     onSimulationRun?: (data: { decisionGraph: DecisionGraphType; context: unknown }) => Promise<Simulation>;
+    onSimulatorOpen?: (open: boolean) => void;
   };
 };
 
@@ -441,9 +442,9 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         });
       },
       toggleSimulator: () => {
-        stateStore.setState({
-          simulatorOpen: !stateStore.getState()?.simulatorOpen,
-        });
+        const simulatorOpen = !stateStore.getState()?.simulatorOpen;
+        stateStore.setState({ simulatorOpen });
+        listenerStore.getState().onSimulatorOpen?.(simulatorOpen);
       },
     }),
     [],

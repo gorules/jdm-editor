@@ -3,7 +3,7 @@ import 'ace-builds/src-noconflict/ext-language_tools';
 import 'ace-builds/src-noconflict/mode-json5';
 import 'ace-builds/src-noconflict/theme-chrome';
 import 'ace-builds/src-noconflict/theme-github_dark';
-import { Button, Spin, Tooltip, Typography, notification } from 'antd';
+import { Button, Spin, Tooltip, Typography, notification, theme } from 'antd';
 import clsx from 'clsx';
 import json5 from 'json5';
 import React, { useMemo, useState } from 'react';
@@ -16,15 +16,24 @@ import {
   useDecisionGraphRaw,
   useDecisionGraphState,
 } from './context/dg-store.context';
+import { NodeKind } from './nodes/specification-types';
 
 export const GraphSimulator: React.FC = () => {
+  const { token } = theme.useToken();
   const { stateStore } = useDecisionGraphRaw();
   const { onSimulationRun } = useDecisionGraphListeners(({ onSimulationRun }) => ({ onSimulationRun }));
-  const { simulate, simulatorOpen, simulatorRequest } = useDecisionGraphState(
-    ({ simulate, simulatorOpen, simulatorRequest }) => ({
+  const { simulate, simulatorOpen, simulatorRequest, nodeTypes } = useDecisionGraphState(
+    ({ simulate, simulatorOpen, simulatorRequest, decisionGraph }) => ({
       simulate,
       simulatorOpen,
       simulatorRequest,
+      nodeTypes: (decisionGraph.nodes ?? []).reduce<Record<string, string | undefined>>(
+        (acc, curr) => ({
+          ...acc,
+          [curr.id]: curr.type,
+        }),
+        {},
+      ),
     }),
   );
   const { setSimulatorRequest, toggleSimulator } = useDecisionGraphActions();
@@ -38,10 +47,11 @@ export const GraphSimulator: React.FC = () => {
     .with({ result: P._ }, ({ result }) => result)
     .otherwise(() => undefined);
 
-  const theme = useMemo(() => {
-    // return 'github_dark';
-    return 'chrome';
-  }, []);
+  const codeEditorTheme = useMemo(() => {
+    return match(token.mode)
+      .with('dark', () => 'github_dark')
+      .otherwise(() => 'chrome');
+  }, [token.mode]);
 
   const runSimulation = async (context: unknown) => {
     if (!onSimulationRun) {
@@ -69,14 +79,6 @@ export const GraphSimulator: React.FC = () => {
       setRunLoading(false);
     }
   };
-
-  // const output = useMemo(() => {
-  //   if (selectedNode) {
-  //     return simulate?.result?.trace?.[selectedNode];
-  //   }
-  //
-  //   return simulate?.result?.result;
-  // }, [simulate?.result, selectedNode]);
 
   if (!simulatorOpen) return null;
 
@@ -145,7 +147,7 @@ export const GraphSimulator: React.FC = () => {
               setSimulatorRequest(e);
             }}
             mode='json5'
-            theme={theme}
+            theme={codeEditorTheme}
             width='100%'
             height='100%'
             tabSize={2}
@@ -186,16 +188,18 @@ export const GraphSimulator: React.FC = () => {
                     .otherwise(() => undefined)}
                 </Typography.Text>
               </div>
-              {Object.entries(simulateResult?.trace ?? {}).map(([nodeId, trace]) => (
-                <div
-                  key={nodeId}
-                  className={clsx('grl-dg__simulator__nodes-list__node', nodeId === selectedNode && 'active')}
-                  onClick={() => setSelectedNode(nodeId)}
-                >
-                  <Typography.Text>{trace.name}</Typography.Text>
-                  <Typography.Text type={'secondary'}>{trace.performance}</Typography.Text>
-                </div>
-              ))}
+              {Object.entries(simulateResult?.trace ?? {})
+                .filter(([, trace]) => ![NodeKind.Input, NodeKind.Output].includes(nodeTypes?.[trace?.id] as NodeKind))
+                .map(([nodeId, trace]) => (
+                  <div
+                    key={nodeId}
+                    className={clsx('grl-dg__simulator__nodes-list__node', nodeId === selectedNode && 'active')}
+                    onClick={() => setSelectedNode(nodeId)}
+                  >
+                    <Typography.Text>{trace.name}</Typography.Text>
+                    <Typography.Text type={'secondary'}>{trace.performance}</Typography.Text>
+                  </div>
+                ))}
             </div>
           </Spin>
         </div>
@@ -230,7 +234,7 @@ export const GraphSimulator: React.FC = () => {
               .otherwise(() => '')}
             readOnly
             mode='json5'
-            theme={theme}
+            theme={codeEditorTheme}
             width='100%'
             height='100%'
             tabSize={2}

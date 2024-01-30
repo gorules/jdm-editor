@@ -32,6 +32,7 @@ export type DecisionGraphEmptyType = {
   onTabChange?: (tab?: string) => void;
   onEditGraph?: (edit: boolean) => void;
   onSimulationRun?: DecisionGraphStoreType['listeners']['onSimulationRun'];
+  onSimulatorOpen?: DecisionGraphStoreType['listeners']['onSimulatorOpen'];
 };
 export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
   id,
@@ -47,6 +48,7 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
   onSimulationRun,
   components,
   simulate,
+  onSimulatorOpen,
 }) => {
   const mountedRef = useRef(false);
   const graphActions = useDecisionGraphActions();
@@ -76,8 +78,9 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
       onTabChange,
       onEditGraph,
       onSimulationRun,
+      onSimulatorOpen,
     });
-  }, [onAddNode, onOpenNode, onTabChange, onEditGraph, onSimulationRun]);
+  }, [onAddNode, onOpenNode, onTabChange, onEditGraph, onSimulationRun, onSimulatorOpen]);
 
   useEffect(() => {
     listenerStore.setState({ onChange: innerChange });

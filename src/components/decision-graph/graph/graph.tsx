@@ -86,7 +86,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
     );
   }, [components]);
 
-  const addNodeInner = (type: string, position?: XYPosition) => {
+  const addNodeInner = async (type: string, position?: XYPosition) => {
     if (!reactFlowWrapper.current || !reactFlowInstance.current) {
       return;
     }
@@ -109,12 +109,20 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
     }
 
     const partialNode = specification.generateNode();
-    const newNode: DecisionNode = {
+    let newNode: DecisionNode = {
       ...partialNode,
       id: v4(),
       position,
       type: specification.type,
     };
+
+    if (specification.onNodeAdd) {
+      try {
+        newNode = await specification.onNodeAdd(newNode);
+      } catch {
+        return;
+      }
+    }
 
     graphActions.addNodes([newNode]);
   };
