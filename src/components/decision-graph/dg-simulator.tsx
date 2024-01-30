@@ -10,18 +10,28 @@ import React, { useMemo, useState } from 'react';
 import ReactAce from 'react-ace';
 import { P, match } from 'ts-pattern';
 
-import { useDecisionGraphListeners, useDecisionGraphRaw, useDecisionGraphState } from './context/dg-store.context';
+import {
+  useDecisionGraphActions,
+  useDecisionGraphListeners,
+  useDecisionGraphRaw,
+  useDecisionGraphState,
+} from './context/dg-store.context';
 
 export const GraphSimulator: React.FC = () => {
   const { stateStore } = useDecisionGraphRaw();
   const { onSimulationRun } = useDecisionGraphListeners(({ onSimulationRun }) => ({ onSimulationRun }));
-  const { simulate } = useDecisionGraphState(({ simulate }) => ({
-    simulate,
-  }));
+  const { simulate, simulatorOpen, simulatorRequest } = useDecisionGraphState(
+    ({ simulate, simulatorOpen, simulatorRequest }) => ({
+      simulate,
+      simulatorOpen,
+      simulatorRequest,
+    }),
+  );
+  const { setSimulatorRequest, toggleSimulator } = useDecisionGraphActions();
 
   const [runLoading, setRunLoading] = useState(false);
 
-  const [requestValue, setRequestValue] = useState('');
+  const [requestValue, setRequestValue] = useState(simulatorRequest);
   const [selectedNode, setSelectedNode] = useState<string>('graph');
 
   const simulateResult = match(simulate)
@@ -46,7 +56,7 @@ export const GraphSimulator: React.FC = () => {
       });
 
       stateStore.setState({ simulate });
-      if ('error' in simulate) {
+      if (simulate && typeof simulate === 'object' && 'error' in simulate) {
         notification.error({
           message: 'Node error',
           placement: 'top',
@@ -68,6 +78,8 @@ export const GraphSimulator: React.FC = () => {
   //   return simulate?.result?.result;
   // }, [simulate?.result, selectedNode]);
 
+  if (!simulatorOpen) return null;
+
   return (
     <div className={'grl-dg__simulator'}>
       <div className={'grl-dg__simulator__sidebar'}></div>
@@ -86,7 +98,7 @@ export const GraphSimulator: React.FC = () => {
                   }
 
                   try {
-                    setRequestValue(json5.stringify(json5.parse(requestValue), null, 2));
+                    setRequestValue(json5.stringify(json5.parse(requestValue || ''), null, 2));
                   } catch (e) {
                     notification.error({
                       message: 'Invalid format',
@@ -103,7 +115,7 @@ export const GraphSimulator: React.FC = () => {
               loading={runLoading}
               onClick={async () => {
                 try {
-                  const context = match(requestValue.trim())
+                  const context = match(requestValue?.trim?.())
                     .with(P.string.minLength(1), (value) => json5.parse(value))
                     .otherwise(() => ({}));
 
@@ -130,6 +142,7 @@ export const GraphSimulator: React.FC = () => {
             value={requestValue}
             onChange={(e) => {
               setRequestValue(e);
+              setSimulatorRequest(e);
             }}
             mode='json5'
             theme={theme}
@@ -197,7 +210,7 @@ export const GraphSimulator: React.FC = () => {
                 type={'text'}
                 icon={<CloseOutlined />}
                 onClick={() => {
-                  // onClose?.();
+                  toggleSimulator();
                 }}
               />
             </Tooltip>

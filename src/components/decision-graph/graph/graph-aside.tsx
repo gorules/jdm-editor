@@ -1,4 +1,11 @@
-import { CloseOutlined, CloudDownloadOutlined, CloudUploadOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import {
+  CloseOutlined,
+  CloudDownloadOutlined,
+  CloudUploadOutlined,
+  PlayCircleFilled,
+  PlayCircleOutlined,
+  PlusCircleOutlined,
+} from '@ant-design/icons';
 import { Button, Tooltip, Typography, message } from 'antd';
 import React, { useRef, useState } from 'react';
 
@@ -17,7 +24,7 @@ export const GraphAside = () => {
   const fileInput = useRef<HTMLInputElement>(null);
   const [menu, setMenu] = useState<string | undefined>('components');
 
-  const { setDecisionGraph } = useDecisionGraphActions();
+  const { setDecisionGraph, toggleSimulator } = useDecisionGraphActions();
   const { decisionGraph, activeTab, disabled, hasInputNode } = useDecisionGraphState(
     ({ decisionGraph, activeTab, disabled }) => ({
       decisionGraph,
@@ -97,32 +104,46 @@ export const GraphAside = () => {
         }}
       />
       <div className={'grl-dg__aside__side-bar'}>
-        <Tooltip placement='right' title='Components'>
-          <Button
-            type={'primary'}
-            icon={<PlusCircleOutlined />}
-            onClick={() => setMenu((m) => (m !== 'components' ? 'components' : undefined))}
-          />
-        </Tooltip>
-        <Tooltip placement='right' title='Upload JSON'>
-          <Button
-            type={'text'}
-            disabled={disabled}
-            icon={<CloudUploadOutlined />}
-            onClick={() => {
-              fileInput?.current?.click?.();
-            }}
-          />
-        </Tooltip>
-        <Tooltip placement='right' title='Download JSON'>
-          <Button
-            type={'text'}
-            icon={<CloudDownloadOutlined />}
-            onClick={() => {
-              downloadJDM();
-            }}
-          />
-        </Tooltip>
+        <div className={'grl-dg__aside__side-bar__top'}>
+          <Tooltip placement='right' title='Components'>
+            <Button
+              type={'primary'}
+              icon={<PlusCircleOutlined />}
+              onClick={() => setMenu((m) => (m !== 'components' ? 'components' : undefined))}
+            />
+          </Tooltip>
+          <Tooltip placement='right' title='Upload JSON'>
+            <Button
+              type={'text'}
+              disabled={disabled}
+              icon={<CloudUploadOutlined />}
+              onClick={() => {
+                fileInput?.current?.click?.();
+              }}
+            />
+          </Tooltip>
+          <Tooltip placement='right' title='Download JSON'>
+            <Button
+              type={'text'}
+              icon={<CloudDownloadOutlined />}
+              onClick={() => {
+                downloadJDM();
+              }}
+            />
+          </Tooltip>
+        </div>
+
+        <div className={'grl-dg__aside__side-bar__bottom'}>
+          <Tooltip placement='right' title='Toggle Simulator'>
+            <Button
+              type={'text'}
+              icon={<PlayCircleOutlined className={'color-primary'} />}
+              onClick={() => {
+                toggleSimulator();
+              }}
+            />
+          </Tooltip>
+        </div>
       </div>
       {menu && (
         <div className={'grl-dg__aside__menu'}>

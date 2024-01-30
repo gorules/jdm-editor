@@ -3,7 +3,7 @@
   display: grid;
   grid-template-areas: 'sidebar graph' 'simulator simulator';
   grid-template-columns: min-content 1fr;
-  grid-template-rows: 1fr 240px;
+  grid-template-rows: 1fr auto;
 
   &__content {
     grid-area: graph;
@@ -17,9 +17,9 @@
   &__simulator {
     grid-area: simulator;
     width: 100%;
-    height: 100%;
     border-top: 1px solid var(--grl-color-border);
     display: flex;
+    height: 300px;
 
     &__nodes-list {
       display: flex;
@@ -47,7 +47,7 @@
         }
 
         &.active {
-          background-color: rgba(0, 0, 0, 0.10);
+          background-color: rgba(0, 0, 0, 0.1);
         }
       }
     }
@@ -266,15 +266,37 @@
     height: 100%;
     display: flex;
     background-color: var(--grl-color-bg-container);
+    min-height: 0;
 
     &__side-bar {
       width: 48px;
+      min-width: 48px;
       display: flex;
+      justify-content: space-between;
       flex-direction: column;
       gap: 0.5rem;
       align-items: center;
       border-right: 1px solid var(--grl-color-border);
       padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+
+      &__top {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+      }
+
+      &__bottom {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+
+        .color-primary {
+          color: var(--grl-color-primary);
+        }
+      }
     }
 
     &__menu {
@@ -305,85 +327,52 @@
       &__content {
         flex: 1;
         overflow-y: auto;
-
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 16px;
-        padding: 1rem;
       }
 
-      &.narrow {
-        width: 120px;
-        min-width: 120px;
-
-        .wrapper {
-          &__list {
-            grid-template-columns: 1fr;
-            gap: 8px;
-          }
-        }
-      }
-
-      .wrapper {
+      &__components {
+        flex-grow: 1;
         display: flex;
         flex-direction: column;
-        box-sizing: border-box;
-        user-select: none;
-        height: 100%;
+        gap: 16px;
+        padding: 1rem;
 
-        &__actions {
-          padding: 1rem;
-          display: flex;
+        .divider {
+          grid-column: 1 / -1;
+          height: 1px;
+          background-color: var(--grl-color-border);
+          margin-top: 0.25rem;
+          margin-bottom: 0.25rem;
         }
 
-        &__list-wrapper {
-          flex-grow: 1;
-        }
+        .draggable-component {
+          cursor: grab;
+          transform: translate(0);
 
-        &__list {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 16px;
-          padding: 1rem;
+          &[draggable='false'] {
+            cursor: not-allowed;
+            user-select: none;
 
-          .divider {
-            grid-column: 1 / -1;
-            height: 1px;
-            background-color: var(--grl-color-border);
-            margin-top: 0.25rem;
-            margin-bottom: 0.25rem;
-          }
-
-          .draggable-component {
-            cursor: grab;
-            transform: translate(0);
-
-            &[draggable='false'] {
-              cursor: not-allowed;
-              user-select: none;
-
-              .grl-dn {
-                background-color: var(--grl-color-bg-container-disabled);
-              }
-
-              .grl-dn__header__icon {
-                filter: grayscale(1) opacity(0.3);
-              }
-            }
-
-            &[draggable='true'] {
-              &:hover,
-              &:active {
-                .grl-dn__header__icon {
-                  filter: none;
-                }
-              }
+            .grl-dn {
+              background-color: var(--grl-color-bg-container-disabled);
             }
 
             .grl-dn__header__icon {
-              transition: var(--grl-transition);
-              filter: opacity(0.5) grayscale(0.3);
+              filter: grayscale(1) opacity(0.3);
             }
+          }
+
+          &[draggable='true'] {
+            &:hover,
+            &:active {
+              .grl-dn__header__icon {
+                filter: none;
+              }
+            }
+          }
+
+          .grl-dn__header__icon {
+            transition: var(--grl-transition);
+            filter: opacity(0.5) grayscale(0.3);
           }
         }
       }
@@ -495,7 +484,7 @@
   }
 
   .grl-dt__container {
-    padding-bottom: 2.5rem;
+    padding-bottom: 2.75rem;
   }
 
   .edge-renderer {

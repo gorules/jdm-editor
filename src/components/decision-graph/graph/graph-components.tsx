@@ -38,7 +38,7 @@ export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inp
   }, []);
 
   return (
-    <>
+    <div className={'grl-dg__aside__menu__components'}>
       {Object.keys(nodeSpecification).map((kind: NodeKind) => (
         <React.Fragment key={kind}>
           <DragDecisionNode
@@ -61,7 +61,7 @@ export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inp
           onDragStart={(event) => onDragStart(event, component.type)}
         />
       ))}
-    </>
+    </div>
   );
 });
 

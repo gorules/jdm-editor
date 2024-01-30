@@ -59,6 +59,8 @@ export type DecisionGraphStoreType = {
     openTabs: string[];
     activeTab: string;
 
+    simulatorOpen?: boolean;
+    simulatorRequest?: string;
     simulate?: Simulation;
   };
 
@@ -90,6 +92,9 @@ export type DecisionGraphStoreType = {
 
     closeTab: (id: string) => void;
     openTab: (id: string) => void;
+
+    setSimulatorRequest: (req: string) => void;
+    toggleSimulator: () => void;
   };
 
   listeners: {
@@ -429,6 +434,16 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
             activeTab: index > 0 ? openTabs?.[index - 1] : 'graph',
           });
         }
+      },
+      setSimulatorRequest: (request: string) => {
+        stateStore.setState({
+          simulatorRequest: request,
+        });
+      },
+      toggleSimulator: () => {
+        stateStore.setState({
+          simulatorOpen: !stateStore.getState()?.simulatorOpen,
+        });
       },
     }),
     [],
