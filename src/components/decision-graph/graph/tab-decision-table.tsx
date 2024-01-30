@@ -1,8 +1,10 @@
 import type { DragDropManager } from 'dnd-core';
 import React from 'react';
+import { P, match } from 'ts-pattern';
 
 import { DecisionTable } from '../../decision-table';
 import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
+import type { SimulationTrace, SimulationTraceDataTable } from '../types/simulation.types';
 
 export type TabDecisionTableProps = {
   id: string;
@@ -13,7 +15,9 @@ export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager 
   const graphActions = useDecisionGraphActions();
   const { nodeTrace, disabled, configurable, content } = useDecisionGraphState(
     ({ simulate, disabled, configurable, decisionGraph }) => ({
-      nodeTrace: simulate?.result?.trace?.[id],
+      nodeTrace: match(simulate)
+        .with({ result: P._ }, ({ result }) => result?.trace?.[id] as SimulationTrace<SimulationTraceDataTable>)
+        .otherwise(() => null),
       disabled,
       configurable,
       content: (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content,

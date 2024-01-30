@@ -5,12 +5,12 @@ import type { editor } from 'monaco-editor';
 import React, { useEffect, useRef, useState } from 'react';
 import { useDebouncedCallback, useThrottledCallback } from 'use-debounce';
 
+import type { SimulationTrace, SimulationTraceDataFunction } from '../decision-graph/types/simulation.types';
 import { Stack } from '../stack';
 import { FunctionDebugger } from './function-debugger';
 import './function.scss';
 import { functionDefinitions } from './helpers/libs';
 import './monaco';
-import type { FunctionDebuggerTrace } from './types';
 
 export type FunctionProps = {
   disabled?: boolean;
@@ -19,7 +19,7 @@ export type FunctionProps = {
   language?: string;
   value?: string;
   onChange?: (value: string) => void;
-  trace?: FunctionDebuggerTrace;
+  trace?: SimulationTrace<SimulationTraceDataFunction>;
 };
 
 export const Function: React.FC<FunctionProps> = ({
@@ -116,7 +116,6 @@ export const Function: React.FC<FunctionProps> = ({
             setInnerValue(value ?? '');
             innerChange(value ?? '');
           }}
-
           theme={token.mode === 'dark' ? 'vs-dark' : 'light'}
           height='100%'
           options={{

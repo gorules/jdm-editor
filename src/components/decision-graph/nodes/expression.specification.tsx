@@ -18,34 +18,32 @@ export type NodeExpressionData = {
 };
 
 export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
+  type: NodeKind.Expression,
   icon: <NumberOutlined />,
   displayName: 'Expression',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/expression',
   shortDescription: 'Mapping utility',
   generateNode: () => ({
-    type: NodeKind.Expression,
     name: 'myExpression',
     content: {
       expressions: [],
     },
   }),
-  renderNode:
-    ({ specification }) =>
-    ({ id, data, selected }) => {
-      const graphActions = useDecisionGraphActions();
+  renderNode: ({ id, data, selected, specification }) => {
+    const graphActions = useDecisionGraphActions();
 
-      return (
-        <GraphNode
-          id={id}
-          specification={specification}
-          name={data.name}
-          isSelected={selected}
-          actions={[
-            <Button key='edit-table' type='link' onClick={() => graphActions.openTab(id)}>
-              Edit Expression
-            </Button>,
-          ]}
-        />
-      );
-    },
+    return (
+      <GraphNode
+        id={id}
+        specification={specification}
+        name={data.name}
+        isSelected={selected}
+        actions={[
+          <Button key='edit-table' type='link' onClick={() => graphActions.openTab(id)}>
+            Edit Expression
+          </Button>,
+        ]}
+      />
+    );
+  },
 };

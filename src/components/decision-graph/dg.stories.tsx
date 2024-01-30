@@ -1,6 +1,5 @@
 import { ApartmentOutlined } from '@ant-design/icons';
 import type { Meta, StoryObj } from '@storybook/react';
-import { Form, Input } from 'antd';
 import React, { useRef, useState } from 'react';
 import { v4 } from 'uuid';
 
@@ -66,10 +65,26 @@ export const Uncontrolled: Story = {
   },
 };
 
+const components = [
+  {
+    displayName: 'Decision',
+    shortDescription: 'Execute decisions',
+    icon: <ApartmentOutlined />,
+    generateNode: () => ({
+      name: 'asd',
+      description: 'asd',
+      type: 'asd',
+      content: {},
+    }),
+    renderNode: () => () => <div>Hello</div>,
+  },
+];
+
 export const Extended: Story = {
   render: (args) => {
     const ref = useRef<GraphRef>(null);
     const [value, setValue] = useState<any>();
+
     return (
       <div
         style={{
@@ -81,44 +96,9 @@ export const Extended: Story = {
           ref={ref}
           value={value}
           onChange={(val) => setValue(val)}
-          components={[
-            {
-              name: 'Decision',
-              type: 'decisionNode',
-              onOpen: async (node) => {
-                console.log(node);
-              },
-              renderForm: ({ value, onChange }) => (
-                <Form.Item label={'Key'}>
-                  <Input
-                    placeholder={'Key'}
-                    value={value?.key || ''}
-                    onChange={(e) => {
-                      onChange({
-                        key: e.target.value,
-                      });
-                    }}
-                  />
-                </Form.Item>
-              ),
-              renderIcon: () => <ApartmentOutlined />,
-            },
-          ]}
+          components={components}
           onTabChange={(e) => {
             console.log(e);
-          }}
-          onAddNode={(type, position) => {
-            ref!.current!.addNodes!([
-              {
-                id: v4(),
-                type,
-                position: position as any,
-                name: 'Decision',
-                content: {
-                  key: 'test',
-                },
-              },
-            ]);
           }}
         />
       </div>

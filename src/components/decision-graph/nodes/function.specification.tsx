@@ -11,32 +11,30 @@ import { NodeKind } from './specification-types';
 export type NodeFunctionData = string;
 
 export const functionSpecification: NodeSpecification<NodeFunctionData> = {
+  type: NodeKind.Function,
   icon: <FunctionOutlined />,
   displayName: 'Function',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/functions',
   shortDescription: 'Javascript lambda',
   generateNode: () => ({
-    type: NodeKind.Function,
     name: 'myFunction',
     content: defaultFunctionValue,
   }),
-  renderNode:
-    ({ specification }) =>
-    ({ id, data, selected }) => {
-      const graphActions = useDecisionGraphActions();
+  renderNode: ({ id, data, selected, specification }) => {
+    const graphActions = useDecisionGraphActions();
 
-      return (
-        <GraphNode
-          id={id}
-          specification={specification}
-          name={data.name}
-          isSelected={selected}
-          actions={[
-            <Button key='edit-function' type='link' onClick={() => graphActions.openTab(id)}>
-              Edit Function
-            </Button>,
-          ]}
-        />
-      );
-    },
+    return (
+      <GraphNode
+        id={id}
+        specification={specification}
+        name={data.name}
+        isSelected={selected}
+        actions={[
+          <Button key='edit-function' type='link' onClick={() => graphActions.openTab(id)}>
+            Edit Function
+          </Button>,
+        ]}
+      />
+    );
+  },
 };

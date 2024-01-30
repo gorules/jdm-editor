@@ -1,7 +1,13 @@
 import { Spin } from 'antd';
 import React, { Suspense } from 'react';
+import { P, match } from 'ts-pattern';
 
 import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
+import type {
+  SimulationTrace,
+  SimulationTraceDataExpression,
+  SimulationTraceDataFunction,
+} from '../types/simulation.types';
 
 const Function = React.lazy(async () => {
   const functionImport = await import('../../function');
@@ -16,7 +22,9 @@ export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
   const graphActions = useDecisionGraphActions();
   const { nodeTrace, disabled, content } = useDecisionGraphState(
     ({ simulate, disabled, configurable, decisionGraph }) => ({
-      nodeTrace: simulate?.result?.trace?.[id],
+      nodeTrace: match(simulate)
+        .with({ result: P._ }, ({ result }) => result?.trace?.[id])
+        .otherwise(() => null),
       disabled,
       configurable,
       content: (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content,
@@ -34,7 +42,7 @@ export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
           });
         }}
         disabled={disabled}
-        trace={nodeTrace}
+        trace={nodeTrace as SimulationTrace<SimulationTraceDataFunction>}
       />
     </Suspense>
   );

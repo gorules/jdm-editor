@@ -2,11 +2,11 @@ import { DownOutlined } from '@ant-design/icons';
 import { Typography, theme } from 'antd';
 import React, { useState } from 'react';
 
+import type { SimulationTrace, SimulationTraceDataFunction } from '../decision-graph/types/simulation.types';
 import { FunctionDebuggerLog } from './function-debugger-log';
-import type { FunctionDebuggerTrace } from './types';
 
 export type FunctionDebuggerProps = {
-  trace?: FunctionDebuggerTrace;
+  trace?: SimulationTrace<SimulationTraceDataFunction>;
 };
 
 export const FunctionDebugger: React.FC<FunctionDebuggerProps> = ({ trace }) => {

@@ -6,7 +6,7 @@ import { match } from 'ts-pattern';
 
 import { useDecisionGraphState } from '../context/dg-store.context';
 import { DecisionNode } from '../nodes/decision-node';
-import { NodeKind } from '../nodes/specification-types';
+import { NodeKind, type NodeSpecification } from '../nodes/specification-types';
 import { nodeSpecification } from '../nodes/specifications';
 
 export type GraphComponentsProps = {
@@ -38,49 +38,39 @@ export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inp
   }, []);
 
   return (
-    <div className={'wrapper'}>
-      <div className={'wrapper__list-wrapper'}>
-        <div className={'wrapper__list'}>
-          {Object.keys(nodeSpecification).map((kind: NodeKind) => (
-            <React.Fragment key={kind}>
-              <DragDecisionNode
-                disabled={match(kind)
-                  .with(NodeKind.Input, () => disabled || inputDisabled)
-                  .otherwise(() => disabled)}
-                kind={kind}
-                onDragStart={(event) => onDragStart(event, kind)}
-              />
-              {kind === NodeKind.Output && <Divider style={{ margin: '4px 0' }} />}
-            </React.Fragment>
-          ))}
+    <>
+      {Object.keys(nodeSpecification).map((kind: NodeKind) => (
+        <React.Fragment key={kind}>
+          <DragDecisionNode
+            disabled={match(kind)
+              .with(NodeKind.Input, () => disabled || inputDisabled)
+              .otherwise(() => disabled)}
+            specification={nodeSpecification[kind]}
+            onDragStart={(event) => onDragStart(event, kind)}
+          />
+          {kind === NodeKind.Output && <Divider style={{ margin: '4px 0' }} />}
+        </React.Fragment>
+      ))}
 
-          {customComponents?.length > 0 && <Divider style={{ margin: '4px 0' }} />}
-          {customComponents.map((component) => (
-            <div key={component.type} className={'component'}>
-              <div
-                className={clsx(['icon', disabled && 'disabled'])}
-                onDragStart={(event) => onDragStart(event, component.type)}
-                draggable={!disabled}
-              >
-                {component?.renderIcon?.()}
-              </div>
-              <Typography.Text type={'secondary'}>{component.name}</Typography.Text>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+      {customComponents?.length > 0 && <Divider style={{ margin: '4px 0' }} />}
+      {customComponents.map((component) => (
+        <DragDecisionNode
+          key={component.displayName}
+          disabled={disabled}
+          specification={component}
+          // onDragStart={(event) => onDragStart(event, kind)}
+        />
+      ))}
+    </>
   );
 });
 
 const DragDecisionNode: React.FC<
   {
-    kind: NodeKind;
+    specification: NodeSpecification;
     disabled?: boolean;
   } & React.HTMLAttributes<HTMLDivElement>
-> = ({ kind, disabled = false, ...props }) => {
-  const specification = nodeSpecification[kind];
-
+> = ({ specification, disabled = false, ...props }) => {
   return (
     <div className={clsx('draggable-component')} draggable={!disabled} {...props}>
       <div style={{ pointerEvents: 'none' }}>

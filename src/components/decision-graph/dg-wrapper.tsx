@@ -30,23 +30,21 @@ export const DecisionGraphWrapper = React.memo(
     });
 
     return (
-      <div className={'grl-dg__wrapper'}>
-        <div className={'grl-dg__content'}>
-          <GraphAside />
-          <div className={'grl-dg__graph'}>
-            <GraphTabs disabled={disableTabs} onTabChange={onTabChange} />
-            <Graph
-              ref={ref}
-              className={clsx([!hasActiveNode && 'active'])}
-              hideExportImport={hideExportImport}
-              reactFlowProOptions={reactFlowProOptions}
-              onDisableTabs={setDisableTabs}
-            />
-            <TabContents />
-          </div>
+      <>
+        <GraphAside />
+        <div className={'grl-dg__graph'}>
+          <GraphTabs disabled={disableTabs} onTabChange={onTabChange} />
+          <Graph
+            ref={ref}
+            className={clsx([!hasActiveNode && 'active'])}
+            hideExportImport={hideExportImport}
+            reactFlowProOptions={reactFlowProOptions}
+            onDisableTabs={setDisableTabs}
+          />
+          <TabContents />
         </div>
         <GraphSimulator />
-      </div>
+      </>
     );
   }),
 );

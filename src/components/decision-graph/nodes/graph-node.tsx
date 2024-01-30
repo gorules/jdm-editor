@@ -33,17 +33,23 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
   const graphActions = useDecisionGraphActions();
   const { nodeError, nodeTrace, disabled } = useDecisionGraphState(({ simulate, disabled }) => ({
     disabled,
-    nodeTrace: simulate?.result?.trace?.[id],
-    nodeError: simulate?.error?.data?.nodeId === id ? simulate?.error?.data : undefined,
+    nodeTrace: match(simulate)
+      .with({ result: P._ }, ({ result }) => result?.trace?.[id])
+      .otherwise(() => null),
+    nodeError: match(simulate)
+      .with({ error: { data: { nodeId: id } } }, ({ error }) => error)
+      .otherwise(() => null),
   }));
 
   const menuItems = [
-    {
-      key: 'documentation',
-      icon: <BookOutlined />,
-      label: 'Documentation',
-      onClick: () => window.open(specification.documentationUrl, '_href'),
-    },
+    specification.documentationUrl
+      ? {
+          key: 'documentation',
+          icon: <BookOutlined />,
+          label: 'Documentation',
+          onClick: () => window.open(specification.documentationUrl, '_href'),
+        }
+      : null,
     { key: 'divider-1', type: 'divider' },
     {
       key: 'copy-clipboard',

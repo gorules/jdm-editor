@@ -85,7 +85,7 @@ export const GraphAside = () => {
   };
 
   return (
-    <>
+    <div className={'grl-dg__aside'}>
       <input
         hidden
         accept='application/json'
@@ -96,63 +96,53 @@ export const GraphAside = () => {
           (event.target as any).value = null;
         }}
       />
-
-      <div className={'grl-dg__aside'}>
-        <div className={'grl-dg__aside__side-bar'}>
-          <Tooltip placement='right' title='Components'>
-            <Button
-              type={'primary'}
-              icon={<PlusCircleOutlined />}
-              onClick={() => setMenu((m) => (m !== 'components' ? 'components' : undefined))}
-            />
-          </Tooltip>
-          <Tooltip placement='right' title='Upload JSON'>
-            <Button
-              type={'text'}
-              disabled={disabled}
-              icon={<CloudUploadOutlined />}
-              onClick={() => {
-                fileInput?.current?.click?.();
-              }}
-            />
-          </Tooltip>
-          <Tooltip placement='right' title='Download JSON'>
-            <Button
-              type={'text'}
-              icon={<CloudDownloadOutlined />}
-              onClick={() => {
-                downloadJDM();
-              }}
-            />
-          </Tooltip>
-        </div>
-        {menu && (
-          <div className={'grl-dg__aside__menu'}>
-            {menu === 'components' && (
-              <>
-                <div className={'grl-dg__aside__menu__heading'}>
-                  <div className={'grl-dg__aside__menu__heading__text'}>
-                    <Typography.Text strong style={{ marginBottom: 0 }}>
-                      Components
-                    </Typography.Text>
-                  </div>
-                  <Button
-                    type={'text'}
-                    size='small'
-                    icon={<CloseOutlined />}
-                    onClick={() => setMenu(undefined)}
-                  ></Button>
-                </div>
-                <div className={'grl-dg__aside__menu__content'}>
-                  <div className={'grl-dg__aside__menu__content__inner'}>
-                    <GraphComponents inputDisabled={hasInputNode} disabled={activeTab !== 'graph' || disabled} />
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-        )}
+      <div className={'grl-dg__aside__side-bar'}>
+        <Tooltip placement='right' title='Components'>
+          <Button
+            type={'primary'}
+            icon={<PlusCircleOutlined />}
+            onClick={() => setMenu((m) => (m !== 'components' ? 'components' : undefined))}
+          />
+        </Tooltip>
+        <Tooltip placement='right' title='Upload JSON'>
+          <Button
+            type={'text'}
+            disabled={disabled}
+            icon={<CloudUploadOutlined />}
+            onClick={() => {
+              fileInput?.current?.click?.();
+            }}
+          />
+        </Tooltip>
+        <Tooltip placement='right' title='Download JSON'>
+          <Button
+            type={'text'}
+            icon={<CloudDownloadOutlined />}
+            onClick={() => {
+              downloadJDM();
+            }}
+          />
+        </Tooltip>
       </div>
-    </>
+      {menu && (
+        <div className={'grl-dg__aside__menu'}>
+          {menu === 'components' && (
+            <>
+              <div className={'grl-dg__aside__menu__heading'}>
+                <div className={'grl-dg__aside__menu__heading__text'}>
+                  <Typography.Text strong style={{ marginBottom: 0 }}>
+                    Components
+                  </Typography.Text>
+                </div>
+                <Button type={'text'} size='small' icon={<CloseOutlined />} onClick={() => setMenu(undefined)}></Button>
+              </div>
+              <div className={'grl-dg__aside__menu__content'}>
+                <GraphComponents inputDisabled={hasInputNode} disabled={activeTab !== 'graph' || disabled} />
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </div>
   );
 };

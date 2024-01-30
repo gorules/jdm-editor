@@ -18,7 +18,7 @@ import { edgeFunction } from '../custom-edge';
 import { mapToDecisionEdge } from '../dg-util';
 import '../dg.scss';
 import { useGraphClipboard } from '../hooks/use-graph-clipboard';
-import type { NodeKind } from '../nodes/specification-types';
+import type { MinimalNodeProps, NodeKind } from '../nodes/specification-types';
 import { nodeSpecification } from '../nodes/specifications';
 
 export type GraphProps = {
@@ -30,14 +30,19 @@ export type GraphProps = {
 
 export type GraphRef = DecisionGraphStoreType['actions'];
 
-const nodeTypes = Object.entries(nodeSpecification).reduce(
+const defaultNodeTypes = Object.entries(nodeSpecification).reduce(
   (acc, [key, value]) => ({
     ...acc,
-    [key]: React.memo(value.renderNode({ specification: value }), (prevProps, nextProps) => {
-      return (
-        prevProps.id === nextProps.id && prevProps.selected === nextProps.selected && prevProps.data === nextProps.data
-      );
-    }),
+    [key]: React.memo(
+      (props: MinimalNodeProps) => value.renderNode({ specification: value, ...props }),
+      (prevProps, nextProps) => {
+        return (
+          prevProps.id === nextProps.id &&
+          prevProps.selected === nextProps.selected &&
+          prevProps.data === nextProps.data
+        );
+      },
+    ),
   }),
   {},
 );
@@ -81,11 +86,13 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
       return graphListeners.onAddNode?.(type, position);
     }
 
-    const partialNode = nodeSpecification[type as NodeKind].generateNode();
+    const specification = nodeSpecification[type as NodeKind];
+    const partialNode = specification.generateNode();
     const newNode: DecisionNode = {
       ...partialNode,
       id: v4(),
       position,
+      type: specification.type,
     };
 
     graphActions.addNodes([newNode]);
@@ -176,7 +183,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
             }}
             snapToGrid={true}
             snapGrid={[5, 5]}
-            nodeTypes={nodeTypes}
+            nodeTypes={defaultNodeTypes}
             edgeTypes={edgeTypes}
             onDrop={onDrop}
             onDragOver={onDragOver}

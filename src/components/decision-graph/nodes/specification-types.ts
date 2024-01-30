@@ -1,5 +1,5 @@
 import type React from 'react';
-import type { Node, NodeProps } from 'reactflow';
+import type { NodeProps } from 'reactflow';
 
 import type { DecisionNode } from '../context/dg-store.context';
 import type { DecisionNodeProps } from './decision-node';
@@ -18,10 +18,11 @@ export type MinimalNodeSpecification = Pick<NodeSpecification, 'color' | 'icon' 
 
 export type NodeSpecification<T = any> = {
   icon: React.ReactNode;
+  type: string;
   color?: DecisionNodeProps['color'];
   displayName: string;
-  documentationUrl: string;
+  documentationUrl?: string;
   shortDescription: string;
-  generateNode: () => Omit<DecisionNode<T>, 'position' | 'id'>;
-  renderNode: (data: { specification: MinimalNodeSpecification }) => React.FC<MinimalNodeProps>;
+  generateNode: () => Omit<DecisionNode<T>, 'position' | 'id' | 'type'>;
+  renderNode: React.FC<MinimalNodeProps & { specification: MinimalNodeSpecification }>;
 };

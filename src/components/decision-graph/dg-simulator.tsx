@@ -8,74 +8,65 @@ import clsx from 'clsx';
 import json5 from 'json5';
 import React, { useMemo, useState } from 'react';
 import ReactAce from 'react-ace';
+import { P, match } from 'ts-pattern';
 
-import type { DecisionNode } from './context/dg-store.context';
+import { useDecisionGraphListeners, useDecisionGraphRaw, useDecisionGraphState } from './context/dg-store.context';
 
-export type GraphSimulatorProps = {
-  onRun?: (val: unknown) => void;
-  onClose?: () => void;
-  onClear?: () => void;
-  open?: boolean;
+export const GraphSimulator: React.FC = () => {
+  const { stateStore } = useDecisionGraphRaw();
+  const { onSimulationRun } = useDecisionGraphListeners(({ onSimulationRun }) => ({ onSimulationRun }));
+  const { simulate } = useDecisionGraphState(({ simulate }) => ({
+    simulate,
+  }));
 
-  nodes: DecisionNode[];
+  const [runLoading, setRunLoading] = useState(false);
 
-  loading?: boolean;
-  simulate?: any;
-};
-
-export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
-  onRun,
-  onClose,
-  onClear,
-  nodes,
-  simulate,
-  loading = false,
-}) => {
   const [requestValue, setRequestValue] = useState('');
   const [selectedNode, setSelectedNode] = useState<string>('graph');
+
+  const simulateResult = match(simulate)
+    .with({ result: P._ }, ({ result }) => result)
+    .otherwise(() => undefined);
 
   const theme = useMemo(() => {
     // return 'github_dark';
     return 'chrome';
   }, []);
 
-  const output = useMemo(() => {
-    if (selectedNode) {
-      return simulate?.result?.trace?.[selectedNode];
+  const runSimulation = async (context: unknown) => {
+    if (!onSimulationRun) {
+      return;
     }
-    return simulate?.result?.result;
-  }, [simulate?.result, selectedNode]);
 
-  console.log(selectedNode);
+    try {
+      setRunLoading(true);
+      const simulate = await onSimulationRun({
+        decisionGraph: stateStore.getState().decisionGraph,
+        context,
+      });
 
-  const mappedNodes = useMemo(() => {
-    return [
-      {
-        key: 'graph',
-        type: 'graph',
-        label: 'Graph',
-        meta: {
-          performance: '20ms',
-        },
-      },
-      {
-        key: '12345',
-        type: 'decisionTableNode',
-        label: 'Decision Table 1',
-        meta: {
-          performance: '20ms',
-        },
-      },
-      {
-        key: '12346',
-        type: 'functionNode',
-        label: 'Function Node 1',
-        meta: {
-          performance: '20ms',
-        },
-      },
-    ];
-  }, [simulate?.result]);
+      stateStore.setState({ simulate });
+      if ('error' in simulate) {
+        notification.error({
+          message: 'Node error',
+          placement: 'top',
+          description: simulate?.error?.message,
+        });
+      }
+    } catch (e) {
+      throw e;
+    } finally {
+      setRunLoading(false);
+    }
+  };
+
+  // const output = useMemo(() => {
+  //   if (selectedNode) {
+  //     return simulate?.result?.trace?.[selectedNode];
+  //   }
+  //
+  //   return simulate?.result?.result;
+  // }, [simulate?.result, selectedNode]);
 
   return (
     <div className={'grl-dg__simulator'}>
@@ -90,7 +81,10 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
                 type={'text'}
                 icon={<FormatPainterOutlined />}
                 onClick={() => {
-                  if ((requestValue || '').trim()?.length === 0) return;
+                  if ((requestValue || '').trim().length === 0) {
+                    return;
+                  }
+
                   try {
                     setRequestValue(json5.stringify(json5.parse(requestValue), null, 2));
                   } catch (e) {
@@ -106,19 +100,23 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
             <Button
               size={'small'}
               type={'primary'}
-              loading={loading}
+              loading={runLoading}
               onClick={async () => {
-                let context;
                 try {
-                  if (requestValue?.trim?.()?.length > 0) {
-                    context = json5.parse(requestValue);
-                  }
-                  onRun?.(context);
+                  const context = match(requestValue.trim())
+                    .with(P.string.minLength(1), (value) => json5.parse(value))
+                    .otherwise(() => ({}));
+
+                  await runSimulation(context);
                 } catch (e) {
+                  const description = match(e)
+                    .with({ message: P._ }, ({ message }) => message?.toString())
+                    .otherwise(() => undefined);
+
                   notification.error({
                     message: 'Simulation failed',
-                    description: (e as any)?.message,
                     placement: 'top',
+                    description,
                   });
                 }
               }}
@@ -154,26 +152,35 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
                 type={'text'}
                 icon={<ClearOutlined />}
                 onClick={() => {
-                  onClear?.();
+                  stateStore.setState({ simulate: undefined });
+                  setSelectedNode('graph');
                 }}
               />
             </Tooltip>
           </div>
         </div>
         <div className={'grl-dg__simulator__section__content'}>
-          <Spin spinning={loading}>
+          <Spin spinning={runLoading}>
             <div className={'grl-dg__simulator__nodes-list'}>
-              {mappedNodes.map((node) => (
+              <div
+                className={clsx('grl-dg__simulator__nodes-list__node', selectedNode === 'graph' && 'active')}
+                onClick={() => setSelectedNode('graph')}
+              >
+                <Typography.Text>Graph</Typography.Text>
+                <Typography.Text type={'secondary'}>
+                  {match(simulate)
+                    .with({ result: P._ }, ({ result }) => result?.performance)
+                    .otherwise(() => undefined)}
+                </Typography.Text>
+              </div>
+              {Object.entries(simulateResult?.trace ?? {}).map(([nodeId, trace]) => (
                 <div
-                  key={node?.key}
-                  className={clsx(
-                    'grl-dg__simulator__nodes-list__node',
-                    node?.key && node?.key === selectedNode && 'active',
-                  )}
-                  onClick={() => setSelectedNode(node?.key)}
+                  key={nodeId}
+                  className={clsx('grl-dg__simulator__nodes-list__node', nodeId === selectedNode && 'active')}
+                  onClick={() => setSelectedNode(nodeId)}
                 >
-                  <Typography.Text>{node?.label}</Typography.Text>
-                  <Typography.Text type={'secondary'}>{node?.meta?.performance}</Typography.Text>
+                  <Typography.Text>{trace.name}</Typography.Text>
+                  <Typography.Text type={'secondary'}>{trace.performance}</Typography.Text>
                 </div>
               ))}
             </div>
@@ -190,7 +197,7 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
                 type={'text'}
                 icon={<CloseOutlined />}
                 onClick={() => {
-                  onClose?.();
+                  // onClose?.();
                 }}
               />
             </Tooltip>
@@ -198,16 +205,23 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
         </div>
         <div className={'grl-dg__simulator__section__content'}>
           <ReactAce
-            value={output}
+            value={match(simulate)
+              .with({ result: P._ }, ({ result }) =>
+                match(selectedNode)
+                  .with('graph', () => json5.stringify(result?.result ?? {}, undefined, 2))
+                  .otherwise(() => {
+                    const { input, output, traceData } = result?.trace[selectedNode] ?? {};
+                    return json5.stringify({ input, output, traceData }, undefined, 2);
+                  }),
+              )
+              .otherwise(() => '')}
             readOnly
             mode='json5'
             theme={theme}
             width='100%'
             height='100%'
             tabSize={2}
-            setOptions={{
-              useWorker: false,
-            }}
+            setOptions={{ useWorker: false }}
           />
         </div>
       </div>

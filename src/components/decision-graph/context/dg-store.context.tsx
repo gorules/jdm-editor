@@ -9,7 +9,8 @@ import { create } from 'zustand';
 
 import { mapToGraphEdge, mapToGraphEdges, mapToGraphNode, mapToGraphNodes } from '../dg-util';
 import type { useGraphClipboard } from '../hooks/use-graph-clipboard';
-import { NodeKind } from '../nodes/specification-types';
+import { NodeKind, type NodeSpecification } from '../nodes/specification-types';
+import type { Simulation } from '../types/simulation.types';
 
 export type Position = {
   x: number;
@@ -45,27 +46,20 @@ export type CustomNodeRenderFormType = {
   onChange: (val: any) => void;
 };
 
-export type CustomNodeType = {
-  type: string;
-  name: string;
-  onOpen?: (node: DecisionNode) => void;
-  renderForm?: (props: CustomNodeRenderFormType) => React.ReactNode;
-  renderIcon?: () => React.ReactNode;
-};
-
 type DraftUpdateCallback<T> = (draft: WritableDraft<T>) => WritableDraft<T>;
 
 export type DecisionGraphStoreType = {
   state: {
     id?: string;
-    components?: CustomNodeType[];
+    components: NodeSpecification[];
     disabled?: boolean;
     configurable?: boolean;
-    simulate?: any;
     decisionGraph: DecisionGraphType;
     hoveredEdgeId: string | null;
     openTabs: string[];
     activeTab: string;
+
+    simulate?: Simulation;
   };
 
   references: {
@@ -104,6 +98,8 @@ export type DecisionGraphStoreType = {
     onEditGraph?: (edit: boolean) => void;
     onAddNode?: (type: string, position?: XYPosition) => void;
     onTabChange?: (tab?: string) => void;
+
+    onSimulationRun?: (data: { decisionGraph: DecisionGraphType; context: unknown }) => Promise<Simulation>;
   };
 };
 

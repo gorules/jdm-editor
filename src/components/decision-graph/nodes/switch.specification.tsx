@@ -3,6 +3,7 @@ import { Button, Dropdown, Typography } from 'antd';
 import clsx from 'clsx';
 import React, { useLayoutEffect, useState } from 'react';
 import { Handle, Position } from 'reactflow';
+import { P, match } from 'ts-pattern';
 import { v4 } from 'uuid';
 
 import { AutosizeTextArea } from '../../autosize-text-area';
@@ -22,20 +23,18 @@ export type NodeSwitchData = {
 };
 
 export const switchSpecification: NodeSpecification<NodeSwitchData> = {
+  type: NodeKind.Switch,
   icon: <BranchesOutlined />,
   displayName: 'Switch',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/switch',
   shortDescription: 'Conditional branching',
   generateNode: () => ({
-    type: NodeKind.Switch,
     name: 'mySwitch',
     content: {
       statements: [{ id: v4(), condition: '' }],
     },
   }),
-  renderNode:
-    ({ specification }) =>
-    (props) => <SwitchNode specification={specification} {...props} />,
+  renderNode: ({ specification, ...props }) => <SwitchNode specification={specification} {...props} />,
 };
 
 const SwitchNode: React.FC<
@@ -45,7 +44,9 @@ const SwitchNode: React.FC<
 > = ({ id, data, selected, specification }) => {
   const graphActions = useDecisionGraphActions();
   const { content, disabled, nodeTrace } = useDecisionGraphState(({ decisionGraph, disabled, simulate }) => ({
-    nodeTrace: simulate?.result?.trace?.[id],
+    nodeTrace: match(simulate)
+      .with({ result: P._ }, ({ result }) => result?.trace?.[id]?.traceData)
+      .otherwise(() => null),
     content: (decisionGraph?.nodes || []).find((n) => n?.id === id)?.content as NodeSwitchData | undefined,
     disabled,
   }));
@@ -122,9 +123,11 @@ const SwitchNode: React.FC<
               value={statement.condition}
               id={statement.id}
               disabled={disabled}
-              isActive={(nodeTrace?.traceData?.statements || []).some(
-                (s: SwitchStatement) => s?.id && s?.id === statement?.id,
-              )}
+              isActive={match(nodeTrace)
+                .with({ statements: P.array(P._) }, ({ statements }) =>
+                  statements.some((s) => s?.id && s?.id === statement?.id),
+                )
+                .otherwise(() => false)}
               onDelete={() => {
                 graphActions.updateNode(id, (draft) => {
                   draft.content.statements = draft.content.statements.filter(
