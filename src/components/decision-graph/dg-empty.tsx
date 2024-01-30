@@ -64,7 +64,7 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
       id,
       disabled,
       configurable,
-      components,
+      components: Array.isArray(components) ? components : [],
       simulate,
     });
   }, [id, disabled, configurable, components, simulate]);
