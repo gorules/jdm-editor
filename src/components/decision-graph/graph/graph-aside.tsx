@@ -2,7 +2,6 @@ import {
   CloseOutlined,
   CloudDownloadOutlined,
   CloudUploadOutlined,
-  PlayCircleFilled,
   PlayCircleOutlined,
   PlusCircleOutlined,
 } from '@ant-design/icons';

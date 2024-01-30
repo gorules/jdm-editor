@@ -10,7 +10,6 @@ import {
   type DecisionGraphStoreType,
   type DecisionNode,
   useDecisionGraphActions,
-  useDecisionGraphListeners,
   useDecisionGraphReferences,
   useDecisionGraphState,
 } from '../context/dg-store.context';
@@ -60,7 +59,6 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
 
   const graphActions = useDecisionGraphActions();
   const { disabled, components } = useDecisionGraphState(({ disabled, components }) => ({ disabled, components }));
-  const graphListeners = useDecisionGraphListeners(({ onAddNode }) => ({ onAddNode }));
   const graphReferences = useDecisionGraphReferences((s) => s);
 
   graphReferences.nodesState.current = nodesState;

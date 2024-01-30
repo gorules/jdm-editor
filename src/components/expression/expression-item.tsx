@@ -1,4 +1,4 @@
-import { DeleteOutlined, MenuOutlined, MinusCircleOutlined } from '@ant-design/icons';
+import { DeleteOutlined, MenuOutlined } from '@ant-design/icons';
 import type { Row } from '@tanstack/react-table';
 import { Button, Input, Popconfirm } from 'antd';
 import clsx from 'clsx';

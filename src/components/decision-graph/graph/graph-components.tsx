@@ -1,4 +1,4 @@
-import { Divider, Typography } from 'antd';
+import { Divider } from 'antd';
 import clsx from 'clsx';
 import React, { useCallback } from 'react';
 import type { XYPosition } from 'reactflow';

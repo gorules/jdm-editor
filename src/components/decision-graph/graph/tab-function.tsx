@@ -3,11 +3,7 @@ import React, { Suspense } from 'react';
 import { P, match } from 'ts-pattern';
 
 import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
-import type {
-  SimulationTrace,
-  SimulationTraceDataExpression,
-  SimulationTraceDataFunction,
-} from '../types/simulation.types';
+import type { SimulationTrace, SimulationTraceDataFunction } from '../types/simulation.types';
 
 const Function = React.lazy(async () => {
   const functionImport = await import('../../function');
