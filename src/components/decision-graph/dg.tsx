@@ -18,7 +18,9 @@ export type DecisionGraphProps = {
   DecisionGraphContextProps &
   DecisionGraphEmptyType;
 
-export const DecisionGraph = forwardRef<GraphRef, DecisionGraphProps>(
+export type DecisionGraphRef = GraphRef;
+
+export const DecisionGraph = forwardRef<DecisionGraphRef, DecisionGraphProps>(
   ({ manager: _, reactFlowProOptions, hideExportImport, ...props }, ref) => {
     return (
       <div className={'grl-dg'}>

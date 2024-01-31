@@ -22,5 +22,3 @@ export type {
   SimulationOk,
   SimulationTraceDataSwitch,
 } from './types/simulation.types';
-
-export type { GraphRef as DecisionGraphRef } from './graph/graph';
