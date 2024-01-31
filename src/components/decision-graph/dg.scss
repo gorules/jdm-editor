@@ -20,6 +20,7 @@
     border-top: 1px solid var(--grl-color-border);
     display: flex;
     height: 300px;
+    background: var(--grl-color-primary-bg-fade);
 
     &__nodes-list {
       display: flex;
