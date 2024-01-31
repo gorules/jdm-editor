@@ -21,16 +21,12 @@ export type DecisionGraphProps = {
 export type DecisionGraphRef = GraphRef;
 
 export const DecisionGraph = forwardRef<DecisionGraphRef, DecisionGraphProps>(
-  ({ manager: _, reactFlowProOptions, hideExportImport, ...props }, ref) => {
+  ({ manager: _, reactFlowProOptions, ...props }, ref) => {
     return (
       <div className={'grl-dg'}>
         <ReactFlowProvider>
           <DecisionGraphProvider>
-            <DecisionGraphWrapper
-              reactFlowProOptions={reactFlowProOptions}
-              hideExportImport={hideExportImport}
-              ref={ref}
-            />
+            <DecisionGraphWrapper reactFlowProOptions={reactFlowProOptions} ref={ref} />
             <DecisionGraphEmpty {...props} />
           </DecisionGraphProvider>
         </ReactFlowProvider>

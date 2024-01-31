@@ -5,7 +5,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import type { ProOptions } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-import { useDecisionGraphListeners, useDecisionGraphState } from './context/dg-store.context';
+import { useDecisionGraphState } from './context/dg-store.context';
 import { GraphSimulator } from './dg-simulator';
 import './dg.scss';
 import type { GraphRef } from './graph/graph';
@@ -18,13 +18,11 @@ import { TabFunction } from './graph/tab-function';
 
 export type DecisionGraphWrapperProps = {
   reactFlowProOptions?: ProOptions;
-  hideExportImport?: boolean;
 };
 
 export const DecisionGraphWrapper = React.memo(
-  forwardRef<GraphRef, DecisionGraphWrapperProps>(({ reactFlowProOptions, hideExportImport }, ref) => {
+  forwardRef<GraphRef, DecisionGraphWrapperProps>(({ reactFlowProOptions }, ref) => {
     const [disableTabs, setDisableTabs] = useState(false);
-    const onTabChange = useDecisionGraphListeners(({ onTabChange }) => onTabChange);
     const hasActiveNode = useDecisionGraphState(({ decisionGraph, activeTab }) => {
       return (decisionGraph?.nodes ?? []).some((node) => node.id === activeTab);
     });
@@ -33,11 +31,10 @@ export const DecisionGraphWrapper = React.memo(
       <>
         <GraphAside />
         <div className={'grl-dg__graph'}>
-          <GraphTabs disabled={disableTabs} onTabChange={onTabChange} />
+          <GraphTabs disabled={disableTabs} />
           <Graph
             ref={ref}
             className={clsx([!hasActiveNode && 'active'])}
-            hideExportImport={hideExportImport}
             reactFlowProOptions={reactFlowProOptions}
             onDisableTabs={setDisableTabs}
           />

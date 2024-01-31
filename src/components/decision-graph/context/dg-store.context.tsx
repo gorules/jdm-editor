@@ -2,7 +2,7 @@ import equal from 'fast-deep-equal/es6/react';
 import { produce } from 'immer';
 import type { WritableDraft } from 'immer/src/types/types-external';
 import React, { type MutableRefObject, createRef, useMemo } from 'react';
-import type { EdgeChange, NodeChange, XYPosition, useEdgesState, useNodesState } from 'reactflow';
+import type { EdgeChange, NodeChange, useEdgesState, useNodesState } from 'reactflow';
 import { v4 } from 'uuid';
 import type { StoreApi, UseBoundStore } from 'zustand';
 import { create } from 'zustand';
@@ -99,10 +99,6 @@ export type DecisionGraphStoreType = {
 
   listeners: {
     onChange?: (val: DecisionGraphType) => void;
-    onOpenNode?: (node: DecisionNode) => void;
-    onEditGraph?: (edit: boolean) => void;
-    onAddNode?: (type: string, position?: XYPosition) => void;
-    onTabChange?: (tab?: string) => void;
 
     onSimulationRun?: (data: { decisionGraph: DecisionGraphType; context: unknown }) => Promise<Simulation>;
     onSimulatorOpen?: (open: boolean) => void;
@@ -147,10 +143,8 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
     () =>
       create<DecisionGraphStoreType['listeners']>(() => ({
         onChange: undefined,
-        onOpenNode: undefined,
-        onEditGraph: undefined,
-        onAddNode: undefined,
-        onTabChange: undefined,
+        onSimulationRun: undefined,
+        onSimulatorOpen: undefined,
       })),
     [],
   );

@@ -1,13 +1,11 @@
 import equal from 'fast-deep-equal/es6/react';
 import type React from 'react';
 import { useEffect, useRef } from 'react';
-import type { XYPosition } from 'reactflow';
 import { useDebouncedCallback } from 'use-debounce';
 
 import {
   type DecisionGraphStoreType,
   type DecisionGraphType,
-  type DecisionNode,
   useDecisionGraphActions,
   useDecisionGraphRaw,
   useDecisionGraphState,
@@ -22,15 +20,9 @@ export type DecisionGraphEmptyType = {
   disabled?: boolean;
   configurable?: boolean;
 
-  simulate?: any;
-
   components?: NodeSpecification[];
 
   onChange?: (val: DecisionGraphType) => void;
-  onAddNode?: (type: string, position?: XYPosition) => void;
-  onOpenNode?: (node: DecisionNode) => void;
-  onTabChange?: (tab?: string) => void;
-  onEditGraph?: (edit: boolean) => void;
   onSimulationRun?: DecisionGraphStoreType['listeners']['onSimulationRun'];
   onSimulatorOpen?: DecisionGraphStoreType['listeners']['onSimulatorOpen'];
 };
@@ -41,13 +33,8 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
   disabled = false,
   configurable = true,
   onChange,
-  onAddNode,
-  onOpenNode,
-  onTabChange,
-  onEditGraph,
   onSimulationRun,
   components,
-  simulate,
   onSimulatorOpen,
 }) => {
   const mountedRef = useRef(false);
@@ -67,20 +54,15 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
       disabled,
       configurable,
       components: Array.isArray(components) ? components : [],
-      simulate,
     });
-  }, [id, disabled, configurable, components, simulate]);
+  }, [id, disabled, configurable, components]);
 
   useEffect(() => {
     listenerStore.setState({
-      onAddNode,
-      onOpenNode,
-      onTabChange,
-      onEditGraph,
       onSimulationRun,
       onSimulatorOpen,
     });
-  }, [onAddNode, onOpenNode, onTabChange, onEditGraph, onSimulationRun, onSimulatorOpen]);
+  }, [onSimulationRun, onSimulatorOpen]);
 
   useEffect(() => {
     listenerStore.setState({ onChange: innerChange });

@@ -80,7 +80,9 @@ export const GraphSimulator: React.FC = () => {
     }
   };
 
-  if (!simulatorOpen) return null;
+  if (!simulatorOpen || !onSimulationRun) {
+    return null;
+  }
 
   return (
     <div className={'grl-dg__simulator'}>

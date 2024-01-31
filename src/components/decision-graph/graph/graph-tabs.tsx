@@ -1,7 +1,7 @@
 import { DeploymentUnitOutlined } from '@ant-design/icons';
 import type { TabsProps } from 'antd';
 import { Avatar, Tabs } from 'antd';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
 import type { NodeKind } from '../nodes/specification-types';
@@ -9,13 +9,12 @@ import { nodeSpecification } from '../nodes/specifications';
 
 export type GraphTabsProps = {
   disabled?: boolean;
-  onTabChange?: (val: string) => void;
 };
 
 type NonUndefined<T> = T extends undefined ? never : T;
 type TabItem = NonUndefined<TabsProps['items']>[number];
 
-export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled, onTabChange }) => {
+export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled }) => {
   const graphActions = useDecisionGraphActions();
   const { openNodes, activeNodeId } = useDecisionGraphState(({ decisionGraph, activeTab, openTabs }) => ({
     activeNodeId: (decisionGraph?.nodes ?? []).find((node) => node.id === activeTab)?.id,
@@ -27,10 +26,6 @@ export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled, onTabChange }) =
         type,
       })),
   }));
-
-  useEffect(() => {
-    onTabChange?.(activeNodeId || 'graph');
-  }, [activeNodeId]);
 
   return (
     <Tabs

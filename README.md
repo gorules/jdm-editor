@@ -40,10 +40,6 @@ export type DecisionGraphProps = {
   configurable?: boolean;
   components?: CustomNodeType[];
   onChange?: (val: DecisionGraphType) => void;
-  onAddNode?: (type: string, position?: XYPosition) => void;
-  onOpenNode?: (node: DecisionNode) => void;
-  onTabChange?: (tab?: string) => void;
-  onEditGraph?: (edit: boolean) => void;
   manager?: DragDropManager;
   reactFlowProOptions?: ProOptions;
 };

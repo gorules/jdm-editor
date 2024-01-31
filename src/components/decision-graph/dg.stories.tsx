@@ -93,16 +93,7 @@ export const Extended: Story = {
           height: '100%',
         }}
       >
-        <DecisionGraph
-          {...args}
-          ref={ref}
-          value={value}
-          onChange={(val) => setValue(val)}
-          components={components}
-          onTabChange={(e) => {
-            console.log(e);
-          }}
-        />
+        <DecisionGraph {...args} ref={ref} value={value} onChange={(val) => setValue(val)} components={components} />
       </div>
     );
   },

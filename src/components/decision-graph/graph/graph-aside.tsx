@@ -12,6 +12,7 @@ import {
   type DecisionEdge,
   type DecisionNode,
   useDecisionGraphActions,
+  useDecisionGraphListeners,
   useDecisionGraphState,
 } from '../context/dg-store.context';
 import { NodeKind } from '../nodes/specification-types';
@@ -24,6 +25,7 @@ export const GraphAside = () => {
   const [menu, setMenu] = useState<string | undefined>('components');
 
   const { setDecisionGraph, toggleSimulator } = useDecisionGraphActions();
+  const { onSimulationRun } = useDecisionGraphListeners(({ onSimulationRun }) => ({ onSimulationRun }));
   const { decisionGraph, activeTab, disabled, hasInputNode } = useDecisionGraphState(
     ({ decisionGraph, activeTab, disabled }) => ({
       decisionGraph,
@@ -133,15 +135,17 @@ export const GraphAside = () => {
         </div>
 
         <div className={'grl-dg__aside__side-bar__bottom'}>
-          <Tooltip placement='right' title='Toggle Simulator'>
-            <Button
-              type={'text'}
-              icon={<PlayCircleOutlined className={'color-primary'} />}
-              onClick={() => {
-                toggleSimulator();
-              }}
-            />
-          </Tooltip>
+          {onSimulationRun && (
+            <Tooltip placement='right' title='Toggle Simulator'>
+              <Button
+                type={'text'}
+                icon={<PlayCircleOutlined className={'color-primary'} />}
+                onClick={() => {
+                  toggleSimulator();
+                }}
+              />
+            </Tooltip>
+          )}
         </div>
       </div>
       {menu && (

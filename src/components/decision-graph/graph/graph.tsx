@@ -22,7 +22,6 @@ import { nodeSpecification } from '../nodes/specifications';
 
 export type GraphProps = {
   className?: string;
-  hideExportImport?: boolean;
   onDisableTabs?: (val: boolean) => void;
   reactFlowProOptions?: ProOptions;
 };
