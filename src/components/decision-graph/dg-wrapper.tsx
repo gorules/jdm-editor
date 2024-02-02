@@ -18,7 +18,7 @@ import { TabFunction } from './graph/tab-function';
 
 export type DecisionGraphWrapperProps = {
   reactFlowProOptions?: ProOptions;
-  defaultOpenMenu: GraphAsideProps['defaultOpenMenu'];
+  defaultOpenMenu?: GraphAsideProps['defaultOpenMenu'];
 };
 
 export const DecisionGraphWrapper = React.memo(
