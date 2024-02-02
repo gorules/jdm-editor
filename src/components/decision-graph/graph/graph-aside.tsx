@@ -32,10 +32,10 @@ export const GraphAside: React.FC<GraphAsideProps> = ({ defaultOpenMenu = 'compo
 
   const { setDecisionGraph, toggleSimulator } = useDecisionGraphActions();
   const { onSimulationRun } = useDecisionGraphListeners(({ onSimulationRun }) => ({ onSimulationRun }));
-  const { decisionGraph, activeTab, disabled, hasInputNode } = useDecisionGraphState(
+  const { decisionGraph, activeNodeId, disabled, hasInputNode } = useDecisionGraphState(
     ({ decisionGraph, activeTab, disabled }) => ({
       decisionGraph,
-      activeTab,
+      activeNodeId: (decisionGraph?.nodes ?? []).find((node) => node.id === activeTab)?.id,
       disabled,
       hasInputNode: (decisionGraph?.nodes || []).some((n) => n.type === NodeKind.Input),
     }),
@@ -167,7 +167,7 @@ export const GraphAside: React.FC<GraphAsideProps> = ({ defaultOpenMenu = 'compo
                 <Button type={'text'} size='small' icon={<CloseOutlined />} onClick={() => setMenu(false)}></Button>
               </div>
               <div className={'grl-dg__aside__menu__content'}>
-                <GraphComponents inputDisabled={hasInputNode} disabled={activeTab !== 'graph' || disabled} />
+                <GraphComponents inputDisabled={hasInputNode} disabled={!!activeNodeId || disabled} />
               </div>
             </>
           )}
