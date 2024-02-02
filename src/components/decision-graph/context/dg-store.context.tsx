@@ -1,8 +1,10 @@
 import equal from 'fast-deep-equal/es6/react';
 import { produce } from 'immer';
 import type { WritableDraft } from 'immer/src/types/types-external';
+import json5 from 'json5';
 import React, { type MutableRefObject, createRef, useMemo } from 'react';
-import type { EdgeChange, NodeChange, useEdgesState, useNodesState } from 'reactflow';
+import type { EdgeChange, NodeChange, ReactFlowInstance, useEdgesState, useNodesState } from 'reactflow';
+import { P, match } from 'ts-pattern';
 import { v4 } from 'uuid';
 import type { StoreApi, UseBoundStore } from 'zustand';
 import { create } from 'zustand';
@@ -59,9 +61,10 @@ export type DecisionGraphStoreType = {
     openTabs: string[];
     activeTab: string;
 
-    simulatorOpen?: boolean;
+    simulatorOpen: boolean;
     simulatorRequest?: string;
     simulate?: Simulation;
+    simulatorLoading: boolean;
   };
 
   references: {
@@ -95,6 +98,7 @@ export type DecisionGraphStoreType = {
 
     setSimulatorRequest: (req: string) => void;
     toggleSimulator: () => void;
+    runSimulator: (context?: unknown) => Promise<Simulation>;
   };
 
   listeners: {
@@ -102,6 +106,8 @@ export type DecisionGraphStoreType = {
 
     onSimulationRun?: (data: { decisionGraph: DecisionGraphType; context: unknown }) => Promise<Simulation>;
     onSimulatorOpen?: (open: boolean) => void;
+
+    onReactFlowInit?: (instance: ReactFlowInstance) => void;
   };
 };
 
@@ -135,6 +141,9 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         disabled: false,
         configurable: true,
         components: [],
+
+        simulatorLoading: false,
+        simulatorOpen: false,
       })),
     [],
   );
@@ -420,15 +429,15 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         const index = openTabs?.findIndex((i) => i === id);
         const tab = openTabs?.[index];
 
-        stateStore.setState({
+        const updatedState: Partial<DecisionGraphStoreType['state']> = {
           openTabs: openTabs.filter((id) => id !== tab),
-        });
+        };
 
         if (activeTab === id) {
-          stateStore.setState({
-            activeTab: index > 0 ? openTabs?.[index - 1] : 'graph',
-          });
+          updatedState.activeTab = openTabs?.[index - 1] ?? 'graph';
         }
+
+        stateStore.setState(updatedState);
       },
       setSimulatorRequest: (request: string) => {
         stateStore.setState({
@@ -439,6 +448,36 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         const simulatorOpen = !stateStore.getState()?.simulatorOpen;
         stateStore.setState({ simulatorOpen });
         listenerStore.getState().onSimulatorOpen?.(simulatorOpen);
+      },
+      runSimulator: async (providedContext?: unknown): Promise<Simulation> => {
+        const { onSimulationRun } = listenerStore.getState();
+        if (!onSimulationRun) {
+          return { error: { title: 'Component error', message: 'Simulation callback is not defined.', data: {} } };
+        }
+
+        const { decisionGraph, simulatorRequest } = stateStore.getState();
+
+        try {
+          const context = match(providedContext)
+            .with(P.not(P.nullish), (context) => {
+              stateStore.setState({ simulatorRequest: json5.stringify(context, undefined, 2), simulatorLoading: true });
+              return context;
+            })
+            .otherwise(() => {
+              stateStore.setState({ simulatorLoading: true });
+              return match(simulatorRequest?.trim?.())
+                .with(P.string.minLength(1), (value) => json5.parse(value))
+                .otherwise(() => ({}));
+            });
+
+          const simulate = await onSimulationRun({ decisionGraph, context });
+          stateStore.setState({ simulate });
+          return simulate;
+        } catch (e) {
+          throw e;
+        } finally {
+          stateStore.setState({ simulatorLoading: false });
+        }
       },
     }),
     [],

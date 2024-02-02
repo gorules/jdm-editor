@@ -4,6 +4,7 @@ type Output = unknown;
 export type Simulation = { result?: SimulationOk } | { error?: SimulationError };
 
 export type SimulationError = {
+  title?: string;
   message?: string;
   data: {
     nodeId?: string;

@@ -20,9 +20,15 @@ import { GraphComponents } from './graph-components';
 
 const DecisionContentType = 'application/vnd.gorules.decision';
 
-export const GraphAside = () => {
+type Menu = 'components';
+
+export type GraphAsideProps = {
+  defaultOpenMenu?: Menu | false;
+};
+
+export const GraphAside: React.FC<GraphAsideProps> = ({ defaultOpenMenu = 'components' }) => {
   const fileInput = useRef<HTMLInputElement>(null);
-  const [menu, setMenu] = useState<string | undefined>('components');
+  const [menu, setMenu] = useState<Menu | false>(defaultOpenMenu);
 
   const { setDecisionGraph, toggleSimulator } = useDecisionGraphActions();
   const { onSimulationRun } = useDecisionGraphListeners(({ onSimulationRun }) => ({ onSimulationRun }));
@@ -110,7 +116,7 @@ export const GraphAside = () => {
             <Button
               type={'primary'}
               icon={<PlusCircleOutlined />}
-              onClick={() => setMenu((m) => (m !== 'components' ? 'components' : undefined))}
+              onClick={() => setMenu((m) => (m !== 'components' ? 'components' : false))}
             />
           </Tooltip>
           <Tooltip placement='right' title='Upload JSON'>
@@ -158,7 +164,7 @@ export const GraphAside = () => {
                     Components
                   </Typography.Text>
                 </div>
-                <Button type={'text'} size='small' icon={<CloseOutlined />} onClick={() => setMenu(undefined)}></Button>
+                <Button type={'text'} size='small' icon={<CloseOutlined />} onClick={() => setMenu(false)}></Button>
               </div>
               <div className={'grl-dg__aside__menu__content'}>
                 <GraphComponents inputDisabled={hasInputNode} disabled={activeTab !== 'graph' || disabled} />

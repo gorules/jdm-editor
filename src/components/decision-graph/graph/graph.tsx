@@ -10,6 +10,7 @@ import {
   type DecisionGraphStoreType,
   type DecisionNode,
   useDecisionGraphActions,
+  useDecisionGraphListeners,
   useDecisionGraphReferences,
   useDecisionGraphState,
 } from '../context/dg-store.context';
@@ -59,6 +60,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
   const graphActions = useDecisionGraphActions();
   const { disabled, components } = useDecisionGraphState(({ disabled, components }) => ({ disabled, components }));
   const graphReferences = useDecisionGraphReferences((s) => s);
+  const { onReactFlowInit } = useDecisionGraphListeners(({ onReactFlowInit }) => ({ onReactFlowInit }));
 
   graphReferences.nodesState.current = nodesState;
   graphReferences.edgesState.current = edgesState;
@@ -205,6 +207,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
             edges={edgesState[0]}
             onInit={(instance) => {
               (reactFlowInstance as MutableRefObject<ReactFlowInstance>).current = instance;
+              onReactFlowInit?.(instance);
             }}
             snapToGrid={true}
             snapGrid={[5, 5]}

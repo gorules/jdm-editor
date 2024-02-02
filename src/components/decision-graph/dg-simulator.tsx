@@ -1,4 +1,4 @@
-import { ClearOutlined, CloseOutlined, FormatPainterOutlined } from '@ant-design/icons';
+import { ClearOutlined, CloseOutlined, FormatPainterOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import 'ace-builds/src-noconflict/ext-language_tools';
 import 'ace-builds/src-noconflict/mode-json5';
 import 'ace-builds/src-noconflict/theme-chrome';
@@ -21,12 +21,14 @@ import { NodeKind } from './nodes/specification-types';
 export const GraphSimulator: React.FC = () => {
   const { token } = theme.useToken();
   const { stateStore } = useDecisionGraphRaw();
+  const graphActions = useDecisionGraphActions();
   const { onSimulationRun } = useDecisionGraphListeners(({ onSimulationRun }) => ({ onSimulationRun }));
-  const { simulate, simulatorOpen, simulatorRequest, nodeTypes } = useDecisionGraphState(
-    ({ simulate, simulatorOpen, simulatorRequest, decisionGraph }) => ({
+  const { simulate, simulatorOpen, simulatorRequest, simulatorLoading, nodeTypes } = useDecisionGraphState(
+    ({ simulate, simulatorOpen, simulatorRequest, simulatorLoading, decisionGraph }) => ({
       simulate,
       simulatorOpen,
       simulatorRequest,
+      simulatorLoading,
       nodeTypes: (decisionGraph.nodes ?? []).reduce<Record<string, string | undefined>>(
         (acc, curr) => ({
           ...acc,
@@ -36,11 +38,7 @@ export const GraphSimulator: React.FC = () => {
       ),
     }),
   );
-  const { setSimulatorRequest, toggleSimulator } = useDecisionGraphActions();
 
-  const [runLoading, setRunLoading] = useState(false);
-
-  const [requestValue, setRequestValue] = useState(simulatorRequest);
   const [selectedNode, setSelectedNode] = useState<string>('graph');
 
   const simulateResult = match(simulate)
@@ -53,30 +51,26 @@ export const GraphSimulator: React.FC = () => {
       .otherwise(() => 'chrome');
   }, [token.mode]);
 
-  const runSimulation = async (context: unknown) => {
-    if (!onSimulationRun) {
-      return;
-    }
-
+  const runSimulation = async () => {
     try {
-      setRunLoading(true);
-      const simulate = await onSimulationRun({
-        decisionGraph: stateStore.getState().decisionGraph,
-        context,
-      });
-
-      stateStore.setState({ simulate });
-      if (simulate && typeof simulate === 'object' && 'error' in simulate) {
+      const response = await graphActions.runSimulator();
+      if (response && typeof response === 'object' && 'error' in response) {
         notification.error({
-          message: 'Node error',
+          message: response?.error?.title ?? 'Node error',
           placement: 'top',
-          description: simulate?.error?.message,
+          description: response?.error?.message,
         });
       }
     } catch (e) {
-      throw e;
-    } finally {
-      setRunLoading(false);
+      const description = match(e)
+        .with({ message: P._ }, ({ message }) => message?.toString())
+        .otherwise(() => undefined);
+
+      notification.error({
+        message: 'Simulation failed',
+        placement: 'top',
+        description,
+      });
     }
   };
 
@@ -97,12 +91,14 @@ export const GraphSimulator: React.FC = () => {
                 type={'text'}
                 icon={<FormatPainterOutlined />}
                 onClick={() => {
-                  if ((requestValue || '').trim().length === 0) {
+                  if ((simulatorRequest || '').trim().length === 0) {
                     return;
                   }
 
                   try {
-                    setRequestValue(json5.stringify(json5.parse(requestValue || ''), null, 2));
+                    stateStore.setState({
+                      simulatorRequest: json5.stringify(json5.parse(simulatorRequest || ''), null, 2),
+                    });
                   } catch (e) {
                     notification.error({
                       message: 'Invalid format',
@@ -116,26 +112,9 @@ export const GraphSimulator: React.FC = () => {
             <Button
               size={'small'}
               type={'primary'}
-              loading={runLoading}
-              onClick={async () => {
-                try {
-                  const context = match(requestValue?.trim?.())
-                    .with(P.string.minLength(1), (value) => json5.parse(value))
-                    .otherwise(() => ({}));
-
-                  await runSimulation(context);
-                } catch (e) {
-                  const description = match(e)
-                    .with({ message: P._ }, ({ message }) => message?.toString())
-                    .otherwise(() => undefined);
-
-                  notification.error({
-                    message: 'Simulation failed',
-                    placement: 'top',
-                    description,
-                  });
-                }
-              }}
+              loading={simulatorLoading}
+              icon={<PlayCircleOutlined />}
+              onClick={runSimulation}
             >
               Run
             </Button>
@@ -143,10 +122,9 @@ export const GraphSimulator: React.FC = () => {
         </div>
         <div className={'grl-dg__simulator__section__content'}>
           <ReactAce
-            value={requestValue}
+            value={simulatorRequest}
             onChange={(e) => {
-              setRequestValue(e);
-              setSimulatorRequest(e);
+              graphActions.setSimulatorRequest(e);
             }}
             mode='json5'
             theme={codeEditorTheme}
@@ -177,7 +155,7 @@ export const GraphSimulator: React.FC = () => {
           </div>
         </div>
         <div className={'grl-dg__simulator__section__content'}>
-          <Spin spinning={runLoading}>
+          <Spin spinning={simulatorLoading}>
             <div className={'grl-dg__simulator__nodes-list'}>
               <div
                 className={clsx('grl-dg__simulator__nodes-list__node', selectedNode === 'graph' && 'active')}
@@ -215,9 +193,7 @@ export const GraphSimulator: React.FC = () => {
                 size={'small'}
                 type={'text'}
                 icon={<CloseOutlined />}
-                onClick={() => {
-                  toggleSimulator();
-                }}
+                onClick={() => graphActions.toggleSimulator()}
               />
             </Tooltip>
           </div>
