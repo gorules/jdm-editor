@@ -1,7 +1,7 @@
 /* eslint-disable */
 // @ts-ignore
-// @ts-ignore
 import bigJs from '@types/big.js/index.d.ts?raw';
+// @ts-ignore
 import dayjs from 'dayjs/index.d.ts?raw';
 
 // @ts-ignore

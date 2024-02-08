@@ -1,20 +1,22 @@
-import { Button, Typography } from 'antd';
+import { Divider } from 'antd';
 import clsx from 'clsx';
-import equal from 'fast-deep-equal/es6/react';
 import React, { useCallback } from 'react';
 import type { XYPosition } from 'reactflow';
+import { match } from 'ts-pattern';
 
-import type { CustomNodeType } from '../context/dg-store.context';
-import { useDecisionGraphStore } from '../context/dg-store.context';
+import { useDecisionGraphState } from '../context/dg-store.context';
+import { DecisionNode } from '../nodes/decision-node';
+import { NodeKind, type NodeSpecification } from '../nodes/specification-types';
+import { nodeSpecification } from '../nodes/specifications';
 
 export type GraphComponentsProps = {
   inputDisabled?: boolean;
-  onPaste?: () => void;
   components?: React.ReactNode[];
+  disabled?: boolean;
 };
 
-export const GraphComponents: React.FC<GraphComponentsProps> = ({ inputDisabled, onPaste }) => {
-  const customComponents: CustomNodeType[] = useDecisionGraphStore((store) => store.components || [], equal);
+export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inputDisabled, disabled }) => {
+  const customComponents = useDecisionGraphState((store) => store.components || []);
 
   const onDragStart = useCallback((event: React.DragEvent, nodeType: string) => {
     const target = event.target as HTMLDivElement;
@@ -36,47 +38,49 @@ export const GraphComponents: React.FC<GraphComponentsProps> = ({ inputDisabled,
   }, []);
 
   return (
-    <div className={'wrapper'}>
-      <Typography.Text style={{ marginBottom: '1rem' }}>Drag and Drop components</Typography.Text>
-      <div className={'list'}>
-        <div
-          className={clsx(['component', inputDisabled && 'disabled'])}
-          onDragStart={(event) => onDragStart(event, 'inputNode')}
-          draggable={!inputDisabled}
-        >
-          <Typography.Text strong type={inputDisabled ? 'secondary' : undefined}>
-            Input
-          </Typography.Text>
-        </div>
-        <div className={clsx(['component'])} onDragStart={(event) => onDragStart(event, 'outputNode')} draggable>
-          <Typography.Text strong>Output</Typography.Text>
-        </div>
-        <div className={clsx(['component'])} onDragStart={(event) => onDragStart(event, 'decisionTableNode')} draggable>
-          <Typography.Text strong>Decision Table</Typography.Text>
-        </div>
-        <div className={clsx(['component'])} onDragStart={(event) => onDragStart(event, 'functionNode')} draggable>
-          <Typography.Text strong>Function</Typography.Text>
-        </div>
-        <div className={clsx(['component'])} onDragStart={(event) => onDragStart(event, 'expressionNode')} draggable>
-          <Typography.Text strong>Expression</Typography.Text>
-        </div>
-        <div className={clsx(['component'])} onDragStart={(event) => onDragStart(event, 'switchNode')} draggable>
-          <Typography.Text strong>Switch</Typography.Text>
-        </div>
-        {customComponents.map((component) => (
-          <div
-            key={component.type}
-            className={clsx(['component'])}
-            onDragStart={(event) => onDragStart(event, component.type)}
-            draggable
-          >
-            <Typography.Text strong>{component.name}</Typography.Text>
-          </div>
-        ))}
+    <div className={'grl-dg__aside__menu__components'}>
+      {Object.keys(nodeSpecification).map((kind: NodeKind) => (
+        <React.Fragment key={kind}>
+          <DragDecisionNode
+            disabled={match(kind)
+              .with(NodeKind.Input, () => disabled || inputDisabled)
+              .otherwise(() => disabled)}
+            specification={nodeSpecification[kind]}
+            onDragStart={(event) => onDragStart(event, kind)}
+          />
+          {kind === NodeKind.Output && <Divider style={{ margin: '4px 0' }} />}
+        </React.Fragment>
+      ))}
+
+      {customComponents?.length > 0 && <Divider style={{ margin: '4px 0' }} />}
+      {customComponents.map((component) => (
+        <DragDecisionNode
+          key={component.displayName}
+          disabled={disabled}
+          specification={component}
+          onDragStart={(event) => onDragStart(event, component.type)}
+        />
+      ))}
+    </div>
+  );
+});
+
+const DragDecisionNode: React.FC<
+  {
+    specification: NodeSpecification;
+    disabled?: boolean;
+  } & React.HTMLAttributes<HTMLDivElement>
+> = ({ specification, disabled = false, ...props }) => {
+  return (
+    <div className={clsx('draggable-component')} draggable={!disabled} {...props}>
+      <div style={{ pointerEvents: 'none' }}>
+        <DecisionNode
+          color={specification.color}
+          icon={specification.icon}
+          name={specification.displayName}
+          type={specification.shortDescription}
+        />
       </div>
-      <Button onClick={onPaste} type='default' style={{ marginTop: 'auto' }}>
-        Paste from clipboard
-      </Button>
     </div>
   );
 };

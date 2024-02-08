@@ -31,7 +31,7 @@ export const getPath = (key: string, items: SchemaSelectProps[]): string[] | und
   }
 };
 
-export const columnIdSelector = (x: string) => (state: DecisionTableStoreType) =>
+export const columnIdSelector = (x: string) => (state: DecisionTableStoreType['state']) =>
   [
     ...state.decisionTable.inputs.map((i: any) => ({
       ...i,

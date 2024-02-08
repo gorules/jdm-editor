@@ -1,5 +1,7 @@
 import type { DragDropManager } from 'dnd-core';
 import React, { forwardRef } from 'react';
+import 'react-ace';
+import { ReactFlowProvider } from 'reactflow';
 
 import type { DecisionGraphContextProps } from './context/dg-store.context';
 import { DecisionGraphProvider } from './context/dg-store.context';
@@ -16,18 +18,22 @@ export type DecisionGraphProps = {
   DecisionGraphContextProps &
   DecisionGraphEmptyType;
 
-export const DecisionGraph = forwardRef<GraphRef, DecisionGraphProps>(
-  ({ manager: _, reactFlowProOptions, hideExportImport, ...props }, ref) => {
+export type DecisionGraphRef = GraphRef;
+
+export const DecisionGraph = forwardRef<DecisionGraphRef, DecisionGraphProps>(
+  ({ manager: _, reactFlowProOptions, defaultOpenMenu, ...props }, ref) => {
     return (
       <div className={'grl-dg'}>
-        <DecisionGraphProvider>
-          <DecisionGraphWrapper
-            reactFlowProOptions={reactFlowProOptions}
-            hideExportImport={hideExportImport}
-            ref={ref}
-          />
-          <DecisionGraphEmpty {...props} />
-        </DecisionGraphProvider>
+        <ReactFlowProvider>
+          <DecisionGraphProvider>
+            <DecisionGraphWrapper
+              ref={ref}
+              reactFlowProOptions={reactFlowProOptions}
+              defaultOpenMenu={defaultOpenMenu}
+            />
+            <DecisionGraphEmpty {...props} />
+          </DecisionGraphProvider>
+        </ReactFlowProvider>
       </div>
     );
   },

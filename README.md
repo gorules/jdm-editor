@@ -1,7 +1,9 @@
-## BETA JDM Editor
+## JDM Editor
 
 JDM Editor is an open-source React component for crafting and designing JDM (JSON Decision model) files.
 Whether you’re a developer, data analyst, or decision model expert, JDM Editor can help you harness the full potential of decision modeling, making it more accessible and manageable than ever before
+
+<img width="945" alt="Rules Engine Editor" src="https://gorules.io/images/jdm-editor.gif">
 
 > A JDM Editor
 > Live demo and usage at https://gorules.github.io/jdm-editor/
@@ -29,29 +31,30 @@ import { DecisionGraph, JdmConfigProvider } from '@gorules/jdm-editor';
 
 ## Decision Graph
 
-<img width="945" alt="Rules Engine Editor" src="https://user-images.githubusercontent.com/60513195/224425568-4a717e34-3d4b-4cc6-b031-8cd35f8ff459.png">
+<img width="945" alt="Decision Graph" src="https://gorules.io/images/decision-graph.png">
 
 ```typescript
 export type DecisionGraphProps = {
   id?: string;
+  forwardedRef?: (instance: DecisionGraphRef) => void;
   defaultValue?: DecisionGraphType;
   value?: DecisionGraphType;
   disabled?: boolean;
   configurable?: boolean;
   components?: CustomNodeType[];
   onChange?: (val: DecisionGraphType) => void;
-  onAddNode?: (type: string, position?: XYPosition) => void;
-  onOpenNode?: (node: DecisionNode) => void;
-  onTabChange?: (tab?: string) => void;
-  onEditGraph?: (edit: boolean) => void;
   manager?: DragDropManager;
   reactFlowProOptions?: ProOptions;
+  defaultOpenMenu?: boolean;
+  onReactFlowInit?: () => void;
+  onSimulatorOpen?: (opened: boolean) => void;
+  onSimulationRun?: ({ context: any, decisionGraph: DecisionGraphType}) => Promise<Trace>;
 };
 ```
 
 ## Decision Table
 
-<img width="945" alt="Decision Table Editor" src="https://github.com/gorules/jdm-editor/assets/60513195/8db213d7-0b59-4969-a7d8-afaffd1c5a85">
+<img width="945" alt="Decision Table" src="https://gorules.io/images/decision-table.png">
 
 ### API
 

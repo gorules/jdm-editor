@@ -1,8 +1,9 @@
 import { Spin } from 'antd';
-import equal from 'fast-deep-equal/es6/react';
 import React, { Suspense } from 'react';
+import { P, match } from 'ts-pattern';
 
-import { useDecisionGraphStore } from '../context/dg-store.context';
+import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
+import type { SimulationTrace, SimulationTraceDataFunction } from '../types/simulation.types';
 
 const Function = React.lazy(async () => {
   const functionImport = await import('../../function');
@@ -14,25 +15,30 @@ export type TabFunctionProps = {
 };
 
 export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
-  const { node, nodeTrace, updateNode, disabled } = useDecisionGraphStore(
-    ({ decisionGraph, simulate, updateNode, disabled }) => ({
-      node: (decisionGraph?.nodes ?? []).find((node) => node.id === id),
-      nodeTrace: simulate?.result?.trace?.[id],
-      updateNode,
+  const graphActions = useDecisionGraphActions();
+  const { nodeTrace, disabled, content } = useDecisionGraphState(
+    ({ simulate, disabled, configurable, decisionGraph }) => ({
+      nodeTrace: match(simulate)
+        .with({ result: P._ }, ({ result }) => result?.trace?.[id])
+        .otherwise(() => null),
       disabled,
+      configurable,
+      content: (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content,
     }),
-    equal,
   );
-
-  if (!node) return null;
 
   return (
     <Suspense fallback={<Spin />}>
       <Function
-        value={typeof node?.content === 'string' ? node?.content : ''}
-        onChange={(val) => updateNode(id, val)}
+        value={typeof content === 'string' ? content : ''}
+        onChange={(val) => {
+          graphActions.updateNode(id, (draft) => {
+            draft.content = val;
+            return draft;
+          });
+        }}
         disabled={disabled}
-        trace={nodeTrace}
+        trace={nodeTrace as SimulationTrace<SimulationTraceDataFunction>}
       />
     </Suspense>
   );

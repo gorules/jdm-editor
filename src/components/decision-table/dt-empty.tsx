@@ -2,11 +2,15 @@ import equal from 'fast-deep-equal/es6/react';
 import type React from 'react';
 import { useEffect, useRef } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
-import { shallow } from 'zustand/shallow';
 
 import type { SchemaSelectProps } from '../../helpers/components';
-import type { DecisionTableType } from './context/dt-store.context';
-import { parseDecisionTable, useDecisionTableRaw, useDecisionTableStore } from './context/dt-store.context';
+import {
+  type DecisionTableType,
+  parseDecisionTable,
+  useDecisionTableActions,
+  useDecisionTableRaw,
+  useDecisionTableState,
+} from './context/dt-store.context';
 import type { TableCellProps } from './table/table-default-cell';
 
 export type DecisionTableEmptyType = {
@@ -40,16 +44,18 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
   onChange,
 }) => {
   const mountedRef = useRef(false);
-  const store = useDecisionTableRaw();
-  const setDecisionTable = useDecisionTableStore((store) => store.setDecisionTable, shallow);
-  const decisionTable = useDecisionTableStore((store) => store.decisionTable, shallow);
+  const { stateStore, listenerStore } = useDecisionTableRaw();
+  const tableActions = useDecisionTableActions();
+  const { decisionTable } = useDecisionTableState(({ decisionTable }) => ({
+    decisionTable,
+  }));
 
   const innerChange = useDebouncedCallback((table: DecisionTableType) => {
     onChange?.(table);
   }, 100);
 
   useEffect(() => {
-    store.setState({
+    stateStore.setState({
       id,
       disabled,
       configurable,
@@ -59,31 +65,26 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
       outputsSchema,
       colWidth: colWidth || 200,
       minColWidth: minColWidth || 150,
+    });
+  }, [id, disabled, configurable, disableHitPolicy, activeRules, inputsSchema, minColWidth, colWidth, outputsSchema]);
+
+  useEffect(() => {
+    listenerStore.setState({
       cellRenderer,
       onChange: innerChange,
     });
-  }, [
-    id,
-    disabled,
-    configurable,
-    disableHitPolicy,
-    activeRules,
-    inputsSchema,
-    minColWidth,
-    colWidth,
-    outputsSchema,
-    cellRenderer,
-  ]);
+  }, [cellRenderer, innerChange]);
 
   useEffect(() => {
     if (mountedRef.current && value !== undefined && !equal(value, decisionTable)) {
-      setDecisionTable(parseDecisionTable(value));
+      tableActions.setDecisionTable(parseDecisionTable(value));
     }
   }, [value]);
 
   useEffect(() => {
-    setDecisionTable(parseDecisionTable(value === undefined ? defaultValue : value));
+    tableActions.setDecisionTable(parseDecisionTable(value === undefined ? defaultValue : value));
     mountedRef.current = true;
   }, []);
+
   return null;
 };

@@ -1,569 +1,300 @@
-import { CheckOutlined, CloseOutlined, ExportOutlined, ImportOutlined, NodeIndexOutlined } from '@ant-design/icons';
-import { Button, Tooltip, message } from 'antd';
+import { Modal, Typography, message } from 'antd';
 import clsx from 'clsx';
-import equal from 'fast-deep-equal/es6/react';
-import { DirectedGraph } from 'graphology';
-import { hasCycle } from 'graphology-dag';
-import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import type { Edge, Node, ProOptions, ReactFlowInstance, XYPosition } from 'reactflow';
-import ReactFlow, { Background, Controls, addEdge, useEdgesState, useNodesState } from 'reactflow';
+import React, { type MutableRefObject, forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
+import type { Connection, ProOptions, ReactFlowInstance, XYPosition } from 'reactflow';
+import ReactFlow, { Background, Controls, useEdgesState, useNodesState } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { v4 } from 'uuid';
 
-import { defaultFunctionValue } from '../../function/helpers/libs';
-import type { DecisionEdge, DecisionGraphType, DecisionNode } from '../context/dg-store.context';
-import { useDecisionGraphStore } from '../context/dg-store.context';
+import {
+  type DecisionGraphStoreType,
+  type DecisionNode,
+  useDecisionGraphActions,
+  useDecisionGraphListeners,
+  useDecisionGraphReferences,
+  useDecisionGraphState,
+} from '../context/dg-store.context';
 import { edgeFunction } from '../custom-edge';
-import { mapToDecisionEdges, mapToDecisionNodes, mapToGraphEdges, mapToGraphNode, mapToGraphNodes } from '../dg-util';
+import { mapToDecisionEdge } from '../dg-util';
 import '../dg.scss';
 import { useGraphClipboard } from '../hooks/use-graph-clipboard';
-import { GraphComponents } from './graph-components';
-import { MultiNodeForm } from './multi-node-form';
-import { NodeForm } from './node-form';
-import { GraphNode, GraphNodeEdit } from './nodes';
-import { GraphSwitchNode, GraphSwitchNodeEdit } from './switch-node';
-
-export const DecisionContentType = 'application/vnd.gorules.decision';
+import type { MinimalNodeProps } from '../nodes/specification-types';
+import { nodeSpecification } from '../nodes/specifications';
 
 export type GraphProps = {
   className?: string;
-  hideExportImport?: boolean;
   onDisableTabs?: (val: boolean) => void;
   reactFlowProOptions?: ProOptions;
 };
 
-export type GraphRef = {
-  openEdit?: () => void;
-  closeEdit?: () => void;
-  confirmEdit?: () => void;
-  openNode?: (id: string) => void;
-  addNode?: (node: DecisionNode) => void;
-  setDecisionGraph?: (decisionGraph: DecisionGraphType) => void;
+export type GraphRef = DecisionGraphStoreType['actions'];
+
+const defaultNodeTypes = Object.entries(nodeSpecification).reduce(
+  (acc, [key, value]) => ({
+    ...acc,
+    [key]: React.memo(
+      (props: MinimalNodeProps) => value.renderNode({ specification: value, ...props }),
+      (prevProps, nextProps) => {
+        return (
+          prevProps.id === nextProps.id &&
+          prevProps.selected === nextProps.selected &&
+          prevProps.data === nextProps.data
+        );
+      },
+    ),
+  }),
+  {},
+);
+
+const edgeTypes = {
+  edge: React.memo(edgeFunction(null)),
 };
 
-export const Graph = forwardRef<GraphRef, GraphProps>(
-  ({ reactFlowProOptions, className, onDisableTabs, hideExportImport }, ref) => {
-    const reactFlowWrapper = useRef<any>(null);
-    const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
+export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, className }, ref) => {
+  const reactFlowWrapper = useRef<HTMLDivElement>(null);
+  const reactFlowInstance = useRef<ReactFlowInstance>(null);
 
-    const fileInput = useRef<HTMLInputElement>(null);
-    const [editGraph, setEditGraph] = useState(false);
+  const nodesState = useNodesState([]);
+  const edgesState = useEdgesState([]);
 
-    const [editNodes, setEditNodes, onEditNodesChange] = useNodesState([]);
-    const [editEdges, setEditEdges, onEditEdgesChange] = useEdgesState([]);
+  const graphActions = useDecisionGraphActions();
+  const { disabled, components } = useDecisionGraphState(({ disabled, components }) => ({ disabled, components }));
+  const graphReferences = useDecisionGraphReferences((s) => s);
+  const { onReactFlowInit } = useDecisionGraphListeners(({ onReactFlowInit }) => ({ onReactFlowInit }));
 
-    const inputNodes = editNodes?.filter?.((node) => node.type === 'inputNode');
+  graphReferences.nodesState.current = nodesState;
+  graphReferences.edgesState.current = edgesState;
+  graphReferences.graphClipboard.current = useGraphClipboard(reactFlowInstance, reactFlowWrapper);
 
-    const selected = editNodes?.filter?.((node) => node?.selected);
-    const selectedEdges = editEdges?.filter?.((edge) => edge?.selected);
+  const nodeTypes = useMemo<Record<string, React.FC>>(() => {
+    return components.reduce(
+      (acc, component) => ({
+        ...acc,
+        [component.type]: React.memo(
+          (props: MinimalNodeProps) => component.renderNode({ specification: component, ...props }),
+          (prevProps, nextProps) => {
+            return (
+              prevProps.id === nextProps.id &&
+              prevProps.selected === nextProps.selected &&
+              prevProps.data === nextProps.data
+            );
+          },
+        ),
+      }),
+      defaultNodeTypes,
+    );
+  }, [components]);
 
-    const { nodes, edges, setDecisionGraph, disabled, closeTab, openTab, onAddNode, onEditGraph, onChange } =
-      useDecisionGraphStore(
-        ({ decisionGraph, setDecisionGraph, disabled, closeTab, openTab, onChange, onAddNode, onEditGraph }) => ({
-          nodes: decisionGraph?.nodes ?? [],
-          edges: decisionGraph?.edges ?? [],
-          setDecisionGraph,
-          disabled,
-          closeTab,
-          openTab,
-          onChange,
-          onAddNode,
-          onEditGraph,
-        }),
-        equal,
-      );
+  const addNodeInner = async (type: string, position?: XYPosition) => {
+    if (!reactFlowWrapper.current || !reactFlowInstance.current) {
+      return;
+    }
 
-    const graphClipboard = useGraphClipboard(reactFlowInstance, reactFlowWrapper.current || undefined);
-
-    useEffect(() => {
-      onEditGraph?.(editGraph);
-      onDisableTabs?.(editGraph);
-    }, [editGraph]);
-
-    useEffect(() => {
-      return graphClipboard.register(editGraph ? selected : undefined);
-    }, [selected, graphClipboard.register, editGraph]);
-
-    const addNode = (type: string, position?: XYPosition) => {
-      if (!reactFlowWrapper.current || !reactFlowInstance) return;
-      if (!position) {
-        const rect = reactFlowWrapper?.current?.getBoundingClientRect() as DOMRect;
-        const rectCenter = {
-          x: rect.width / 2,
-          y: rect.height / 2,
-        };
-
-        position = reactFlowInstance?.project(rectCenter);
-      }
-
-      if (
-        type !== 'decisionTableNode' &&
-        type !== 'functionNode' &&
-        type !== 'expressionNode' &&
-        type !== 'switchNode' &&
-        type !== 'inputNode' &&
-        type !== 'outputNode'
-      ) {
-        return onAddNode?.(type, position);
-      }
-
-      const count = (nodes || []).filter((node) => node?.type === type)?.length;
-
-      const data: any = {};
-      if (type === 'decisionTableNode') {
-        const inputField = {
-          id: v4(),
-          name: 'Input',
-          type: 'expression',
-        };
-        const outputField = {
-          field: 'output',
-          id: v4(),
-          name: 'Output',
-          type: 'expression',
-        };
-        data.content = {
-          hitPolicy: 'first',
-          inputs: [inputField],
-          outputs: [outputField],
-          rules: [],
-        };
-      } else if (type === 'functionNode') {
-        data.content = defaultFunctionValue;
-      } else if (type === 'inputNode') {
-        data.name = 'Request';
-      } else if (type === 'outputNode') {
-        data.name = 'Response';
-      } else if (type === 'expressionNode') {
-        data.content = {
-          expressions: [],
-        };
-      } else if (type === 'switchNode') {
-        data.content = {
-          statements: [{ id: v4(), condition: '' }],
-        };
-      }
-
-      const newNode: Node = {
-        id: v4(),
-        type,
-        position,
-        data: {
-          name: `${type} ${count + 1}`,
-          ...data,
-        },
+    if (!position) {
+      const rect = reactFlowWrapper.current.getBoundingClientRect();
+      const rectCenter = {
+        x: rect.width / 2,
+        y: rect.height / 2,
       };
 
-      setEditNodes((nodes) => nodes.concat(newNode));
+      position = reactFlowInstance.current.project(rectCenter);
+    }
+
+    const allSpecifications = [...Object.values(nodeSpecification), ...components];
+    const specification = allSpecifications.find((s) => s.type === type);
+    if (!specification) {
+      message.error(`Unknown node type ${type}`);
+      return;
+    }
+
+    const partialNode = specification.generateNode();
+    let newNode: DecisionNode = {
+      ...partialNode,
+      id: v4(),
+      position,
+      type: specification.type,
     };
 
-    const updateNode = (node: Partial<Node>) => {
-      setEditNodes((nodes) => {
-        return (nodes || []).map((e) => {
-          if (e.id === node?.id) {
-            return {
-              ...(e || {}),
-              ...(node || {}),
-              type: e.type,
-              data: {
-                ...(e?.data || {}),
-                ...(node?.data || {}),
-              },
-            };
-          }
-          return e;
-        });
-      });
-    };
-
-    const onDrop = (event: React.DragEvent) => {
-      event.preventDefault();
-
-      if (!reactFlowWrapper.current || !reactFlowInstance) return;
-
-      const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
-      const type = event.dataTransfer.getData('application/reactflow');
-      let elementPosition: XYPosition;
-
+    if (specification.onNodeAdd) {
       try {
-        elementPosition = JSON.parse(event.dataTransfer.getData('relativePosition'));
-      } catch (e) {
+        newNode = await specification.onNodeAdd(newNode);
+      } catch {
         return;
       }
+    }
 
-      const position = reactFlowInstance.project({
-        x: event.clientX - reactFlowBounds.left,
-        y: event.clientY - reactFlowBounds.top,
-      }) as XYPosition;
+    graphActions.addNodes([newNode]);
+  };
 
-      position.x -= Math.round((elementPosition.x * 180) / 10) * 10;
-      position.y -= Math.round((elementPosition.y * 80) / 10) * 10;
+  const isValidConnection = (connection: Connection): boolean => {
+    // Disallow self-reference
+    if (connection.source === connection.target) {
+      return false;
+    }
 
-      addNode(type, position);
-    };
+    if (disabled) {
+      return false;
+    }
 
-    const onDragOver = (event: any) => {
-      event.preventDefault();
-      event.dataTransfer.dropEffect = 'move';
-    };
-
-    const onConnect = (params: any) => {
-      setEditEdges((els: Edge[]) => {
-        return addEdge(
-          {
-            ...params,
-            type: 'edge',
-            id: v4(),
-          },
-          els,
-        );
-      });
-    };
-
-    const edgeTypes = useMemo(
-      () => ({
-        edge: edgeFunction({
-          nodes,
-        }),
-      }),
-      [],
+    const [edges] = edgesState;
+    const hasDuplicate = edges.some(
+      (edge) =>
+        edge.source === connection.source &&
+        edge.target === connection.target &&
+        (edge.sourceHandle ?? null) === (connection.sourceHandle ?? null) &&
+        (edge.targetHandle ?? null) === (connection.targetHandle ?? null),
     );
 
-    const nodeTypes = useMemo(() => {
-      return {
-        decisionTableNode: GraphNode,
-        decisionNode: GraphNode,
-        functionNode: GraphNode,
-        expressionNode: GraphNode,
-        switchNode: GraphSwitchNode,
-        inputNode: GraphNode,
-        outputNode: GraphNode,
-      };
-    }, []);
+    return !hasDuplicate;
+  };
 
-    const editNodeTypes = useMemo(() => {
-      return {
-        decisionTableNode: GraphNodeEdit,
-        decisionNode: GraphNodeEdit,
-        functionNode: GraphNodeEdit,
-        expressionNode: GraphNodeEdit,
-        switchNode: GraphSwitchNodeEdit,
-        inputNode: GraphNodeEdit,
-        outputNode: GraphNodeEdit,
-      };
-    }, []);
+  const onDrop = (event: React.DragEvent) => {
+    event.preventDefault();
+    if (!reactFlowWrapper.current || !reactFlowInstance.current) {
+      return;
+    }
 
-    const confirmEdit = () => {
-      try {
-        const edges = mapToDecisionEdges(editEdges);
-        const nodes = mapToDecisionNodes(editNodes);
+    const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+    const type = event.dataTransfer.getData('application/reactflow');
+    let elementPosition: XYPosition;
 
-        if (nodes.filter((node) => node?.type === 'inputNode')?.length > 1) {
-          message.error('Maximum 1 input');
-          return;
-        }
+    try {
+      elementPosition = JSON.parse(event.dataTransfer.getData('relativePosition'));
+    } catch (e) {
+      return;
+    }
+    const position = reactFlowInstance.current.project({
+      x: event.clientX - reactFlowBounds.left,
+      y: event.clientY - reactFlowBounds.top,
+    }) as XYPosition;
 
-        const graph = new DirectedGraph();
-        edges.forEach((edge) => {
-          graph.mergeEdge(edge.sourceId, edge.targetId);
-        });
+    position.x -= Math.round((elementPosition.x * 226) / 10) * 10;
+    position.y -= Math.round((elementPosition.y * 60) / 10) * 10;
 
-        if (hasCycle(graph)) {
-          throw new Error('Graph is cyclic');
-        }
+    addNodeInner(type, position);
+  };
 
-        setDecisionGraph({
-          nodes,
-          edges,
-        });
-        onChange?.({
-          nodes,
-          edges,
-        });
-        setEditGraph(false);
-      } catch (e: any) {
-        message.error(e?.message);
-      }
+  const onDragOver = (event: any) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+  };
+
+  const onConnect = (params: any) => {
+    const edge = {
+      ...params,
+      type: 'edge',
+      id: v4(),
     };
 
-    const handleUploadInput = async (event: any) => {
-      const fileList = event?.target?.files as FileList;
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        try {
-          const parsed: any = JSON.parse(e?.target?.result as string);
-          if (parsed?.contentType !== DecisionContentType) throw new Error('Invalid content type');
+    if (disabled) return;
+    graphActions.addEdges([mapToDecisionEdge(edge)]);
+  };
 
-          const nodes: DecisionNode[] = Array.isArray(parsed?.nodes) ? parsed.nodes : [];
-          const nodeIds = nodes.map((node) => node.id);
+  useImperativeHandle(ref, () => graphActions);
 
-          const edges: DecisionEdge[] = (parsed.edges as DecisionEdge[]).filter(
-            (edge) => nodeIds.includes(edge?.targetId) && nodeIds.includes(edge?.sourceId),
-          );
-
-          setDecisionGraph({
-            edges,
-            nodes,
-          });
-          onChange?.({
-            edges,
-            nodes,
-          });
-        } catch (e: any) {
-          message.error(e.message);
+  return (
+    <div
+      className={clsx(['tab-content', className])}
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'v' && e.metaKey && !disabled) {
+          graphActions.pasteNodes();
         }
-      };
+      }}
+    >
+      <div className={'content-wrapper'}>
+        <div className={clsx(['react-flow'])} ref={reactFlowWrapper}>
+          <ReactFlow
+            elevateEdgesOnSelect={false}
+            elevateNodesOnSelect={true}
+            zoomOnDoubleClick={false}
+            nodes={nodesState[0]}
+            edges={edgesState[0]}
+            onInit={(instance) => {
+              (reactFlowInstance as MutableRefObject<ReactFlowInstance>).current = instance;
+              onReactFlowInit?.(instance);
+            }}
+            snapToGrid={true}
+            snapGrid={[5, 5]}
+            nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
+            onDrop={onDrop}
+            onDragOver={onDragOver}
+            onConnect={onConnect}
+            isValidConnection={isValidConnection}
+            proOptions={reactFlowProOptions}
+            nodesConnectable={!disabled}
+            nodesDraggable={!disabled}
+            edgesUpdatable={!disabled}
+            onNodesChange={graphActions.handleNodesChange}
+            onEdgesChange={graphActions.handleEdgesChange}
+            onNodesDelete={(e) => {
+              e.forEach((node) => {
+                graphActions.closeTab(node?.id);
+              });
+            }}
+            onKeyDown={(e) => {
+              const [nodes] = nodesState;
+              const [edges] = edgesState;
 
-      reader.readAsText(Array.from(fileList)?.[0], 'UTF-8');
-    };
-
-    const downloadJDM = async (name: string) => {
-      try {
-        // create file in browser
-        const fileName = `${name.replaceAll('.json', '')}.json`;
-        const json = JSON.stringify(
-          {
-            contentType: DecisionContentType,
-            nodes,
-            edges,
-          },
-          null,
-          2,
-        );
-        const blob = new Blob([json], { type: 'application/json' });
-        const href = URL.createObjectURL(blob);
-
-        // create "a" HTLM element with href to file
-        const link = window.document.createElement('a');
-        link.href = href;
-        link.download = fileName;
-        window.document.body.appendChild(link);
-        link.click();
-
-        // clean up "a" element & remove ObjectURL
-        window.document.body.removeChild(link);
-        URL.revokeObjectURL(href);
-      } catch (e) {
-        message.error(e.message);
-      }
-    };
-
-    useImperativeHandle(ref, () => ({
-      openEdit: () => {
-        if (disabled) return;
-        setEditNodes(mapToGraphNodes(nodes));
-        setEditEdges(mapToGraphEdges(edges));
-        setEditGraph(true);
-      },
-      closeEdit: () => {
-        setEditGraph(false);
-      },
-      confirmEdit: () => {
-        confirmEdit();
-      },
-      addNode: (node: DecisionNode) => {
-        if (editGraph) {
-          setEditNodes((nodes) => nodes.concat(mapToGraphNode(node)));
-        }
-      },
-      openNode: (id: string) => {
-        if (!editGraph) {
-          openTab(id);
-        }
-      },
-      setDecisionGraph,
-    }));
-
-    return (
-      <div className={clsx(['tab-content', className])}>
-        <input
-          hidden
-          accept='application/json'
-          type='file'
-          ref={fileInput}
-          onChange={handleUploadInput}
-          onClick={(event) => {
-            (event.target as any).value = null;
-          }}
-        />
-        <div className={'grl-dg__command-bar'}>
-          {!editGraph && (
-            <>
-              <Tooltip title='Edit graph mode allows you to add, connect and move nodes.'>
-                <Button
-                  type='default'
-                  size={'small'}
-                  disabled={disabled}
-                  onClick={() => {
-                    setEditNodes(mapToGraphNodes(nodes));
-                    setEditEdges(mapToGraphEdges(edges));
-                    setEditGraph(true);
-                  }}
-                  icon={<NodeIndexOutlined />}
-                >
-                  Edit graph
-                </Button>
-              </Tooltip>
-              {!hideExportImport && (
-                <Button
-                  type='default'
-                  size={'small'}
-                  onClick={() => {
-                    downloadJDM('graph');
-                  }}
-                  icon={<ExportOutlined />}
-                >
-                  Export JSON
-                </Button>
-              )}
-              {!hideExportImport && (
-                <Button
-                  type='default'
-                  size={'small'}
-                  disabled={disabled}
-                  onClick={() => {
-                    fileInput?.current?.click?.();
-                  }}
-                  icon={<ImportOutlined />}
-                >
-                  Import JSON
-                </Button>
-              )}
-            </>
-          )}
-          {editGraph && (
-            <Button
-              type='default'
-              size={'small'}
-              onClick={() => {
-                confirmEdit();
-              }}
-              icon={<CheckOutlined />}
-            >
-              Apply changes
-            </Button>
-          )}
-          {editGraph && (
-            <Button
-              type='default'
-              color='secondary'
-              size={'small'}
-              onClick={() => {
-                setEditGraph(false);
-              }}
-              icon={<CloseOutlined />}
-            >
-              Revert
-            </Button>
-          )}
-        </div>
-        <div className={'content-wrapper'}>
-          <div className={clsx(['react-flow'])} ref={reactFlowWrapper}>
-            <ReactFlow
-              nodesConnectable={editGraph}
-              nodesDraggable={editGraph}
-              elevateEdgesOnSelect={editGraph}
-              elevateNodesOnSelect={editGraph}
-              zoomOnDoubleClick={false}
-              nodes={editGraph ? editNodes : mapToGraphNodes(nodes || [])}
-              edges={editGraph ? editEdges : mapToGraphEdges(edges || [])}
-              onInit={(instance) => setReactFlowInstance(instance)}
-              snapToGrid={true}
-              snapGrid={[10, 10]}
-              nodeTypes={editGraph ? editNodeTypes : nodeTypes}
-              edgeTypes={edgeTypes}
-              onDrop={(e) => (editGraph ? onDrop(e) : undefined)}
-              onDragOver={editGraph ? onDragOver : undefined}
-              onConnect={onConnect}
-              proOptions={reactFlowProOptions}
-              onNodesChange={(e) => {
-                editGraph && onEditNodesChange(e);
-              }}
-              onEdgesChange={(e) => {
-                editGraph && onEditEdgesChange(e);
-              }}
-              onNodesDelete={(e) => {
-                if (editGraph) {
-                  e.forEach((node) => {
-                    closeTab?.(node?.id);
-                  });
+              if (e.key === 'c' && e.metaKey) {
+                const selectedNodeIds = nodesState[0].filter((n) => n.selected).map(({ id }) => id);
+                if (selectedNodeIds.length === 0) {
+                  return;
                 }
-              }}
-              onEdgesDelete={() => {
-                //
-              }}
-              onEdgeClick={() => {
-                //
-              }}
-            >
-              <Controls showInteractive={false} />
-              <Background color='var(--grl-color-border)' gap={20} />
-            </ReactFlow>
-          </div>
-          {editGraph && (
-            <div className={'grl-dg__aside'}>
-              {!selected?.length && !selectedEdges?.length && (
-                <GraphComponents
-                  inputDisabled={inputNodes.length > 0}
-                  onPaste={async () => {
-                    if (editGraph) {
-                      try {
-                        await graphClipboard.pasteNodes();
-                      } catch (e) {
-                        message.error(e?.message);
-                      }
-                    }
-                  }}
-                />
-              )}
-              {selected?.length === 1 && selectedEdges?.length === 0 && (
-                <NodeForm
-                  node={selected?.[0]}
-                  onChange={updateNode}
-                  onClose={() => {
-                    setEditNodes((nodes) => nodes.map((i) => ({ ...i, selected: false })));
-                  }}
-                  onCopy={async () => {
-                    await graphClipboard.copyNodes(selected);
-                    message.success('Copied to clipboard!');
-                  }}
-                  removeNode={(node) => {
-                    setEditEdges((edges) =>
-                      edges.filter((edge) => edge?.target !== node?.id && edge?.source !== node?.id),
-                    );
-                    setEditNodes((nodes) => nodes.filter((n) => n?.id !== node?.id));
-                  }}
-                />
-              )}
-              {(selected?.length > 1 || selectedEdges?.length > 0) && (
-                <MultiNodeForm
-                  edges={selectedEdges}
-                  nodes={selected}
-                  onCopy={async (nodes) => {
-                    await graphClipboard.copyNodes(nodes);
-                    message.success('Copied to clipboard!');
-                  }}
-                  removeNodes={(nodes) => {
-                    const nodeIds = nodes.map((i) => i.id);
-                    setEditEdges((edges) =>
-                      edges.filter((edge) => !nodeIds.includes(edge?.target) && !nodeIds.includes(edge?.source)),
-                    );
-                    setEditNodes((nodes) => nodes.filter((n) => !nodeIds.includes(n?.id)));
-                  }}
-                  removeEdges={(edges) => {
-                    const edgeIds = edges.map((i) => i.id);
-                    setEditEdges((edges) => edges.filter((edge) => !edgeIds.includes(edge?.id)));
-                  }}
-                  onClose={() => {
-                    setEditNodes((nodes) => nodes.map((i) => ({ ...i, selected: false })));
-                    setEditEdges((edges) => edges.map((i) => ({ ...i, selected: false })));
-                  }}
-                />
-              )}
-            </div>
-          )}
+
+                graphActions.copyNodes(selectedNodeIds);
+                e.preventDefault();
+              } else if (e.key === 'd' && e.metaKey) {
+                if (!disabled) {
+                  const selectedNodeIds = nodes.filter((n) => n.selected).map(({ id }) => id);
+                  if (selectedNodeIds.length === 0) {
+                    return;
+                  }
+
+                  graphActions.duplicateNodes(selectedNodeIds);
+                }
+                e.preventDefault();
+              } else if (e.key === 'Backspace') {
+                if (!disabled) {
+                  const selectedNodes = nodes.filter((n) => n.selected);
+                  const selectedEdges = edges.filter((e) => e.selected);
+
+                  if (selectedNodes.length > 0) {
+                    const length = selectedNodes.length;
+                    const text = length > 1 ? 'nodes' : 'node';
+                    Modal.confirm({
+                      icon: null,
+                      title: `Delete ${text}`,
+                      content: (
+                        <Typography.Text>
+                          Are you sure you want to delete {length > 1 ? `${length} ${text}` : text}?
+                        </Typography.Text>
+                      ),
+                      okButtonProps: { danger: true },
+                      onOk: () => {
+                        if (selectedEdges.length > 0) {
+                          graphActions.removeEdges(selectedEdges.map((e) => e.id));
+                        }
+                        graphActions.removeNodes(selectedNodes.map((n) => n.id));
+                      },
+                    });
+                  } else if (selectedEdges.length > 0) {
+                    graphActions.removeEdges(selectedEdges.map((e) => e.id));
+                  }
+                }
+                e.stopPropagation();
+                e.preventDefault();
+              }
+            }}
+            onEdgeMouseEnter={(_, edge) => graphActions.setHoveredEdgeId(edge.id)}
+            onEdgeMouseLeave={() => graphActions.setHoveredEdgeId(null)}
+          >
+            <Controls showInteractive={false} />
+            <Background color='var(--grl-color-border)' gap={20} />
+          </ReactFlow>
         </div>
       </div>
-    );
-  },
-);
+    </div>
+  );
+});

@@ -1,12 +1,13 @@
 import { ApartmentOutlined } from '@ant-design/icons';
 import type { Meta, StoryObj } from '@storybook/react';
-import { Form, Input } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
-import { v4 } from 'uuid';
+import { Select } from 'antd';
+import React, { useRef, useState } from 'react';
 
 import { DecisionGraph } from './dg';
 import { defaultGraph } from './dg.stories-values';
 import type { GraphRef } from './graph/graph';
+import { GraphNode } from './nodes/graph-node';
+import type { NodeSpecification } from './nodes/specification-types';
 
 const meta: Meta<typeof DecisionGraph> = {
   /* 👇 The title prop is optional.
@@ -28,11 +29,6 @@ type Story = StoryObj<typeof DecisionGraph>;
 export const Controlled: Story = {
   render: (args) => {
     const [value, setValue] = useState<any>(defaultGraph);
-    useEffect(() => {
-      if (args.value) {
-        setValue(args.value);
-      }
-    }, [args.value]);
     return (
       <div
         style={{
@@ -43,9 +39,7 @@ export const Controlled: Story = {
           {...args}
           value={value}
           onChange={(val) => {
-            console.log(val);
-            setValue(val);
-            args?.onChange?.(val);
+            setValue?.(val);
           }}
         />
       </div>
@@ -65,7 +59,6 @@ export const Uncontrolled: Story = {
           {...args}
           defaultValue={defaultGraph}
           onChange={(val) => {
-            console.log(val);
             args?.onChange?.(val);
           }}
         />
@@ -74,59 +67,33 @@ export const Uncontrolled: Story = {
   },
 };
 
+const components: NodeSpecification[] = [
+  {
+    type: 'decisionNode',
+    displayName: 'Decision',
+    shortDescription: 'Execute decisions',
+    icon: <ApartmentOutlined />,
+    generateNode: () => ({ name: 'myDecision' }),
+    renderNode: ({ specification, id, selected, data }) => (
+      <GraphNode id={id} specification={specification} name={data.name} isSelected={selected}>
+        <Select placeholder='Select decision from list' />
+      </GraphNode>
+    ),
+  },
+];
+
 export const Extended: Story = {
   render: (args) => {
     const ref = useRef<GraphRef>(null);
     const [value, setValue] = useState<any>();
+
     return (
       <div
         style={{
           height: '100%',
         }}
       >
-        <DecisionGraph
-          {...args}
-          ref={ref}
-          value={value}
-          onChange={(val) => setValue(val)}
-          components={[
-            {
-              name: 'Decision',
-              type: 'decisionNode',
-              onOpen: async (node) => {
-                console.log(node);
-              },
-              renderForm: ({ value, onChange }) => (
-                <Form.Item label={'Key'}>
-                  <Input
-                    placeholder={'Key'}
-                    value={value?.key || ''}
-                    onChange={(e) => {
-                      onChange({
-                        key: e.target.value,
-                      });
-                    }}
-                  />
-                </Form.Item>
-              ),
-              renderIcon: () => <ApartmentOutlined />,
-            },
-          ]}
-          onTabChange={(e) => {
-            console.log(e);
-          }}
-          onAddNode={(type, position) => {
-            ref!.current!.addNode!({
-              id: v4(),
-              type,
-              position: position as any,
-              name: 'Decision',
-              content: {
-                key: 'test',
-              },
-            });
-          }}
-        />
+        <DecisionGraph {...args} ref={ref} value={value} onChange={(val) => setValue(val)} components={components} />
       </div>
     );
   },

@@ -1,9 +1,10 @@
 import type { DragDropManager } from 'dnd-core';
-import equal from 'fast-deep-equal/es6/react';
 import React from 'react';
+import { P, match } from 'ts-pattern';
 
 import { DecisionTable } from '../../decision-table';
-import { useDecisionGraphStore } from '../context/dg-store.context';
+import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
+import type { SimulationTrace, SimulationTraceDataTable } from '../types/simulation.types';
 
 export type TabDecisionTableProps = {
   id: string;
@@ -11,15 +12,16 @@ export type TabDecisionTableProps = {
 };
 
 export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager }) => {
-  const { node, nodeTrace, updateNode, disabled, configurable } = useDecisionGraphStore(
-    ({ decisionGraph, simulate, updateNode, disabled, configurable }) => ({
-      node: (decisionGraph?.nodes ?? []).find((node) => node.id === id),
-      nodeTrace: simulate?.result?.trace?.[id],
-      updateNode,
+  const graphActions = useDecisionGraphActions();
+  const { nodeTrace, disabled, configurable, content } = useDecisionGraphState(
+    ({ simulate, disabled, configurable, decisionGraph }) => ({
+      nodeTrace: match(simulate)
+        .with({ result: P._ }, ({ result }) => result?.trace?.[id] as SimulationTrace<SimulationTraceDataTable>)
+        .otherwise(() => null),
       disabled,
       configurable,
+      content: (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content,
     }),
-    equal,
   );
 
   const activeRules: string[] =
@@ -29,13 +31,16 @@ export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager 
         : [nodeTrace?.traceData?.rule?._id]
       : [];
 
-  if (!node) return null;
-
   return (
     <DecisionTable
       tableHeight={'100%'}
-      value={node?.content as any}
-      onChange={(val) => updateNode(id, val)}
+      value={content as any}
+      onChange={(val) => {
+        graphActions.updateNode(id, (draft) => {
+          draft.content = val;
+          return draft;
+        });
+      }}
       manager={manager}
       disabled={disabled}
       configurable={configurable}

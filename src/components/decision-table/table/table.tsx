@@ -2,13 +2,12 @@ import { PlusOutlined } from '@ant-design/icons';
 import type { ColumnDef, Table as ReactTable } from '@tanstack/react-table';
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { Button, Typography } from 'antd';
+import { Button, Typography, theme } from 'antd';
 import clsx from 'clsx';
 import equal from 'fast-deep-equal/es6/react';
-import React, { forwardRef, useImperativeHandle, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 
-import type { DecisionTableType } from '../context/dt-store.context';
-import { useDecisionTableStore } from '../context/dt-store.context';
+import { useDecisionTableActions, useDecisionTableListeners, useDecisionTableState } from '../context/dt-store.context';
 import { TableContextMenu } from './table-context-menu';
 import { TableDefaultCell } from './table-default-cell';
 import {
@@ -24,28 +23,24 @@ export type TableProps = {
   maxHeight: string | number;
 };
 
-export const Table = forwardRef<
-  {
-    setDecisionTable?: (decisionTable: DecisionTableType) => void;
-  },
-  TableProps
->(({ maxHeight }, ref) => {
-  const { configurable, disabled, cellRenderer, minColWidth, colWidth, addRowBelow, inputs, outputs } =
-    useDecisionTableStore(
-      ({ configurable, disabled, cellRenderer, minColWidth, colWidth, addRowBelow, decisionTable }) => ({
-        configurable,
-        disabled,
-        cellRenderer,
-        minColWidth,
-        colWidth,
-        addRowBelow,
-        inputs: decisionTable.inputs,
-        outputs: decisionTable.outputs,
-      }),
-      equal,
-    );
+export const Table: React.FC<TableProps> = ({ maxHeight }) => {
+  const { token } = theme.useToken();
 
-  const { rules } = useDecisionTableStore(
+  const tableActions = useDecisionTableActions();
+  const { cellRenderer } = useDecisionTableListeners(({ cellRenderer }) => ({ cellRenderer }));
+
+  const { configurable, disabled, inputs, outputs, colWidth, minColWidth } = useDecisionTableState(
+    ({ configurable, disabled, minColWidth, colWidth, decisionTable }) => ({
+      configurable,
+      disabled,
+      minColWidth,
+      colWidth,
+      inputs: decisionTable.inputs,
+      outputs: decisionTable.outputs,
+    }),
+  );
+
+  const { rules } = useDecisionTableState(
     ({ decisionTable }) => ({
       rules: decisionTable.rules,
     }),
@@ -55,12 +50,6 @@ export const Table = forwardRef<
         curr.rules.map((i: any) => i?._id),
       ),
   );
-
-  const setDecisionTable = useDecisionTableStore((store) => store.setDecisionTable, equal);
-
-  useImperativeHandle(ref, () => ({
-    setDecisionTable,
-  }));
 
   const columns = React.useMemo<ColumnDef<any>[]>(
     () => [
@@ -103,7 +92,7 @@ export const Table = forwardRef<
       {
         id: '_description',
         accessorKey: '_description',
-        header: () => <Typography.Text>Description</Typography.Text>,
+        header: () => <Typography.Text className='grl-dt-text-primary'>Description</Typography.Text>,
         minSize: minColWidth,
         size: colWidth,
       },
@@ -129,8 +118,33 @@ export const Table = forwardRef<
 
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    if (!tableContainerRef.current) {
+      return;
+    }
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.target instanceof HTMLDivElement) {
+          entry.target.style.setProperty('--dt-container-width', `${entry.contentRect.width}px`);
+        }
+      }
+    });
+
+    resizeObserver.observe(tableContainerRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
+
   return (
-    <div ref={tableContainerRef} className='grl-dt__container' style={{ maxHeight, overflowY: 'auto' }}>
+    <div
+      ref={tableContainerRef}
+      className='grl-dt__container'
+      style={{ maxHeight, overflowY: 'auto' }}
+      data-theme={token.mode}
+    >
       <StyledTable width={table.getCenterTotalSize()}>
         <thead>
           {table
@@ -154,16 +168,20 @@ export const Table = forwardRef<
         <tfoot>
           <tr>
             <td colSpan={inputs.length + outputs.length + 2}>
-              <Button type='link' disabled={disabled} icon={<PlusOutlined />} onClick={() => addRowBelow()}>
-                Add row
-              </Button>
+              <Button
+                className='grl-dt__add-row'
+                type='text'
+                disabled={disabled}
+                icon={<PlusOutlined />}
+                onClick={() => tableActions.addRowBelow()}
+              />
             </td>
           </tr>
         </tfoot>
       </StyledTable>
     </div>
   );
-});
+};
 
 type TableBodyProps = {
   tableContainerRef: React.RefObject<HTMLDivElement>;
@@ -172,17 +190,11 @@ type TableBodyProps = {
 
 const TableBody = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(
   ({ table, tableContainerRef, ...props }, ref) => {
-    const { disabled, cursor, addRowAbove, addRowBelow, removeRow, swapRows } = useDecisionTableStore(
-      ({ disabled, cursor, addRowAbove, addRowBelow, removeRow, swapRows }) => ({
-        disabled,
-        cursor,
-        addRowAbove,
-        addRowBelow,
-        removeRow,
-        swapRows,
-      }),
-      equal,
-    );
+    const tableActions = useDecisionTableActions();
+    const { disabled, cursor } = useDecisionTableState(({ disabled, cursor }) => ({
+      disabled,
+      cursor,
+    }));
 
     const { rows } = table.getRowModel();
     const virtualizer = useVirtualizer({
@@ -209,13 +221,13 @@ const TableBody = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(
             }
 
             if (e.code === 'ArrowUp' && (e.metaKey || e.altKey)) {
-              if (cursor) addRowAbove(cursor.y);
+              if (cursor) tableActions.addRowAbove(cursor.y);
             }
             if (e.code === 'ArrowDown' && (e.metaKey || e.altKey)) {
-              if (cursor) addRowBelow(cursor.y);
+              if (cursor) tableActions.addRowBelow(cursor.y);
             }
             if (e.code === 'Backspace' && (e.metaKey || e.altKey)) {
-              if (cursor) removeRow(cursor.y);
+              if (cursor) tableActions.removeRow(cursor.y);
             }
           }}
         >
@@ -227,7 +239,15 @@ const TableBody = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(
           {virtualItems.map((item) => {
             const row = rows[item.index];
 
-            return <TableRow key={row.id} index={item.index} row={row} reorderRow={swapRows} disabled={disabled} />;
+            return (
+              <TableRow
+                key={row.id}
+                index={item.index}
+                row={row}
+                reorderRow={tableActions.swapRows}
+                disabled={disabled}
+              />
+            );
           })}
           {paddingBottom > 0 && (
             <tr>

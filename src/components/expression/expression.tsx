@@ -9,13 +9,11 @@ import { ExpressionController } from './expression-controller';
 import { ExpressionList } from './expression-list';
 import './expression.scss';
 
-export type ExpressionRef = null;
-
 export type ExpressionProps = {
   manager?: DragDropManager;
 } & ExpressionControllerProps;
 
-export const Expression = React.forwardRef<ExpressionRef, ExpressionProps>(({ manager, ...props }) => {
+export const Expression: React.FC<ExpressionProps> = ({ manager, ...props }) => {
   const [_, setMounted] = useState(false);
   const container = useRef<HTMLDivElement>(null);
 
@@ -50,4 +48,4 @@ export const Expression = React.forwardRef<ExpressionRef, ExpressionProps>(({ ma
       )}
     </div>
   );
-});
+};

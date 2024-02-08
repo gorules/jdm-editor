@@ -1,8 +1,12 @@
 import React from 'react';
 
 import { useDecisionTableDialog } from '../context/dt-dialog.context';
-import type { ColumnType, TableSchemaItem } from '../context/dt-store.context';
-import { useDecisionTableStore } from '../context/dt-store.context';
+import {
+  type ColumnType,
+  type TableSchemaItem,
+  useDecisionTableActions,
+  useDecisionTableState,
+} from '../context/dt-store.context';
 import { FieldAdd } from './field-add-dialog';
 import { FieldUpdate } from './field-update-dialog';
 import { FieldsReorder } from './fields-reorder-dialog';
@@ -11,12 +15,14 @@ export const DecisionTableDialogs: React.FC = () => {
   const { dialog, setDialog, isDialogActive, getContainer } = useDecisionTableDialog();
 
   const id = 'test';
-  const inputsSchema = useDecisionTableStore((store: any) => store?.inputsSchema);
-  const outputsSchema = useDecisionTableStore((store: any) => store?.outputsSchema);
-  const addColumn = useDecisionTableStore((store: any) => store.addColumn);
-  const updateColumn = useDecisionTableStore((store: any) => store.updateColumn);
-  const reorderColumns = useDecisionTableStore((store: any) => store.reorderColumns);
-  const decisionTable = useDecisionTableStore((store: any) => store.decisionTable);
+  const tableActions = useDecisionTableActions();
+  const { decisionTable, inputsSchema, outputsSchema } = useDecisionTableState(
+    ({ decisionTable, inputsSchema, outputsSchema }) => ({
+      decisionTable,
+      inputsSchema,
+      outputsSchema,
+    }),
+  );
 
   return (
     <>
@@ -28,7 +34,7 @@ export const DecisionTableDialogs: React.FC = () => {
         onDismiss={() => setDialog(undefined)}
         onSuccess={(data: TableSchemaItem) => {
           if (!dialog) return;
-          addColumn(dialog.columnType, data);
+          tableActions.addColumn(dialog.columnType, data);
           setDialog(undefined);
         }}
         getContainer={getContainer}
@@ -42,7 +48,7 @@ export const DecisionTableDialogs: React.FC = () => {
         onDismiss={() => setDialog(undefined)}
         onSuccess={(data) => {
           if (!dialog) return;
-          updateColumn(dialog.columnType, data.id, data);
+          tableActions.updateColumn(dialog.columnType, data.id, data);
           setDialog(undefined);
         }}
         getContainer={getContainer}
@@ -53,7 +59,7 @@ export const DecisionTableDialogs: React.FC = () => {
         onDismiss={() => setDialog(undefined)}
         onSuccess={(data) => {
           if (!dialog) return;
-          reorderColumns(dialog.columnType, data);
+          tableActions.reorderColumns(dialog.columnType, data);
           setDialog(undefined);
         }}
         getContainer={getContainer}

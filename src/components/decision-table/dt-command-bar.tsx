@@ -6,8 +6,14 @@ import { v4 } from 'uuid';
 
 import { saveFile } from '../../helpers/file-helpers';
 import { Stack } from '../stack';
-import type { TableExportOptions, TableSchemaItem } from './context/dt-store.context';
-import { parseDecisionTable, useDecisionTableRaw, useDecisionTableStore } from './context/dt-store.context';
+import {
+  type TableExportOptions,
+  type TableSchemaItem,
+  parseDecisionTable,
+  useDecisionTableActions,
+  useDecisionTableRaw,
+  useDecisionTableState,
+} from './context/dt-store.context';
 
 const parserOptions = {
   delimiter: ';',
@@ -16,17 +22,17 @@ const parserOptions = {
 const parserPipe = '|';
 
 export const DecisionTableCommandBar: React.FC = () => {
-  const { disableHitPolicy, updateHitPolicy, disabled, configurable } = useDecisionTableStore((store) => ({
-    disableHitPolicy: store.disableHitPolicy,
-    updateHitPolicy: store.updateHitPolicy,
-    disabled: store.disabled,
-    configurable: store.configurable,
-  }));
+  const tableActions = useDecisionTableActions();
+  const { disableHitPolicy, disabled, configurable, decisionTable } = useDecisionTableState(
+    ({ disableHitPolicy, disabled, configurable, decisionTable }) => ({
+      disableHitPolicy,
+      disabled,
+      configurable,
+      decisionTable,
+    }),
+  );
 
-  const store = useDecisionTableRaw();
-
-  const decisionTable = useDecisionTableStore((store) => store.decisionTable);
-
+  const { listenerStore } = useDecisionTableRaw();
   const fileInput = useRef<HTMLInputElement>(null);
 
   const exportCsv = async (options: TableExportOptions) => {
@@ -143,8 +149,9 @@ export const DecisionTableCommandBar: React.FC = () => {
       rules,
       hitPolicy: 'first',
     });
-    store.getState().setDecisionTable?.(newTable);
-    store.getState().onChange?.(newTable);
+
+    tableActions.setDecisionTable(newTable);
+    listenerStore.getState().onChange?.(newTable);
   };
 
   const handleUploadInput = async (event: any) => {
@@ -162,7 +169,7 @@ export const DecisionTableCommandBar: React.FC = () => {
       <Stack horizontal horizontalAlign={'space-between'} verticalAlign={'center'} className={'grl-dt__command-bar'}>
         <Stack gap={8} horizontal className='full-width'>
           <Button
-            type='default'
+            type='text'
             size={'small'}
             color='secondary'
             icon={<ExportOutlined />}
@@ -171,7 +178,7 @@ export const DecisionTableCommandBar: React.FC = () => {
             Export CSV
           </Button>
           <Button
-            type='default'
+            type='text'
             size={'small'}
             color='secondary'
             disabled={disabled}
@@ -186,7 +193,7 @@ export const DecisionTableCommandBar: React.FC = () => {
           size={'small'}
           disabled={disabled || !configurable || disableHitPolicy}
           value={decisionTable.hitPolicy}
-          onSelect={updateHitPolicy}
+          onSelect={tableActions.updateHitPolicy}
           options={[
             {
               key: 'first',

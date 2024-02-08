@@ -1,9 +1,8 @@
 import type { DragDropManager } from 'dnd-core';
-import equal from 'fast-deep-equal/es6/react';
 import React from 'react';
 
 import { Expression } from '../../expression/expression';
-import { useDecisionGraphStore } from '../context/dg-store.context';
+import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
 
 export type TabExpressionProps = {
   id: string;
@@ -11,27 +10,23 @@ export type TabExpressionProps = {
 };
 
 export const TabExpression: React.FC<TabExpressionProps> = ({ id, manager }) => {
-  const { node, updateNode, disabled, configurable } = useDecisionGraphStore(
-    ({ decisionGraph, updateNode, disabled, configurable }) => ({
-      node: (decisionGraph?.nodes ?? []).find((node) => node.id === id),
-      updateNode,
-      disabled,
-      configurable,
-    }),
-    equal,
-  );
-
-  if (!node) return null;
+  const graphActions = useDecisionGraphActions();
+  const { disabled, configurable, content } = useDecisionGraphState(({ disabled, configurable, decisionGraph }) => ({
+    disabled,
+    configurable,
+    content: (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content,
+  }));
 
   return (
     <div style={{ maxWidth: 900, height: '100%', overflowY: 'auto', boxSizing: 'border-box', paddingBottom: '1.5rem' }}>
       <Expression
-        value={node?.content?.expressions}
-        onChange={(val) =>
-          updateNode(id, {
-            expressions: val,
-          })
-        }
+        value={content?.expressions}
+        onChange={(val) => {
+          graphActions.updateNode(id, (draft) => {
+            draft.content.expressions = val;
+            return draft;
+          });
+        }}
         disabled={disabled}
         configurable={configurable}
         manager={manager}
