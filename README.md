@@ -31,7 +31,7 @@ import { DecisionGraph, JdmConfigProvider } from '@gorules/jdm-editor';
 
 ## Decision Graph
 
-<img width="945" alt="Decision Table Editor" src="https://gorules.io/images/decision-graph.png">
+<img width="945" alt="Decision Graph" src="https://gorules.io/images/decision-graph.png">
 
 ```typescript
 export type DecisionGraphProps = {
@@ -54,7 +54,7 @@ export type DecisionGraphProps = {
 
 ## Decision Table
 
-<img width="945" alt="Decision Table Editor" src="https://gorules.io/images/decision-table.png">
+<img width="945" alt="Decision Table" src="https://gorules.io/images/decision-table.png">
 
 ### API
 
