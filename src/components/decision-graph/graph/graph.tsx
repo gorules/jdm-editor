@@ -132,6 +132,10 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
       return false;
     }
 
+    if (disabled) {
+      return false;
+    }
+
     const [edges] = edgesState;
     const hasDuplicate = edges.some(
       (edge) =>
@@ -182,6 +186,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
       id: v4(),
     };
 
+    if (disabled) return;
     graphActions.addEdges([mapToDecisionEdge(edge)]);
   };
 
@@ -192,7 +197,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
       className={clsx(['tab-content', className])}
       tabIndex={0}
       onKeyDown={(e) => {
-        if (e.key === 'v' && e.metaKey) {
+        if (e.key === 'v' && e.metaKey && !disabled) {
           graphActions.pasteNodes();
         }
       }}
@@ -241,43 +246,45 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
                 graphActions.copyNodes(selectedNodeIds);
                 e.preventDefault();
               } else if (e.key === 'd' && e.metaKey) {
-                const selectedNodeIds = nodes.filter((n) => n.selected).map(({ id }) => id);
-                if (selectedNodeIds.length === 0) {
-                  return;
-                }
+                if (!disabled) {
+                  const selectedNodeIds = nodes.filter((n) => n.selected).map(({ id }) => id);
+                  if (selectedNodeIds.length === 0) {
+                    return;
+                  }
 
-                graphActions.duplicateNodes(selectedNodeIds);
+                  graphActions.duplicateNodes(selectedNodeIds);
+                }
                 e.preventDefault();
               } else if (e.key === 'Backspace') {
-                const selectedNodes = nodes.filter((n) => n.selected);
-                const selectedEdges = edges.filter((e) => e.selected);
+                if (!disabled) {
+                  const selectedNodes = nodes.filter((n) => n.selected);
+                  const selectedEdges = edges.filter((e) => e.selected);
 
-                if (selectedNodes.length > 0) {
-                  const length = selectedNodes.length;
-                  const text = length > 1 ? 'nodes' : 'node';
-                  Modal.confirm({
-                    icon: null,
-                    title: `Delete ${text}`,
-                    content: (
-                      <Typography.Text>
-                        Are you sure you want to delete {length > 1 ? `${length} ${text}` : text}?
-                      </Typography.Text>
-                    ),
-                    okButtonProps: { danger: true },
-                    onOk: () => {
-                      if (selectedEdges.length > 0) {
-                        graphActions.removeEdges(selectedEdges.map((e) => e.id));
-                      }
-                      graphActions.removeNodes(selectedNodes.map((n) => n.id));
-                    },
-                  });
-                  e.stopPropagation();
-                  e.preventDefault();
-                } else if (selectedEdges.length > 0) {
-                  graphActions.removeEdges(selectedEdges.map((e) => e.id));
-                  e.stopPropagation();
-                  e.preventDefault();
+                  if (selectedNodes.length > 0) {
+                    const length = selectedNodes.length;
+                    const text = length > 1 ? 'nodes' : 'node';
+                    Modal.confirm({
+                      icon: null,
+                      title: `Delete ${text}`,
+                      content: (
+                        <Typography.Text>
+                          Are you sure you want to delete {length > 1 ? `${length} ${text}` : text}?
+                        </Typography.Text>
+                      ),
+                      okButtonProps: { danger: true },
+                      onOk: () => {
+                        if (selectedEdges.length > 0) {
+                          graphActions.removeEdges(selectedEdges.map((e) => e.id));
+                        }
+                        graphActions.removeNodes(selectedNodes.map((n) => n.id));
+                      },
+                    });
+                  } else if (selectedEdges.length > 0) {
+                    graphActions.removeEdges(selectedEdges.map((e) => e.id));
+                  }
                 }
+                e.stopPropagation();
+                e.preventDefault();
               }
             }}
             onEdgeMouseEnter={(_, edge) => graphActions.setHoveredEdgeId(edge.id)}
