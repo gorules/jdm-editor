@@ -191,8 +191,6 @@ export const DecisionTableCommandBar: React.FC = () => {
         defaultValue: column?.defaultValue,
       })) as TableSchemaItem[];
 
-    
-
     const rules = spreadSheetData.map((data: any) => {
       const dataPoint: Record<string, string> = {
         _id: v4(),
