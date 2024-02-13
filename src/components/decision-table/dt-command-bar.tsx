@@ -1,6 +1,5 @@
 import { ExportOutlined, ImportOutlined } from '@ant-design/icons';
 import { Button, Select } from 'antd';
-import Papa from 'papaparse';
 import React, { useRef } from 'react';
 import { v4 } from 'uuid';
 
@@ -14,12 +13,6 @@ import {
   useDecisionTableRaw,
   useDecisionTableState,
 } from './context/dt-store.context';
-
-const parserOptions = {
-  delimiter: ';',
-};
-
-const parserPipe = '|';
 
 export const DecisionTableCommandBar: React.FC = () => {
   const tableActions = useDecisionTableActions();
@@ -35,16 +28,19 @@ export const DecisionTableCommandBar: React.FC = () => {
   const { listenerStore } = useDecisionTableRaw();
   const fileInput = useRef<HTMLInputElement>(null);
 
-  const exportCsv = async (options: TableExportOptions) => {
+  const exportExcel = async (options: TableExportOptions) => {
+    const ExcelJS = await import('exceljs');
     const { name } = options;
     const schemaMeta = [
-      ...decisionTable.inputs.map((input: any) =>
-        [input.name, input.field, 'INPUT', input.id, input.defaultValue].join(` ${parserPipe} `),
-      ),
-      ...decisionTable.outputs.map((output: any) =>
-        [output.name, output.field, 'OUTPUT', output.id, output.defaultValue].join(` ${parserPipe} `),
-      ),
-      'DESCRIPTION',
+      ...decisionTable.inputs.map((input: any) => ({
+        title: input.name,
+        meta: { id: input.id, name: input.field, type: 'input' },
+      })),
+      ...decisionTable.outputs.map((output: any) => ({
+        title: output.name,
+        meta: { id: output.id, name: output.field, type: 'output' },
+      })),
+      { title: 'DESCRIPTION', meta: null },
     ];
 
     const schemaItems = [...decisionTable.inputs, ...decisionTable.outputs];
@@ -59,61 +55,128 @@ export const DecisionTableCommandBar: React.FC = () => {
       return newDataPoint;
     });
 
-    const csv = Papa.unparse(
-      {
-        fields: schemaMeta,
-        data: formatted,
-      },
-      {
-        ...parserOptions,
-        header: true,
-      },
-    );
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('decision table');
 
-    const blob = new Blob([csv], { type: 'text/csv' });
-    saveFile(`${name}.csv`, blob);
+    const inputCellsLength = schemaMeta.filter((data) => data.meta?.type.toLowerCase() === 'input').length;
+    const outputCellsLength = schemaMeta.filter((data) => data.meta?.type.toLowerCase() === 'output').length;
+
+    worksheet.addRow(['Inputs', 'Outputs']);
+
+    // row, start column, end row, end column
+    worksheet.mergeCells(1, 1, 1, inputCellsLength);
+    const inputCell = worksheet.getCell(1, 1);
+    inputCell.value = 'Inputs';
+    inputCell.alignment = { horizontal: 'center', vertical: 'middle' };
+    inputCell.font = { bold: true, color: { argb: 'FFFFFF' } };
+    inputCell.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: '5e6476' },
+    };
+
+    worksheet.mergeCells(1, inputCellsLength + 1, 1, inputCellsLength + outputCellsLength);
+    const outputCell = worksheet.getCell(1, inputCellsLength + 1);
+    outputCell.value = 'Outputs';
+    outputCell.alignment = { horizontal: 'center', vertical: 'middle' };
+    outputCell.font = { bold: true, color: { argb: 'FFFFFF' } };
+    outputCell.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: '63546c' },
+    };
+
+    const descriptionCell = worksheet.getCell(1, inputCellsLength + outputCellsLength + 1);
+    descriptionCell.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: '63546c' },
+    };
+
+    const headerRow = worksheet.addRow(schemaMeta.map((data) => data.title));
+    headerRow.eachCell((cell) => {
+      const note = schemaMeta.find((data) => data.title === cell.value)?.meta;
+      const cellColor = note?.type.toLowerCase() === 'input' ? '5e6476' : '63546c';
+
+      cell.font = { bold: true, color: { argb: 'FFFFFF' } };
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: cellColor } };
+
+      if (note) {
+        cell.note = {
+          texts: [{ text: JSON.stringify(note, undefined, 2) }],
+        };
+      }
+    });
+
+    formatted?.forEach((data) => {
+      worksheet.addRow(Object.values(data));
+    });
+
+    worksheet.columns.forEach((_, index) => {
+      let minLength = 15;
+      const column = worksheet.getColumn(index + 1);
+      column.eachCell({ includeEmpty: false }, (cell) => {
+        const cellLength = cell.value ? cell.value.toString().length : 0;
+        minLength = cellLength > minLength ? cellLength : minLength;
+
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' },
+        };
+      });
+      column.width = minLength;
+    });
+
+    worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 2 }];
+
+    // Save the workbook to a blob
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    saveFile(`${name}.xlsx`, blob);
   };
 
-  const importCsv = () => {
+  const importExcel = () => {
     fileInput?.current?.click?.();
   };
 
-  const handleCsv = async (content: string) => {
-    const spreadsheetData = await new Promise<any[]>((resolve, reject) =>
-      Papa.parse(content, {
-        ...parserOptions,
-        header: false,
-        complete: (results: Papa.ParseResult<Record<string, string>>) => {
-          if (results.errors.length) {
-            return reject('failed to parse csv file');
-          }
-
-          resolve(results.data);
-        },
-      }),
-    );
-
-    const headers: any[] = spreadsheetData?.splice(0, 1)?.[0];
-    const columns = headers.map((header: string) => {
-      const [name, field, _type, id, defaultValue] = header.split(parserPipe).map((s) => (s || '').trim());
-      if (name.toLowerCase() === 'description') {
+  const parseExcelSheetData = (spreadSheetData: any) => {
+    const headers: any[] = spreadSheetData.splice(0, 2)[1];
+    const columns = headers.map((header: any) => {
+      if (header.value.toLowerCase() === 'description') {
         return {
-          name,
+          name: header.value,
           id: '_description',
         };
       }
+
+      let headerNote = {
+        name: '',
+        type: '',
+        id: '',
+      };
+
+      try {
+        headerNote = JSON.parse(header.note);
+      } catch (error) {
+        console.log('Header note can not be parsed!');
+      }
+
+      const parsedHeader = { value: header.value, ...headerNote };
+
       return {
-        name,
-        field,
-        _type,
+        name: parsedHeader.value,
+        field: parsedHeader.name,
+        _type: parsedHeader.type,
         type: 'expression',
-        id,
-        defaultValue,
+        id: parsedHeader.id,
+        defaultValue: '',
       };
     });
 
     const inputs = columns
-      .filter((column) => column._type === 'INPUT')
+      .filter((column) => column._type?.toLowerCase() === 'input')
       .map((column) => ({
         id: column.id,
         name: column?.name,
@@ -123,7 +186,7 @@ export const DecisionTableCommandBar: React.FC = () => {
       })) as TableSchemaItem[];
 
     const outputs = columns
-      .filter((column) => column._type === 'OUTPUT')
+      .filter((column) => column._type?.toLowerCase() === 'output')
       .map((column) => ({
         id: column.id,
         name: column?.name,
@@ -132,13 +195,13 @@ export const DecisionTableCommandBar: React.FC = () => {
         defaultValue: column?.defaultValue,
       })) as TableSchemaItem[];
 
-    const rules = spreadsheetData.map((data) => {
+    const rules = spreadSheetData.map((data: any) => {
       const dataPoint: Record<string, string> = {
         _id: v4(),
       };
 
       columns.forEach((col, index) => {
-        dataPoint[col.id] = data?.[index] || '';
+        dataPoint[col.id] = data?.[index].value || '';
       });
       return dataPoint;
     });
@@ -154,14 +217,39 @@ export const DecisionTableCommandBar: React.FC = () => {
     listenerStore.getState().onChange?.(newTable);
   };
 
-  const handleUploadInput = async (event: any) => {
-    const fileList = event?.target?.files as FileList;
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      handleCsv((e as any)?.target?.result);
-    };
+  const readExcelFile = async (event: any) => {
+    const ExcelJS = await import('exceljs');
 
-    reader.readAsText(Array.from(fileList)?.[0]);
+    const file = event?.target?.files[0];
+    const reader = new FileReader();
+    const excelWorkbook = new ExcelJS.Workbook();
+
+    reader.readAsArrayBuffer(file);
+    reader.onload = async () => {
+      const buffer = reader.result as ArrayBuffer;
+
+      if (!buffer) return;
+
+      const workbook = await excelWorkbook.xlsx.load(buffer);
+      workbook.eachSheet((sheet) => {
+        const spreadSheet: any = [];
+        sheet.eachRow((row) => {
+          const dataRow: any[] = [];
+          row.eachCell((cell) => {
+            const cellNote = cell.note
+              ? typeof cell.note === 'object'
+                ? cell.note.texts?.map((obj) => obj.text).join('')
+                : cell.note
+              : null;
+            // TODO: Title instead of value
+            dataRow.push({ value: cell.value, note: cellNote });
+          });
+          spreadSheet.push(dataRow);
+        });
+
+        parseExcelSheetData(spreadSheet);
+      });
+    };
   };
 
   return (
@@ -173,9 +261,9 @@ export const DecisionTableCommandBar: React.FC = () => {
             size={'small'}
             color='secondary'
             icon={<ExportOutlined />}
-            onClick={() => exportCsv({ name: 'table' })}
+            onClick={() => exportExcel({ name: 'table' })}
           >
-            Export CSV
+            Export Excel
           </Button>
           <Button
             type='text'
@@ -183,9 +271,9 @@ export const DecisionTableCommandBar: React.FC = () => {
             color='secondary'
             disabled={disabled}
             icon={<ImportOutlined />}
-            onClick={() => importCsv()}
+            onClick={() => importExcel()}
           >
-            Import CSV
+            Import Excel
           </Button>
         </Stack>
         <Select
@@ -211,10 +299,10 @@ export const DecisionTableCommandBar: React.FC = () => {
       <input
         multiple
         hidden
-        accept='.csv'
+        accept='.xlsx'
         type='file'
         ref={fileInput}
-        onChange={handleUploadInput}
+        onChange={readExcelFile}
         onClick={(event) => {
           (event.target as any).value = null;
         }}
