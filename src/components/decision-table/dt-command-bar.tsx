@@ -30,6 +30,7 @@ export const DecisionTableCommandBar: React.FC = () => {
 
   const exportExcel = async (options: TableExportOptions) => {
     const ExcelJS = await import('exceljs');
+
     const { name } = options;
     const schemaMeta = [
       ...decisionTable.inputs.map((input: any) => ({
@@ -61,9 +62,7 @@ export const DecisionTableCommandBar: React.FC = () => {
     const inputCellsLength = schemaMeta.filter((data) => data.meta?.type.toLowerCase() === 'input').length;
     const outputCellsLength = schemaMeta.filter((data) => data.meta?.type.toLowerCase() === 'output').length;
 
-    worksheet.addRow(['Inputs', 'Outputs']);
-
-    // row, start column, end row, end column
+    // start row, start column, end row, end column
     worksheet.mergeCells(1, 1, 1, inputCellsLength);
     const inputCell = worksheet.getCell(1, 1);
     inputCell.value = 'Inputs';
@@ -131,7 +130,6 @@ export const DecisionTableCommandBar: React.FC = () => {
 
     worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 2 }];
 
-    // Save the workbook to a blob
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     saveFile(`${name}.xlsx`, blob);
@@ -143,7 +141,7 @@ export const DecisionTableCommandBar: React.FC = () => {
 
   const parseExcelSheetData = (spreadSheetData: any) => {
     const headers: any[] = spreadSheetData.splice(0, 2)[1];
-    const columns = headers.map((header: any) => {
+    const columnHeaders = headers.map((header) => {
       if (header.value.toLowerCase() === 'description') {
         return {
           name: header.value,
@@ -151,31 +149,29 @@ export const DecisionTableCommandBar: React.FC = () => {
         };
       }
 
-      let headerNote = {
+      let headerMeta = {
         name: '',
         type: '',
         id: '',
       };
 
       try {
-        headerNote = JSON.parse(header.note);
+        headerMeta = JSON.parse(header.note);
       } catch (error) {
         console.log('Header note can not be parsed!');
       }
 
-      const parsedHeader = { value: header.value, ...headerNote };
-
       return {
-        name: parsedHeader.value,
-        field: parsedHeader.name,
-        _type: parsedHeader.type,
+        name: header.value,
+        field: headerMeta.name,
+        _type: headerMeta.type,
         type: 'expression',
-        id: parsedHeader.id,
+        id: headerMeta.id,
         defaultValue: '',
       };
     });
 
-    const inputs = columns
+    const inputs = columnHeaders
       .filter((column) => column._type?.toLowerCase() === 'input')
       .map((column) => ({
         id: column.id,
@@ -185,7 +181,7 @@ export const DecisionTableCommandBar: React.FC = () => {
         defaultValue: column?.defaultValue,
       })) as TableSchemaItem[];
 
-    const outputs = columns
+    const outputs = columnHeaders
       .filter((column) => column._type?.toLowerCase() === 'output')
       .map((column) => ({
         id: column.id,
@@ -195,14 +191,17 @@ export const DecisionTableCommandBar: React.FC = () => {
         defaultValue: column?.defaultValue,
       })) as TableSchemaItem[];
 
+    
+
     const rules = spreadSheetData.map((data: any) => {
       const dataPoint: Record<string, string> = {
         _id: v4(),
       };
 
-      columns.forEach((col, index) => {
+      columnHeaders.forEach((col, index) => {
         dataPoint[col.id] = data?.[index].value || '';
       });
+
       return dataPoint;
     });
 
@@ -232,7 +231,7 @@ export const DecisionTableCommandBar: React.FC = () => {
 
       const workbook = await excelWorkbook.xlsx.load(buffer);
       workbook.eachSheet((sheet) => {
-        const spreadSheet: any = [];
+        const spreadSheet: any[] = [];
         sheet.eachRow((row) => {
           const dataRow: any[] = [];
           row.eachCell((cell) => {
@@ -241,7 +240,7 @@ export const DecisionTableCommandBar: React.FC = () => {
                 ? cell.note.texts?.map((obj) => obj.text).join('')
                 : cell.note
               : null;
-            // TODO: Title instead of value
+
             dataRow.push({ value: cell.value, note: cellNote });
           });
           spreadSheet.push(dataRow);
