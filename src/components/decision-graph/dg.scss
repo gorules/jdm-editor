@@ -134,6 +134,37 @@
     flex-direction: column;
     overflow: hidden;
 
+    &__empty {
+      flex: 1;
+      display: flex;
+
+      &__message {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 2rem;
+      }
+
+      &__content {
+        min-height: 0;
+        overflow-y: auto;
+        padding: 1rem;
+      }
+
+      &__title {
+        margin: 0 0 2rem 0;
+      }
+
+      &__list {
+        display: grid;
+        overflow-y: auto;
+        min-height: 0;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      }
+    }
+
     .tabs {
       max-width: 100%;
       background-color: var(--grl-color-bg-elevated);
@@ -328,6 +359,69 @@
       &__content {
         flex: 1;
         overflow-y: auto;
+      }
+
+      &__nodes {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 0.5rem;
+        color: var(--grl-color-text);
+
+        &__empty {
+          padding: 1rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+        }
+
+        &__node {
+          display: flex;
+          gap: 8px;
+          align-items: center;
+          padding: 4px 8px;
+          border-radius: 4px;
+
+          &.disabled {
+            pointer-events: none;
+            &:hover {
+              background-color: transparent;
+            }
+
+            .node__icon {
+              color: var(--grl-color-text-disabled);
+            }
+          }
+
+          &.active {
+            background-color: var(--grl-color-primary-bg-hover);
+
+            &:hover {
+              background-color: var(--grl-color-primary-bg-hover);
+            }
+          }
+
+          &:hover {
+            background-color: var(--grl-color-bg-text-hover);
+            cursor: pointer;
+          }
+
+          .node__icon {
+            color: var(--grl-color-primary);
+
+            &.input,
+            &.output {
+              color: #722ed1;
+            }
+          }
+
+          .node__name {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+          }
+        }
       }
 
       &__components {

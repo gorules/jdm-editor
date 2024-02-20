@@ -1,3 +1,4 @@
+import { Typography } from 'antd';
 import clsx from 'clsx';
 import { createDragDropManager } from 'dnd-core';
 import React, { forwardRef, useMemo, useRef, useState } from 'react';
@@ -24,8 +25,8 @@ export type DecisionGraphWrapperProps = {
 export const DecisionGraphWrapper = React.memo(
   forwardRef<GraphRef, DecisionGraphWrapperProps>(({ reactFlowProOptions, defaultOpenMenu }, ref) => {
     const [disableTabs, setDisableTabs] = useState(false);
-    const hasActiveNode = useDecisionGraphState(({ decisionGraph, activeTab }) => {
-      return (decisionGraph?.nodes ?? []).some((node) => node.id === activeTab);
+    const { hasActiveNode } = useDecisionGraphState(({ decisionGraph, activeTab }) => {
+      return { hasActiveNode: (decisionGraph?.nodes ?? []).some((node) => node.id === activeTab) };
     });
 
     return (

@@ -11,11 +11,13 @@ export type TabExpressionProps = {
 
 export const TabExpression: React.FC<TabExpressionProps> = ({ id, manager }) => {
   const graphActions = useDecisionGraphActions();
-  const { disabled, configurable, content } = useDecisionGraphState(({ disabled, configurable, decisionGraph }) => ({
-    disabled,
-    configurable,
-    content: (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content,
-  }));
+  const { disabled, configurable, content } = useDecisionGraphState(
+    ({ disabled, configurable, decisionGraph, graphConfig }) => ({
+      disabled: disabled || (graphConfig ? !graphConfig?.[id]?.editable : false),
+      configurable: graphConfig ? graphConfig?.[id]?.configurable : configurable,
+      content: (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content,
+    }),
+  );
 
   return (
     <div style={{ maxWidth: 900, height: '100%', overflowY: 'auto', boxSizing: 'border-box', paddingBottom: '1.5rem' }}>

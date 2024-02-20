@@ -14,12 +14,12 @@ export type TabDecisionTableProps = {
 export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager }) => {
   const graphActions = useDecisionGraphActions();
   const { nodeTrace, disabled, configurable, content } = useDecisionGraphState(
-    ({ simulate, disabled, configurable, decisionGraph }) => ({
+    ({ simulate, disabled, configurable, decisionGraph, graphConfig }) => ({
       nodeTrace: match(simulate)
         .with({ result: P._ }, ({ result }) => result?.trace?.[id] as SimulationTrace<SimulationTraceDataTable>)
         .otherwise(() => null),
-      disabled,
-      configurable,
+      disabled: disabled || (graphConfig ? !graphConfig?.[id]?.editable : false),
+      configurable: graphConfig ? graphConfig?.[id]?.configurable : configurable,
       content: (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content,
     }),
   );

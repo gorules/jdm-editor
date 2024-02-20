@@ -48,6 +48,14 @@ export type CustomNodeRenderFormType = {
   onChange: (val: any) => void;
 };
 
+export type GraphConfig = Record<
+  string,
+  {
+    editable?: boolean;
+    configurable?: boolean;
+  }
+>;
+
 type DraftUpdateCallback<T> = (draft: WritableDraft<T>) => WritableDraft<T>;
 
 export type DecisionGraphStoreType = {
@@ -60,6 +68,8 @@ export type DecisionGraphStoreType = {
     hoveredEdgeId: string | null;
     openTabs: string[];
     activeTab: string;
+
+    graphConfig?: GraphConfig;
 
     simulatorOpen: boolean;
     simulatorRequest?: string;

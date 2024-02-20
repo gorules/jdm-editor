@@ -22,6 +22,9 @@ export const GraphSimulator: React.FC = () => {
   const { token } = theme.useToken();
   const { stateStore } = useDecisionGraphRaw();
   const graphActions = useDecisionGraphActions();
+  const { graphConfig } = useDecisionGraphState((state) => ({
+    graphConfig: state.graphConfig,
+  }));
   const { onSimulationRun } = useDecisionGraphListeners(({ onSimulationRun }) => ({ onSimulationRun }));
   const { simulate, simulatorOpen, simulatorRequest, simulatorLoading, nodeTypes } = useDecisionGraphState(
     ({ simulate, simulatorOpen, simulatorRequest, simulatorLoading, decisionGraph }) => ({
@@ -169,6 +172,7 @@ export const GraphSimulator: React.FC = () => {
                 </Typography.Text>
               </div>
               {Object.entries(simulateResult?.trace ?? {})
+                .filter(([id]) => (graphConfig ? !!graphConfig[id] : true))
                 .filter(([, trace]) => ![NodeKind.Input, NodeKind.Output].includes(nodeTypes?.[trace?.id] as NodeKind))
                 .map(([nodeId, trace]) => (
                   <div

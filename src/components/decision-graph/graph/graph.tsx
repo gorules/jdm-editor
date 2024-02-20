@@ -20,6 +20,7 @@ import '../dg.scss';
 import { useGraphClipboard } from '../hooks/use-graph-clipboard';
 import type { MinimalNodeProps } from '../nodes/specification-types';
 import { nodeSpecification } from '../nodes/specifications';
+import { GraphEmpty } from './graph-empty';
 
 export type GraphProps = {
   className?: string;
@@ -58,7 +59,11 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
   const edgesState = useEdgesState([]);
 
   const graphActions = useDecisionGraphActions();
-  const { disabled, components } = useDecisionGraphState(({ disabled, components }) => ({ disabled, components }));
+  const { disabled, components, graphConfig } = useDecisionGraphState(({ disabled, components, graphConfig }) => ({
+    disabled,
+    components,
+    graphConfig,
+  }));
   const graphReferences = useDecisionGraphReferences((s) => s);
   const { onReactFlowInit } = useDecisionGraphListeners(({ onReactFlowInit }) => ({ onReactFlowInit }));
 
@@ -191,6 +196,14 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
   };
 
   useImperativeHandle(ref, () => graphActions);
+
+  if (graphConfig) {
+    return (
+      <div className={clsx(['tab-content', className])}>
+        <GraphEmpty />
+      </div>
+    );
+  }
 
   return (
     <div
