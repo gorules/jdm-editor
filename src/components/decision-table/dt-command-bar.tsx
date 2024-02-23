@@ -7,10 +7,10 @@ import { exportExcelFile, readFromExcel } from '../../helpers/excel-file-utils';
 import type { DecisionNode } from '../decision-graph';
 import { Stack } from '../stack';
 import {
+  type TableExportOptions,
   useDecisionTableActions,
   useDecisionTableRaw,
   useDecisionTableState,
-  type TableExportOptions,
 } from './context/dt-store.context';
 
 export const DecisionTableCommandBar: React.FC = () => {
