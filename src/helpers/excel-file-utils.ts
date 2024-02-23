@@ -1,4 +1,5 @@
 import { message } from 'antd';
+import { P, match } from 'ts-pattern';
 import { v4 } from 'uuid';
 
 import type { DecisionNode, DecisionTableType } from '../components';
@@ -200,7 +201,10 @@ const parseSpreadsheetData = (spreadSheetData: any) => {
     };
 
     columnHeaders.forEach((col, index) => {
-      dataPoint[col.id] = data?.[index].value.trim() || '';
+      dataPoint[col.id] = match(data?.[index]?.value)
+        .with(P.string, (val) => val.trim())
+        .with(P.nullish, () => '')
+        .otherwise((val) => val.toString());
     });
 
     return dataPoint;
