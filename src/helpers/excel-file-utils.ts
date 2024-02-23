@@ -18,7 +18,17 @@ export const exportExcelFile = async (fileName: string, decisionTableNodes: Deci
   const workbook = new ExcelJS.Workbook();
 
   decisionTableNodes.forEach((decisionTableNode) => {
-    const worksheet = workbook.addWorksheet(decisionTableNode.name);
+    let worksheetName: string = decisionTableNode.name;
+    let worksheetNameIndex = 0;
+
+    if (workbook.getWorksheet(worksheetName)) {
+      do {
+        worksheetNameIndex++;
+        worksheetName = `${decisionTableNode.name} (${worksheetNameIndex})`;
+      } while (workbook.getWorksheet(worksheetName));
+    }
+
+    const worksheet = workbook.addWorksheet(worksheetName);
 
     const schemaMeta = [
       ...decisionTableNode.inputs.map((input: any) => ({

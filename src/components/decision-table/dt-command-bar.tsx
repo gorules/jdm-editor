@@ -1,5 +1,5 @@
 import { ExportOutlined, ImportOutlined } from '@ant-design/icons';
-import { Button, Select } from 'antd';
+import { Button, Select, message } from 'antd';
 import React, { useRef } from 'react';
 import { v4 } from 'uuid';
 
@@ -7,10 +7,10 @@ import { exportExcelFile, readFromExcel } from '../../helpers/excel-file-utils';
 import type { DecisionNode } from '../decision-graph';
 import { Stack } from '../stack';
 import {
-  type TableExportOptions,
   useDecisionTableActions,
   useDecisionTableRaw,
   useDecisionTableState,
+  type TableExportOptions,
 } from './context/dt-store.context';
 
 export const DecisionTableCommandBar: React.FC = () => {
@@ -30,7 +30,12 @@ export const DecisionTableCommandBar: React.FC = () => {
   const exportExcel = async (options: TableExportOptions) => {
     const { name } = options;
 
-    await exportExcelFile(name, [{ ...decisionTable, name: 'decision table', id: v4() }]);
+    try {
+      await exportExcelFile(name, [{ ...decisionTable, name: 'decision table', id: v4() }]);
+      message.success('Excel file has been downloaded successfully!');
+    } catch {
+      message.error('Failed to download Excel file!');
+    }
   };
 
   const importExcel = () => {
@@ -41,18 +46,23 @@ export const DecisionTableCommandBar: React.FC = () => {
     const file = event?.target?.files[0];
     const reader = new FileReader();
 
-    reader.readAsArrayBuffer(file);
-    reader.onload = async () => {
-      const buffer = reader.result as ArrayBuffer;
+    try {
+      reader.readAsArrayBuffer(file);
+      reader.onload = async () => {
+        const buffer = reader.result as ArrayBuffer;
 
-      if (!buffer) return;
+        if (!buffer) return;
 
-      const nodes: DecisionNode[] = await readFromExcel(buffer);
-      const newTable = nodes[0].content;
+        const nodes: DecisionNode[] = await readFromExcel(buffer);
+        const newTable = nodes[0].content;
 
-      tableActions.setDecisionTable(newTable);
-      listenerStore.getState().onChange?.(newTable);
-    };
+        tableActions.setDecisionTable(newTable);
+        listenerStore.getState().onChange?.(newTable);
+      };
+      message.success('Excel file has been uploaded successfully!');
+    } catch {
+      message.error('Failed to upload Excel!');
+    }
   };
 
   return (

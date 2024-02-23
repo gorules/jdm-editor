@@ -11,11 +11,11 @@ import React, { useRef, useState } from 'react';
 
 import { exportExcelFile, readFromExcel } from '../../../helpers/excel-file-utils';
 import {
-  type DecisionEdge,
-  type DecisionNode,
   useDecisionGraphActions,
   useDecisionGraphListeners,
   useDecisionGraphState,
+  type DecisionEdge,
+  type DecisionNode,
 } from '../context/dg-store.context';
 import { NodeKind } from '../nodes/specification-types';
 import { GraphComponents } from './graph-components';
@@ -74,35 +74,40 @@ export const GraphAside: React.FC<GraphAsideProps> = ({ defaultOpenMenu = 'compo
     const file = event?.target?.files[0];
     const fileReader = new FileReader();
 
-    fileReader.readAsArrayBuffer(file);
+    try {
+      fileReader.readAsArrayBuffer(file);
+      fileReader.onload = async () => {
+        const buffer = fileReader.result as ArrayBuffer;
 
-    fileReader.onload = async () => {
-      const buffer = fileReader.result as ArrayBuffer;
+        if (!buffer) return;
 
-      if (!buffer) return;
+        const nodesFromExcel = await readFromExcel(buffer);
 
-      const nodesFromExcel = await readFromExcel(buffer);
+        const updatedNodes = decisionGraph.nodes.map((node) => {
+          let _node = node;
+          // updating existing nodes
+          nodesFromExcel.forEach((excelNode) => {
+            if (excelNode.id === node.id) _node = { ...node, content: excelNode.content };
+          });
 
-      const updatedNodes = decisionGraph.nodes.map((node) => {
-        let _node = node;
-        // updating existing nodes
-        nodesFromExcel.forEach((excelNode) => {
-          if (excelNode.id === node.id) _node = { ...node, content: excelNode.content };
+          return _node;
         });
 
-        return _node;
-      });
+        // filtering new nodes and setting them proper position
+        const newNodes = nodesFromExcel
+          .filter((node) => !updatedNodes.some((existingNode) => existingNode.id === node.id))
+          .map((newNode, index) => ({ ...newNode, position: { x: index * 250, y: 0 } }));
 
-      // filtering new nodes and setting them proper position
-      const newNodes = nodesFromExcel
-        .filter((node) => !updatedNodes.some((existingNode) => existingNode.id === node.id))
-        .map((newNode, index) => ({ ...newNode, position: { x: index * 250, y: 0 } }));
+        setDecisionGraph({
+          nodes: [...updatedNodes, ...newNodes],
+          edges: decisionGraph.edges,
+        });
 
-      setDecisionGraph({
-        nodes: [...updatedNodes, ...newNodes],
-        edges: decisionGraph.edges,
-      });
-    };
+        message.success('Excel file has been uploaded successfully!');
+      };
+    } catch {
+      message.error('Failed to upload Excel!');
+    }
   };
 
   const downloadJDM = async (name: string = 'graph') => {
@@ -137,15 +142,20 @@ export const GraphAside: React.FC<GraphAsideProps> = ({ defaultOpenMenu = 'compo
   };
 
   const downloadJDMExcel = async (name: string = 'decision tables') => {
-    const decisionTableNodes = decisionGraph.nodes
-      .filter((node) => node.type === NodeKind.DecisionTable)
-      .map((decisionTable) => ({
-        ...decisionTable.content,
-        id: decisionTable.id,
-        name: decisionTable.name,
-      }));
+    try {
+      const decisionTableNodes = decisionGraph.nodes
+        .filter((node) => node.type === NodeKind.DecisionTable)
+        .map((decisionTable) => ({
+          ...decisionTable.content,
+          id: decisionTable.id,
+          name: decisionTable.name,
+        }));
 
-    await exportExcelFile(name, decisionTableNodes);
+      await exportExcelFile(name, decisionTableNodes);
+      message.success('Excel file has been downloaded successfully!');
+    } catch {
+      message.error('Failed to download Excel file!');
+    }
   };
 
   const uploadItems: MenuProps['items'] = [
@@ -205,10 +215,10 @@ export const GraphAside: React.FC<GraphAsideProps> = ({ defaultOpenMenu = 'compo
               onClick={() => setMenu((m) => (m !== 'components' ? 'components' : false))}
             />
           </Tooltip>
-          <Dropdown menu={{ items: uploadItems }} placement='bottomRight' arrow>
+          <Dropdown menu={{ items: uploadItems }} placement='bottomRight' trigger={['click']} arrow>
             <Button type={'text'} disabled={disabled} icon={<CloudUploadOutlined />} />
           </Dropdown>
-          <Dropdown menu={{ items: downloadItems }} placement='bottomRight' arrow>
+          <Dropdown menu={{ items: downloadItems }} placement='bottomRight' trigger={['click']} arrow>
             <Button type={'text'} disabled={disabled} icon={<CloudDownloadOutlined />} />
           </Dropdown>
         </div>
