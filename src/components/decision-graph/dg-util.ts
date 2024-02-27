@@ -1,4 +1,5 @@
 import type { Edge, Node } from 'reactflow';
+import { MarkerType } from 'reactflow';
 
 import type { DecisionEdge, DecisionNode } from './context/dg-store.context';
 
@@ -37,6 +38,7 @@ export const mapToGraphEdge = (edge: DecisionEdge): Edge => {
     label: edge.name,
     sourceHandle: edge.sourceHandle,
     targetHandle: edge.targetHandle,
+    markerEnd: { type: MarkerType.ArrowClosed, width: 20, height: 20 },
   };
 };
 export const mapToGraphEdges = (edges: DecisionEdge[]): Edge[] => {
