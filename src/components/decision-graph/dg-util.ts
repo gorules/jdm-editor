@@ -22,6 +22,7 @@ export const mapToGraphNode = (node: DecisionNode): Node => {
     position: node.position,
     data: {
       name: node.name,
+      component: node?.content?.component,
     },
   };
 };

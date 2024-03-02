@@ -11,6 +11,7 @@ import { create } from 'zustand';
 
 import { mapToGraphEdge, mapToGraphEdges, mapToGraphNode, mapToGraphNodes } from '../dg-util';
 import type { useGraphClipboard } from '../hooks/use-graph-clipboard';
+import type { CustomNodeSpecification } from '../nodes/custom-node';
 import { NodeKind, type NodeSpecification } from '../nodes/specification-types';
 import type { Simulation } from '../types/simulation.types';
 
@@ -60,6 +61,8 @@ export type DecisionGraphStoreType = {
     hoveredEdgeId: string | null;
     openTabs: string[];
     activeTab: string;
+
+    customNodes: CustomNodeSpecification<object, string>[];
 
     simulatorOpen: boolean;
     simulatorRequest?: string;
@@ -141,6 +144,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         disabled: false,
         configurable: true,
         components: [],
+        customNodes: [],
 
         simulatorLoading: false,
         simulatorOpen: false,

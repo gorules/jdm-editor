@@ -17,8 +17,9 @@ export type GraphComponentsProps = {
 
 export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inputDisabled, disabled }) => {
   const customComponents = useDecisionGraphState((store) => store.components || []);
+  const customNodes = useDecisionGraphState((store) => store.customNodes || []);
 
-  const onDragStart = useCallback((event: React.DragEvent, nodeType: string) => {
+  const onDragStart = useCallback((event: React.DragEvent, nodeType: string, component?: string) => {
     const target = event.target as HTMLDivElement;
     if (!target) {
       return;
@@ -35,6 +36,9 @@ export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inp
     event.dataTransfer.effectAllowed = 'move';
     event.dataTransfer.setData('application/reactflow', nodeType);
     event.dataTransfer.setData('relativePosition', JSON.stringify(positionData));
+    if (component) {
+      event.dataTransfer.setData('customNodeComponent', component);
+    }
   }, []);
 
   return (
@@ -52,7 +56,7 @@ export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inp
         </React.Fragment>
       ))}
 
-      {customComponents?.length > 0 && <Divider style={{ margin: '4px 0' }} />}
+      {(customComponents?.length > 0 || customNodes?.length > 0) && <Divider style={{ margin: '4px 0' }} />}
       {customComponents.map((component) => (
         <DragDecisionNode
           key={component.displayName}
@@ -61,13 +65,21 @@ export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inp
           onDragStart={(event) => onDragStart(event, component.type)}
         />
       ))}
+      {customNodes.map((customNode) => (
+        <DragDecisionNode
+          key={customNode.component}
+          disabled={disabled}
+          specification={customNode}
+          onDragStart={(event) => onDragStart(event, 'customNode', customNode.component)}
+        />
+      ))}
     </div>
   );
 });
 
 const DragDecisionNode: React.FC<
   {
-    specification: NodeSpecification;
+    specification: Pick<NodeSpecification, 'color' | 'icon' | 'displayName' | 'shortDescription'>;
     disabled?: boolean;
   } & React.HTMLAttributes<HTMLDivElement>
 > = ({ specification, disabled = false, ...props }) => {
