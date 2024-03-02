@@ -1,7 +1,7 @@
-import { DeploymentUnitOutlined } from '@ant-design/icons';
+import { DeploymentUnitOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import type { TabsProps } from 'antd';
 import { Avatar, Tabs } from 'antd';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
 import type { NodeKind } from '../nodes/specification-types';
@@ -16,16 +16,34 @@ type TabItem = NonUndefined<TabsProps['items']>[number];
 
 export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled }) => {
   const graphActions = useDecisionGraphActions();
-  const { openNodes, activeNodeId } = useDecisionGraphState(({ decisionGraph, activeTab, openTabs }) => ({
-    activeNodeId: (decisionGraph?.nodes ?? []).find((node) => node.id === activeTab)?.id,
-    openNodes: (decisionGraph?.nodes ?? [])
-      .filter((node) => openTabs.includes(node.id))
-      .map(({ id, name, type }) => ({
-        id,
-        name,
-        type,
-      })),
-  }));
+  const { openNodes, activeNodeId, graphConfig } = useDecisionGraphState(
+    ({ decisionGraph, activeTab, openTabs, graphConfig }) => ({
+      activeNodeId: (decisionGraph?.nodes ?? []).find((node) => node.id === activeTab)?.id,
+      openNodes: (decisionGraph?.nodes ?? [])
+        .filter((node) => openTabs.includes(node.id))
+        .map(({ id, name, type }) => ({
+          id,
+          name,
+          type,
+        })),
+      graphConfig,
+    }),
+  );
+
+  const defaultItems = useMemo(() => {
+    return [
+      {
+        closable: false,
+        key: 'graph',
+        label: (
+          <TabLabel
+            icon={graphConfig ? <UnorderedListOutlined /> : <DeploymentUnitOutlined />}
+            name={graphConfig ? 'Nodes' : 'Graph'}
+          />
+        ),
+      },
+    ];
+  }, [graphConfig]);
 
   return (
     <Tabs
@@ -41,11 +59,7 @@ export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled }) => {
       }}
       onChange={(val) => graphActions.openTab(val)}
       items={[
-        {
-          closable: false,
-          key: 'graph',
-          label: <TabLabel icon={<DeploymentUnitOutlined />} name='Graph' />,
-        },
+        ...defaultItems,
         ...openNodes.map((node) => {
           const specification = nodeSpecification[node.type as NodeKind];
 

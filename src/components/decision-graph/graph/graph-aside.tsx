@@ -6,7 +6,7 @@ import {
   PlusCircleOutlined,
 } from '@ant-design/icons';
 import { Button, Tooltip, Typography, message } from 'antd';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import {
   type DecisionEdge,
@@ -17,29 +17,37 @@ import {
 } from '../context/dg-store.context';
 import { NodeKind } from '../nodes/specification-types';
 import { GraphComponents } from './graph-components';
+import { GraphNodes } from './graph-nodes';
 
 const DecisionContentType = 'application/vnd.gorules.decision';
 
-type Menu = 'components';
+type Menu = 'components' | 'nodes';
 
 export type GraphAsideProps = {
   defaultOpenMenu?: Menu | false;
 };
 
-export const GraphAside: React.FC<GraphAsideProps> = ({ defaultOpenMenu = 'components' }) => {
+export const GraphAside: React.FC<GraphAsideProps> = ({ defaultOpenMenu }) => {
   const fileInput = useRef<HTMLInputElement>(null);
-  const [menu, setMenu] = useState<Menu | false>(defaultOpenMenu);
-
-  const { setDecisionGraph, toggleSimulator } = useDecisionGraphActions();
-  const { onSimulationRun } = useDecisionGraphListeners(({ onSimulationRun }) => ({ onSimulationRun }));
-  const { decisionGraph, activeNodeId, disabled, hasInputNode } = useDecisionGraphState(
-    ({ decisionGraph, activeTab, disabled }) => ({
+  const { decisionGraph, activeNodeId, graphConfig, disabled, hasInputNode } = useDecisionGraphState(
+    ({ decisionGraph, activeTab, graphConfig, disabled }) => ({
       decisionGraph,
+      graphConfig,
       activeNodeId: (decisionGraph?.nodes ?? []).find((node) => node.id === activeTab)?.id,
       disabled,
       hasInputNode: (decisionGraph?.nodes || []).some((n) => n.type === NodeKind.Input),
     }),
   );
+
+  const [menu, setMenu] = useState<Menu | false>(defaultOpenMenu || (graphConfig ? false : 'components'));
+  useEffect(() => {
+    if (menu === 'components' && graphConfig) {
+      setMenu(false);
+    }
+  }, [graphConfig]);
+
+  const { setDecisionGraph, toggleSimulator } = useDecisionGraphActions();
+  const { onSimulationRun } = useDecisionGraphListeners(({ onSimulationRun }) => ({ onSimulationRun }));
 
   const handleUploadInput = async (event: any) => {
     const fileList = event?.target?.files as FileList;
@@ -112,23 +120,34 @@ export const GraphAside: React.FC<GraphAsideProps> = ({ defaultOpenMenu = 'compo
       />
       <div className={'grl-dg__aside__side-bar'}>
         <div className={'grl-dg__aside__side-bar__top'}>
-          <Tooltip placement='right' title='Components'>
-            <Button
-              type={'primary'}
-              icon={<PlusCircleOutlined />}
-              onClick={() => setMenu((m) => (m !== 'components' ? 'components' : false))}
-            />
-          </Tooltip>
-          <Tooltip placement='right' title='Upload JSON'>
-            <Button
-              type={'text'}
-              disabled={disabled}
-              icon={<CloudUploadOutlined />}
-              onClick={() => {
-                fileInput?.current?.click?.();
-              }}
-            />
-          </Tooltip>
+          {!graphConfig && (
+            <Tooltip placement='right' title='Components'>
+              <Button
+                type={'primary'}
+                icon={<PlusCircleOutlined />}
+                onClick={() => setMenu((m) => (m !== 'components' ? 'components' : false))}
+              />
+            </Tooltip>
+          )}
+          {/*<Tooltip>*/}
+          {/*  <Button*/}
+          {/*    type={'text'}*/}
+          {/*    icon={<UnorderedListOutlined />}*/}
+          {/*    onClick={() => setMenu((m) => (m !== 'nodes' ? 'nodes' : false))}*/}
+          {/*  />*/}
+          {/*</Tooltip>*/}
+          {!graphConfig && (
+            <Tooltip placement='right' title='Upload JSON'>
+              <Button
+                type={'text'}
+                disabled={disabled}
+                icon={<CloudUploadOutlined />}
+                onClick={() => {
+                  fileInput?.current?.click?.();
+                }}
+              />
+            </Tooltip>
+          )}
           <Tooltip placement='right' title='Download JSON'>
             <Button
               type={'text'}
@@ -156,7 +175,7 @@ export const GraphAside: React.FC<GraphAsideProps> = ({ defaultOpenMenu = 'compo
       </div>
       {menu && (
         <div className={'grl-dg__aside__menu'}>
-          {menu === 'components' && (
+          {menu === 'components' && !graphConfig && (
             <>
               <div className={'grl-dg__aside__menu__heading'}>
                 <div className={'grl-dg__aside__menu__heading__text'}>
@@ -168,6 +187,21 @@ export const GraphAside: React.FC<GraphAsideProps> = ({ defaultOpenMenu = 'compo
               </div>
               <div className={'grl-dg__aside__menu__content'}>
                 <GraphComponents inputDisabled={hasInputNode} disabled={!!activeNodeId || disabled} />
+              </div>
+            </>
+          )}
+          {menu === 'nodes' && (
+            <>
+              <div className={'grl-dg__aside__menu__heading'}>
+                <div className={'grl-dg__aside__menu__heading__text'}>
+                  <Typography.Text strong style={{ marginBottom: 0 }}>
+                    Nodes
+                  </Typography.Text>
+                </div>
+                <Button type={'text'} size='small' icon={<CloseOutlined />} onClick={() => setMenu(false)}></Button>
+              </div>
+              <div className={'grl-dg__aside__menu__content'}>
+                <GraphNodes />
               </div>
             </>
           )}

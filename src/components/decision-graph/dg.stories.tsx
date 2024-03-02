@@ -24,10 +24,10 @@ const meta: Meta<typeof DecisionGraph> = {
 
 export default meta;
 
-type Story = StoryObj<typeof DecisionGraph>;
+type Story = StoryObj<any>;
 
 export const Controlled: Story = {
-  render: (args) => {
+  render: (args: any) => {
     const [value, setValue] = useState<any>(defaultGraph);
     return (
       <div
@@ -38,12 +38,26 @@ export const Controlled: Story = {
         <DecisionGraph
           {...args}
           value={value}
+          graphConfig={args?.enableConfig ? args?.graphConfig : undefined}
           onChange={(val) => {
             setValue?.(val);
           }}
         />
       </div>
     );
+  },
+  argTypes: {
+    enableConfig: {
+      type: 'boolean',
+      defaultValue: true,
+    },
+  },
+  args: {
+    graphConfig: {
+      '359173d8-0068-45f8-bb71-8240ad73201d': {
+        configurable: true,
+      },
+    },
   },
 };
 

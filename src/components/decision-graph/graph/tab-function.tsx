@@ -17,12 +17,11 @@ export type TabFunctionProps = {
 export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
   const graphActions = useDecisionGraphActions();
   const { nodeTrace, disabled, content } = useDecisionGraphState(
-    ({ simulate, disabled, configurable, decisionGraph }) => ({
+    ({ simulate, disabled, decisionGraph, graphConfig }) => ({
       nodeTrace: match(simulate)
         .with({ result: P._ }, ({ result }) => result?.trace?.[id])
         .otherwise(() => null),
-      disabled,
-      configurable,
+      disabled: disabled || (graphConfig ? !graphConfig?.[id]?.editable : false),
       content: (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content,
     }),
   );
