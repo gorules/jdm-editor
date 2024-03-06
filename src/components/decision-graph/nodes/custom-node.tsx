@@ -13,5 +13,10 @@ export type CustomNodeSpecification<Data extends object, Component extends strin
   generateNode: () => Omit<DecisionNode<Data>, 'position' | 'id' | 'type' | 'content'> & { config: Data };
   renderNode: React.FC<MinimalNodeProps & { specification: MinimalNodeSpecification }>;
 
-  onNodeAdd?: (node: DecisionNode<Data>) => Promise<DecisionNode<Data>>;
+  onNodeAdd?: (node: DecisionNode<{ component: Component; config: Data }>) => Promise<
+    DecisionNode<{
+      component: Component;
+      config: Data;
+    }>
+  >;
 };
