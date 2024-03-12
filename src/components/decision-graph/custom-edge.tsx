@@ -3,7 +3,7 @@ import { Button } from 'antd';
 import clsx from 'clsx';
 import React from 'react';
 import type { EdgeProps } from 'reactflow';
-import { BaseEdge, EdgeLabelRenderer, getSmoothStepPath } from 'reactflow';
+import { BaseEdge, EdgeLabelRenderer, getBezierPath } from 'reactflow';
 
 import { useDecisionGraphActions, useDecisionGraphState } from './context/dg-store.context';
 
@@ -15,7 +15,7 @@ export const CustomEdge: React.FC<EdgeProps> = (props) => {
     disabled,
   }));
 
-  const [edgePath, labelX, labelY] = getSmoothStepPath({
+  const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
     sourceY,
     sourcePosition,
