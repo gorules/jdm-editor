@@ -1,25 +1,17 @@
 import { ExportOutlined, ImportOutlined } from '@ant-design/icons';
-import { Button, Select } from 'antd';
-import Papa from 'papaparse';
+import { Button, Select, message } from 'antd';
 import React, { useRef } from 'react';
 import { v4 } from 'uuid';
 
-import { saveFile } from '../../helpers/file-helpers';
+import { exportExcelFile, readFromExcel } from '../../helpers/excel-file-utils';
+import type { DecisionNode } from '../decision-graph';
 import { Stack } from '../stack';
 import {
   type TableExportOptions,
-  type TableSchemaItem,
-  parseDecisionTable,
   useDecisionTableActions,
   useDecisionTableRaw,
   useDecisionTableState,
 } from './context/dt-store.context';
-
-const parserOptions = {
-  delimiter: ';',
-};
-
-const parserPipe = '|';
 
 export const DecisionTableCommandBar: React.FC = () => {
   const tableActions = useDecisionTableActions();
@@ -35,133 +27,42 @@ export const DecisionTableCommandBar: React.FC = () => {
   const { listenerStore } = useDecisionTableRaw();
   const fileInput = useRef<HTMLInputElement>(null);
 
-  const exportCsv = async (options: TableExportOptions) => {
+  const exportExcel = async (options: TableExportOptions) => {
     const { name } = options;
-    const schemaMeta = [
-      ...decisionTable.inputs.map((input: any) =>
-        [input.name, input.field, 'INPUT', input.id, input.defaultValue].join(` ${parserPipe} `),
-      ),
-      ...decisionTable.outputs.map((output: any) =>
-        [output.name, output.field, 'OUTPUT', output.id, output.defaultValue].join(` ${parserPipe} `),
-      ),
-      'DESCRIPTION',
-    ];
 
-    const schemaItems = [...decisionTable.inputs, ...decisionTable.outputs];
-    const formatted = decisionTable?.rules.map((record: any) => {
-      const newDataPoint: string[] = [];
-      schemaItems.forEach((schemaItem) => {
-        const val = record?.[schemaItem.id || ''];
-        const formattedVal = typeof val === 'object' && val !== null ? JSON.stringify(val) : val;
-        newDataPoint.push(formattedVal || '');
-      });
-      newDataPoint.push(record?.['_description'] || '');
-      return newDataPoint;
-    });
-
-    const csv = Papa.unparse(
-      {
-        fields: schemaMeta,
-        data: formatted,
-      },
-      {
-        ...parserOptions,
-        header: true,
-      },
-    );
-
-    const blob = new Blob([csv], { type: 'text/csv' });
-    saveFile(`${name}.csv`, blob);
+    try {
+      await exportExcelFile(name, [{ ...decisionTable, name: 'decision table', id: v4() }]);
+      message.success('Excel file has been downloaded successfully!');
+    } catch {
+      message.error('Failed to download Excel file!');
+    }
   };
 
-  const importCsv = () => {
+  const importExcel = () => {
     fileInput?.current?.click?.();
   };
 
-  const handleCsv = async (content: string) => {
-    const spreadsheetData = await new Promise<any[]>((resolve, reject) =>
-      Papa.parse(content, {
-        ...parserOptions,
-        header: false,
-        complete: (results: Papa.ParseResult<Record<string, string>>) => {
-          if (results.errors.length) {
-            return reject('failed to parse csv file');
-          }
-
-          resolve(results.data);
-        },
-      }),
-    );
-
-    const headers: any[] = spreadsheetData?.splice(0, 1)?.[0];
-    const columns = headers.map((header: string) => {
-      const [name, field, _type, id, defaultValue] = header.split(parserPipe).map((s) => (s || '').trim());
-      if (name.toLowerCase() === 'description') {
-        return {
-          name,
-          id: '_description',
-        };
-      }
-      return {
-        name,
-        field,
-        _type,
-        type: 'expression',
-        id,
-        defaultValue,
-      };
-    });
-
-    const inputs = columns
-      .filter((column) => column._type === 'INPUT')
-      .map((column) => ({
-        id: column.id,
-        name: column?.name,
-        field: column?.field,
-        type: column?.type,
-        defaultValue: column?.defaultValue,
-      })) as TableSchemaItem[];
-
-    const outputs = columns
-      .filter((column) => column._type === 'OUTPUT')
-      .map((column) => ({
-        id: column.id,
-        name: column?.name,
-        field: column?.field,
-        type: column?.type,
-        defaultValue: column?.defaultValue,
-      })) as TableSchemaItem[];
-
-    const rules = spreadsheetData.map((data) => {
-      const dataPoint: Record<string, string> = {
-        _id: v4(),
-      };
-
-      columns.forEach((col, index) => {
-        dataPoint[col.id] = data?.[index] || '';
-      });
-      return dataPoint;
-    });
-
-    const newTable = parseDecisionTable({
-      inputs,
-      outputs,
-      rules,
-      hitPolicy: 'first',
-    });
-
-    tableActions.setDecisionTable(newTable);
-    listenerStore.getState().onChange?.(newTable);
-  };
-
-  const handleUploadInput = async (event: any) => {
-    const fileList = event?.target?.files as FileList;
+  const readExcelFile = async (event: any) => {
+    const file = event?.target?.files[0];
     const reader = new FileReader();
-    reader.onload = function (e) {
-      handleCsv((e as any)?.target?.result);
-    };
 
-    reader.readAsText(Array.from(fileList)?.[0]);
+    try {
+      reader.readAsArrayBuffer(file);
+      reader.onload = async () => {
+        const buffer = reader.result as ArrayBuffer;
+
+        if (!buffer) return;
+
+        const nodes: DecisionNode[] = await readFromExcel(buffer);
+        const newTable = nodes[0].content;
+
+        tableActions.setDecisionTable(newTable);
+        listenerStore.getState().onChange?.(newTable);
+      };
+      message.success('Excel file has been uploaded successfully!');
+    } catch {
+      message.error('Failed to upload Excel!');
+    }
   };
 
   return (
@@ -173,9 +74,9 @@ export const DecisionTableCommandBar: React.FC = () => {
             size={'small'}
             color='secondary'
             icon={<ExportOutlined />}
-            onClick={() => exportCsv({ name: 'table' })}
+            onClick={() => exportExcel({ name: 'table' })}
           >
-            Export CSV
+            Export Excel
           </Button>
           <Button
             type='text'
@@ -183,9 +84,9 @@ export const DecisionTableCommandBar: React.FC = () => {
             color='secondary'
             disabled={disabled}
             icon={<ImportOutlined />}
-            onClick={() => importCsv()}
+            onClick={() => importExcel()}
           >
-            Import CSV
+            Import Excel
           </Button>
         </Stack>
         <Select
@@ -211,10 +112,10 @@ export const DecisionTableCommandBar: React.FC = () => {
       <input
         multiple
         hidden
-        accept='.csv'
+        accept='.xlsx'
         type='file'
         ref={fileInput}
-        onChange={handleUploadInput}
+        onChange={readExcelFile}
         onClick={(event) => {
           (event.target as any).value = null;
         }}

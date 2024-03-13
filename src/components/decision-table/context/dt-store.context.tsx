@@ -9,7 +9,7 @@ import type { SchemaSelectProps } from '../../../helpers/components';
 import type { TableCellProps } from '../table/table-default-cell';
 
 export type TableExportOptions = {
-  name?: string;
+  name: string;
 };
 
 export type TableCursor = {
