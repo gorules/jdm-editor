@@ -200,6 +200,7 @@ const TableBody = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(
     const virtualizer = useVirtualizer({
       getScrollElement: () => tableContainerRef.current,
       estimateSize: () => 38,
+      indexAttribute: 'data-virtual-index',
       count: rows.length,
       overscan: 10,
     });
@@ -242,10 +243,11 @@ const TableBody = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(
             return (
               <TableRow
                 key={row.id}
-                index={item.index}
+                virtualItem={item}
                 row={row}
                 reorderRow={tableActions.swapRows}
                 disabled={disabled}
+                onResize={(node) => virtualizer.measureElement(node)}
               />
             );
           })}

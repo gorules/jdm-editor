@@ -1,6 +1,6 @@
 {
   "name": "@gorules/jdm-editor",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "author": "GoRules <hi@gorules.io> (https://gorules.io)",
   "homepage": "https://github.com/gorules/jdm-editor",
@@ -38,7 +38,7 @@
     "@ant-design/icons": "5.2.6",
     "@monaco-editor/react": "^4.6.0",
     "@tanstack/react-table": "8.11.7",
-    "@tanstack/react-virtual": "3.0.2",
+    "@tanstack/react-virtual": "3.2.0",
     "ace-builds": "^1.32.5",
     "antd": "5.13.3",
     "clsx": "2.1.0",
