@@ -6,6 +6,7 @@ import { useDebouncedCallback } from 'use-debounce';
 import {
   type DecisionGraphStoreType,
   type DecisionGraphType,
+  type GraphConfig,
   useDecisionGraphActions,
   useDecisionGraphRaw,
   useDecisionGraphState,
@@ -22,6 +23,7 @@ export type DecisionGraphEmptyType = {
 
   components?: NodeSpecification[];
 
+  graphConfig?: GraphConfig;
   onChange?: DecisionGraphStoreType['listeners']['onChange'];
   onSimulationRun?: DecisionGraphStoreType['listeners']['onSimulationRun'];
   onSimulatorOpen?: DecisionGraphStoreType['listeners']['onSimulatorOpen'];
@@ -36,14 +38,17 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
   onChange,
   onSimulationRun,
   components,
+  graphConfig,
   onSimulatorOpen,
   onReactFlowInit,
 }) => {
   const mountedRef = useRef(false);
   const graphActions = useDecisionGraphActions();
   const { stateStore, listenerStore } = useDecisionGraphRaw();
-  const { decisionGraph } = useDecisionGraphState(({ decisionGraph }) => ({
+  const { decisionGraph, openTabs, activeTab } = useDecisionGraphState(({ decisionGraph, openTabs, activeTab }) => ({
     decisionGraph,
+    openTabs,
+    activeTab,
   }));
 
   const innerChange = useDebouncedCallback((graph: DecisionGraphType) => {
@@ -51,13 +56,25 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
   }, 100);
 
   useEffect(() => {
+    if (graphConfig) {
+      const filtered = openTabs.filter((tab) => !!graphConfig[tab]);
+
+      stateStore.setState({
+        openTabs: filtered,
+        activeTab: !!graphConfig?.[activeTab] ? activeTab : filtered?.[0],
+      });
+    }
+  }, [graphConfig]);
+
+  useEffect(() => {
     stateStore.setState({
       id,
       disabled,
       configurable,
+      graphConfig,
       components: Array.isArray(components) ? components : [],
     });
-  }, [id, disabled, configurable, components]);
+  }, [id, disabled, configurable, components, graphConfig]);
 
   useEffect(() => {
     listenerStore.setState({
