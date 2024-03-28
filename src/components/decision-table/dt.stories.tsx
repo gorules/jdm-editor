@@ -110,7 +110,7 @@ const stressRules = () => {
   for (let i = 10_000; i > 0; i--) {
     stressRules.push({
       '_id': `${i}`,
-      '_description': `${i} description asdainsffi asnofa asniof saion fionas finosafionf saoin`,
+      '_description': `${i} Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.`,
       'HVo_JpALi8': `> ${i}`,
       'HW6mSVfLbs': '"US"',
       '3EGDrV0ssV': `${i}`,
