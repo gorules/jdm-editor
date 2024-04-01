@@ -7,7 +7,6 @@ import type { DecisionNode } from '../../context/dg-store.context';
 import { useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
 import { GraphNode } from '../graph-node';
 import type { MinimalNodeProps, MinimalNodeSpecification } from '../specifications/specification-types';
-import './metadata';
 
 export type CustomNodeSpecification<Data extends object, Component extends string> = {
   type: Component;

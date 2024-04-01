@@ -89,9 +89,6 @@ dependencies:
   uuid:
     specifier: 9.0.1
     version: 9.0.1
-  zod:
-    specifier: ^3.22.4
-    version: 3.22.4
   zustand:
     specifier: ^4.5.0
     version: 4.5.0(@types/react@18.2.48)(immer@10.0.3)(react@18.2.0)
@@ -12185,10 +12182,6 @@ packages:
       archiver-utils: 3.0.4
       compress-commons: 4.1.2
       readable-stream: 3.6.2
-    dev: false
-
-  /zod@3.22.4:
-    resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
     dev: false
 
   /zustand@4.5.0(@types/react@18.2.48)(immer@10.0.3)(react@18.2.0):

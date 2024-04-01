@@ -1,7 +1,7 @@
-import { ApartmentOutlined } from '@ant-design/icons';
+import { ApartmentOutlined, ApiOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
 import type { Meta, StoryObj } from '@storybook/react';
 import { Select } from 'antd';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 
 import { DecisionGraph } from './dg';
 import { defaultGraph } from './dg.stories-values';
@@ -100,62 +100,63 @@ export const Extended: Story = {
   },
 };
 
+const customNodes = [
+  createJdmNode({
+    type: 'pingNode',
+    displayName: 'Ping',
+    group: 'ping',
+    shortDescription: 'Used for ping',
+  }),
+  createJdmNode({
+    type: 'pongNode',
+    displayName: 'Pong',
+    group: 'ping',
+    shortDescription: 'Used for pong',
+  }),
+  createJdmNode({
+    type: 'rightHandleNode',
+    group: 'integrations',
+    displayName: 'Right Handle',
+    icon: <RightOutlined />,
+    handleLeft: false,
+  }),
+  createJdmNode({
+    type: 'leftHandleNode',
+    group: 'integrations',
+    displayName: 'Left Handle',
+    icon: <LeftOutlined />,
+    handleRight: false,
+  }),
+  createJdmNode({
+    type: 'inputsNode',
+    group: 'inputs',
+    displayName: 'Inputs Form',
+    shortDescription: 'With inputs map form',
+    icon: <ApiOutlined />,
+    inputs: [
+      {
+        control: 'text',
+        name: 'hello.nested.something',
+        label: 'First',
+      },
+      {
+        control: 'text',
+        name: 'second',
+        label: 'Second',
+      },
+      {
+        control: 'bool',
+        name: 'checkbox',
+        label: 'Checkbox',
+      },
+    ],
+  }),
+];
+
 export const CustomNode: Story = {
   render: (args) => {
     const ref = useRef<GraphRef>(null);
     const [value, setValue] = useState<any>();
-
-    const customNodes = useMemo(() => {
-      return [
-        createJdmNode({
-          type: 'pingNode',
-          displayName: 'Ping',
-          group: 'ping',
-          shortDescription: 'Used for ping',
-        }),
-        createJdmNode({
-          type: 'pongNode',
-          displayName: 'Pong',
-          group: 'ping',
-          shortDescription: 'Used for pong',
-        }),
-        createJdmNode({
-          type: 'rightHandleNode',
-          group: 'integrations',
-          displayName: 'Right Handle',
-          handleLeft: false,
-        }),
-        createJdmNode({
-          type: 'leftHandleNode',
-          group: 'integrations',
-          displayName: 'Left Handle',
-          handleRight: false,
-        }),
-        createJdmNode({
-          type: 'inputsNode',
-          group: 'inputs',
-          displayName: 'Inputs Form',
-          shortDescription: 'With inputs map form',
-          inputs: [
-            {
-              control: 'text',
-              name: 'hello.nested.something',
-              label: 'First',
-            },
-            {
-              control: 'text',
-              name: 'second',
-              label: 'Second',
-            },
-            {
-              control: 'bool',
-              name: 'checkbox',
-              label: 'Checkbox',
-            },
-          ],
-        }),
-      ];
-    }, []);
 
     return (
       <div
