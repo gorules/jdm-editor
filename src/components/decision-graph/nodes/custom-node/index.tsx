@@ -1,5 +1,5 @@
 import { DownOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Form, Input, Typography } from 'antd';
+import { Button, Checkbox, Form, Input, Typography, theme } from 'antd';
 import React, { useState } from 'react';
 import { match } from 'ts-pattern';
 
@@ -21,9 +21,9 @@ export type CustomNodeSpecification<Data extends object, Component extends strin
   generateNode: () => Omit<DecisionNode<Data>, 'position' | 'id' | 'type' | 'content'> & { config?: Data };
   renderNode: React.FC<MinimalNodeProps & { specification: MinimalNodeSpecification }>;
 
-  onNodeAdd?: (node: DecisionNode<{ type: Component; config: Data }>) => Promise<
+  onNodeAdd?: (node: DecisionNode<{ kind: Component; config: Data }>) => Promise<
     DecisionNode<{
-      type: Component;
+      kind: Component;
       config: Data;
     }>
   >;
@@ -70,6 +70,7 @@ export const createJdmNode = <Component extends string>(
       ? n.renderNode
       : ({ id, specification, data, selected }) => {
           const [open, setOpen] = useState(false);
+          const { token } = theme.useToken();
           const { updateNode } = useDecisionGraphActions();
           const node = useDecisionGraphState((state) => (state.decisionGraph?.nodes || []).find((n) => n.id === id));
           const nodeData = node?.content?.config;
@@ -99,12 +100,9 @@ export const createJdmNode = <Component extends string>(
             >
               {open && n?.inputs && (
                 <Form
-                  size='middle'
+                  className='grl-dn__cn__form'
                   layout='vertical'
                   initialValues={nodeData}
-                  style={{
-                    padding: '0.5rem',
-                  }}
                   onValuesChange={(_, values) => {
                     updateNode(id, (draft) => {
                       draft.content.config = values;
@@ -114,13 +112,19 @@ export const createJdmNode = <Component extends string>(
                 >
                   {(n?.inputs || []).map(({ name, control, label }) => {
                     const formItem = match({ control })
-                      .with({ control: 'text' }, () => <Input.TextArea size='small' autoSize={{ maxRows: 3 }} />)
-                      .with({ control: 'checkbox' }, () => <Checkbox>{label}</Checkbox>)
+                      .with({ control: 'text' }, () => <Input size='small' />)
+                      .with({ control: 'checkbox' }, () => (
+                        <Checkbox>
+                          <Typography.Text style={{ fontSize: token.fontSizeSM }}>{label}</Typography.Text>
+                        </Checkbox>
+                      ))
                       .exhaustive();
 
                     const outerLabel = match({ control })
                       .with({ control: 'checkbox' }, () => null)
-                      .otherwise(() => <Typography.Text>{label}</Typography.Text>);
+                      .otherwise(() => (
+                        <Typography.Text style={{ fontSize: token.fontSizeSM }}>{label}</Typography.Text>
+                      ));
 
                     return (
                       <Form.Item

@@ -147,6 +147,11 @@ export const CustomNode: Story = {
               name: 'second',
               label: 'Second',
             },
+            {
+              control: 'checkbox',
+              name: 'checkbox',
+              label: 'Checkbox'
+            }
           ],
         }),
       ];

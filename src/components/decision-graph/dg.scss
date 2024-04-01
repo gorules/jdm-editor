@@ -346,6 +346,18 @@
         gap: 16px;
         padding: 1rem;
 
+        &__search {
+          border-left: none;
+          border-top: none;
+          border-right: none;
+          border-radius: 0;
+          height: 39px;
+          box-shadow: none;
+          position: sticky;
+          top: 0;
+          z-index: 1;
+        }
+
         .divider {
           grid-column: 1 / -1;
           height: 1px;

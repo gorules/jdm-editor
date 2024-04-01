@@ -98,17 +98,7 @@ export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inp
         value={search}
         onChange={(e) => setSearch(e.target.value || '')}
         allowClear
-        style={{
-          borderLeft: 'none',
-          borderTop: 'none',
-          borderRight: 'none',
-          borderRadius: 0,
-          height: 39,
-          boxShadow: 'none',
-          position: 'sticky',
-          top: 0,
-          zIndex: 1,
-        }}
+        className={'grl-dg__aside__menu__components__search'}
       />
       <div className={'grl-dg__aside__menu__components'}>
         {Object.keys(groups).map((group) => {
