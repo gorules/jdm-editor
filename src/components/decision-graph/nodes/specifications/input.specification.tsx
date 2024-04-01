@@ -2,10 +2,10 @@ import { BookOutlined, DeleteOutlined, LoginOutlined } from '@ant-design/icons';
 import { Modal, Typography } from 'antd';
 import React from 'react';
 
-import { platform } from '../../../helpers/platform';
-import { SpacedText } from '../../spaced-text';
-import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
-import { GraphNode } from './graph-node';
+import { platform } from '../../../../helpers/platform';
+import { SpacedText } from '../../../spaced-text';
+import { useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
+import { GraphNode } from '../graph-node';
 import type { NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
 

@@ -16,7 +16,7 @@ import {
   useDecisionGraphRaw,
   useDecisionGraphState,
 } from './context/dg-store.context';
-import { NodeKind } from './nodes/specification-types';
+import { NodeKind } from './nodes/specifications/specification-types';
 
 export const GraphSimulator: React.FC = () => {
   const { token } = theme.useToken();

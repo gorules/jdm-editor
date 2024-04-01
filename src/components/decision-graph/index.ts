@@ -1,6 +1,12 @@
 export * from './dg';
 
-export type { NodeSpecification, MinimalNodeSpecification, MinimalNodeProps } from './nodes/specification-types';
+export type {
+  NodeSpecification,
+  MinimalNodeSpecification,
+  MinimalNodeProps,
+} from './nodes/specifications/specification-types';
+export type { CustomNodeSpecification } from './nodes/custom-node/index';
+export { createJdmNode } from './nodes/custom-node';
 export { GraphNode, type GraphNodeProps } from './nodes/graph-node';
 export {
   useDecisionGraphState,

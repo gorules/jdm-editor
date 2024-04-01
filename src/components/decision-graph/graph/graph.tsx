@@ -4,6 +4,7 @@ import React, { type MutableRefObject, forwardRef, useImperativeHandle, useMemo,
 import type { Connection, ProOptions, ReactFlowInstance, XYPosition } from 'reactflow';
 import ReactFlow, { Background, Controls, useEdgesState, useNodesState } from 'reactflow';
 import 'reactflow/dist/style.css';
+import { P, match } from 'ts-pattern';
 import { v4 } from 'uuid';
 
 import {
@@ -18,8 +19,9 @@ import { edgeFunction } from '../custom-edge';
 import { mapToDecisionEdge } from '../dg-util';
 import '../dg.scss';
 import { useGraphClipboard } from '../hooks/use-graph-clipboard';
-import type { MinimalNodeProps } from '../nodes/specification-types';
-import { nodeSpecification } from '../nodes/specifications';
+import type { CustomNodeSpecification } from '../nodes/custom-node/index';
+import type { MinimalNodeProps } from '../nodes/specifications/specification-types';
+import { nodeSpecification } from '../nodes/specifications/specifications';
 
 export type GraphProps = {
   className?: string;
@@ -58,13 +60,45 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
   const edgesState = useEdgesState([]);
 
   const graphActions = useDecisionGraphActions();
-  const { disabled, components } = useDecisionGraphState(({ disabled, components }) => ({ disabled, components }));
   const graphReferences = useDecisionGraphReferences((s) => s);
   const { onReactFlowInit } = useDecisionGraphListeners(({ onReactFlowInit }) => ({ onReactFlowInit }));
+  const { disabled, components, customNodes } = useDecisionGraphState(({ disabled, components, customNodes }) => ({
+    disabled,
+    components,
+    customNodes,
+  }));
 
   graphReferences.nodesState.current = nodesState;
   graphReferences.edgesState.current = edgesState;
   graphReferences.graphClipboard.current = useGraphClipboard(reactFlowInstance, reactFlowWrapper);
+
+  const customNodeRenderer = useMemo(() => {
+    return React.memo(
+      (props: MinimalNodeProps) => {
+        const node = customNodes.find((node) => node.type === props?.data?.kind) as CustomNodeSpecification<
+          object,
+          string
+        >;
+
+        if (!node) {
+          console.warn('node not found', props, customNodes);
+          return null;
+        }
+
+        return node.renderNode({
+          specification: node,
+          ...props,
+        });
+      },
+      (prevProps, nextProps) => {
+        return (
+          prevProps.id === nextProps.id &&
+          prevProps.selected === nextProps.selected &&
+          prevProps.data === nextProps.data
+        );
+      },
+    );
+  }, [customNodes]);
 
   const nodeTypes = useMemo<Record<string, React.FC>>(() => {
     return components.reduce(
@@ -81,11 +115,11 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
           },
         ),
       }),
-      defaultNodeTypes,
+      { ...defaultNodeTypes, customNode: customNodeRenderer },
     );
-  }, [components]);
+  }, [components, customNodeRenderer]);
 
-  const addNodeInner = async (type: string, position?: XYPosition) => {
+  const addNodeInner = async (type: string, position?: XYPosition, component?: string) => {
     if (!reactFlowWrapper.current || !reactFlowInstance.current) {
       return;
     }
@@ -100,24 +134,46 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
       position = reactFlowInstance.current.project(rectCenter);
     }
 
-    const allSpecifications = [...Object.values(nodeSpecification), ...components];
-    const specification = allSpecifications.find((s) => s.type === type);
-    if (!specification) {
-      message.error(`Unknown node type ${type}`);
+    const customSpecification = match(type)
+      .with('customNode', () => customNodes.find((node) => node.type === component))
+      .otherwise(() => {
+        const allSpecifications = [...Object.values(nodeSpecification), ...components];
+        return allSpecifications.find((s) => s.type === type);
+      });
+    if (!customSpecification) {
+      message.error(`Unknown node type ${type} - ${component}.`);
       return;
     }
 
-    const partialNode = specification.generateNode();
-    let newNode: DecisionNode = {
-      ...partialNode,
-      id: v4(),
-      position,
-      type: specification.type,
-    };
+    let newNode: DecisionNode = match(type)
+      .with('customNode', () => {
+        const partialNode = customSpecification.generateNode();
+        return {
+          type: 'customNode',
+          name: partialNode?.name || customSpecification?.displayName,
+          id: v4(),
+          position: position as XYPosition,
+          content: {
+            kind: customSpecification.type,
+            config: partialNode?.config,
+          },
+        } satisfies DecisionNode;
+      })
+      .otherwise(() => {
+        const partialNode = customSpecification.generateNode();
+        return {
+          type: customSpecification.type,
+          id: v4(),
+          position: position as XYPosition,
+          ...partialNode,
+        } satisfies DecisionNode;
+      });
 
-    if (specification.onNodeAdd) {
+    console.log(newNode);
+
+    if (customSpecification.onNodeAdd) {
       try {
-        newNode = await specification.onNodeAdd(newNode);
+        newNode = await customSpecification.onNodeAdd(newNode);
       } catch {
         return;
       }
@@ -171,7 +227,12 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
     position.x -= Math.round((elementPosition.x * 226) / 10) * 10;
     position.y -= Math.round((elementPosition.y * 60) / 10) * 10;
 
-    addNodeInner(type, position);
+    const component = match(event.dataTransfer.getData('customNodeComponent'))
+      .with(P.string, (c) => c)
+      .otherwise(() => undefined);
+
+    console.log(component);
+    addNodeInner(type, position, component);
   };
 
   const onDragOver = (event: any) => {

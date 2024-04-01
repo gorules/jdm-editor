@@ -1,8 +1,8 @@
 .grl-dg {
   height: 100%;
   display: grid;
-  grid-template-areas: 'sidebar graph' 'simulator simulator';
-  grid-template-columns: min-content 1fr;
+  grid-template-areas: 'sidebar graph component' 'simulator simulator component';
+  grid-template-columns: min-content 1fr min-content;
   grid-template-rows: 1fr auto;
 
   &__content {
@@ -260,6 +260,15 @@
         right: 8px;
       }
     }
+  }
+
+  &__component-bar {
+    grid-area: component;
+    height: 100%;
+    display: flex;
+    background-color: var(--grl-color-bg-container);
+    min-height: 0;
+    border-left: 1px solid var(--grl-color-border);
   }
 
   &__aside {

@@ -6,9 +6,9 @@ import { Handle, Position } from 'reactflow';
 import { P, match } from 'ts-pattern';
 import { v4 } from 'uuid';
 
-import { AutosizeTextArea } from '../../autosize-text-area';
-import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
-import { GraphNode } from './graph-node';
+import { AutosizeTextArea } from '../../../autosize-text-area';
+import { useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
+import { GraphNode } from '../graph-node';
 import type { MinimalNodeProps, NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
 

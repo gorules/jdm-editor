@@ -2,8 +2,8 @@ import { NumberOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import React from 'react';
 
-import { useDecisionGraphActions } from '../context/dg-store.context';
-import { GraphNode } from './graph-node';
+import { useDecisionGraphActions } from '../../context/dg-store.context';
+import { GraphNode } from '../graph-node';
 import type { NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
 

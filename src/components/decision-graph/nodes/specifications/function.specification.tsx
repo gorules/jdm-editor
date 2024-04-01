@@ -2,9 +2,9 @@ import { FunctionOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import React from 'react';
 
-import { defaultFunctionValue } from '../../function/helpers/libs';
-import { useDecisionGraphActions } from '../context/dg-store.context';
-import { GraphNode } from './graph-node';
+import { defaultFunctionValue } from '../../../function/helpers/libs';
+import { useDecisionGraphActions } from '../../context/dg-store.context';
+import { GraphNode } from '../graph-node';
 import type { NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
 

@@ -17,7 +17,7 @@ import {
   useDecisionGraphListeners,
   useDecisionGraphState,
 } from '../context/dg-store.context';
-import { NodeKind } from '../nodes/specification-types';
+import { NodeKind } from '../nodes/specifications/specification-types';
 import { GraphComponents } from './graph-components';
 
 const DecisionContentType = 'application/vnd.gorules.decision';

@@ -1,7 +1,7 @@
 import { LogoutOutlined } from '@ant-design/icons';
 import React from 'react';
 
-import { GraphNode } from './graph-node';
+import { GraphNode } from '../graph-node';
 import type { NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
 
