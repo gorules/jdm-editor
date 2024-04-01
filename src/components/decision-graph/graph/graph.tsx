@@ -169,8 +169,6 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
         } satisfies DecisionNode;
       });
 
-    console.log(newNode);
-
     if (customSpecification.onNodeAdd) {
       try {
         newNode = await customSpecification.onNodeAdd(newNode);

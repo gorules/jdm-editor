@@ -139,7 +139,7 @@ export const CustomNode: Story = {
           inputs: [
             {
               control: 'text',
-              name: 'first',
+              name: 'hello.nested.something',
               label: 'First',
             },
             {
@@ -148,10 +148,10 @@ export const CustomNode: Story = {
               label: 'Second',
             },
             {
-              control: 'checkbox',
+              control: 'bool',
               name: 'checkbox',
-              label: 'Checkbox'
-            }
+              label: 'Checkbox',
+            },
           ],
         }),
       ];
