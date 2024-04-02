@@ -28,8 +28,8 @@ export const switchSpecification: NodeSpecification<NodeSwitchData> = {
   displayName: 'Switch',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/switch',
   shortDescription: 'Conditional branching',
-  generateNode: () => ({
-    name: 'mySwitch',
+  generateNode: ({ index }) => ({
+    name: `switch${index}`,
     content: {
       statements: [{ id: v4(), condition: '' }],
     },

@@ -55,9 +55,9 @@ export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inp
       const group = node.group?.trim?.() || '';
       if (group.length > 0) {
         if (initialGroups?.[group]) {
-          initialGroups[group].push(node);
+          initialGroups[group].push({ ...node, type: 'customNode' });
         } else {
-          initialGroups[group] = [node];
+          initialGroups[group] = [{ ...node, type: 'customNode' }];
         }
       }
     });
@@ -65,9 +65,9 @@ export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inp
     (customNodes || []).forEach((node) => {
       if (!node?.group) {
         if (initialGroups?.['custom']) {
-          initialGroups['custom'].push(node);
+          initialGroups['custom'].push({ ...node, type: 'customNode' });
         } else {
-          initialGroups['custom'] = [node];
+          initialGroups['custom'] = [{ ...node, type: 'customNode' }];
         }
       }
     });
@@ -121,7 +121,7 @@ export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inp
                       </Typography.Text>
                     </Divider>
                     {(groups['core'] || []).map((node) => (
-                      <React.Fragment key={node.type}>
+                      <React.Fragment key={'kind' in node ? (node.kind as string) : node.type}>
                         <DragDecisionNode
                           disabled={match(node.type)
                             .with(NodeKind.Input, () => disabled || inputDisabled)
@@ -130,7 +130,7 @@ export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inp
                           onDragStart={(event) =>
                             nodeSpecification[node.type as NodeKind] !== undefined
                               ? onDragStart(event, node.type)
-                              : onDragStart(event, 'customNode', node.type)
+                              : onDragStart(event, 'customNode', 'kind' in node ? (node.kind as string) : '')
                           }
                         />
                         {node.type === NodeKind.Output && (
@@ -159,13 +159,13 @@ export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inp
                     </Divider>
                     {(groups?.[group] || []).map((customNode) => (
                       <DragDecisionNode
-                        key={customNode.type}
+                        key={'kind' in customNode ? (customNode.kind as string) : customNode.type}
                         disabled={disabled}
                         specification={customNode}
                         onDragStart={(event) =>
                           group === 'extended'
                             ? onDragStart(event, customNode.type)
-                            : onDragStart(event, 'customNode', customNode.type)
+                            : onDragStart(event, 'customNode', 'kind' in customNode ? (customNode.kind as string) : '')
                         }
                       />
                     ))}

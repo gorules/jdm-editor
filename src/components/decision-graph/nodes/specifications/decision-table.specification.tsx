@@ -33,8 +33,8 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
   displayName: 'Decision table',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/decision-tables',
   shortDescription: 'Rules spreadsheet',
-  generateNode: () => ({
-    name: 'myDecisionTable',
+  generateNode: ({ index }) => ({
+    name: `decisionTable${index}`,
     content: {
       hitPolicy: 'first',
       inputs: [

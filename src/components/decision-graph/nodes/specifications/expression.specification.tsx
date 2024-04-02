@@ -23,8 +23,8 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
   displayName: 'Expression',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/expression',
   shortDescription: 'Mapping utility',
-  generateNode: () => ({
-    name: 'myExpression',
+  generateNode: ({ index }) => ({
+    name: `expression${index}`,
     content: {
       expressions: [],
     },

@@ -18,7 +18,7 @@ export const inputSpecification: NodeSpecification<NodeInputData> = {
   color: 'secondary',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions',
   shortDescription: 'Provides input context',
-  generateNode: () => ({ name: 'myRequest' }),
+  generateNode: () => ({ name: 'request' }),
   renderNode: ({ id, data, selected, specification }) => {
     const graphActions = useDecisionGraphActions();
     const { disabled } = useDecisionGraphState(({ disabled }) => ({

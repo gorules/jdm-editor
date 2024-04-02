@@ -8,15 +8,21 @@ import { useDecisionGraphActions, useDecisionGraphState } from '../../context/dg
 import { GraphNode } from '../graph-node';
 import type { MinimalNodeProps, MinimalNodeSpecification } from '../specifications/specification-types';
 
+type GenerateNodeParams = {
+  index: number;
+};
+
 export type CustomNodeSpecification<Data extends object, Component extends string> = {
-  type: Component;
+  kind: Component;
   color?: string;
   icon?: React.ReactNode;
   displayName: string;
   group?: string;
   documentationUrl?: string;
   shortDescription?: string;
-  generateNode: () => Omit<DecisionNode<Data>, 'position' | 'id' | 'type' | 'content'> & { config?: Data };
+  generateNode: (params: GenerateNodeParams) => Omit<DecisionNode<Data>, 'position' | 'id' | 'type' | 'content'> & {
+    config?: Data;
+  };
   renderNode: React.FC<MinimalNodeProps & { specification: MinimalNodeSpecification }>;
 
   onNodeAdd?: (node: DecisionNode<{ kind: Component; config: Data }>) => Promise<
@@ -65,7 +71,7 @@ export type BaseNode<
   Inputs extends InputSchema<InputName>[],
   NodeData extends object = CreateDynamicType<Inputs>,
 > = {
-  type: Component;
+  kind: Component;
   icon?: React.ReactNode;
   color?: string;
   displayName: string;
@@ -87,7 +93,7 @@ export const createJdmNode = <
   n: BaseNode<Component, InputName, Inputs>,
 ): CustomNodeSpecification<any, Component> => {
   return {
-    type: n.type,
+    kind: n.kind,
     icon: n.icon,
     color: n.color,
     displayName: n.displayName,
@@ -95,8 +101,8 @@ export const createJdmNode = <
     shortDescription: n.shortDescription,
     generateNode:
       n.generateNode ||
-      (() => ({
-        name: n.displayName || n.type,
+      (({ index }) => ({
+        name: `${n.kind || n.displayName}${index}`,
       })),
     onNodeAdd: n.onNodeAdd,
     renderNode: n.renderNode

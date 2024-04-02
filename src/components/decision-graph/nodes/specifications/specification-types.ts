@@ -16,6 +16,10 @@ export enum NodeKind {
 export type MinimalNodeProps = Pick<NodeProps, 'id' | 'data' | 'selected'>;
 export type MinimalNodeSpecification = Pick<NodeSpecification, 'color' | 'icon' | 'displayName' | 'documentationUrl'>;
 
+type GenerateNodeParams = {
+  index: number;
+};
+
 export type NodeSpecification<T = any> = {
   icon?: React.ReactNode;
   type: string;
@@ -24,7 +28,7 @@ export type NodeSpecification<T = any> = {
   displayName: string;
   documentationUrl?: string;
   shortDescription?: string;
-  generateNode: () => Omit<DecisionNode<T>, 'position' | 'id' | 'type'>;
+  generateNode: (params: GenerateNodeParams) => Omit<DecisionNode<T>, 'position' | 'id' | 'type'>;
   renderNode: React.FC<MinimalNodeProps & { specification: MinimalNodeSpecification }>;
 
   onNodeAdd?: (node: DecisionNode<T>) => Promise<DecisionNode<T>>;

@@ -102,33 +102,33 @@ export const Extended: Story = {
 
 const customNodes = [
   createJdmNode({
-    type: 'pingNode',
+    kind: 'pingNode',
     displayName: 'Ping',
     group: 'ping',
     shortDescription: 'Used for ping',
   }),
   createJdmNode({
-    type: 'pongNode',
+    kind: 'pongNode',
     displayName: 'Pong',
     group: 'ping',
     shortDescription: 'Used for pong',
   }),
   createJdmNode({
-    type: 'rightHandleNode',
+    kind: 'rightHandleNode',
     group: 'integrations',
     displayName: 'Right Handle',
     icon: <RightOutlined />,
     handleLeft: false,
   }),
   createJdmNode({
-    type: 'leftHandleNode',
+    kind: 'leftHandleNode',
     group: 'integrations',
     displayName: 'Left Handle',
     icon: <LeftOutlined />,
     handleRight: false,
   }),
   createJdmNode({
-    type: 'inputsNode',
+    kind: 'inputsNode',
     group: 'inputs',
     displayName: 'Inputs Form',
     shortDescription: 'With inputs map form',

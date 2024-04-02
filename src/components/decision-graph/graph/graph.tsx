@@ -75,7 +75,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
   const customNodeRenderer = useMemo(() => {
     return React.memo(
       (props: MinimalNodeProps) => {
-        const node = customNodes.find((node) => node.type === props?.data?.kind) as CustomNodeSpecification<
+        const node = customNodes.find((node) => node.kind === props?.data?.kind) as CustomNodeSpecification<
           object,
           string
         >;
@@ -135,7 +135,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
     }
 
     const customSpecification = match(type)
-      .with('customNode', () => customNodes.find((node) => node.type === component))
+      .with('customNode', () => customNodes.find((node) => node.kind === component))
       .otherwise(() => {
         const allSpecifications = [...Object.values(nodeSpecification), ...components];
         return allSpecifications.find((s) => s.type === type);
@@ -145,29 +145,40 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
       return;
     }
 
-    let newNode: DecisionNode = match(type)
-      .with('customNode', () => {
-        const partialNode = customSpecification.generateNode();
+    let newNode: DecisionNode | null = match(customSpecification)
+      .with({ kind: P.string }, (specification) => {
+        const existingCount =
+          (reactFlowInstance.current?.getNodes() || []).filter((n) => n.data?.kind === specification.kind).length + 1;
+
+        const partialNode = specification.generateNode({ index: existingCount });
         return {
-          type: 'customNode',
-          name: partialNode?.name || customSpecification?.displayName,
           id: v4(),
+          type: 'customNode',
+          name: partialNode.name,
           position: position as XYPosition,
           content: {
-            kind: customSpecification.type,
+            kind: specification.kind,
             config: partialNode?.config,
           },
         } satisfies DecisionNode;
       })
-      .otherwise(() => {
-        const partialNode = customSpecification.generateNode();
+      .with({ type: P.string }, (specification) => {
+        const existingCount =
+          (reactFlowInstance.current?.getNodes() || []).filter((n) => n.type === specification.type).length + 1;
+        const partialNode = specification.generateNode({ index: existingCount });
+
         return {
-          type: customSpecification.type,
+          type: specification.type,
           id: v4(),
           position: position as XYPosition,
           ...partialNode,
         } satisfies DecisionNode;
-      });
+      })
+      .otherwise(() => null);
+    if (!newNode) {
+      message.error(`Unknown node type ${type} - ${component}.`);
+      return;
+    }
 
     if (customSpecification.onNodeAdd) {
       try {
@@ -229,7 +240,6 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
       .with(P.string, (c) => c)
       .otherwise(() => undefined);
 
-    console.log(component);
     addNodeInner(type, position, component);
   };
 
