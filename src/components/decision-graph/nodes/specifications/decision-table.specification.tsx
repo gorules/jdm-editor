@@ -3,8 +3,8 @@ import { Button } from 'antd';
 import React from 'react';
 import { v4 } from 'uuid';
 
-import { useDecisionGraphActions } from '../context/dg-store.context';
-import { GraphNode } from './graph-node';
+import { useDecisionGraphActions } from '../../context/dg-store.context';
+import { GraphNode } from '../graph-node';
 import type { NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
 
@@ -33,8 +33,8 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
   displayName: 'Decision table',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/decision-tables',
   shortDescription: 'Rules spreadsheet',
-  generateNode: () => ({
-    name: 'myDecisionTable',
+  generateNode: ({ index }) => ({
+    name: `decisionTable${index}`,
     content: {
       hitPolicy: 'first',
       inputs: [

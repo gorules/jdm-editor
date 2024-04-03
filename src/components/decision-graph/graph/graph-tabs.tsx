@@ -4,8 +4,8 @@ import { Avatar, Tabs } from 'antd';
 import React from 'react';
 
 import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
-import type { NodeKind } from '../nodes/specification-types';
-import { nodeSpecification } from '../nodes/specifications';
+import type { NodeKind } from '../nodes/specifications/specification-types';
+import { nodeSpecification } from '../nodes/specifications/specifications';
 
 export type GraphTabsProps = {
   disabled?: boolean;

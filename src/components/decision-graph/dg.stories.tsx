@@ -1,4 +1,4 @@
-import { ApartmentOutlined } from '@ant-design/icons';
+import { ApartmentOutlined, ApiOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
 import type { Meta, StoryObj } from '@storybook/react';
 import { Select } from 'antd';
 import React, { useRef, useState } from 'react';
@@ -6,8 +6,9 @@ import React, { useRef, useState } from 'react';
 import { DecisionGraph } from './dg';
 import { defaultGraph } from './dg.stories-values';
 import type { GraphRef } from './graph/graph';
+import { createJdmNode } from './nodes/custom-node';
 import { GraphNode } from './nodes/graph-node';
-import type { NodeSpecification } from './nodes/specification-types';
+import type { NodeSpecification } from './nodes/specifications/specification-types';
 
 const meta: Meta<typeof DecisionGraph> = {
   /* 👇 The title prop is optional.
@@ -94,6 +95,83 @@ export const Extended: Story = {
         }}
       >
         <DecisionGraph {...args} ref={ref} value={value} onChange={(val) => setValue(val)} components={components} />
+      </div>
+    );
+  },
+};
+
+const customNodes = [
+  createJdmNode({
+    kind: 'pingNode',
+    displayName: 'Ping',
+    group: 'ping',
+    shortDescription: 'Used for ping',
+  }),
+  createJdmNode({
+    kind: 'pongNode',
+    displayName: 'Pong',
+    group: 'ping',
+    shortDescription: 'Used for pong',
+  }),
+  createJdmNode({
+    kind: 'rightHandleNode',
+    group: 'integrations',
+    displayName: 'Right Handle',
+    icon: <RightOutlined />,
+    handleLeft: false,
+  }),
+  createJdmNode({
+    kind: 'leftHandleNode',
+    group: 'integrations',
+    displayName: 'Left Handle',
+    icon: <LeftOutlined />,
+    handleRight: false,
+  }),
+  createJdmNode({
+    kind: 'inputsNode',
+    group: 'inputs',
+    displayName: 'Inputs Form',
+    shortDescription: 'With inputs map form',
+    icon: <ApiOutlined />,
+    inputs: [
+      {
+        control: 'text',
+        name: 'hello.nested.something',
+        label: 'First',
+      },
+      {
+        control: 'text',
+        name: 'second',
+        label: 'Second',
+      },
+      {
+        control: 'bool',
+        name: 'checkbox',
+        label: 'Checkbox',
+      },
+    ],
+  }),
+];
+
+export const CustomNode: Story = {
+  render: (args) => {
+    const ref = useRef<GraphRef>(null);
+    const [value, setValue] = useState<any>();
+
+    return (
+      <div
+        style={{
+          height: '100%',
+        }}
+      >
+        <DecisionGraph
+          customNodes={customNodes}
+          {...args}
+          ref={ref}
+          value={value}
+          onChange={(val) => setValue(val)}
+          components={components}
+        />
       </div>
     );
   },

@@ -6,9 +6,9 @@ import { Handle, Position } from 'reactflow';
 import { P, match } from 'ts-pattern';
 import { v4 } from 'uuid';
 
-import { AutosizeTextArea } from '../../autosize-text-area';
-import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
-import { GraphNode } from './graph-node';
+import { AutosizeTextArea } from '../../../autosize-text-area';
+import { useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
+import { GraphNode } from '../graph-node';
 import type { MinimalNodeProps, NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
 
@@ -28,8 +28,8 @@ export const switchSpecification: NodeSpecification<NodeSwitchData> = {
   displayName: 'Switch',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/switch',
   shortDescription: 'Conditional branching',
-  generateNode: () => ({
-    name: 'mySwitch',
+  generateNode: ({ index }) => ({
+    name: `switch${index}`,
     content: {
       statements: [{ id: v4(), condition: '' }],
     },

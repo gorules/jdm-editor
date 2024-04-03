@@ -2,10 +2,10 @@ import { BookOutlined, DeleteOutlined, LoginOutlined } from '@ant-design/icons';
 import { Modal, Typography } from 'antd';
 import React from 'react';
 
-import { platform } from '../../../helpers/platform';
-import { SpacedText } from '../../spaced-text';
-import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
-import { GraphNode } from './graph-node';
+import { platform } from '../../../../helpers/platform';
+import { SpacedText } from '../../../spaced-text';
+import { useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
+import { GraphNode } from '../graph-node';
 import type { NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
 
@@ -18,7 +18,7 @@ export const inputSpecification: NodeSpecification<NodeInputData> = {
   color: 'secondary',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions',
   shortDescription: 'Provides input context',
-  generateNode: () => ({ name: 'myRequest' }),
+  generateNode: () => ({ name: 'request' }),
   renderNode: ({ id, data, selected, specification }) => {
     const graphActions = useDecisionGraphActions();
     const { disabled } = useDecisionGraphState(({ disabled }) => ({

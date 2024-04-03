@@ -2,6 +2,7 @@ import { CloseOutlined, MoreOutlined } from '@ant-design/icons';
 import { Button, Dropdown, type MenuProps, Typography, theme } from 'antd';
 import clsx from 'clsx';
 import React, { useEffect, useRef, useState } from 'react';
+import { match } from 'ts-pattern';
 
 import './decision-node.scss';
 
@@ -15,7 +16,7 @@ export type DecisionNodeProps = {
   actions?: React.ReactNode[];
   status?: 'error' | 'success';
   noBodyPadding?: boolean;
-  color?: 'primary' | 'secondary';
+  color?: 'primary' | 'secondary' | string;
   menuItems?: MenuProps['items'];
   onNameChange?: (name: string) => void;
 };
@@ -46,14 +47,19 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
     }
   }, [contentEditing]);
 
+  const nodeColor = match(color)
+    .with('primary', () => undefined)
+    .with('secondary', () => '#722ed1')
+    .otherwise((c) => c);
+
   return (
     <div
-      className={clsx(
-        'grl-dn',
-        `grl-dn--color--${color}`,
-        isSelected && `grl-dn--selected`,
-        status && `grl-dn--${status}`,
-      )}
+      className={clsx('grl-dn', isSelected && `grl-dn--selected`, status && `grl-dn--${status}`)}
+      style={
+        {
+          '--node-color': nodeColor,
+        } as any
+      }
       onKeyDown={(e) => e.stopPropagation()}
     >
       {status === 'error' && (

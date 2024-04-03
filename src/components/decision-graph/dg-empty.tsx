@@ -10,7 +10,6 @@ import {
   useDecisionGraphRaw,
   useDecisionGraphState,
 } from './context/dg-store.context';
-import type { NodeSpecification } from './nodes/specification-types';
 
 export type DecisionGraphEmptyType = {
   id?: string;
@@ -20,13 +19,15 @@ export type DecisionGraphEmptyType = {
   disabled?: boolean;
   configurable?: boolean;
 
-  components?: NodeSpecification[];
+  components?: DecisionGraphStoreType['state']['components'];
+  customNodes?: DecisionGraphStoreType['state']['customNodes'];
 
   onChange?: DecisionGraphStoreType['listeners']['onChange'];
   onSimulationRun?: DecisionGraphStoreType['listeners']['onSimulationRun'];
   onSimulatorOpen?: DecisionGraphStoreType['listeners']['onSimulatorOpen'];
   onReactFlowInit?: DecisionGraphStoreType['listeners']['onReactFlowInit'];
 };
+
 export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
   id,
   defaultValue,
@@ -36,6 +37,7 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
   onChange,
   onSimulationRun,
   components,
+  customNodes,
   onSimulatorOpen,
   onReactFlowInit,
 }) => {
@@ -56,8 +58,9 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
       disabled,
       configurable,
       components: Array.isArray(components) ? components : [],
+      customNodes: Array.isArray(customNodes) ? customNodes : [],
     });
-  }, [id, disabled, configurable, components]);
+  }, [id, disabled, configurable, components, customNodes]);
 
   useEffect(() => {
     listenerStore.setState({

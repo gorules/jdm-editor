@@ -3,7 +3,7 @@ import { P, match } from 'ts-pattern';
 import { v4 } from 'uuid';
 
 import type { DecisionNode, DecisionTableType } from '../components';
-import { NodeKind } from '../components/decision-graph/nodes/specification-types';
+import { NodeKind } from '../components/decision-graph/nodes/specifications/specification-types';
 import type { TableSchemaItem } from '../components/decision-table/context/dt-store.context';
 import { parseDecisionTable } from '../components/decision-table/context/dt-store.context';
 import { saveFile } from './file-helpers';

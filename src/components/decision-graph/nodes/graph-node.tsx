@@ -11,7 +11,7 @@ import { SpacedText } from '../../spaced-text';
 import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
 import type { DecisionNodeProps } from './decision-node';
 import { DecisionNode } from './decision-node';
-import type { MinimalNodeSpecification } from './specification-types';
+import type { MinimalNodeSpecification } from './specifications/specification-types';
 
 export type GraphNodeProps = {
   id: string;

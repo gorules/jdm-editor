@@ -1,8 +1,8 @@
 .grl-dg {
   height: 100%;
   display: grid;
-  grid-template-areas: 'sidebar graph' 'simulator simulator';
-  grid-template-columns: min-content 1fr;
+  grid-template-areas: 'sidebar graph component' 'simulator simulator component';
+  grid-template-columns: min-content 1fr min-content;
   grid-template-rows: 1fr auto;
 
   &__content {
@@ -262,6 +262,15 @@
     }
   }
 
+  &__component-bar {
+    grid-area: component;
+    height: 100%;
+    display: flex;
+    background-color: var(--grl-color-bg-container);
+    min-height: 0;
+    border-left: 1px solid var(--grl-color-border);
+  }
+
   &__aside {
     grid-area: sidebar;
     height: 100%;
@@ -336,6 +345,18 @@
         flex-direction: column;
         gap: 16px;
         padding: 1rem;
+
+        &__search {
+          border-left: none;
+          border-top: none;
+          border-right: none;
+          border-radius: 0;
+          height: 39px;
+          box-shadow: none;
+          position: sticky;
+          top: 0;
+          z-index: 1;
+        }
 
         .divider {
           grid-column: 1 / -1;
