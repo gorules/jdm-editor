@@ -13,7 +13,7 @@ export const defaultGraph = {
       id: 'c5e747fe-b74b-4b74-9fd0-bfd7d67007c3',
       type: 'outputNode',
       position: {
-        x: 570,
+        x: 670,
         y: 250,
       },
       name: 'Response',
@@ -22,7 +22,7 @@ export const defaultGraph = {
       id: '359173d8-0068-45f8-bb71-8240ad73201d',
       type: 'decisionTableNode',
       position: {
-        x: 320,
+        x: 370,
         y: 250,
       },
       name: 'decisionTableNode 1',
@@ -107,6 +107,131 @@ export const defaultGraph = {
     {
       id: 'c5d49d3a-fdfd-4f4b-8838-791cee4d4a55',
       sourceId: '359173d8-0068-45f8-bb71-8240ad73201d',
+      type: 'edge',
+      targetId: 'c5e747fe-b74b-4b74-9fd0-bfd7d67007c3',
+    },
+  ],
+};
+
+export const defaultGraphCustomNode = {
+  nodes: [
+    {
+      id: 'ca98730e-a40f-4601-98cc-b5a57429596d',
+      type: 'inputNode',
+      position: {
+        x: 70,
+        y: 250,
+      },
+      name: 'Request',
+    },
+    {
+      id: 'c5e747fe-b74b-4b74-9fd0-bfd7d67007c3',
+      type: 'outputNode',
+      position: {
+        x: 675,
+        y: 250,
+      },
+      name: 'Response',
+    },
+    {
+      id: 'a70ede61-ba67-46fb-af25-c2d22afb2f0e',
+      type: 'customNode',
+      name: 'pingNode1',
+      position: {
+        x: 375,
+        y: 250,
+      },
+      content: {
+        kind: 'pingNode',
+        config: {},
+      },
+    },
+  ],
+  edges: [
+    {
+      id: 'd306fcd9-5d16-4f15-8677-c59098db5bfe',
+      sourceId: 'ca98730e-a40f-4601-98cc-b5a57429596d',
+      type: 'edge',
+      targetId: 'a70ede61-ba67-46fb-af25-c2d22afb2f0e',
+    },
+    {
+      id: 'a1a64d21-4248-45cd-8502-30d47ac685d0',
+      sourceId: 'a70ede61-ba67-46fb-af25-c2d22afb2f0e',
+      type: 'edge',
+      targetId: 'c5e747fe-b74b-4b74-9fd0-bfd7d67007c3',
+    },
+  ],
+};
+
+export const defaultGraphUnknownNode = {
+  nodes: [
+    {
+      id: 'ca98730e-a40f-4601-98cc-b5a57429596d',
+      type: 'inputNode',
+      position: {
+        x: 70,
+        y: 250,
+      },
+      name: 'Request',
+    },
+    {
+      id: 'c5e747fe-b74b-4b74-9fd0-bfd7d67007c3',
+      type: 'outputNode',
+      position: {
+        x: 685,
+        y: 250,
+      },
+      name: 'Response',
+    },
+    {
+      id: 'dc75f8e9-ea03-4de1-b48a-1d5b52076c66',
+      type: 'customNode',
+      name: 'pingNode1',
+      position: {
+        x: 380,
+        y: 205,
+      },
+      content: {
+        kind: 'pingNode',
+        config: {},
+      },
+    },
+    {
+      id: 'c25d895a-826d-4e8b-9477-cd5b368fe3e6',
+      type: 'customNode',
+      name: 'Test Node',
+      position: {
+        x: 380,
+        y: 300,
+      },
+      content: {
+        kind: 'unknownNode',
+        config: {},
+      },
+    },
+  ],
+  edges: [
+    {
+      id: 'f9695843-7e91-4e93-b92e-8611e40dc1b7',
+      sourceId: 'ca98730e-a40f-4601-98cc-b5a57429596d',
+      type: 'edge',
+      targetId: 'c25d895a-826d-4e8b-9477-cd5b368fe3e6',
+    },
+    {
+      id: 'fe2781c3-4495-4c01-9cf7-253954afc753',
+      sourceId: 'ca98730e-a40f-4601-98cc-b5a57429596d',
+      type: 'edge',
+      targetId: 'dc75f8e9-ea03-4de1-b48a-1d5b52076c66',
+    },
+    {
+      id: '04bfffb2-2cca-407a-b8d6-dc0f8431253c',
+      sourceId: 'dc75f8e9-ea03-4de1-b48a-1d5b52076c66',
+      type: 'edge',
+      targetId: 'c5e747fe-b74b-4b74-9fd0-bfd7d67007c3',
+    },
+    {
+      id: '3f382611-9a8d-4405-ae80-0e607bb97f42',
+      sourceId: 'c25d895a-826d-4e8b-9477-cd5b368fe3e6',
       type: 'edge',
       targetId: 'c5e747fe-b74b-4b74-9fd0-bfd7d67007c3',
     },
