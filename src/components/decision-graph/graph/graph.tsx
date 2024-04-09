@@ -1,3 +1,4 @@
+import { WarningOutlined } from '@ant-design/icons';
 import { Modal, Typography, message } from 'antd';
 import clsx from 'clsx';
 import React, { type MutableRefObject, forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
@@ -20,6 +21,7 @@ import { mapToDecisionEdge } from '../dg-util';
 import '../dg.scss';
 import { useGraphClipboard } from '../hooks/use-graph-clipboard';
 import type { CustomNodeSpecification } from '../nodes/custom-node/index';
+import { GraphNode } from '../nodes/graph-node';
 import type { MinimalNodeProps } from '../nodes/specifications/specification-types';
 import { nodeSpecification } from '../nodes/specifications/specifications';
 
@@ -82,7 +84,22 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
 
         if (!node) {
           console.warn('node not found', props, customNodes);
-          return null;
+          return (
+            <GraphNode
+              id={props.id}
+              specification={{
+                displayName: `${props.data?.kind}`,
+                color: 'var(--grl-color-error)',
+                icon: <WarningOutlined />,
+              }}
+              name={props?.data?.name}
+              isSelected={props.selected}
+              displayError
+              noBodyPadding
+              handleLeft={true}
+              handleRight={true}
+            />
+          );
         }
 
         return node.renderNode({

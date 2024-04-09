@@ -4,7 +4,7 @@ import { Select } from 'antd';
 import React, { useRef, useState } from 'react';
 
 import { DecisionGraph } from './dg';
-import { defaultGraph } from './dg.stories-values';
+import { defaultGraph, defaultGraphCustomNode, defaultGraphUnknownNode } from './dg.stories-values';
 import type { GraphRef } from './graph/graph';
 import { createJdmNode } from './nodes/custom-node';
 import { GraphNode } from './nodes/graph-node';
@@ -156,7 +156,7 @@ const customNodes = [
 export const CustomNode: Story = {
   render: (args) => {
     const ref = useRef<GraphRef>(null);
-    const [value, setValue] = useState<any>();
+    const [value, setValue] = useState<any>(defaultGraphCustomNode);
 
     return (
       <div
@@ -166,6 +166,39 @@ export const CustomNode: Story = {
       >
         <DecisionGraph
           customNodes={customNodes}
+          {...args}
+          ref={ref}
+          value={value}
+          onChange={(val) => setValue(val)}
+          components={components}
+        />
+      </div>
+    );
+  },
+};
+
+const unknownCustomNodes = [
+  createJdmNode({
+    kind: 'pingNode',
+    displayName: 'Ping',
+    group: 'ping',
+    shortDescription: 'Used for ping',
+  }),
+];
+
+export const UnknownCustomNode: Story = {
+  render: (args) => {
+    const ref = useRef<GraphRef>(null);
+    const [value, setValue] = useState<any>(defaultGraphUnknownNode);
+
+    return (
+      <div
+        style={{
+          height: '100%',
+        }}
+      >
+        <DecisionGraph
+          customNodes={unknownCustomNodes}
           {...args}
           ref={ref}
           value={value}

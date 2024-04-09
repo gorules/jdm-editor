@@ -19,6 +19,7 @@ export type GraphNodeProps = {
   handleRight?: boolean | Partial<HandleProps>;
   className?: string;
   specification: MinimalNodeSpecification;
+  displayError?: boolean;
 } & Partial<DecisionNodeProps>;
 
 export const GraphNode: React.FC<GraphNodeProps> = ({
@@ -28,6 +29,7 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
   className,
   specification,
   name,
+  displayError,
   ...decisionNodeProps
 }) => {
   const graphActions = useDecisionGraphActions();
@@ -51,20 +53,20 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
         }
       : null,
     specification.documentationUrl ? { key: 'divider-1', type: 'divider' } : null,
-    {
+    !displayError && {
       key: 'copy-clipboard',
       icon: <BookOutlined />,
       label: <SpacedText left='Copy to clipboard' right={platform.shortcut('Ctrl + C')} />,
       onClick: () => {},
     },
-    {
+    !displayError && {
       key: 'duplicate',
       icon: <CopyOutlined />,
       disabled,
       label: <SpacedText left='Duplicate' right={platform.shortcut('Ctrl + D')} />,
       onClick: () => graphActions.duplicateNodes([id]),
     },
-    { key: 'divider-2', type: 'divider' },
+    !displayError && { key: 'divider-2', type: 'divider' },
     {
       key: 'delete',
       icon: <DeleteOutlined />,
@@ -104,9 +106,10 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
         color={specification.color}
         type={specification.displayName}
         name={name}
-        status={match([nodeTrace, nodeError])
-          .with([P.not(P.nullish), P._], () => 'success' as const)
-          .with([P._, P.not(P.nullish)], () => 'error' as const)
+        status={match([nodeTrace, nodeError, displayError])
+          .with([P._, P._, true], () => 'error' as const)
+          .with([P.not(P.nullish), P._, P._], () => 'success' as const)
+          .with([P._, P.not(P.nullish), P._], () => 'error' as const)
           .otherwise(() => undefined)}
         onNameChange={(name) => {
           graphActions.updateNode(id, (draft) => {
