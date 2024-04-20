@@ -42,9 +42,9 @@ export const createExpression = (data: Partial<ExpressionEntry> = {}): Expressio
   ...data,
 });
 
-export const ExpressionStoreProvider: React.FC<React.PropsWithChildren<ExpressionStoreProviderProps>> = (
-  { children }
-) => {
+export const ExpressionStoreProvider: React.FC<React.PropsWithChildren<ExpressionStoreProviderProps>> = ({
+  children,
+}) => {
   const store = useMemo(
     () =>
       create<ExpressionStore>((set) => ({
@@ -55,7 +55,7 @@ export const ExpressionStoreProvider: React.FC<React.PropsWithChildren<Expressio
             produce<ExpressionStore>((draft) => {
               draft.expressions.splice(index, 0, createExpression());
               return draft;
-            })
+            }),
           );
         },
         addRowBelow: (index) => {
@@ -65,7 +65,7 @@ export const ExpressionStoreProvider: React.FC<React.PropsWithChildren<Expressio
               draft.expressions.splice(index + 1, 0, createExpression());
 
               return draft;
-            })
+            }),
           );
         },
         expressions: [],
@@ -79,7 +79,7 @@ export const ExpressionStoreProvider: React.FC<React.PropsWithChildren<Expressio
               draft.expressions.splice(targetIndex, 0, input);
 
               return draft;
-            })
+            }),
           );
         },
         removeRow: (index) => {
@@ -87,7 +87,7 @@ export const ExpressionStoreProvider: React.FC<React.PropsWithChildren<Expressio
             produce<ExpressionStore>((draft) => {
               draft.expressions.splice(index, 1);
               return draft;
-            })
+            }),
           );
         },
         updateRow: (index, update) => {
@@ -99,11 +99,11 @@ export const ExpressionStoreProvider: React.FC<React.PropsWithChildren<Expressio
               };
 
               return draft;
-            })
+            }),
           );
         },
       })),
-    []
+    [],
   );
 
   return <ExpressionStoreContext.Provider value={store}>{children}</ExpressionStoreContext.Provider>;
@@ -111,7 +111,7 @@ export const ExpressionStoreProvider: React.FC<React.PropsWithChildren<Expressio
 
 export function useExpressionStore<T>(
   selector: (state: ExpressionStore) => T,
-  equals: (a: any, b: any) => boolean = equal
+  equals: (a: any, b: any) => boolean = equal,
 ): T {
   return React.useContext(ExpressionStoreContext)(selector, equals);
 }

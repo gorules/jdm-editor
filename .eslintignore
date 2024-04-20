@@ -1,2 +1,4 @@
 dist
 node_modules
+
+packages/jdm-editor/src/components/function/helpers/default-function.js

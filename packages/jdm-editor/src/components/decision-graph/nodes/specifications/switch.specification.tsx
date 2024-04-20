@@ -5,7 +5,6 @@ import React, { useLayoutEffect, useState } from 'react';
 import { Handle, Position } from 'reactflow';
 import { P, match } from 'ts-pattern';
 
-import { AutosizeTextArea } from '../../../autosize-text-area';
 import { CodeEditor } from '../../../code-editor';
 import { useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
 import { GraphNode } from '../graph-node';
