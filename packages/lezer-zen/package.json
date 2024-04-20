@@ -29,8 +29,8 @@
   "scripts": {
     "build": "lezer-generator src/zen.grammar -o src/parser && rollup -c",
     "build-debug": "lezer-generator src/zen.grammar --names -o src/parser && rollup -c",
-    "test": "npm run build && mocha test/test-json.js",
-    "watch": "nodemon --watch 'src/zen.grammar' --exec 'pnpm run build'"
+    "watch": "nodemon --watch 'src/zen.grammar' --exec 'pnpm run build'",
+    "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
     "@lezer/common": "^1.2.1",

@@ -1,6 +1,10 @@
 {
-  "packages": ["packages/*"],
-  "version": "0.0.0",
+  "version": "independent",
   "npmClient": "pnpm",
-  "useWorkspaces": true
+  "command": {
+    "publish": {
+      "conventionalCommits": true,
+      "message": "chore(release): publish"
+    }
+  }
 }
