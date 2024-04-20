@@ -2,6 +2,7 @@
   "name": "@gorules/jdm-monorepo",
   "private": true,
   "scripts": {
+    "lerna": "lerna",
     "build": "lerna run build",
     "test": "lerna run test",
     "lint": "eslint --ext js,ts,jsx,tsx .",
