@@ -1,0 +1,168 @@
+@precedence {
+  member,
+  call,
+  taggedTemplate,
+  prefix,
+  postfix,
+  times @left,
+  plus @left,
+  rel @left,
+  equal @left,
+  and @left,
+  or @left,
+  ternary @right,
+  comma @left
+}
+
+@top Standard[group=autoComplete] { expression* }
+
+expression[@isGroup=Expression] {
+  expressionNoComma | SequenceExpression
+}
+
+SequenceExpression {
+  expressionNoComma !comma ("," expressionNoComma)+
+}
+
+expressionNoComma {
+  Number |
+  String |
+  // TemplateString |
+  CallbackReference |
+  VariableName |
+  boolean |
+  kw<"null"> |
+  ArrayExpression |
+  // ObjectExpression { "{" commaSep<Property> ~destructure "}" } | Disabled until object support added
+  UnaryExpression |
+  ParenthesizedExpression |
+  MemberExpression |
+  BinaryExpression |
+  ConditionalExpression { expressionNoComma !ternary questionOp expressionNoComma LogicOp<":"> expressionNoComma } |
+  PostfixExpression { expressionNoComma !postfix (LogicOp<"!">) } |
+  CallExpression { expressionNoComma !call ArgList }
+  // TaggedTemplateExpression { expressionNoComma !taggedTemplate TemplateString } Disabled until template string support added
+}
+
+ParenthesizedExpression { "(" expression ")" }
+
+ArrayExpression {
+  "[" commaSep1<expressionNoComma | ""> ~destructure "]"
+}
+
+// propName { PropertyDefinition | "[" expression "]" | Number | String }
+
+// Property {
+//   propName ~destructure (":" expressionNoComma)?
+// }
+
+UnaryExpression {
+  !prefix (LogicOp<"!"> | ArithOp<"+" | "-">)
+  expressionNoComma
+}
+
+BinaryExpression {
+  expressionNoComma !times (divide | ArithOp<"%"> | ArithOp<"*"> | ArithOp<"^">) expressionNoComma |
+  expressionNoComma !plus ArithOp<"+" | "-"> expressionNoComma |
+  expressionNoComma !rel (LessThan | CompareOp<"<=" | ">" "="?>) expressionNoComma |
+  expressionNoComma !equal CompareOp<"==" | "!="> expressionNoComma |
+  expressionNoComma !and kw<"and"> expressionNoComma |
+  expressionNoComma !or kw<"or"> expressionNoComma
+}
+
+MemberExpression {
+  expressionNoComma !member ("." PropertyName | "." "[" expression "]")
+}
+
+ArgList {
+  "(" commaSep<expressionNoComma> ")"
+}
+
+@skip {} {
+  // TemplateString[isolate] {
+  //   templateStart (templateContent | templateExpr)* templateEnd
+  // }
+
+  String[isolate] {
+    '"' (stringContentDouble)* ('"' | "\n") |
+    "'" (stringContentSingle)* ("'" | "\n")
+  }
+}
+
+// templateExpr[@name=Interpolation,isolate] { InterpolationStart expression InterpolationEnd }
+
+commaSep<content> {
+  "" | content ("," content?)*
+}
+
+commaSep1<content> {
+  content ("," content)*
+}
+
+// Keywords
+
+kw<term> { @specialize[@name={term}]<identifier, term> }
+
+// Contextual keyword in property context
+
+boolean { @specialize[@name=BooleanLiteral]<identifier, "true" | "false"> }
+
+VariableName { identifier ~arrow }
+
+PropertyName { word }
+
+// PropertyDefinition { word }
+
+questionOp[@name=LogicOp] { "?" }
+
+@skip { spaces }
+
+// @local tokens {
+//   InterpolationStart[closedBy=InterpolationEnd] { "${" }
+//   templateEnd { "`" }
+//   @else templateContent
+// }
+
+@tokens {
+  spaces { $[\n\u0009 \u000b\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\ufeff]+ }
+
+  divide[@name=ArithOp] { "/" }
+
+  identifierChar { @asciiLetter | $[_$\u{a1}-\u{10ffff}] }
+
+  word { identifierChar (identifierChar | @digit)* }
+
+  CallbackReference { "#" }
+
+  identifier { word }
+
+  @precedence { spaces, identifier }
+  @precedence { spaces, word }
+
+  Number {
+    (@digit ("_" | @digit)* ("." ("_" | @digit)*)? | "." @digit ("_" | @digit)*)
+  }
+
+  @precedence { Number "." }
+
+  stringContentSingle { ![\n']+ }
+  stringContentDouble { ![\n"]+ }
+
+  // templateStart { "`" }
+  // InterpolationEnd[openedBy=InterpolationStart] { "}" }
+
+  ArithOp<expr> { expr }
+  LogicOp<expr> { expr }
+  CompareOp<expr> { expr }
+
+  LessThan[@name=CompareOp] { "<" }
+
+  "(" ")" "[" "]" "<" ">"
+  // "{" "}" 
+
+  "." "," ";" ":" "@"
+}
+
+@detectDelim
+
+@external propSource zenHighlight from "./highlight"

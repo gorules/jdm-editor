@@ -1,0 +1,6 @@
+# Build artifacts
+dist/
+node_modules/
+docs/
+
+pnpm-lock.yaml
