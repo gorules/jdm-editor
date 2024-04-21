@@ -1,8 +1,9 @@
 import { DownOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Form, Input, Typography, theme } from 'antd';
+import { Button, Checkbox, Form, Typography, theme } from 'antd';
 import React, { useState } from 'react';
 import { match } from 'ts-pattern';
 
+import { CodeEditor } from '../../../code-editor';
 import type { DecisionNode } from '../../context/dg-store.context';
 import { useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
 import { GraphNode } from '../graph-node';
@@ -151,7 +152,7 @@ export const createJdmNode = <
                 >
                   {(n?.inputs || []).map(({ name, control, label }) => {
                     const formItem = match({ control })
-                      .with({ control: 'text' }, () => <Input size='small' />)
+                      .with({ control: 'text' }, () => <CodeEditor type='template' />)
                       .with({ control: 'bool' }, () => (
                         <Checkbox>
                           <Typography.Text style={{ fontSize: token.fontSizeSM }}>{label}</Typography.Text>

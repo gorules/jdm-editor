@@ -1,9 +1,9 @@
 import { Cascader, Form, Input, Modal } from 'antd';
 import React, { useEffect } from 'react';
-import slugify from 'slugify';
 
 import type { SchemaSelectProps } from '../../../helpers/components';
 import { recursiveSelect } from '../../../helpers/components';
+import { AutosizeTextArea } from '../../autosize-text-area';
 import { CodeEditor } from '../../code-editor';
 import type { ColumnType, TableSchemaItem } from '../context/dt-store.context';
 
@@ -20,7 +20,6 @@ export type FieldAddProps = {
 export const FieldAdd: React.FC<FieldAddProps> = (props) => {
   const { isOpen, onDismiss, onSuccess, schema, getContainer } = props;
   const [form] = Form.useForm<TableSchemaItem>();
-  const name = Form.useWatch('name', form);
   const type = Form.useWatch('type', form);
 
   useEffect(() => {
@@ -28,18 +27,6 @@ export const FieldAdd: React.FC<FieldAddProps> = (props) => {
       form.resetFields();
     }
   }, [isOpen, form]);
-
-  useEffect(() => {
-    if (!form.isFieldTouched('field') && name) {
-      const parsed = slugify(name, {
-        replacement: '.',
-        remove: undefined,
-        lower: true,
-      });
-
-      form.setFields([{ name: 'field', value: parsed, touched: false }]);
-    }
-  }, [name, form]);
 
   return (
     <Modal
@@ -96,7 +83,7 @@ export const FieldAdd: React.FC<FieldAddProps> = (props) => {
           label={type === 'expression' ? 'Selector' : 'Field'}
           rules={[{ required: props.columnType === 'outputs' }]}
         >
-          <CodeEditor />
+          {props.columnType === 'inputs' ? <CodeEditor /> : <AutosizeTextArea maxRows={3} />}
         </Form.Item>
         <Form.Item name='defaultValue' label='Default Value'>
           <Input autoComplete='off' />

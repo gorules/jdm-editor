@@ -52,7 +52,6 @@
     "react-dnd-html5-backend": "16.0.1",
     "react-json-tree": "^0.18.0",
     "reactflow": "11.10.3",
-    "slugify": "1.6.6",
     "ts-pattern": "^5.1.1",
     "use-debounce": "^10.0.0",
     "zustand": "^4.5.2"
