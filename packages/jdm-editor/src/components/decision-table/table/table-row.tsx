@@ -3,31 +3,31 @@ import { flexRender } from '@tanstack/react-table';
 import type { VirtualItem } from '@tanstack/react-virtual';
 import { Typography } from 'antd';
 import clsx from 'clsx';
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { useDecisionTableActions, useDecisionTableState } from '../context/dt-store.context';
 
 export const TableRow: React.FC<{
   row: Row<Record<string, string>>;
-  reorderRow: (draggedRowIndex: number, targetRowIndex: number) => void;
   disabled?: boolean;
   virtualItem: VirtualItem;
   onResize?: (node: HTMLElement) => void;
-}> = ({ row, reorderRow, disabled, virtualItem, onResize }) => {
-  const tableActions = useDecisionTableActions();
-  const { cursor, activeRules } = useDecisionTableState(({ cursor, activeRules }) => ({
-    cursor,
-    activeRules,
-  }));
+}> = ({ row, disabled, virtualItem, onResize }) => {
   const trRef = useRef<HTMLTableRowElement>(null);
+  const tableActions = useDecisionTableActions();
+  const { cursor, isActive } = useDecisionTableState(({ cursor, activeRules }) => ({
+    cursor,
+    isActive: Array.isArray(activeRules) && activeRules.includes(row.id),
+  }));
+
   const [{ isDropping, direction }, dropRef] = useDrop({
     accept: 'row',
     collect: (monitor) => ({
       isDropping: monitor.isOver({ shallow: true }),
       direction: (monitor.getDifferenceFromInitialOffset()?.y || 0) > 0 ? 'down' : 'up',
     }),
-    drop: (draggedRow: Row<Record<string, string>>) => reorderRow(draggedRow.index, row.index),
+    drop: (draggedRow: Row<Record<string, string>>) => tableActions.swapRows(draggedRow.index, row.index),
   });
 
   const [{ isDragging }, dragRef, previewRef] = useDrag({
@@ -39,10 +39,6 @@ export const TableRow: React.FC<{
   });
 
   previewRef(dropRef(trRef));
-
-  const isActive = useMemo(() => {
-    return Array.isArray(activeRules) && activeRules.indexOf(row.id) > -1;
-  }, [row.id, activeRules]);
 
   useEffect(() => {
     if (!trRef.current) {

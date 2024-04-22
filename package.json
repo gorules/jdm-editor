@@ -1,6 +1,7 @@
 {
   "name": "@gorules/jdm-monorepo",
   "private": true,
+  "packageManager": "pnpm@9.0.5",
   "scripts": {
     "lerna": "lerna",
     "build": "lerna run build",

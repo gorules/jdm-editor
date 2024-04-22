@@ -16,7 +16,6 @@
     "README.md",
     "LICENSE"
   ],
-  "packageManager": "pnpm@9.0.4",
   "scripts": {
     "build": "vite build",
     "build:watch": "vite build --watch",

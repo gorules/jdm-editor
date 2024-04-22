@@ -5,7 +5,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { Button, Typography, theme } from 'antd';
 import clsx from 'clsx';
 import equal from 'fast-deep-equal/es6/react';
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 
 import { useDecisionTableActions, useDecisionTableListeners, useDecisionTableState } from '../context/dt-store.context';
 import { TableContextMenu } from './table-context-menu';
@@ -100,17 +100,15 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
     [configurable, disabled, inputs, outputs],
   );
 
-  const defaultColumn: Partial<ColumnDef<Record<string, string>, string>> = {
-    cell: (context) => <TableDefaultCell context={context} />,
-  };
-
   const table = useReactTable({
     data: rules,
     columnResizeMode: 'onChange',
     getRowId: (row) => row._id,
-    defaultColumn,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    defaultColumn: {
+      cell: (context) => <TableDefaultCell context={context} />,
+    },
     meta: {
       getCell: cellRenderer,
     },
@@ -164,7 +162,9 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
               <TableHeadRow key={headerGroup.id} headerGroup={headerGroup} />
             ))}
         </thead>
-        <TableBody tableContainerRef={tableContainerRef} table={table} />
+        <TableContextMenu>
+          <TableBody tableContainerRef={tableContainerRef} table={table} />
+        </TableContextMenu>
         <tfoot>
           <tr>
             <td colSpan={inputs.length + outputs.length + 2}>
@@ -211,53 +211,48 @@ const TableBody = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(
     const paddingTop = virtualItems.length > 0 ? virtualItems?.[0]?.start || 0 : 0;
     const paddingBottom = virtualItems.length > 0 ? totalSize - (virtualItems?.[virtualItems.length - 1]?.end || 0) : 0;
 
+    const onKeyDown = useCallback((e: React.KeyboardEvent) => {
+      if (disabled) {
+        return;
+      }
+
+      if (e.code === 'ArrowUp' && (e.metaKey || e.altKey)) {
+        if (cursor) tableActions.addRowAbove(cursor.y);
+      }
+      if (e.code === 'ArrowDown' && (e.metaKey || e.altKey)) {
+        if (cursor) tableActions.addRowBelow(cursor.y);
+      }
+      if (e.code === 'Backspace' && (e.metaKey || e.altKey)) {
+        if (cursor) tableActions.removeRow(cursor.y);
+      }
+    }, []);
+
     return (
-      <TableContextMenu>
-        <tbody
-          ref={ref}
-          {...props}
-          onKeyDown={(e) => {
-            if (disabled) {
-              return;
-            }
+      <tbody ref={ref} {...props} onKeyDown={onKeyDown}>
+        {paddingTop > 0 && (
+          <tr>
+            <td style={{ height: `${paddingTop}px` }} />
+          </tr>
+        )}
+        {virtualItems.map((item) => {
+          const row = rows[item.index];
 
-            if (e.code === 'ArrowUp' && (e.metaKey || e.altKey)) {
-              if (cursor) tableActions.addRowAbove(cursor.y);
-            }
-            if (e.code === 'ArrowDown' && (e.metaKey || e.altKey)) {
-              if (cursor) tableActions.addRowBelow(cursor.y);
-            }
-            if (e.code === 'Backspace' && (e.metaKey || e.altKey)) {
-              if (cursor) tableActions.removeRow(cursor.y);
-            }
-          }}
-        >
-          {paddingTop > 0 && (
-            <tr>
-              <td style={{ height: `${paddingTop}px` }} />
-            </tr>
-          )}
-          {virtualItems.map((item) => {
-            const row = rows[item.index];
-
-            return (
-              <TableRow
-                key={row.id}
-                virtualItem={item}
-                row={row}
-                reorderRow={tableActions.swapRows}
-                disabled={disabled}
-                onResize={(node) => virtualizer.measureElement(node)}
-              />
-            );
-          })}
-          {paddingBottom > 0 && (
-            <tr>
-              <td style={{ height: `${paddingBottom}px` }} />
-            </tr>
-          )}
-        </tbody>
-      </TableContextMenu>
+          return (
+            <TableRow
+              key={row.id}
+              virtualItem={item}
+              row={row}
+              disabled={disabled}
+              onResize={(node) => virtualizer.measureElement(node)}
+            />
+          );
+        })}
+        {paddingBottom > 0 && (
+          <tr>
+            <td style={{ height: `${paddingBottom}px` }} />
+          </tr>
+        )}
+      </tbody>
     );
   },
 );

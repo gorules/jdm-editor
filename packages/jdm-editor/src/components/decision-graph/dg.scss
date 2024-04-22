@@ -5,6 +5,10 @@
   grid-template-columns: min-content 1fr min-content;
   grid-template-rows: 1fr auto;
 
+  .nodrag {
+    cursor: initial;
+  }
+
   &__content {
     grid-area: graph;
     flex: 1;
