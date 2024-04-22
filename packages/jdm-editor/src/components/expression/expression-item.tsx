@@ -82,7 +82,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
       <div>
         <CodeEditor
           placeholder='Expression'
-          maxRows={4}
+          maxRows={6}
           disabled={disabled}
           value={expression?.value}
           onChange={(value) => onChange({ value })}

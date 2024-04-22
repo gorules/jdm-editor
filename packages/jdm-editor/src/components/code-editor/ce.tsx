@@ -18,11 +18,6 @@ const updateListener = (onChange?: (data: string) => void, onStateChange?: (stat
     onChange?.(update.state.doc.toString());
   });
 
-const maxRowsFilter = (maxRows: number) => [
-  EditorState.transactionFilter.of((tr) => (tr.newDoc.lines > maxRows ? [] : [tr])),
-  EditorView.lineWrapping,
-];
-
 const editorTheme = (isDark = false) => (isDark ? zenHighlightDark : zenHighlightLight);
 
 export type CodeEditorProps = {
@@ -36,10 +31,7 @@ export type CodeEditorProps = {
 } & Omit<React.HTMLAttributes<HTMLDivElement>, 'disabled' | 'onChange'>;
 
 export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
-  (
-    { maxRows = 3, disabled, value, onChange, placeholder, className, onStateChange, type = 'standard', ...props },
-    ref,
-  ) => {
+  ({ maxRows, disabled, value, onChange, placeholder, className, onStateChange, type = 'standard', ...props }, ref) => {
     const container = useRef<HTMLDivElement>(null);
     const codeMirror = useRef<EditorView>(null);
     const { token } = theme.useToken();
@@ -48,7 +40,6 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
       () => ({
         zenExtension: new Compartment(),
         theme: new Compartment(),
-        maxRows: new Compartment(),
         placeholder: new Compartment(),
         readOnly: new Compartment(),
         updateListener: new Compartment(),
@@ -66,9 +57,9 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
         state: EditorState.create({
           doc: value,
           extensions: [
+            EditorView.lineWrapping,
             compartment.zenExtension.of(zenExtensions({ type })),
             compartment.updateListener.of(updateListener(onChange, onStateChange)),
-            compartment.maxRows.of(maxRowsFilter(maxRows)),
             compartment.theme.of(editorTheme(token.mode === 'dark')),
             compartment.placeholder.of(placeholder ? placeholderExt(placeholder) : []),
             compartment.readOnly.of(EditorView.editable.of(!disabled)),
@@ -129,16 +120,6 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
       }
 
       codeMirror.current.dispatch({
-        effects: compartment.maxRows.reconfigure(maxRowsFilter(maxRows)),
-      });
-    }, [maxRows]);
-
-    useEffect(() => {
-      if (!codeMirror.current) {
-        return;
-      }
-
-      codeMirror.current.dispatch({
         effects: compartment.readOnly.reconfigure(EditorView.editable.of(!disabled)),
       });
     }, [disabled]);
@@ -163,6 +144,13 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
       });
     }, [type]);
 
-    return <div ref={composeRefs(container, ref)} className={clsx('grl-ce', className)} {...props} />;
+    return (
+      <div
+        ref={composeRefs(container, ref)}
+        className={clsx('grl-ce', maxRows && 'grl-ce--max-rows', className)}
+        style={{ '--editorMaxRows': maxRows } as any}
+        {...props}
+      />
+    );
   },
 );

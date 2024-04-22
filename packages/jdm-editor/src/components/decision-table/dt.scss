@@ -240,12 +240,14 @@
     }
 
     &.grl-ce {
+      --ce-verticalPadding: 9px;
+      --ce-horizontalPadding: 0.75rem;
+
       .cm-editor {
         border: 0 !important;
         box-shadow: none !important;
         width: 100%;
         background-color: transparent;
-        padding: 9px 0.75rem;
       }
     }
   }

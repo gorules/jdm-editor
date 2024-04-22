@@ -1,19 +1,24 @@
-// @gorules/jdm-editor
-// @gorules/lezer
-// @gorules/jdm-wasm
-
 .grl-ce {
+  --ce-lineHeight: 1.5em;
+  --ce-verticalPadding: 4px;
+  --ce-horizontalPadding: 11px;
+
+  &--max-rows {
+    .cm-editor {
+      max-height: calc(var(--editorMaxRows) * var(--ce-lineHeight) + 2 * var(--ce-verticalPadding));
+    }
+  }
+
   .cm-editor {
-    padding: 4px 11px;
     background: var(--grl-color-bg-container);
     width: 100%;
     max-width: 100%;
     border: 1px solid var(--grl-color-border);
     border-color: var(--grl-color-border);
     border-radius: 6px;
-    transition:
-      border-color,
-      box-shadow 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+    transition: border-color,
+    box-shadow 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+    line-height: var(--ce-lineHeight);
 
     &.cm-focused {
       outline: none;
@@ -27,8 +32,16 @@
     }
   }
 
+  .cm-scroller {
+    line-height: inherit;
+  }
+
+  .cm-placeholder {
+    display: inline;
+  }
+
   .cm-content {
-    padding: 0;
+    padding: var(--ce-verticalPadding) var(--ce-horizontalPadding);
   }
 
   .cm-completionDetail {
@@ -38,7 +51,6 @@
 
   .cm-line {
     padding: 0;
-    line-height: 1.5714285714285714;
     caret-color: var(--grl-color-text);
 
     &:focus-visible {
