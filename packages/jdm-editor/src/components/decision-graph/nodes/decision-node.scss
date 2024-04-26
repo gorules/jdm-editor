@@ -155,8 +155,13 @@
   &__cn {
     &__form {
       padding: 0.5rem;
+      font-size: 12px;
       .ant-form-item-label {
         padding: 0 !important;
+      }
+
+      .grl-ce {
+        font-size: 12px;
       }
     }
   }
