@@ -1,1 +1,0 @@
-{"version":3,"file":"autosize-text-area.d.ts","sourceRoot":"","sources":["../../src/components/autosize-text-area.tsx"],"names":[],"mappings":"AACA,OAAO,KAA4B,MAAM,OAAO,CAAC;AAIjD,MAAM,MAAM,qBAAqB,GAAG;IAClC,OAAO,EAAE,MAAM,CAAC;CACjB,GAAG,KAAK,CAAC,iBAAiB,CAAC,KAAK,CAAC,sBAAsB,CAAC,mBAAmB,CAAC,EAAE,mBAAmB,CAAC,CAAC;AAgBpG,eAAO,MAAM,gBAAgB,gHA4C5B,CAAC"}
