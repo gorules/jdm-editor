@@ -26,6 +26,6 @@ jobs:
         run: pnpm build
 
       - name: Publish Beta
-        run: pnpm lerna publish from-package
+        run: pnpm lerna publish from-package --yes
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
