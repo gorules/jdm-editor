@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.1](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.4.0...@gorules/jdm-editor@1.4.1) (2024-04-26)
+
+### Bug Fixes
+
+- custom node styles ([#39](https://github.com/gorules/jdm-editor/issues/39)) ([7171a98](https://github.com/gorules/jdm-editor/commit/7171a982bc0b1d0a27009dd311e9c5f94684c7b2))
+
 # 1.4.0 (2024-04-26)
 
 ### Features
