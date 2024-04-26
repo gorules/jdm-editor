@@ -9,12 +9,13 @@ Whether you’re a developer, data analyst, or decision model expert, JDM Editor
 > Live demo and usage at https://gorules.github.io/jdm-editor/
 
 ## Installation
+
 ```bash
 npm i @gorules/jdm-editor
 ```
 
-
 ## Usage
+
 ```typescript
 ...
 import '@gorules/jdm-editor/dist/style.css';
@@ -48,7 +49,7 @@ export type DecisionGraphProps = {
   defaultOpenMenu?: boolean;
   onReactFlowInit?: () => void;
   onSimulatorOpen?: (opened: boolean) => void;
-  onSimulationRun?: ({ context: any, decisionGraph: DecisionGraphType}) => Promise<Trace>;
+  onSimulationRun?: ({ context: any, decisionGraph: DecisionGraphType }) => Promise<Trace>;
 };
 ```
 
@@ -76,19 +77,19 @@ export type DecisionTableProps = {
 };
 ```
 
-
 ## Self-hosting Monaco Editor
+
 To self-host monaco editor in Vite.
 
 ```ts
-import * as monaco from 'monaco-editor';
-import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
-import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
-import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
-import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
-import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 import type { Monaco } from '@monaco-editor/react';
 import { loader } from '@monaco-editor/react';
+import * as monaco from 'monaco-editor';
+import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
+import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
+import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
+import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
+import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 
 declare global {
   interface Window {

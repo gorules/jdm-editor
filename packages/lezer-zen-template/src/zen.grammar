@@ -1,0 +1,37 @@
+@top Template { (Expression | Text)+ }
+
+entity[@isGroup=Entity] {
+  Expression |
+  Text
+}
+
+Expression {
+  ExpressionOpen ExpressionInner ExpressionClose
+}
+
+ExpressionInner {
+  anyChar
+}
+
+Text {
+  anyChar
+}
+
+ExpressionOpen[closedBy=ExpressionClose] {
+  expressionTagOpen
+}
+
+ExpressionClose[openedBy=ExpressionOpen] {
+  expressionTagClose
+}
+
+@tokens {
+  anyChar { ![{}]+ }
+
+  expressionTagOpen { "{{" }
+  expressionTagClose { "}}" }
+
+  @precedence { expressionTagOpen, expressionTagClose, anyChar }
+}
+
+@external propSource zenHighlight from "./highlight"

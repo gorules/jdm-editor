@@ -1,0 +1,5 @@
+dist/
+node_modules/
+docs/
+
+packages/jdm-editor/src/components/function/helpers/default-function.js

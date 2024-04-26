@@ -1,0 +1,102 @@
+{
+  "name": "@gorules/jdm-editor",
+  "version": "1.3.0-beta.2",
+  "description": "",
+  "author": "GoRules <hi@gorules.io> (https://gorules.io)",
+  "homepage": "https://github.com/gorules/jdm-editor",
+  "license": "MIT",
+  "keywords": [],
+  "type": "module",
+  "main": "dist/jdm-editor.umd.cjs",
+  "module": "dist/jdm-editor.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/",
+    "package.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "build:watch": "vite build --watch",
+    "storybook": "storybook dev -p 9009",
+    "build:storybook": "storybook build -o docs",
+    "prepublishOnly": "vite build"
+  },
+  "dependencies": {
+    "@ant-design/icons": "5.3.6",
+    "@codemirror/autocomplete": "^6.16.0",
+    "@codemirror/language": "^6.10.1",
+    "@codemirror/state": "^6.4.1",
+    "@codemirror/view": "^6.26.3",
+    "@gorules/lezer-zen": "workspace:*",
+    "@gorules/lezer-zen-template": "workspace:*",
+    "@lezer/common": "^1.2.1",
+    "@lezer/highlight": "^1.2.0",
+    "@lezer/lr": "^1.4.0",
+    "@monaco-editor/react": "^4.6.0",
+    "@tanstack/react-table": "8.16.0",
+    "@tanstack/react-virtual": "3.4.0",
+    "ace-builds": "^1.32.5",
+    "antd": "5.16.2",
+    "clsx": "2.1.0",
+    "dnd-core": "^16.0.1",
+    "exceljs": "^4.4.0",
+    "fast-deep-equal": "^3.1.3",
+    "immer": "10.0.4",
+    "json5": "^2.2.3",
+    "monaco-editor": "^0.45.0",
+    "react-ace": "^10.1.0",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "16.0.1",
+    "react-json-tree": "^0.18.0",
+    "reactflow": "11.10.3",
+    "ts-pattern": "^5.1.1",
+    "use-debounce": "^10.0.0",
+    "zustand": "^4.5.2"
+  },
+  "devDependencies": {
+    "@storybook/addon-actions": "8.0.8",
+    "@storybook/addon-docs": "8.0.8",
+    "@storybook/addon-essentials": "8.0.8",
+    "@storybook/addon-interactions": "8.0.8",
+    "@storybook/addon-links": "8.0.8",
+    "@storybook/addon-storysource": "^8.0.8",
+    "@storybook/manager-api": "^8.0.8",
+    "@storybook/react": "^8.0.8",
+    "@storybook/react-vite": "^8.0.8",
+    "@storybook/testing-library": "0.2.2",
+    "@testing-library/jest-dom": "6.3.0",
+    "@testing-library/react": "14.1.2",
+    "@testing-library/react-hooks": "8.0.1",
+    "@testing-library/user-event": "14.5.2",
+    "@trivago/prettier-plugin-sort-imports": "4.3.0",
+    "@types/big.js": "^6.2.2",
+    "@types/react": "18.2.79",
+    "@types/react-dom": "18.2.25",
+    "dayjs": "^1.11.10",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "sass": "^1.75.0",
+    "storybook": "8.0.8",
+    "storybook-dark-mode": "^4.0.1",
+    "vite": "5.2.9",
+    "vite-plugin-dts": "^3.8.3"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**",
+      "!src/types.ts",
+      "!src/index.ts",
+      "!src/stories/**"
+    ],
+    "coverageReporters": [
+      "lcov",
+      "json-summary"
+    ]
+  },
+  "peerDependencies": {
+    "react": ">= 18",
+    "react-dom": ">= 18"
+  }
+}

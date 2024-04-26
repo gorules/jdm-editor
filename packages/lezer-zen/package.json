@@ -1,0 +1,40 @@
+{
+  "name": "@gorules/lezer-zen",
+  "version": "0.1.0-beta.1",
+  "description": "lezer-based ZEN grammar",
+  "main": "dist/index.cjs",
+  "type": "module",
+  "exports": {
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
+  "module": "dist/index.js",
+  "files": [
+    "dist/",
+    "package.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@lezer/generator": "^1.7.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "mocha": "^10.4.0",
+    "rollup": "^4.14.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lezer-parser/json.git"
+  },
+  "scripts": {
+    "build": "lezer-generator src/zen.grammar -o src/parser && rollup -c",
+    "build-debug": "lezer-generator src/zen.grammar --names -o src/parser && rollup -c",
+    "watch": "nodemon --watch 'src/zen.grammar' --exec 'pnpm run build'",
+    "prepublishOnly": "pnpm run build"
+  },
+  "dependencies": {
+    "@lezer/common": "^1.2.1",
+    "@lezer/highlight": "^1.2.0",
+    "@lezer/lr": "^1.4.0"
+  }
+}
