@@ -1,0 +1,46 @@
+name: Version beta
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version'
+        required: true
+        default: 'prepatch'
+        type: choice
+        options:
+          - prepatch
+          - preminor
+          - prerelease
+          - premajor
+      preid:
+        description: 'Tag'
+        required: true
+        default: 'beta'
+        type: choice
+        options:
+          - beta
+          - alpha
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+          registry-url: 'https://registry.npmjs.org'
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+          run_install: true
+
+      - name: Run lint and prettier
+        run: pnpm format
+
+      - name: Build
+        run: pnpm lerna version ${{ github.event.inputs.version }} --preid ${{ github.event.inputs.preid }}
