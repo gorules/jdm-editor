@@ -44,3 +44,9 @@ jobs:
 
       - name: Version
         run: pnpm lerna version ${{ github.event.inputs.version }} --preid ${{ github.event.inputs.preid }} --yes
+        env:
+          GIT_AUTHOR_NAME: 'Bot'
+          GIT_AUTHOR_EMAIL: 'bot@gorules.io'
+          GIT_COMMITTER_NAME: 'Bot'
+          GIT_COMMITTER_EMAIL: 'bot@gorules.io'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
