@@ -43,7 +43,7 @@ jobs:
           version: 9
           run_install: true
 
-      - name: Run lint and prettier
+      - name: Lint and prettier
         run: pnpm format
 
       - name: Version
