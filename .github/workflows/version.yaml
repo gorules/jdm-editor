@@ -1,15 +1,22 @@
-name: Publish version
+name: Version
 on:
-  push:
-    branches:
-      - master
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
 
 permissions:
   contents: write
 
 jobs:
   build:
-    if: "startsWith(github.event.head_commit.message, 'chore(release)')"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -17,15 +24,14 @@ jobs:
         with:
           node-version: '20.x'
           registry-url: 'https://registry.npmjs.org'
+
       - uses: pnpm/action-setup@v3
         with:
           version: 9
           run_install: true
 
-      - name: Build
-        run: pnpm build
+      - name: Run lint and prettier
+        run: pnpm format
 
-      - name: Publish Beta
-        run: pnpm lerna publish from-package --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Build
+        run: pnpm lerna version ${{ github.event.inputs.version }}
