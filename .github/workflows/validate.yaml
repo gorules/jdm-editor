@@ -1,4 +1,4 @@
-name: Lint
+name: Validate
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Validate build
+    name: Validate
     steps:
       - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v3
@@ -17,7 +17,7 @@ jobs:
           version: 9
           run_install: true
 
-      - name: Run lint and prettier
+      - name: Lint and prettier
         run: pnpm format
 
       - name: Build

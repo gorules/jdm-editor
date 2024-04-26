@@ -13,13 +13,14 @@ jobs:
       - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v3
         with:
-          run_install: |
-            - recursive: true
           version: 9
+          run_install: true
 
-      - name: Run build-storybook
+      - name: Build modules
+        run: pnpm build
+
+      - name: Build storybook
         run: |
-          pnpm build
           pnpm lerna run --scope @gorules/jdm-editor build:storybook
           touch packages/jdm-editor/docs/.nojekyll
 
