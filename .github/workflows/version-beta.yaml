@@ -42,5 +42,5 @@ jobs:
       - name: Run lint and prettier
         run: pnpm format
 
-      - name: Build
-        run: pnpm lerna version ${{ github.event.inputs.version }} --preid ${{ github.event.inputs.preid }}
+      - name: Version
+        run: pnpm lerna version ${{ github.event.inputs.version }} --preid ${{ github.event.inputs.preid }} --yes
