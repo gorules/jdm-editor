@@ -22,10 +22,7 @@ jobs:
           version: 9
           run_install: true
 
-      - name: Build
-        run: pnpm build
-
-      - name: Publish Beta
+      - name: Publish
         run: pnpm lerna publish from-package --yes
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

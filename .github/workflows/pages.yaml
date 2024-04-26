@@ -19,6 +19,7 @@ jobs:
 
       - name: Run build-storybook
         run: |
+          pnpm build
           pnpm lerna run --scope @gorules/jdm-editor build:storybook
           touch packages/jdm-editor/docs/.nojekyll
 
