@@ -236,9 +236,13 @@ export const readFromExcel = async (buffer: ArrayBuffer) => {
   workbook.eachSheet((sheet) => {
     const spreadsheetData: any[] = [];
     const spreadsheetName = sheet.name;
+
     sheet.eachRow((row) => {
       const rowData: any[] = [];
-      row.eachCell((cell) => {
+
+      for (let i = 1; i <= row.cellCount; i++) {
+        const cell = row.getCell(i);
+
         const cellNote = cell.note
           ? typeof cell.note === 'object'
             ? cell.note.texts?.map((obj) => obj.text).join('')
@@ -246,7 +250,8 @@ export const readFromExcel = async (buffer: ArrayBuffer) => {
           : null;
 
         rowData.push({ value: cell.value, note: cellNote });
-      });
+      }
+
       spreadsheetData.push(rowData);
     });
     const nodeId: string = spreadsheetData[0][0].value;

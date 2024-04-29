@@ -100,6 +100,14 @@ export const parseDecisionTable = (decisionTable?: DecisionTableType) => {
     ];
   }
 
+  dt.rules.forEach((r) => {
+    if (typeof (r as Record<string, unknown>)._id === 'string' && r._id.length > 0) {
+      return;
+    }
+
+    r._id = crypto.randomUUID();
+  });
+
   return dt;
 };
 
