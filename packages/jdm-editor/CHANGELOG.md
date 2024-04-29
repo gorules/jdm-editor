@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.2](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.4.1...@gorules/jdm-editor@1.4.2) (2024-04-29)
+
+### Bug Fixes
+
+- excel import ([#40](https://github.com/gorules/jdm-editor/issues/40)) ([61b7b8b](https://github.com/gorules/jdm-editor/commit/61b7b8bdd79615b9aa30f859ef0c7e9b50cff691))
+
 ## [1.4.1](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.4.0...@gorules/jdm-editor@1.4.1) (2024-04-26)
 
 ### Bug Fixes
