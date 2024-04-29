@@ -202,7 +202,7 @@ const TableBody = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(
       estimateSize: () => 38,
       indexAttribute: 'data-virtual-index',
       count: rows.length,
-      overscan: 10,
+      overscan: 5,
     });
 
     const virtualItems = virtualizer.getVirtualItems();
@@ -239,7 +239,7 @@ const TableBody = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(
 
           return (
             <TableRow
-              key={row.id}
+              key={item.key}
               virtualItem={item}
               row={row}
               disabled={disabled}
