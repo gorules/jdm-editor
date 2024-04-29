@@ -108,8 +108,6 @@ export const parseDecisionTable = (decisionTable?: DecisionTableType) => {
     r._id = crypto.randomUUID();
   });
 
-  console.log(dt.rules);
-
   return dt;
 };
 
