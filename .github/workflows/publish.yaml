@@ -22,6 +22,9 @@ jobs:
           version: 9
           run_install: true
 
+      - name: Build
+        run: pnpm run build
+
       - name: Publish
         run: pnpm lerna publish from-package --yes
         env:
