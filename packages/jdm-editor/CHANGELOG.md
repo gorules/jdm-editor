@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.5-beta.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.4.4-beta.0...@gorules/jdm-editor@1.4.5-beta.0) (2024-05-07)
+
+### Bug Fixes
+
+- cleanup ([29f3a63](https://github.com/gorules/jdm-editor/commit/29f3a63a9699e85032594260de93b2acb736e4a6))
+
 ## [1.4.4-beta.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.4.3...@gorules/jdm-editor@1.4.4-beta.0) (2024-05-07)
 
 ### Features
