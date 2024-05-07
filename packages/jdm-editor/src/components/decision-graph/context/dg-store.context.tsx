@@ -41,11 +41,6 @@ export type DecisionGraphType = {
   edges: DecisionEdge[];
 };
 
-export type CustomNodeRenderFormType = {
-  value: any;
-  onChange: (val: any) => void;
-};
-
 export type PanelType = {
   id: string;
   icon: React.ReactNode;
