@@ -1,4 +1,4 @@
-import { ClearOutlined, CloseOutlined, FormatPainterOutlined, PlayCircleOutlined } from '@ant-design/icons';
+import { ClearOutlined, FormatPainterOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import 'ace-builds/src-noconflict/ext-language_tools';
 import 'ace-builds/src-noconflict/mode-json5';
 import 'ace-builds/src-noconflict/theme-chrome';
@@ -10,34 +10,37 @@ import React, { useMemo, useState } from 'react';
 import ReactAce from 'react-ace';
 import { P, match } from 'ts-pattern';
 
-import {
-  useDecisionGraphActions,
-  useDecisionGraphListeners,
-  useDecisionGraphRaw,
-  useDecisionGraphState,
-} from './context/dg-store.context';
+import { useDecisionGraphState } from './context/dg-store.context';
 import { NodeKind } from './nodes/specifications/specification-types';
 
-export const GraphSimulator: React.FC = () => {
+type GraphSimulatorProps = {
+  defaultRequest?: string;
+  onChange?: (val: string) => void;
+  onRun?: (val?: string) => void;
+  onClear?: () => void;
+  loading?: boolean;
+};
+
+export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
+  defaultRequest,
+  onChange,
+  onRun,
+  onClear,
+  loading = false,
+}) => {
   const { token } = theme.useToken();
-  const { stateStore } = useDecisionGraphRaw();
-  const graphActions = useDecisionGraphActions();
-  const { onSimulationRun } = useDecisionGraphListeners(({ onSimulationRun }) => ({ onSimulationRun }));
-  const { simulate, simulatorOpen, simulatorRequest, simulatorLoading, nodeTypes } = useDecisionGraphState(
-    ({ simulate, simulatorOpen, simulatorRequest, simulatorLoading, decisionGraph }) => ({
-      simulate,
-      simulatorOpen,
-      simulatorRequest,
-      simulatorLoading,
-      nodeTypes: (decisionGraph.nodes ?? []).reduce<Record<string, string | undefined>>(
-        (acc, curr) => ({
-          ...acc,
-          [curr.id]: curr.type,
-        }),
-        {},
-      ),
-    }),
-  );
+  const [requestValue, setRequestValue] = useState(defaultRequest);
+
+  const { nodeTypes, simulate } = useDecisionGraphState(({ decisionGraph, simulate }) => ({
+    simulate,
+    nodeTypes: (decisionGraph.nodes ?? []).reduce<Record<string, string | undefined>>(
+      (acc, curr) => ({
+        ...acc,
+        [curr.id]: curr.type,
+      }),
+      {},
+    ),
+  }));
 
   const [selectedNode, setSelectedNode] = useState<string>('graph');
 
@@ -50,37 +53,32 @@ export const GraphSimulator: React.FC = () => {
       .with('dark', () => 'github_dark')
       .otherwise(() => 'chrome');
   }, [token.mode]);
-
-  const runSimulation = async () => {
-    try {
-      const response = await graphActions.runSimulator();
-      if (response && typeof response === 'object' && 'error' in response) {
-        notification.error({
-          message: response?.error?.title ?? 'Node error',
-          placement: 'top',
-          description: response?.error?.message,
-        });
-      }
-    } catch (e) {
-      const description = match(e)
-        .with({ message: P._ }, ({ message }) => message?.toString())
-        .otherwise(() => undefined);
-
-      notification.error({
-        message: 'Simulation failed',
-        placement: 'top',
-        description,
-      });
-    }
-  };
-
-  if (!simulatorOpen || !onSimulationRun) {
-    return null;
-  }
+  //
+  // const runSimulation = async () => {
+  //   try {
+  //     const response = await graphActions.runSimulator();
+  //     if (response && typeof response === 'object' && 'error' in response) {
+  //       notification.error({
+  //         message: response?.error?.title ?? 'Node error',
+  //         placement: 'top',
+  //         description: response?.error?.message,
+  //       });
+  //     }
+  //   } catch (e) {
+  //     const description = match(e)
+  //       .with({ message: P._ }, ({ message }) => message?.toString())
+  //       .otherwise(() => undefined);
+  //
+  //     notification.error({
+  //       message: 'Simulation failed',
+  //       placement: 'top',
+  //       description,
+  //     });
+  //   }
+  // };
 
   return (
     <div className={'grl-dg__simulator'}>
-      <div className={'grl-dg__simulator__sidebar'}></div>
       <div className={'grl-dg__simulator__section grl-dg__simulator__request'}>
         <div className={'grl-dg__simulator__section__bar grl-dg__simulator__section__bar--request'}>
           <Typography.Text>Request (json5)</Typography.Text>
@@ -91,14 +89,15 @@ export const GraphSimulator: React.FC = () => {
                 type={'text'}
                 icon={<FormatPainterOutlined />}
                 onClick={() => {
-                  if ((simulatorRequest || '').trim().length === 0) {
+                  if ((requestValue || '').trim().length === 0) {
                     return;
                   }
 
                   try {
-                    stateStore.setState({
-                      simulatorRequest: json5.stringify(json5.parse(simulatorRequest || ''), null, 2),
-                    });
+                    const formatted = json5.stringify(json5.parse(requestValue || ''), null, 2);
+
+                    onChange?.(formatted);
+                    setRequestValue(formatted);
                   } catch (e) {
                     notification.error({
                       message: 'Invalid format',
@@ -109,22 +108,25 @@ export const GraphSimulator: React.FC = () => {
                 }}
               />
             </Tooltip>
-            <Button
-              size={'small'}
-              type={'primary'}
-              loading={simulatorLoading}
-              icon={<PlayCircleOutlined />}
-              onClick={runSimulation}
-            >
-              Run
-            </Button>
+            {onRun && (
+              <Button
+                size={'small'}
+                type={'primary'}
+                loading={loading}
+                icon={<PlayCircleOutlined />}
+                onClick={() => onRun?.(requestValue)}
+              >
+                Run
+              </Button>
+            )}
           </div>
         </div>
         <div className={'grl-dg__simulator__section__content'}>
           <ReactAce
-            value={simulatorRequest}
+            value={requestValue}
             onChange={(e) => {
-              graphActions.setSimulatorRequest(e);
+              setRequestValue(e);
+              onChange?.(e);
             }}
             mode='json5'
             theme={codeEditorTheme}
@@ -141,21 +143,23 @@ export const GraphSimulator: React.FC = () => {
         <div className={'grl-dg__simulator__section__bar grl-dg__simulator__section__bar--nodes'}>
           <Typography.Text>Nodes</Typography.Text>
           <div className={'grl-dg__simulator__section__bar__actions'}>
-            <Tooltip title={'Clear'}>
-              <Button
-                size={'small'}
-                type={'text'}
-                icon={<ClearOutlined />}
-                onClick={() => {
-                  stateStore.setState({ simulate: undefined });
-                  setSelectedNode('graph');
-                }}
-              />
-            </Tooltip>
+            {onClear && (
+              <Tooltip title={'Clear'}>
+                <Button
+                  size={'small'}
+                  type={'text'}
+                  icon={<ClearOutlined />}
+                  onClick={() => {
+                    onClear?.();
+                    setSelectedNode('graph');
+                  }}
+                />
+              </Tooltip>
+            )}
           </div>
         </div>
         <div className={'grl-dg__simulator__section__content'}>
-          <Spin spinning={simulatorLoading}>
+          <Spin spinning={loading}>
             <div className={'grl-dg__simulator__nodes-list'}>
               <div
                 className={clsx('grl-dg__simulator__nodes-list__node', selectedNode === 'graph' && 'active')}
@@ -187,16 +191,6 @@ export const GraphSimulator: React.FC = () => {
       <div className={'grl-dg__simulator__section grl-dg__simulator__response'}>
         <div className={'grl-dg__simulator__section__bar grl-dg__simulator__section__bar--response'}>
           <Typography.Text>Response</Typography.Text>
-          <div className={'grl-dg__simulator__section__bar__actions'}>
-            <Tooltip title={'Close panel'}>
-              <Button
-                size={'small'}
-                type={'text'}
-                icon={<CloseOutlined />}
-                onClick={() => graphActions.toggleSimulator()}
-              />
-            </Tooltip>
-          </div>
         </div>
         <div className={'grl-dg__simulator__section__content'}>
           <ReactAce

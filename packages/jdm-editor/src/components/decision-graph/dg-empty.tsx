@@ -22,9 +22,11 @@ export type DecisionGraphEmptyType = {
   components?: DecisionGraphStoreType['state']['components'];
   customNodes?: DecisionGraphStoreType['state']['customNodes'];
 
+  defaultActivePanel?: string;
+  panels?: DecisionGraphStoreType['state']['panels'];
+  onPanelsChange?: DecisionGraphStoreType['listeners']['onPanelsChange'];
+
   onChange?: DecisionGraphStoreType['listeners']['onChange'];
-  onSimulationRun?: DecisionGraphStoreType['listeners']['onSimulationRun'];
-  onSimulatorOpen?: DecisionGraphStoreType['listeners']['onSimulatorOpen'];
   onReactFlowInit?: DecisionGraphStoreType['listeners']['onReactFlowInit'];
 };
 
@@ -35,10 +37,11 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
   disabled = false,
   configurable = true,
   onChange,
-  onSimulationRun,
   components,
   customNodes,
-  onSimulatorOpen,
+  defaultActivePanel,
+  panels,
+  onPanelsChange,
   onReactFlowInit,
 }) => {
   const mountedRef = useRef(false);
@@ -59,16 +62,16 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
       configurable,
       components: Array.isArray(components) ? components : [],
       customNodes: Array.isArray(customNodes) ? customNodes : [],
+      panels,
     });
-  }, [id, disabled, configurable, components, customNodes]);
+  }, [id, disabled, configurable, components, customNodes, panels]);
 
   useEffect(() => {
     listenerStore.setState({
-      onSimulationRun,
-      onSimulatorOpen,
       onReactFlowInit,
+      onPanelsChange,
     });
-  }, [onSimulationRun, onSimulatorOpen, onReactFlowInit]);
+  }, [onReactFlowInit, onPanelsChange]);
 
   useEffect(() => {
     listenerStore.setState({ onChange: innerChange });
@@ -87,6 +90,9 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
       graphActions.setDecisionGraph(defaultValue);
     }
 
+    stateStore.setState({
+      activePanel: defaultActivePanel,
+    });
     mountedRef.current = true;
   }, []);
 

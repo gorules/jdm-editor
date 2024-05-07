@@ -6,7 +6,7 @@ import type { ProOptions } from 'reactflow';
 import 'reactflow/dist/style.css';
 
 import { useDecisionGraphState } from './context/dg-store.context';
-import { GraphSimulator } from './dg-simulator';
+import { GraphPanel } from './dg-panel';
 import './dg.scss';
 import type { GraphRef } from './graph/graph';
 import { Graph } from './graph/graph';
@@ -41,7 +41,7 @@ export const DecisionGraphWrapper = React.memo(
           />
           <TabContents />
         </div>
-        <GraphSimulator />
+        <GraphPanel />
       </>
     );
   }),

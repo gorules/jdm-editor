@@ -1,10 +1,4 @@
-import {
-  CloseOutlined,
-  CloudDownloadOutlined,
-  CloudUploadOutlined,
-  PlayCircleOutlined,
-  PlusCircleOutlined,
-} from '@ant-design/icons';
+import { CloseOutlined, CloudDownloadOutlined, CloudUploadOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Button, Dropdown, Tooltip, Typography, message } from 'antd';
 import React, { useRef, useState } from 'react';
@@ -14,7 +8,6 @@ import {
   type DecisionEdge,
   type DecisionNode,
   useDecisionGraphActions,
-  useDecisionGraphListeners,
   useDecisionGraphState,
 } from '../context/dg-store.context';
 import { NodeKind } from '../nodes/specifications/specification-types';
@@ -33,14 +26,15 @@ export const GraphAside: React.FC<GraphAsideProps> = ({ defaultOpenMenu = 'compo
   const excelFileInput = useRef<HTMLInputElement>(null);
   const [menu, setMenu] = useState<Menu | false>(defaultOpenMenu);
 
-  const { setDecisionGraph, toggleSimulator } = useDecisionGraphActions();
-  const { onSimulationRun } = useDecisionGraphListeners(({ onSimulationRun }) => ({ onSimulationRun }));
-  const { decisionGraph, activeNodeId, disabled, hasInputNode } = useDecisionGraphState(
-    ({ decisionGraph, activeTab, disabled }) => ({
+  const { setDecisionGraph, setActivePanel } = useDecisionGraphActions();
+  const { decisionGraph, activeNodeId, disabled, hasInputNode, panels, activePanel } = useDecisionGraphState(
+    ({ decisionGraph, activeTab, disabled, panels, activePanel }) => ({
       decisionGraph,
       activeNodeId: (decisionGraph?.nodes ?? []).find((node) => node.id === activeTab)?.id,
       disabled,
       hasInputNode: (decisionGraph?.nodes || []).some((n) => n.type === NodeKind.Input),
+      panels,
+      activePanel,
     }),
   );
 
@@ -224,17 +218,16 @@ export const GraphAside: React.FC<GraphAsideProps> = ({ defaultOpenMenu = 'compo
         </div>
 
         <div className={'grl-dg__aside__side-bar__bottom'}>
-          {onSimulationRun && (
-            <Tooltip placement='right' title='Toggle Simulator'>
-              <Button
-                type={'text'}
-                icon={<PlayCircleOutlined className={'color-primary'} />}
-                onClick={() => {
-                  toggleSimulator();
-                }}
-              />
-            </Tooltip>
-          )}
+          {(panels || []).map((panel) => (
+            <Button
+              key={panel.id}
+              type={activePanel === panel.id ? 'default' : 'text'}
+              icon={panel.icon}
+              onClick={() => {
+                setActivePanel(panel.id);
+              }}
+            />
+          ))}
         </div>
       </div>
       {menu && (
