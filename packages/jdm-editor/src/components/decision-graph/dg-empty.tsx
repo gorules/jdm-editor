@@ -26,6 +26,8 @@ export type DecisionGraphEmptyType = {
   panels?: DecisionGraphStoreType['state']['panels'];
   onPanelsChange?: DecisionGraphStoreType['listeners']['onPanelsChange'];
 
+  simulate?: DecisionGraphStoreType['state']['simulate'];
+
   onChange?: DecisionGraphStoreType['listeners']['onChange'];
   onReactFlowInit?: DecisionGraphStoreType['listeners']['onReactFlowInit'];
 };
@@ -41,6 +43,7 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
   customNodes,
   defaultActivePanel,
   panels,
+  simulate,
   onPanelsChange,
   onReactFlowInit,
 }) => {
@@ -65,6 +68,12 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
       panels,
     });
   }, [id, disabled, configurable, components, customNodes, panels]);
+
+  useEffect(() => {
+    stateStore.setState({
+      simulate,
+    });
+  }, [simulate]);
 
   useEffect(() => {
     listenerStore.setState({
