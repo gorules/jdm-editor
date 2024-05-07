@@ -10,13 +10,13 @@ import React, { useMemo, useState } from 'react';
 import ReactAce from 'react-ace';
 import { P, match } from 'ts-pattern';
 
-import { useDecisionGraphState } from './context/dg-store.context';
+import { type DecisionGraphType, useDecisionGraphRaw, useDecisionGraphState } from './context/dg-store.context';
 import { NodeKind } from './nodes/specifications/specification-types';
 
 type GraphSimulatorProps = {
   defaultRequest?: string;
   onChange?: (val: string) => void;
-  onRun?: (val?: string) => void;
+  onRun?: (payload: { graph: DecisionGraphType; context: unknown }) => void;
   onClear?: () => void;
   loading?: boolean;
 };
@@ -31,6 +31,7 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
   const { token } = theme.useToken();
   const [requestValue, setRequestValue] = useState(defaultRequest);
 
+  const { stateStore } = useDecisionGraphRaw();
   const { nodeTypes, simulate } = useDecisionGraphState(({ decisionGraph, simulate }) => ({
     simulate,
     nodeTypes: (decisionGraph.nodes ?? []).reduce<Record<string, string | undefined>>(
@@ -91,7 +92,18 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
                 type={'primary'}
                 loading={loading}
                 icon={<PlayCircleOutlined />}
-                onClick={() => onRun?.(requestValue)}
+                onClick={() => {
+                  try {
+                    const parsed = (requestValue || '').trim().length === 0 ? null : json5.parse(requestValue || '');
+                    onRun?.({ graph: stateStore.getState().decisionGraph, context: parsed });
+                  } catch {
+                    notification.error({
+                      message: 'Invalid format',
+                      description: 'Unable to format request, invalid JSON format',
+                      placement: 'top',
+                    });
+                  }
+                }}
               >
                 Run
               </Button>
