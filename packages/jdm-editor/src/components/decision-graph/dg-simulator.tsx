@@ -53,29 +53,6 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
       .with('dark', () => 'github_dark')
       .otherwise(() => 'chrome');
   }, [token.mode]);
-  //
-  // const runSimulation = async () => {
-  //   try {
-  //     const response = await graphActions.runSimulator();
-  //     if (response && typeof response === 'object' && 'error' in response) {
-  //       notification.error({
-  //         message: response?.error?.title ?? 'Node error',
-  //         placement: 'top',
-  //         description: response?.error?.message,
-  //       });
-  //     }
-  //   } catch (e) {
-  //     const description = match(e)
-  //       .with({ message: P._ }, ({ message }) => message?.toString())
-  //       .otherwise(() => undefined);
-  //
-  //     notification.error({
-  //       message: 'Simulation failed',
-  //       placement: 'top',
-  //       description,
-  //     });
-  //   }
-  // };
 
   return (
     <div className={'grl-dg__simulator'}>
