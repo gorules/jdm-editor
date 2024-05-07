@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.1](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.5.0...@gorules/jdm-editor@1.5.1) (2024-05-07)
+
+### Bug Fixes
+
+- simulate expose ([#44](https://github.com/gorules/jdm-editor/issues/44)) ([dcce5d8](https://github.com/gorules/jdm-editor/commit/dcce5d8b20c9290bb82668f2a230cc7c6b06a912))
+
 # [1.5.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.4.3...@gorules/jdm-editor@1.5.0) (2024-05-07)
 
 ### Features
