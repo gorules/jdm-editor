@@ -216,7 +216,6 @@ export const GraphAside: React.FC<GraphAsideProps> = ({ defaultOpenMenu = 'compo
             <Button type={'text'} disabled={disabled} icon={<CloudDownloadOutlined />} />
           </Dropdown>
         </div>
-
         <div className={'grl-dg__aside__side-bar__bottom'}>
           {(panels || []).map((panel) => (
             <Button
