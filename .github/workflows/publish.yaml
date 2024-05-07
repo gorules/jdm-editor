@@ -1,6 +1,8 @@
 name: Publish version
 on:
   push:
+    branches:
+      - '**'
 
 permissions:
   contents: write
