@@ -48,8 +48,7 @@ export type DecisionGraphProps = {
   reactFlowProOptions?: ProOptions;
   defaultOpenMenu?: boolean;
   onReactFlowInit?: () => void;
-  onSimulatorOpen?: (opened: boolean) => void;
-  onSimulationRun?: ({ context: any, decisionGraph: DecisionGraphType }) => Promise<Trace>;
+  simulate?: Simulation;
 };
 ```
 

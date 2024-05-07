@@ -1,7 +1,7 @@
 .grl-dg {
   height: 100%;
   display: grid;
-  grid-template-areas: 'sidebar graph component' 'simulator simulator component';
+  grid-template-areas: 'sidebar graph component' 'bottom bottom component';
   grid-template-columns: min-content 1fr min-content;
   grid-template-rows: 1fr auto;
 
@@ -19,11 +19,9 @@
   }
 
   &__simulator {
-    grid-area: simulator;
     width: 100%;
-    border-top: 1px solid var(--grl-color-border);
     display: flex;
-    height: 300px;
+    height: 100%;
     background: var(--grl-color-primary-bg-fade);
 
     &__nodes-list {
@@ -120,6 +118,45 @@
     &__response {
       min-width: 300px;
       flex: 1;
+    }
+  }
+
+  &__panel {
+    grid-area: bottom;
+    position: relative;
+    width: 100%;
+    border-top: 1px solid var(--grl-color-border);
+    height: 340px;
+    background: var(--grl-color-primary-bg-fade);
+    display: flex;
+    flex-direction: column;
+
+    &__content {
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    &__toolbar {
+      padding: 4px 4px 4px 8px;
+      display: flex;
+      gap: 8px;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
+      border-bottom: 1px solid var(--grl-color-border);
+
+      &__content {
+        flex-grow: 1;
+      }
+
+      &__actions {
+        flex-shrink: 1;
+      }
+
+      & > span {
+        font-size: 13px;
+      }
     }
   }
 

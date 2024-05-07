@@ -1,10 +1,8 @@
 import equal from 'fast-deep-equal/es6/react';
 import { produce } from 'immer';
 import type { WritableDraft } from 'immer/src/types/types-external';
-import json5 from 'json5';
 import React, { type MutableRefObject, createRef, useMemo } from 'react';
 import type { EdgeChange, NodeChange, ReactFlowInstance, useEdgesState, useNodesState } from 'reactflow';
-import { P, match } from 'ts-pattern';
 import type { StoreApi, UseBoundStore } from 'zustand';
 import { create } from 'zustand';
 
@@ -43,9 +41,11 @@ export type DecisionGraphType = {
   edges: DecisionEdge[];
 };
 
-export type CustomNodeRenderFormType = {
-  value: any;
-  onChange: (val: any) => void;
+export type PanelType = {
+  id: string;
+  icon: React.ReactNode;
+  title: string;
+  renderPanel: React.FC;
 };
 
 type DraftUpdateCallback<T> = (draft: WritableDraft<T>) => WritableDraft<T>;
@@ -63,10 +63,11 @@ export type DecisionGraphStoreType = {
 
     customNodes: CustomNodeSpecification<object, string>[];
 
-    simulatorOpen: boolean;
-    simulatorRequest?: string;
+    panels?: PanelType[];
+    activePanel?: string;
+    onPanelsChange?: (val?: string) => void;
+
     simulate?: Simulation;
-    simulatorLoading: boolean;
   };
 
   references: {
@@ -98,17 +99,12 @@ export type DecisionGraphStoreType = {
     closeTab: (id: string) => void;
     openTab: (id: string) => void;
 
-    setSimulatorRequest: (req: string) => void;
-    toggleSimulator: () => void;
-    runSimulator: (context?: unknown) => Promise<Simulation>;
+    setActivePanel: (panel?: string) => void;
   };
 
   listeners: {
     onChange?: (val: DecisionGraphType) => void;
-
-    onSimulationRun?: (data: { decisionGraph: DecisionGraphType; context: unknown }) => Promise<Simulation>;
-    onSimulatorOpen?: (open: boolean) => void;
-
+    onPanelsChange?: (val?: string) => void;
     onReactFlowInit?: (instance: ReactFlowInstance) => void;
   };
 };
@@ -144,9 +140,8 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         configurable: true,
         components: [],
         customNodes: [],
-
-        simulatorLoading: false,
-        simulatorOpen: false,
+        activePanel: undefined,
+        panels: [],
       })),
     [],
   );
@@ -155,8 +150,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
     () =>
       create<DecisionGraphStoreType['listeners']>(() => ({
         onChange: undefined,
-        onSimulationRun: undefined,
-        onSimulatorOpen: undefined,
+        onPanelsChange: undefined,
       })),
     [],
   );
@@ -442,45 +436,13 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
 
         stateStore.setState(updatedState);
       },
-      setSimulatorRequest: (request: string) => {
-        stateStore.setState({
-          simulatorRequest: request,
-        });
-      },
-      toggleSimulator: () => {
-        const simulatorOpen = !stateStore.getState()?.simulatorOpen;
-        stateStore.setState({ simulatorOpen });
-        listenerStore.getState().onSimulatorOpen?.(simulatorOpen);
-      },
-      runSimulator: async (providedContext?: unknown): Promise<Simulation> => {
-        const { onSimulationRun } = listenerStore.getState();
-        if (!onSimulationRun) {
-          return { error: { title: 'Component error', message: 'Simulation callback is not defined.', data: {} } };
-        }
-
-        const { decisionGraph, simulatorRequest } = stateStore.getState();
-
-        try {
-          const context = match(providedContext)
-            .with(P.not(P.nullish), (context) => {
-              stateStore.setState({ simulatorRequest: json5.stringify(context, undefined, 2), simulatorLoading: true });
-              return context;
-            })
-            .otherwise(() => {
-              stateStore.setState({ simulatorLoading: true });
-              return match(simulatorRequest?.trim?.())
-                .with(P.string.minLength(1), (value) => json5.parse(value))
-                .otherwise(() => ({}));
-            });
-
-          const simulate = await onSimulationRun({ decisionGraph, context });
-          stateStore.setState({ simulate });
-          return simulate;
-        } catch (e) {
-          throw e;
-        } finally {
-          stateStore.setState({ simulatorLoading: false });
-        }
+      setActivePanel: (panel?: string) => {
+        const { panels } = stateStore.getState();
+        const updatedState: Partial<DecisionGraphStoreType['state']> = {
+          activePanel: panel === undefined ? undefined : (panels || []).find((p) => p.id === panel)?.id,
+        };
+        listenerStore.getState()?.onPanelsChange?.(panel);
+        stateStore.setState(updatedState);
       },
     }),
     [],

@@ -1,9 +1,12 @@
-import { ApartmentOutlined, ApiOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { ApartmentOutlined, ApiOutlined, LeftOutlined, PlayCircleOutlined, RightOutlined } from '@ant-design/icons';
 import type { Meta, StoryObj } from '@storybook/react';
 import { Select } from 'antd';
+import json5 from 'json5';
 import React, { useRef, useState } from 'react';
 
+import type { PanelType } from './context/dg-store.context';
 import { DecisionGraph } from './dg';
+import { GraphSimulator } from './dg-simulator';
 import { defaultGraph, defaultGraphCustomNode, defaultGraphUnknownNode } from './dg.stories-values';
 import type { GraphRef } from './graph/graph';
 import { createJdmNode } from './nodes/custom-node';
@@ -204,6 +207,56 @@ export const UnknownCustomNode: Story = {
           value={value}
           onChange={(val) => setValue(val)}
           components={components}
+        />
+      </div>
+    );
+  },
+};
+
+const panels: PanelType[] = [
+  {
+    id: 'simulator',
+    title: 'Simulator',
+    icon: <PlayCircleOutlined />,
+    renderPanel: () => (
+      <GraphSimulator
+        defaultRequest={json5.stringify(
+          {
+            age: 20,
+          },
+          null,
+          2,
+        )}
+        onChange={(val) => {
+          console.log(val);
+        }}
+        onRun={() => {}}
+        onClear={() => {}}
+      />
+    ),
+  },
+];
+
+export const Simulator: Story = {
+  render: (args) => {
+    const [value, setValue] = useState<any>(defaultGraph);
+    return (
+      <div
+        style={{
+          height: '100%',
+        }}
+      >
+        <DecisionGraph
+          {...args}
+          value={value}
+          onPanelsChange={(val) => {
+            console.log(val);
+          }}
+          defaultActivePanel={'simulator'}
+          panels={panels}
+          onChange={(val) => {
+            setValue?.(val);
+          }}
         />
       </div>
     );
