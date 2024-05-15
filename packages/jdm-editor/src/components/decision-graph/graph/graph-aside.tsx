@@ -223,7 +223,8 @@ export const GraphAside: React.FC<GraphAsideProps> = ({ defaultOpenMenu = 'compo
               type={activePanel === panel.id ? 'default' : 'text'}
               icon={panel.icon}
               onClick={() => {
-                setActivePanel(panel.id);
+                if (panel?.onClick) return panel.onClick();
+                if (panel?.renderPanel) setActivePanel(activePanel === panel.id ? undefined : panel.id);
               }}
             />
           ))}

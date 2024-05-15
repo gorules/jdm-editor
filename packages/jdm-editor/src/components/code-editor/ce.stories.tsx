@@ -57,6 +57,42 @@ export const Controlled: Story = {
   },
 };
 
+export const FullHeight: Story = {
+  render: () => {
+    const [value, setValue] = useState('');
+
+    return (
+      <StoryWrapper>
+        <div
+          style={{
+            height: 200,
+          }}
+        >
+          <CodeEditor fullHeight value={value} onChange={setValue} />
+        </div>
+      </StoryWrapper>
+    );
+  },
+};
+
+export const NoStyle: Story = {
+  render: () => {
+    const [value, setValue] = useState('');
+    return (
+      <StoryWrapper>
+        <p>Parent border</p>
+        <div
+          style={{
+            border: '1px solid blue',
+          }}
+        >
+          <CodeEditor noStyle value={value} onChange={setValue} />
+        </div>
+      </StoryWrapper>
+    );
+  },
+};
+
 export const Debug: Story = {
   render: (args) => {
     const { token } = theme.useToken();
