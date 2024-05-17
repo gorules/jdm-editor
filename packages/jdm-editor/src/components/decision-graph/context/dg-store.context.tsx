@@ -45,7 +45,8 @@ export type PanelType = {
   id: string;
   icon: React.ReactNode;
   title: string;
-  renderPanel: React.FC;
+  renderPanel?: React.FC;
+  onClick?: () => void;
 };
 
 type DraftUpdateCallback<T> = (draft: WritableDraft<T>) => WritableDraft<T>;

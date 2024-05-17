@@ -230,7 +230,9 @@ const panels: PanelType[] = [
         onChange={(val) => {
           console.log(val);
         }}
-        onRun={() => {}}
+        onRun={(payload) => {
+          console.log(payload);
+        }}
         onClear={() => {}}
       />
     ),

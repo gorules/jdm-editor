@@ -3,9 +3,31 @@
   --ce-verticalPadding: 4px;
   --ce-horizontalPadding: 11px;
 
-  &--max-rows {
+  &.max-rows {
     .cm-editor {
       max-height: calc(var(--editorMaxRows) * var(--ce-lineHeight) + 2 * var(--ce-verticalPadding));
+    }
+  }
+
+  &.full-height {
+    height: 100%;
+
+    .cm-editor {
+      height: 100%;
+    }
+  }
+
+  &.no-style {
+    .cm-editor {
+      border: none;
+      border-radius: unset;
+      &.cm-focused {
+        box-shadow: unset;
+      }
+
+      &:hover {
+        border-inline-end-width: unset;
+      }
     }
   }
 

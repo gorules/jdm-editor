@@ -28,10 +28,27 @@ export type CodeEditorProps = {
   placeholder?: string;
   disabled?: boolean;
   type?: 'standard' | 'template';
+  fullHeight?: boolean;
+  noStyle?: boolean;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, 'disabled' | 'onChange'>;
 
 export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
-  ({ maxRows, disabled, value, onChange, placeholder, className, onStateChange, type = 'standard', ...props }, ref) => {
+  (
+    {
+      noStyle = false,
+      fullHeight = false,
+      maxRows,
+      disabled,
+      value,
+      onChange,
+      placeholder,
+      className,
+      onStateChange,
+      type = 'standard',
+      ...props
+    },
+    ref,
+  ) => {
     const container = useRef<HTMLDivElement>(null);
     const codeMirror = useRef<EditorView>(null);
     const { token } = theme.useToken();
@@ -147,7 +164,13 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
     return (
       <div
         ref={composeRefs(container, ref)}
-        className={clsx('grl-ce', maxRows && 'grl-ce--max-rows', className)}
+        className={clsx(
+          'grl-ce',
+          maxRows && !fullHeight && 'max-rows',
+          fullHeight && 'full-height',
+          noStyle && 'no-style',
+          className,
+        )}
         style={{ '--editorMaxRows': maxRows } as any}
         {...props}
       />
