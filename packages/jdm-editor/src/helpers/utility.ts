@@ -37,3 +37,7 @@ export const pasteFromClipboard = async (): Promise<string> => {
     return '';
   }
 };
+
+export const get = <T>(obj: any, path: string, defaultValue: T): T => {
+  return path.split('.').reduce((a, c) => (a && a[c] ? a[c] : defaultValue || null), obj) as T;
+};

@@ -1,11 +1,13 @@
 import { DeleteOutlined, MenuOutlined } from '@ant-design/icons';
 import type { Row } from '@tanstack/react-table';
-import { Button, Input, Popconfirm } from 'antd';
+import { Button, Input, Popconfirm, Typography } from 'antd';
 import clsx from 'clsx';
 import React, { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
+import { get } from '../../helpers/utility';
 import { CodeEditor } from '../code-editor';
+import { type SimulationTraceDataExpression } from '../decision-graph';
 import type { ExpressionEntry } from './context/expression-store.context';
 import { useExpressionStore } from './context/expression-store.context';
 
@@ -79,7 +81,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
           autoComplete='off'
         />
       </div>
-      <div>
+      <div className='expression-list-item__code'>
         <CodeEditor
           placeholder='Expression'
           maxRows={6}
@@ -87,6 +89,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
           value={expression?.value}
           onChange={(value) => onChange({ value })}
         />
+        <ResultOverlay expression={expression} />
       </div>
       <div>
         <Popconfirm
@@ -98,6 +101,23 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
           <Button type='text' icon={<DeleteOutlined />} danger disabled={!configurable || disabled} />
         </Popconfirm>
       </div>
+    </div>
+  );
+};
+
+type ValueOf<T> = T[keyof T];
+
+const ResultOverlay: React.FC<{ expression: ExpressionEntry }> = ({ expression }) => {
+  const { trace } = useExpressionStore(({ traceData }) => ({
+    trace: get<ValueOf<SimulationTraceDataExpression> | undefined>(traceData, expression.key, undefined)?.result,
+  }));
+  if (!trace) {
+    return null;
+  }
+
+  return (
+    <div className='expression-list-item__resultOverlay'>
+      <Typography.Text>= {trace as string}</Typography.Text>
     </div>
   );
 };
