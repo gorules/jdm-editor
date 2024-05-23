@@ -39,7 +39,7 @@ export type SimulationTraceDataFunction = {
   log?: TraceFunctionLog[];
 };
 
-export type SimulationTraceDataExpression = object;
+export type SimulationTraceDataExpression = Record<string, { result: unknown }>;
 
 export type SimulationTraceDataTable = {
   index: number;

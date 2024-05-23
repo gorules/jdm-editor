@@ -4,6 +4,8 @@ import React, { useMemo } from 'react';
 import type { StoreApi, UseBoundStore } from 'zustand';
 import { create } from 'zustand';
 
+import type { SimulationTraceDataExpression } from '../../decision-graph';
+
 const ExpressionStoreContext = React.createContext<
   UseBoundStore<StoreApi<ExpressionStore>> & {
     setState: (partial: Partial<ExpressionStore>) => void;
@@ -19,6 +21,7 @@ export type ExpressionEntry = {
 export type ExpressionStore = {
   configurable: boolean;
   disabled: boolean;
+  traceData?: SimulationTraceDataExpression;
 
   addRowAbove: (index?: number, data?: Partial<ExpressionEntry>) => void;
   addRowBelow: (index?: number, data?: Partial<ExpressionEntry>) => void;
