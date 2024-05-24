@@ -11,6 +11,8 @@ import type { useGraphClipboard } from '../hooks/use-graph-clipboard';
 import type { CustomNodeSpecification } from '../nodes/custom-node/index';
 import { NodeKind, type NodeSpecification } from '../nodes/specifications/specification-types';
 import type { Simulation } from '../types/simulation.types';
+import { BASE_TABS, type Tab } from '../graph/common-tab';
+
 
 export type Position = {
   x: number;
@@ -63,6 +65,7 @@ export type DecisionGraphStoreType = {
     activeTab: string;
 
     customNodes: CustomNodeSpecification<object, string>[];
+    customTabs: Tab[];
 
     panels?: PanelType[];
     activePanel?: string;
@@ -141,6 +144,9 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         configurable: true,
         components: [],
         customNodes: [],
+        customTabs: [
+          ...BASE_TABS
+        ],
         activePanel: undefined,
         panels: [],
       })),

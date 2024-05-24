@@ -12,9 +12,6 @@ import type { GraphRef } from './graph/graph';
 import { Graph } from './graph/graph';
 import { GraphAside, type GraphAsideProps } from './graph/graph-aside';
 import { GraphTabs } from './graph/graph-tabs';
-import { TabDecisionTable } from './graph/tab-decision-table';
-import { TabExpression } from './graph/tab-expression';
-import { TabFunction } from './graph/tab-function';
 
 export type DecisionGraphWrapperProps = {
   reactFlowProOptions?: ProOptions;
@@ -48,13 +45,14 @@ export const DecisionGraphWrapper = React.memo(
 );
 
 const TabContents: React.FC = React.memo(() => {
-  const { openNodes, activeNodeId } = useDecisionGraphState(({ decisionGraph, openTabs, activeTab }) => {
+  const { openNodes, activeNodeId, tabs } = useDecisionGraphState(({ decisionGraph, openTabs, activeTab, customTabs }) => {
     const activeNodeId = (decisionGraph?.nodes ?? []).find((node) => node.id === activeTab)?.id;
     const openNodes = (decisionGraph?.nodes ?? []).filter((node) => openTabs.includes(node.id));
 
     return {
       openNodes: openNodes.map(({ id, type }) => ({ id, type })),
       activeNodeId,
+      tabs: customTabs
     };
   });
 
@@ -69,9 +67,7 @@ const TabContents: React.FC = React.memo(() => {
     <div style={{ display: 'contents' }} ref={containerRef}>
       {openNodes.map((node) => (
         <div key={node?.id} className={clsx(['tab-content', activeNodeId === node?.id && 'active'])}>
-          {node?.type === 'decisionTableNode' && <TabDecisionTable id={node.id} manager={dndManager} />}
-          {node?.type === 'expressionNode' && <TabExpression id={node.id} manager={dndManager} />}
-          {node?.type === 'functionNode' && <TabFunction id={node.id} />}
+          {tabs.find(tab => tab.type === node?.type)?.tab({id: node.id, manager: dndManager})}
         </div>
       ))}
     </div>
