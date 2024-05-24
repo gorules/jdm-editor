@@ -19,7 +19,7 @@ export type JdmConfigProviderProps = {
 };
 
 export const JdmConfigProvider: React.FC<JdmConfigProviderProps> = ({
-  theme: { mode = 'light', ...theme } = {},
+  theme: { mode = 'light', token = {}, ...restTheme } = {},
   prefixCls,
   children,
 }) => {
@@ -34,7 +34,7 @@ export const JdmConfigProvider: React.FC<JdmConfigProviderProps> = ({
   }, [mode]);
 
   return (
-    <ConfigProvider prefixCls={prefixCls} theme={{ ...theme, algorithm, token: { mode } }}>
+    <ConfigProvider prefixCls={prefixCls} theme={{ ...restTheme, algorithm, token: { ...token, mode } }}>
       <GlobalCssVariables mode={mode} />
       {children}
     </ConfigProvider>
