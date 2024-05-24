@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.2](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.7.1...@gorules/jdm-editor@1.7.2) (2024-05-24)
+
+### Bug Fixes
+
+- command bar paddding ([#57](https://github.com/gorules/jdm-editor/issues/57)) ([e52bd5a](https://github.com/gorules/jdm-editor/commit/e52bd5a3bbc38c493da4cf098c7414ef8a63fd31))
+
 ## [1.7.1](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.7.0...@gorules/jdm-editor@1.7.1) (2024-05-24)
 
 ### Bug Fixes
