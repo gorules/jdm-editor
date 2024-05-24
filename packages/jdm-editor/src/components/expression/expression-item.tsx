@@ -5,9 +5,7 @@ import clsx from 'clsx';
 import React, { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
-import { get } from '../../helpers/utility';
 import { CodeEditor } from '../code-editor';
-import { type SimulationTraceDataExpression } from '../decision-graph';
 import type { ExpressionEntry } from './context/expression-store.context';
 import { useExpressionStore } from './context/expression-store.context';
 
@@ -105,11 +103,9 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
   );
 };
 
-type ValueOf<T> = T[keyof T];
-
 const ResultOverlay: React.FC<{ expression: ExpressionEntry }> = ({ expression }) => {
   const { trace } = useExpressionStore(({ traceData }) => ({
-    trace: get<ValueOf<SimulationTraceDataExpression> | undefined>(traceData, expression.key, undefined)?.result,
+    trace: traceData?.[expression.key]?.result,
   }));
   if (!trace) {
     return null;
