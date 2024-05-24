@@ -24,7 +24,7 @@
     "prepublishOnly": "vite build"
   },
   "dependencies": {
-    "@ant-design/icons": "5.3.6",
+    "@ant-design/icons": "5.3.7",
     "@codemirror/autocomplete": "^6.16.0",
     "@codemirror/language": "^6.10.1",
     "@codemirror/state": "^6.4.1",
@@ -38,7 +38,7 @@
     "@tanstack/react-table": "8.16.0",
     "@tanstack/react-virtual": "3.4.0",
     "ace-builds": "^1.32.5",
-    "antd": "5.16.2",
+    "antd": "5.17.3",
     "clsx": "2.1.0",
     "dnd-core": "^16.0.1",
     "exceljs": "^4.4.0",
