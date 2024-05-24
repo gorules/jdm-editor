@@ -4,15 +4,15 @@ import { Button, Select } from 'antd';
 import json5 from 'json5';
 import React, { useRef, useState } from 'react';
 
-import { useDecisionGraphActions, type PanelType } from './context/dg-store.context';
+import { type PanelType, useDecisionGraphActions } from './context/dg-store.context';
 import { DecisionGraph } from './dg';
 import { GraphSimulator } from './dg-simulator';
 import { defaultGraph, defaultGraphCustomNode, defaultGraphUnknownNode } from './dg.stories-values';
+import type { Tab } from './graph/common-tab';
 import type { GraphRef } from './graph/graph';
 import { createJdmNode } from './nodes/custom-node';
 import { GraphNode } from './nodes/graph-node';
 import type { NodeSpecification } from './nodes/specifications/specification-types';
-import type { Tab } from './graph/common-tab';
 
 const meta: Meta<typeof DecisionGraph> = {
   /* 👇 The title prop is optional.
@@ -114,23 +114,41 @@ const customTabsComponents: NodeSpecification[] = [
     renderNode: ({ specification, id, selected, data }) => {
       const graphActions = useDecisionGraphActions();
       return (
-      <GraphNode id={id} specification={specification} name={data.name} isSelected={selected} actions={[<Button key='edit-table' type='link' onClick={() => graphActions.openTab(id)}>
-      Edit Table
-    </Button>]}>
-       
-      </GraphNode>
-    )},
+        <GraphNode
+          id={id}
+          specification={specification}
+          name={data.name}
+          isSelected={selected}
+          actions={[
+            <Button key='edit-table' type='link' onClick={() => graphActions.openTab(id)}>
+              Edit Table
+            </Button>,
+          ]}
+        ></GraphNode>
+      );
+    },
   },
 ];
 
-const customTabs: Tab[] = [{type: "decisionNode", tab: ({id}) => {
-  const graphActions = useDecisionGraphActions();
+const customTabs: Tab[] = [
+  {
+    type: 'decisionNode',
+    tab: ({ id }) => {
+      const graphActions = useDecisionGraphActions();
 
-  return <input onChange={(e) => graphActions.updateNode(id, (draft) => {
-    draft.content = e.target.value;
-    return draft;
-  })}></input>
-}}]
+      return (
+        <input
+          onChange={(e) =>
+            graphActions.updateNode(id, (draft) => {
+              draft.content = e.target.value;
+              return draft;
+            })
+          }
+        ></input>
+      );
+    },
+  },
+];
 
 export const CustomTab: Story = {
   render: (args) => {
@@ -143,7 +161,14 @@ export const CustomTab: Story = {
           height: '100%',
         }}
       >
-        <DecisionGraph {...args} ref={ref} value={value} onChange={(val) => setValue(val)} components={customTabsComponents} customTabs={customTabs}/>
+        <DecisionGraph
+          {...args}
+          ref={ref}
+          value={value}
+          onChange={(val) => setValue(val)}
+          components={customTabsComponents}
+          customTabs={customTabs}
+        />
       </div>
     );
   },

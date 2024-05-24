@@ -45,16 +45,18 @@ export const DecisionGraphWrapper = React.memo(
 );
 
 const TabContents: React.FC = React.memo(() => {
-  const { openNodes, activeNodeId, tabs } = useDecisionGraphState(({ decisionGraph, openTabs, activeTab, customTabs }) => {
-    const activeNodeId = (decisionGraph?.nodes ?? []).find((node) => node.id === activeTab)?.id;
-    const openNodes = (decisionGraph?.nodes ?? []).filter((node) => openTabs.includes(node.id));
+  const { openNodes, activeNodeId, tabs } = useDecisionGraphState(
+    ({ decisionGraph, openTabs, activeTab, customTabs }) => {
+      const activeNodeId = (decisionGraph?.nodes ?? []).find((node) => node.id === activeTab)?.id;
+      const openNodes = (decisionGraph?.nodes ?? []).filter((node) => openTabs.includes(node.id));
 
-    return {
-      openNodes: openNodes.map(({ id, type }) => ({ id, type })),
-      activeNodeId,
-      tabs: customTabs
-    };
-  });
+      return {
+        openNodes: openNodes.map(({ id, type }) => ({ id, type })),
+        activeNodeId,
+        tabs: customTabs,
+      };
+    },
+  );
 
   const containerRef = useRef<HTMLDivElement>(null);
   const dndManager = useMemo(() => {
@@ -67,7 +69,7 @@ const TabContents: React.FC = React.memo(() => {
     <div style={{ display: 'contents' }} ref={containerRef}>
       {openNodes.map((node) => (
         <div key={node?.id} className={clsx(['tab-content', activeNodeId === node?.id && 'active'])}>
-          {tabs.find(tab => tab.type === node?.type)?.tab({id: node.id, manager: dndManager})}
+          {tabs.find((tab) => tab.type === node?.type)?.tab({ id: node.id, manager: dndManager })}
         </div>
       ))}
     </div>

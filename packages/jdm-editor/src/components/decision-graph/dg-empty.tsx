@@ -21,7 +21,7 @@ export type DecisionGraphEmptyType = {
 
   components?: DecisionGraphStoreType['state']['components'];
   customNodes?: DecisionGraphStoreType['state']['customNodes'];
-  customTabs?: DecisionGraphStoreType['state']['customTabs']
+  customTabs?: DecisionGraphStoreType['state']['customTabs'];
 
   defaultActivePanel?: string;
   panels?: DecisionGraphStoreType['state']['panels'];
@@ -52,9 +52,9 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
   const mountedRef = useRef(false);
   const graphActions = useDecisionGraphActions();
   const { stateStore, listenerStore } = useDecisionGraphRaw();
-  const { decisionGraph,tabs } = useDecisionGraphState(({ decisionGraph, customTabs }) => ({
+  const { decisionGraph, tabs } = useDecisionGraphState(({ decisionGraph, customTabs }) => ({
     decisionGraph,
-    tabs: customTabs
+    tabs: customTabs,
   }));
 
   const innerChange = useDebouncedCallback((graph: DecisionGraphType) => {
