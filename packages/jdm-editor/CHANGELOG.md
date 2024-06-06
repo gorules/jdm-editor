@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.3](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.7.2...@gorules/jdm-editor@1.7.3) (2024-06-06)
+
+### Bug Fixes
+
+- graph disabled state ([#58](https://github.com/gorules/jdm-editor/issues/58)) ([ab83b67](https://github.com/gorules/jdm-editor/commit/ab83b67b84280312da1db88e5d23b5c7a41d1709))
+
 ## [1.7.2](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.7.1...@gorules/jdm-editor@1.7.2) (2024-05-24)
 
 ### Bug Fixes
