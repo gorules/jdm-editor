@@ -71,6 +71,28 @@ export const Uncontrolled: Story = {
   },
 };
 
+export const Disabled: Story = {
+  render: (args) => {
+    const [value, setValue] = useState<any>(defaultGraph);
+    return (
+      <div
+        style={{
+          height: '100%',
+        }}
+      >
+        <DecisionGraph
+          {...args}
+          value={value}
+          onChange={(val) => {
+            setValue?.(val);
+          }}
+          disabled
+        />
+      </div>
+    );
+  },
+};
+
 const components: NodeSpecification[] = [
   {
     type: 'decisionNode',
