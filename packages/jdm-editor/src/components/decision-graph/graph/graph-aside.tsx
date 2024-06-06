@@ -24,7 +24,6 @@ export type GraphAsideProps = {
 export const GraphAside: React.FC<GraphAsideProps> = ({ defaultOpenMenu = 'components' }) => {
   const fileInput = useRef<HTMLInputElement>(null);
   const excelFileInput = useRef<HTMLInputElement>(null);
-  const [menu, setMenu] = useState<Menu | false>(defaultOpenMenu);
 
   const { setDecisionGraph, setActivePanel } = useDecisionGraphActions();
   const { decisionGraph, activeNodeId, disabled, hasInputNode, panels, activePanel } = useDecisionGraphState(
@@ -37,6 +36,8 @@ export const GraphAside: React.FC<GraphAsideProps> = ({ defaultOpenMenu = 'compo
       activePanel,
     }),
   );
+
+  const [menu, setMenu] = useState<Menu | false>(disabled ? false : defaultOpenMenu);
 
   const handleUploadInput = async (event: any) => {
     const fileList = event?.target?.files as FileList;
@@ -202,18 +203,22 @@ export const GraphAside: React.FC<GraphAsideProps> = ({ defaultOpenMenu = 'compo
       />
       <div className={'grl-dg__aside__side-bar'}>
         <div className={'grl-dg__aside__side-bar__top'}>
-          <Tooltip placement='right' title='Components'>
-            <Button
-              type={'primary'}
-              icon={<PlusCircleOutlined />}
-              onClick={() => setMenu((m) => (m !== 'components' ? 'components' : false))}
-            />
-          </Tooltip>
-          <Dropdown menu={{ items: uploadItems }} placement='bottomRight' trigger={['click']} arrow>
-            <Button type={'text'} disabled={disabled} icon={<CloudUploadOutlined />} />
-          </Dropdown>
+          {!disabled && (
+            <Tooltip placement='right' title='Components'>
+              <Button
+                type={'primary'}
+                icon={<PlusCircleOutlined />}
+                onClick={() => setMenu((m) => (m !== 'components' ? 'components' : false))}
+              />
+            </Tooltip>
+          )}
+          {!disabled && (
+            <Dropdown menu={{ items: uploadItems }} placement='bottomRight' trigger={['click']} arrow>
+              <Button type={'text'} disabled={disabled} icon={<CloudUploadOutlined />} />
+            </Dropdown>
+          )}
           <Dropdown menu={{ items: downloadItems }} placement='bottomRight' trigger={['click']} arrow>
-            <Button type={'text'} disabled={disabled} icon={<CloudDownloadOutlined />} />
+            <Button type={'text'} icon={<CloudDownloadOutlined />} />
           </Dropdown>
         </div>
         <div className={'grl-dg__aside__side-bar__bottom'}>
@@ -230,7 +235,7 @@ export const GraphAside: React.FC<GraphAsideProps> = ({ defaultOpenMenu = 'compo
           ))}
         </div>
       </div>
-      {menu && (
+      {menu && !disabled && (
         <div className={'grl-dg__aside__menu'}>
           {menu === 'components' && (
             <>
