@@ -231,6 +231,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
 
   const onDrop = (event: React.DragEvent) => {
     event.preventDefault();
+    event.stopPropagation();
     if (!reactFlowWrapper.current || !reactFlowInstance.current) {
       return;
     }
