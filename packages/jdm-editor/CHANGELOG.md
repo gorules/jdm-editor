@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.4](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.7.3...@gorules/jdm-editor@1.7.4) (2024-06-26)
+
+### Bug Fixes
+
+- stop drop propagation ([#60](https://github.com/gorules/jdm-editor/issues/60)) ([dc50f55](https://github.com/gorules/jdm-editor/commit/dc50f5561f2852b8bf706d5dd11a18bc072f9881))
+
 ## [1.7.3](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.7.2...@gorules/jdm-editor@1.7.3) (2024-06-06)
 
 ### Bug Fixes
