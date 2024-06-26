@@ -7,6 +7,7 @@ import type { StoreApi, UseBoundStore } from 'zustand';
 import { create } from 'zustand';
 
 import { mapToGraphEdge, mapToGraphEdges, mapToGraphNode, mapToGraphNodes } from '../dg-util';
+import { BASE_TABS, type Tab } from '../graph/common-tab';
 import type { useGraphClipboard } from '../hooks/use-graph-clipboard';
 import type { CustomNodeSpecification } from '../nodes/custom-node/index';
 import { NodeKind, type NodeSpecification } from '../nodes/specifications/specification-types';
@@ -63,6 +64,7 @@ export type DecisionGraphStoreType = {
     activeTab: string;
 
     customNodes: CustomNodeSpecification<object, string>[];
+    customTabs: Tab[];
 
     panels?: PanelType[];
     activePanel?: string;
@@ -141,6 +143,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         configurable: true,
         components: [],
         customNodes: [],
+        customTabs: [...BASE_TABS],
         activePanel: undefined,
         panels: [],
       })),
