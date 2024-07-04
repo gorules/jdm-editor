@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.9.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.8.0...@gorules/jdm-editor@1.9.0) (2024-07-04)
+
+### Features
+
+- extensible code editor ([#65](https://github.com/gorules/jdm-editor/issues/65)) ([e349c75](https://github.com/gorules/jdm-editor/commit/e349c753b5ece674c674caa3e8dfcd546f943754))
+
 # [1.8.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.7.4...@gorules/jdm-editor@1.8.0) (2024-07-04)
 
 ### Features
