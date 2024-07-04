@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.8.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.7.4...@gorules/jdm-editor@1.8.0) (2024-07-04)
+
+### Features
+
+- update function definitions p1 ([#63](https://github.com/gorules/jdm-editor/issues/63)) ([be2a940](https://github.com/gorules/jdm-editor/commit/be2a940f474702746b8331077a42932f34139d03))
+
 ## [1.7.4](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.7.3...@gorules/jdm-editor@1.7.4) (2024-06-26)
 
 ### Bug Fixes

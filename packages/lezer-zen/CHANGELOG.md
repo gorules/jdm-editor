@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/lezer-parser/json/compare/@gorules/lezer-zen@0.2.0...@gorules/lezer-zen@0.3.0) (2024-07-04)
+
+### Features
+
+- update function definitions p1 ([#63](https://github.com/lezer-parser/json/issues/63)) ([be2a940](https://github.com/lezer-parser/json/commit/be2a940f474702746b8331077a42932f34139d03))
+
 # 0.2.0 (2024-04-26)
 
 ### Features
