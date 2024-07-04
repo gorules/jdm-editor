@@ -20,5 +20,8 @@
     "build": "wasm-pack build --out-dir dist --target web --no-pack --release",
     "build-debug": "wasm-pack build --out-dir dist --target web --no-pack --dev",
     "prepublishOnly": "pnpm run build"
+  },
+  "devDependencies": {
+    "wasm-pack": "^0.13.0"
   }
 }

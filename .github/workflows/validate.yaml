@@ -21,4 +21,4 @@ jobs:
         run: pnpm format
 
       - name: Build
-        run: pnpm build --verbose
+        run: pnpm build
