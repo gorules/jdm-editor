@@ -17,6 +17,6 @@ export const
   LessThan = 26,
   and = 29,
   or = 30,
-  questionOp = 32,
-  ArgList = 36,
-  SequenceExpression = 37
+  questionOp = 33,
+  ArgList = 37,
+  SequenceExpression = 38

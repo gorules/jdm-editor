@@ -66,6 +66,18 @@
     "info": "Extracts matching substrings according to a pattern"
   },
   {
+    "label": "fuzzyMatch",
+    "type": "function",
+    "detail": "(haystack: string | string[], needle: string) -> number | number[]",
+    "info": "Performs a fuzzy search of the needle in the haystack, and returns the match score(s)."
+  },
+  {
+    "label": "split",
+    "type": "function",
+    "detail": "(str: string, delimiter: string) -> string[]",
+    "info": "Splits a string into an array of substrings using the specified delimiter."
+  },
+  {
     "label": "abs",
     "type": "function",
     "detail": "(num: number) -> number",
@@ -156,6 +168,12 @@
     "info": "Converts the given value to a boolean."
   },
   {
+    "label": "type",
+    "type": "function",
+    "detail": "<T>(value: T) -> string",
+    "info": "Returns a string representing the data type of the value."
+  },
+  {
     "label": "date",
     "type": "function",
     "detail": "(timestamp: string | number) -> number",
@@ -238,6 +256,18 @@
     "type": "function",
     "detail": "(timestamp: number, unit: string) -> number",
     "info": "Returns the timestamp representing the end of a specified unit (e.g., day, month, year) based on a given timestamp."
+  },
+  {
+    "label": "keys",
+    "type": "function",
+    "detail": "(obj: object) -> string[]",
+    "info": "Returns an array of a given object's own enumerable property names."
+  },
+  {
+    "label": "values",
+    "type": "function",
+    "detail": "(obj: object) -> any[]",
+    "info": "Returns an array of a given object's own enumerable property values."
   },
   {
     "label": "all",

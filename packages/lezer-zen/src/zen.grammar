@@ -10,6 +10,7 @@
   equal @left,
   and @left,
   or @left,
+  nullCoalesce @left,
   ternary @right,
   comma @left
 }
@@ -67,7 +68,8 @@ BinaryExpression {
   expressionNoComma !rel (LessThan | CompareOp<"<=" | ">" "="?>) expressionNoComma |
   expressionNoComma !equal CompareOp<"==" | "!="> expressionNoComma |
   expressionNoComma !and kw<"and"> expressionNoComma |
-  expressionNoComma !or kw<"or"> expressionNoComma
+  expressionNoComma !or kw<"or"> expressionNoComma |
+  expressionNoComma !nullCoalesce LogicOp<"??"> expressionNoComma
 }
 
 MemberExpression {
