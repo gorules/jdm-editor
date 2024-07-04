@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import React, { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
-import { CodeEditor } from '../code-editor';
+import { LocalCodeEditor } from '../code-editor/local-ce';
 import type { ExpressionEntry } from './context/expression-store.context';
 import { useExpressionStore } from './context/expression-store.context';
 
@@ -80,7 +80,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
         />
       </div>
       <div className='expression-list-item__code'>
-        <CodeEditor
+        <LocalCodeEditor
           placeholder='Expression'
           maxRows={6}
           disabled={disabled}

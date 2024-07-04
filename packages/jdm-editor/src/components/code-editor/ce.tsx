@@ -1,4 +1,4 @@
-import { Compartment, EditorState, Text } from '@codemirror/state';
+import { Compartment, EditorState, type Extension, Text } from '@codemirror/state';
 import { EditorView, placeholder as placeholderExt } from '@codemirror/view';
 import { theme } from 'antd';
 import clsx from 'clsx';
@@ -20,6 +20,10 @@ const updateListener = (onChange?: (data: string) => void, onStateChange?: (stat
 
 const editorTheme = (isDark = false) => (isDark ? zenHighlightDark : zenHighlightLight);
 
+type ExtensionParams = {
+  type?: 'standard' | 'unary' | 'template';
+};
+
 export type CodeEditorProps = {
   maxRows?: number;
   value?: string;
@@ -27,9 +31,10 @@ export type CodeEditorProps = {
   onStateChange?: (state: EditorState) => void;
   placeholder?: string;
   disabled?: boolean;
-  type?: 'standard' | 'template';
+  type?: 'unary' | 'standard' | 'template';
   fullHeight?: boolean;
   noStyle?: boolean;
+  extension?: (params: ExtensionParams) => Extension;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, 'disabled' | 'onChange'>;
 
 export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
@@ -45,6 +50,7 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
       className,
       onStateChange,
       type = 'standard',
+      extension,
       ...props
     },
     ref,
@@ -60,6 +66,7 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
         placeholder: new Compartment(),
         readOnly: new Compartment(),
         updateListener: new Compartment(),
+        userProvided: new Compartment(),
       }),
       [],
     );
@@ -80,6 +87,7 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
             compartment.theme.of(editorTheme(token.mode === 'dark')),
             compartment.placeholder.of(placeholder ? placeholderExt(placeholder) : []),
             compartment.readOnly.of(EditorView.editable.of(!disabled)),
+            compartment.userProvided.of(extension?.({ type }) ?? []),
           ],
         }),
       });
@@ -160,6 +168,16 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
         effects: compartment.zenExtension.reconfigure(zenExtensions({ type })),
       });
     }, [type]);
+
+    useEffect(() => {
+      if (!codeMirror.current) {
+        return;
+      }
+
+      codeMirror.current.dispatch({
+        effects: compartment.userProvided.reconfigure(extension?.({ type }) ?? []),
+      });
+    }, [extension, type]);
 
     return (
       <div

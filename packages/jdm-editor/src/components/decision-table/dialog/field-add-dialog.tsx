@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import type { SchemaSelectProps } from '../../../helpers/components';
 import { recursiveSelect } from '../../../helpers/components';
 import { AutosizeTextArea } from '../../autosize-text-area';
-import { CodeEditor } from '../../code-editor';
+import { LocalCodeEditor } from '../../code-editor/local-ce';
 import type { ColumnType, TableSchemaItem } from '../context/dt-store.context';
 
 export type FieldAddProps = {
@@ -83,7 +83,7 @@ export const FieldAdd: React.FC<FieldAddProps> = (props) => {
           label={type === 'expression' ? 'Selector' : 'Field'}
           rules={[{ required: props.columnType === 'outputs' }]}
         >
-          {props.columnType === 'inputs' ? <CodeEditor /> : <AutosizeTextArea maxRows={3} />}
+          {props.columnType === 'inputs' ? <LocalCodeEditor /> : <AutosizeTextArea maxRows={3} />}
         </Form.Item>
         <Form.Item name='defaultValue' label='Default Value'>
           <Input autoComplete='off' />
