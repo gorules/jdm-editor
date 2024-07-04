@@ -154,11 +154,11 @@ const zenTemplateLanguage = new LanguageSupport(
 );
 
 type extensionOptions = {
-  type: 'standard' | 'template';
+  type: 'unary' | 'standard' | 'template';
 };
 
 export const zenExtensions = ({ type }: extensionOptions) => [
-  type === 'standard' ? zenLanguage : zenTemplateLanguage,
+  type !== 'template' ? zenLanguage : zenTemplateLanguage,
   completionExtension(),
   hoverExtension(),
   closeBrackets(),

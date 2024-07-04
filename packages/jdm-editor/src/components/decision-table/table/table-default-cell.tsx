@@ -1,9 +1,10 @@
 import type { CellContext } from '@tanstack/react-table';
 import React, { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { match } from 'ts-pattern';
 
 import { columnIdSelector } from '../../../helpers/components';
 import { AutosizeTextArea } from '../../autosize-text-area';
-import { CodeEditor } from '../../code-editor';
+import { LocalCodeEditor } from '../../code-editor/local-ce';
 import { type TableSchemaItem, useDecisionTableActions, useDecisionTableState } from '../context/dt-store.context';
 
 export type TableDefaultCellProps = {
@@ -115,9 +116,12 @@ const TableInputCell: React.FC<TableCellProps> = ({ column, value, onChange, dis
   }
 
   return (
-    <CodeEditor
-      id={id}
+    <LocalCodeEditor
       ref={textareaRef as any}
+      id={id}
+      type={match(column.colType)
+        .with('input', () => 'unary' as const)
+        .otherwise(() => 'standard' as const)}
       className='grl-dt__cell__input'
       maxRows={3}
       value={value}

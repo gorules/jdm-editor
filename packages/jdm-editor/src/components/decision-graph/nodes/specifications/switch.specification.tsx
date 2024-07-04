@@ -5,7 +5,7 @@ import React, { useLayoutEffect, useState } from 'react';
 import { Handle, Position } from 'reactflow';
 import { P, match } from 'ts-pattern';
 
-import { CodeEditor } from '../../../code-editor';
+import { LocalCodeEditor } from '../../../code-editor/local-ce';
 import { useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
 import { GraphNode } from '../graph-node';
 import type { MinimalNodeProps, NodeSpecification } from './specification-types';
@@ -178,7 +178,7 @@ const SwitchHandle: React.FC<{
   return (
     <div className={clsx('switchNode__statement')}>
       <div className='switchNode__statement__inputArea'>
-        <CodeEditor
+        <LocalCodeEditor
           placeholder={`Condition (e.g. x > 10)`}
           style={{
             fontSize: 12,

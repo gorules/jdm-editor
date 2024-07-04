@@ -6,9 +6,10 @@ import type { EdgeChange, NodeChange, ReactFlowInstance, useEdgesState, useNodes
 import type { StoreApi, UseBoundStore } from 'zustand';
 import { create } from 'zustand';
 
+import type { CodeEditorProps } from '../../code-editor';
 import { mapToGraphEdge, mapToGraphEdges, mapToGraphNode, mapToGraphNodes } from '../dg-util';
 import type { useGraphClipboard } from '../hooks/use-graph-clipboard';
-import type { CustomNodeSpecification } from '../nodes/custom-node/index';
+import type { CustomNodeSpecification } from '../nodes/custom-node';
 import { NodeKind, type NodeSpecification } from '../nodes/specifications/specification-types';
 import type { Simulation } from '../types/simulation.types';
 
@@ -107,6 +108,7 @@ export type DecisionGraphStoreType = {
     onChange?: (val: DecisionGraphType) => void;
     onPanelsChange?: (val?: string) => void;
     onReactFlowInit?: (instance: ReactFlowInstance) => void;
+    onCodeExtension?: CodeEditorProps['extension'];
   };
 };
 
