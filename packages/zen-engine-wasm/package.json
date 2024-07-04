@@ -17,8 +17,8 @@
   ],
   "license": "MIT",
   "scripts": {
-    "build": "wasm-pack build --out-dir dist --target web --no-pack --release",
-    "build-debug": "wasm-pack build --out-dir dist --target web --no-pack --dev",
+    "build": "wasm-pack build --out-dir dist --target web --no-pack --release && rm dist/.gitignore",
+    "build-debug": "wasm-pack build --out-dir dist --target web --no-pack --dev && rm dist/.gitignore",
     "prepublishOnly": "pnpm run build"
   },
   "devDependencies": {
