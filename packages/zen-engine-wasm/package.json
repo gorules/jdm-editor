@@ -1,0 +1,27 @@
+{
+  "name": "@gorules/zen-engine-wasm",
+  "version": "0.1.0",
+  "description": "ZEN Engine WASM",
+  "type": "module",
+  "module": "dist/zen_engine_wasm.js",
+  "types": "dist/zen_engine_wasm.d.ts",
+  "sideEffects": [
+    "./dist/zen_engine_wasm.js",
+    "./dist/snippets/*"
+  ],
+  "files": [
+    "dist/",
+    "package.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "build": "wasm-pack build --out-dir dist --target web --no-pack --release",
+    "build-debug": "wasm-pack build --out-dir dist --target web --no-pack --dev",
+    "prepublishOnly": "pnpm run build"
+  },
+  "devDependencies": {
+    "wasm-pack": "^0.13.0"
+  }
+}

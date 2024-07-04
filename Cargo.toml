@@ -1,0 +1,11 @@
+[workspace]
+resolver = "2"
+members = [
+    "packages/zen-engine-wasm"
+]
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = "symbols"
+opt-level = "s"
