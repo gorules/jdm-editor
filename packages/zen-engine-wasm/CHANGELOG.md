@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/gorules/jdm-editor/compare/@gorules/zen-engine-wasm@0.3.0...@gorules/zen-engine-wasm@0.4.0) (2024-07-04)
+
+### Bug Fixes
+
+- remove gitignore after build ([0992dcb](https://github.com/gorules/jdm-editor/commit/0992dcbfdcaaaf1b67e7c8779f8b97042c5cbcac))
+
 # [0.3.0](https://github.com/gorules/jdm-editor/compare/@gorules/zen-engine-wasm@0.2.0...@gorules/zen-engine-wasm@0.3.0) (2024-07-04)
 
 ### Bug Fixes
