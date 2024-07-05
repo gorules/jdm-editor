@@ -31,13 +31,11 @@ export const defaultGraph = {
         inputs: [
           {
             id: 'HVo_JpALi8',
-            type: 'expression',
             field: 'cart.weight',
             name: 'Cart Weight (Kg)',
           },
           {
             id: 'HW6mSVfLbs',
-            type: 'expression',
             field: 'customer.country',
             name: 'Customer Country',
           },
@@ -47,7 +45,6 @@ export const defaultGraph = {
             field: 'shippingFee',
             id: '3EGDrV0ssV',
             name: 'Shipping Fee',
-            type: 'expression',
           },
         ],
         rules: [

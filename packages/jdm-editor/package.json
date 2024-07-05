@@ -54,6 +54,7 @@
     "reactflow": "11.11.3",
     "ts-pattern": "^5.1.2",
     "use-debounce": "^10.0.0",
+    "zod": "^3.23.8",
     "zustand": "^4.5.2"
   },
   "devDependencies": {

@@ -178,7 +178,6 @@ const parseSpreadsheetData = (spreadSheetData: any) => {
       name: header.value,
       field: headerMeta?.name,
       _type: headerMeta?.type,
-      type: 'expression',
       id: headerMeta?.id,
       defaultValue: '',
     };
@@ -190,7 +189,6 @@ const parseSpreadsheetData = (spreadSheetData: any) => {
       id: column.id,
       name: column?.name,
       field: column?.field,
-      type: column?.type,
       defaultValue: column?.defaultValue,
     })) as TableSchemaItem[];
 
@@ -200,7 +198,6 @@ const parseSpreadsheetData = (spreadSheetData: any) => {
       id: column.id,
       name: column?.name,
       field: column?.field,
-      type: column?.type,
       defaultValue: column?.defaultValue,
     })) as TableSchemaItem[];
 
