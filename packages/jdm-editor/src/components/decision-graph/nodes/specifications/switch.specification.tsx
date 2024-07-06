@@ -31,7 +31,7 @@ export const switchSpecification: NodeSpecification<NodeSwitchData> = {
   generateNode: ({ index }) => ({
     name: `switch${index}`,
     content: {
-      statements: [{ id: crypto.randomUUID(), condition: '' }],
+      statements: [{ id: crypto.randomUUID(), condition: '', isDefault: false }],
     },
   }),
   renderNode: ({ specification, ...props }) => <SwitchNode specification={specification} {...props} />,
@@ -182,6 +182,17 @@ const SwitchNode: React.FC<
                     (s: SwitchStatement) => s?.id !== statement?.id,
                   );
 
+                  if ((draft.content.statements || []).length === 1) {
+                    draft.content.statements = ((draft.content.statements || []) as SwitchStatement[]).map(
+                      (statement) => {
+                        if (statement.isDefault) {
+                          statement.isDefault = false;
+                        }
+                        return statement;
+                      },
+                    );
+                  }
+
                   return draft;
                 });
               }}
@@ -244,7 +255,7 @@ const SwitchHandle: React.FC<{
 
   const isLastIndex = index === totalStatements - 1;
 
-  const isElse = isDefault && hitPolicy === 'first' && isLastIndex;
+  const isElse = isDefault && hitPolicy === 'first' && isLastIndex && index > 0;
 
   return (
     <div className={clsx('switchNode__statement', isActive && 'active')}>
@@ -301,7 +312,7 @@ const SwitchHandle: React.FC<{
           className={clsx(isActive && 'switchNode__activeHandle')}
         />
       </div>
-      {!isDefault && (
+      {!isElse && (
         <div className='switchNode__statement__inputArea'>
           <LocalCodeEditor
             placeholder={`cart.total > 100`}
