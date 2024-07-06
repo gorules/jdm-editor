@@ -86,6 +86,7 @@ export const switchNodeSchema = z
         z.object({
           id,
           condition: z.string().default(''),
+          isDefault: z.boolean().nullish(),
         }),
       ),
     }),

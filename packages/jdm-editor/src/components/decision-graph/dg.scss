@@ -598,8 +598,6 @@
     flex-direction: column;
     align-items: stretch;
     width: 100%;
-    padding-top: 9px;
-    padding-bottom: 9px;
 
     &__activeHandle {
       background-color: var(--grl-color-success-bg) !important;
@@ -655,17 +653,37 @@
 
     &__statement {
       position: relative;
+      background-color: var(--grl-color-bg-container);
+      &:not(:last-child) {
+        border-bottom: 1px solid var(--grl-color-border);
+      }
 
-      &__more {
-        position: absolute;
-        right: 20px;
-        top: 20px;
-        transform: translateY(-50%);
-        z-index: 10;
+      &.active {
+        background-color: var(--grl-color-success-bg);
+      }
+
+      &__delete {
+        color: var(--grl-color-text-disabled);
+      }
+
+      &__heading {
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        padding: 7px var(--node-horizontal-padding);
+
+        &__action {
+          font-size: 12px;
+          font-weight: 500;
+
+          &.inactive {
+            color: var(--grl-color-text-disabled);
+          }
+        }
       }
 
       &__inputArea {
-        padding: 5px var(--node-horizontal-padding);
+        padding: 0px var(--node-horizontal-padding) 7px;
         display: flex;
       }
 
