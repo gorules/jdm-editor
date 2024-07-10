@@ -1,5 +1,5 @@
 import { FormatPainterOutlined } from '@ant-design/icons';
-import { Editor, useMonaco } from '@monaco-editor/react';
+import { Editor, type Monaco, useMonaco } from '@monaco-editor/react';
 import { Button, Spin, theme } from 'antd';
 import type { editor } from 'monaco-editor';
 import React, { useEffect, useRef, useState } from 'react';
@@ -20,6 +20,7 @@ export type FunctionProps = {
   value?: string;
   onChange?: (value: string) => void;
   trace?: SimulationTrace<SimulationTraceDataFunction>;
+  onMonacoReady?: (monaco: Monaco) => void;
 };
 
 export const Function: React.FC<FunctionProps> = ({
@@ -30,6 +31,7 @@ export const Function: React.FC<FunctionProps> = ({
   value,
   onChange,
   trace,
+  onMonacoReady,
 }) => {
   const monaco = useMonaco();
   const mountedRef = useRef(false);
@@ -51,14 +53,32 @@ export const Function: React.FC<FunctionProps> = ({
   useEffect(() => {
     if (!monaco) return;
 
-    const extraLibs = Object.keys(functionDefinitions).map(
-      (pkg: keyof typeof functionDefinitions) => ({
-        content: `declare module '${pkg}' { ${functionDefinitions[pkg]} }`,
-      }),
-      {},
-    );
+    monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+      target: monaco.languages.typescript.ScriptTarget.ES2020,
+      module: monaco.languages.typescript.ModuleKind.ESNext,
+      moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+      allowSyntheticDefaultImports: true,
+      allowNonTsExtensions: true,
+      allowJs: true,
+      checkJs: true,
+    });
 
-    monaco.languages.typescript.javascriptDefaults.setExtraLibs(extraLibs);
+    monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+      noSyntaxValidation: false,
+      noSemanticValidation: false,
+      noSuggestionDiagnostics: false,
+      onlyVisible: false,
+    });
+
+    Object.entries(functionDefinitions.libs).forEach(([pkg, types]) => {
+      monaco.languages.typescript.javascriptDefaults.addExtraLib(`declare module '${pkg}' { ${types} }`, pkg);
+    });
+
+    Object.entries(functionDefinitions.globals).forEach(([pkg, types]) => {
+      monaco.languages.typescript.javascriptDefaults.addExtraLib(types, `ts:${pkg}`);
+    });
+
+    onMonacoReady?.(monaco);
   }, [monaco]);
 
   useEffect(() => {

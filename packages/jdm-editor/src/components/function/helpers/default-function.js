@@ -1,10 +1,7 @@
-/**
- * @param input
- * @param {{
- *  dayjs: import('dayjs')
- *  Big: import('big.js').BigConstructor
- * }} helpers
- */
-const handler = (input, { dayjs, Big }) => {
+import http from 'http';
+import zen from 'zen';
+
+export const handler = async (input) => {
+  const a = zen.evaluate();
   return input;
 };
