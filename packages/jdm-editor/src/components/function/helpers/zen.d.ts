@@ -25,23 +25,12 @@ interface ZenModule {
 
   /**
    * Evaluates ZEN unary expression
-   * @param file File to be evaluated via DecisionLoader
+   * @param key File key to be evaluated through DecisionLoader
    * @param context
    * @param opts
    */
-  evaluate(file: string, context: any, opts?: EvaluateOptions): Promise<EvaluateResponse>;
-
-  /**
-   * Get Content from the DecisionLoader
-   * @param file
-   */
-  get(file: string): Promise<any>;
+  evaluate(key: string, context: any, opts?: EvaluateOptions): Promise<EvaluateResponse>;
 }
-
-export const evaluateExpression: ZenModule['evaluateExpression'];
-export const evaluateUnaryExpression: ZenModule['evaluateUnaryExpression'];
-export const evaluate: ZenModule['evaluate'];
-export const get: ZenModule['get'];
 
 declare const zenModule: ZenModule;
 

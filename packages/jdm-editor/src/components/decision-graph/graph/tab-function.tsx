@@ -19,10 +19,13 @@ export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
   const graphActions = useDecisionGraphActions();
   const onFunctionReady = useDecisionGraphListeners((s) => s.onFunctionReady);
   const [monaco, setMonaco] = useState<Monaco>();
-  const { nodeTrace, disabled, content, additionalModules } = useDecisionGraphState(
+  const { nodeTrace, disabled, content, additionalModules, nodeError } = useDecisionGraphState(
     ({ simulate, disabled, configurable, decisionGraph }) => ({
       nodeTrace: match(simulate)
         .with({ result: P._ }, ({ result }) => result?.trace?.[id])
+        .otherwise(() => null),
+      nodeError: match(simulate)
+        .with({ error: { data: { nodeId: id } } }, ({ error }) => error)
         .otherwise(() => null),
       disabled,
       configurable,
@@ -66,6 +69,7 @@ export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
       <Function
         onMonacoReady={(monaco) => setMonaco(monaco)}
         value={typeof content === 'string' ? content : ''}
+        error={nodeError ?? undefined}
         onChange={(val) => {
           graphActions.updateNode(id, (draft) => {
             draft.content = val;

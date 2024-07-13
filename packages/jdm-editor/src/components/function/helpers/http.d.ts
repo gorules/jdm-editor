@@ -10,7 +10,7 @@ interface HttpConfig {
   data: any;
 }
 
-export class Http {
+class Http {
   head(url: string, config?: HttpConfig): Promise<HttpResponse>;
 
   get(url: string, config?: HttpConfig): Promise<HttpResponse>;
@@ -24,5 +24,7 @@ export class Http {
   put(url: string, data: any, config?: HttpConfig): Promise<HttpResponse>;
 }
 
-declare const http: Http;
+export interface HttpStatic extends Http {}
+
+declare const http: HttpStatic;
 export default http;

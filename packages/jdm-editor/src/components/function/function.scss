@@ -15,6 +15,10 @@
     flex: 1;
   }
 
+  &__errorLineContent {
+    background: #fff1f0;
+  }
+
   &__debugger {
     &__panel {
       position: absolute;

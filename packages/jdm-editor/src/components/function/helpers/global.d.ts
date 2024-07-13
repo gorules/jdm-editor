@@ -1,5 +1,6 @@
 declare namespace console {
   function log(...args: any[]): void;
+  async function sleep(durationMs: number): Promise<void>;
 }
 
 interface Config {
