@@ -4,6 +4,7 @@ import React, { Suspense, useEffect, useState } from 'react';
 import { P, match } from 'ts-pattern';
 
 import { useDecisionGraphActions, useDecisionGraphListeners, useDecisionGraphState } from '../context/dg-store.context';
+import { FunctionKind, useFunctionKind } from '../nodes/specifications/function.specification';
 import type { SimulationTrace, SimulationTraceDataFunction } from '../types/simulation.types';
 
 const Function = React.lazy(async () => {
@@ -16,6 +17,7 @@ export type TabFunctionProps = {
 };
 
 export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
+  const kind = useFunctionKind(id);
   const graphActions = useDecisionGraphActions();
   const onFunctionReady = useDecisionGraphListeners((s) => s.onFunctionReady);
   const [monaco, setMonaco] = useState<Monaco>();
@@ -68,11 +70,16 @@ export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
     <Suspense fallback={<Spin />}>
       <Function
         onMonacoReady={(monaco) => setMonaco(monaco)}
-        value={typeof content === 'string' ? content : ''}
+        value={kind === FunctionKind.Stable ? content.source : content}
         error={nodeError ?? undefined}
         onChange={(val) => {
           graphActions.updateNode(id, (draft) => {
-            draft.content = val;
+            if (kind === FunctionKind.Stable) {
+              draft.content = { source: val };
+            } else {
+              draft.content = val;
+            }
+
             return draft;
           });
         }}
