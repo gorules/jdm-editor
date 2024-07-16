@@ -1,7 +1,7 @@
 import { FormatPainterOutlined } from '@ant-design/icons';
-import { Editor, useMonaco } from '@monaco-editor/react';
+import { Editor, type Monaco, useMonaco } from '@monaco-editor/react';
 import { Button, Spin, theme } from 'antd';
-import type { editor } from 'monaco-editor';
+import { MarkerSeverity, type editor } from 'monaco-editor';
 import React, { useEffect, useRef, useState } from 'react';
 import { useDebouncedCallback, useThrottledCallback } from 'use-debounce';
 
@@ -20,6 +20,10 @@ export type FunctionProps = {
   value?: string;
   onChange?: (value: string) => void;
   trace?: SimulationTrace<SimulationTraceDataFunction>;
+  onMonacoReady?: (monaco: Monaco) => void;
+  error?: {
+    data: { nodeId: string; source?: string };
+  };
 };
 
 export const Function: React.FC<FunctionProps> = ({
@@ -30,11 +34,14 @@ export const Function: React.FC<FunctionProps> = ({
   value,
   onChange,
   trace,
+  onMonacoReady,
+  error,
 }) => {
   const monaco = useMonaco();
   const mountedRef = useRef(false);
   const { token } = theme.useToken();
   const [innerValue, setInnerValue] = useState<string>();
+  const [decorations, setDecorations] = useState<editor.IEditorDecorationsCollection>();
 
   const innerChange = useDebouncedCallback((val: string) => {
     onChange?.(val);
@@ -51,14 +58,33 @@ export const Function: React.FC<FunctionProps> = ({
   useEffect(() => {
     if (!monaco) return;
 
-    const extraLibs = Object.keys(functionDefinitions).map(
-      (pkg: keyof typeof functionDefinitions) => ({
-        content: `declare module '${pkg}' { ${functionDefinitions[pkg]} }`,
-      }),
-      {},
-    );
+    monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+      target: monaco.languages.typescript.ScriptTarget.ES2020,
+      module: monaco.languages.typescript.ModuleKind.ESNext,
+      moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+      allowSyntheticDefaultImports: true,
+      allowNonTsExtensions: true,
+      allowJs: true,
+      checkJs: true,
+      lib: ['es2023'],
+    });
 
-    monaco.languages.typescript.javascriptDefaults.setExtraLibs(extraLibs);
+    monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+      noSyntaxValidation: false,
+      noSemanticValidation: false,
+      noSuggestionDiagnostics: false,
+      onlyVisible: false,
+    });
+
+    Object.entries(functionDefinitions.libs).forEach(([pkg, types]) => {
+      monaco.languages.typescript.javascriptDefaults.addExtraLib(`declare module '${pkg}' { ${types} }`, pkg);
+    });
+
+    Object.entries(functionDefinitions.globals).forEach(([pkg, types]) => {
+      monaco.languages.typescript.javascriptDefaults.addExtraLib(types, `ts:${pkg}`);
+    });
+
+    onMonacoReady?.(monaco);
   }, [monaco]);
 
   useEffect(() => {
@@ -71,6 +97,93 @@ export const Function: React.FC<FunctionProps> = ({
     setInnerValue(value === undefined ? defaultValue : value);
     mountedRef.current = true;
   }, []);
+
+  useEffect(() => {
+    if (!monaco) {
+      return;
+    }
+
+    const model = monaco.editor.getModels()?.[0];
+    if (!model) {
+      return;
+    }
+
+    monaco.editor.setModelMarkers(model, 'gorules', []);
+  }, [innerValue, monaco]);
+
+  useEffect(() => {
+    if (!decorations) {
+      return;
+    }
+
+    decorations.clear();
+    setDecorations(undefined);
+  }, [innerValue]);
+
+  useEffect(() => {
+    try {
+      if (!error || !monaco) {
+        return;
+      }
+
+      const results = /Error:(\[.*])?(:?\d+)?(:\d+)?(.*)/s.exec(error.data.source ?? '');
+      if (!results || results.length === 0) {
+        return;
+      }
+
+      const line = parseFloat((results?.[2] ?? '').replace(/^:/, ''));
+      const errorMessage = results?.[4] ?? '';
+      if (!line || !errorMessage) {
+        return;
+      }
+
+      const model = monaco.editor.getModels()[0];
+      if (!model) {
+        return;
+      }
+
+      const range = new monaco.Range(
+        line,
+        model.getLineFirstNonWhitespaceColumn(line),
+        line,
+        model.getLineLastNonWhitespaceColumn(line),
+      );
+
+      monaco.editor.setModelMarkers(model, 'gorules', [
+        {
+          severity: MarkerSeverity.Error,
+          message: errorMessage,
+          startLineNumber: range.startLineNumber,
+          endLineNumber: range.endLineNumber,
+          startColumn: range.startColumn,
+          endColumn: range.endColumn,
+        },
+      ]);
+
+      const editor = monaco.editor.getEditors()[0];
+      if (!editor) {
+        return;
+      }
+
+      const decorations = editor.createDecorationsCollection([
+        {
+          range,
+          options: {
+            hoverMessage: { value: errorMessage },
+            isWholeLine: true,
+            className: 'grl-function__errorLineContent',
+          },
+        },
+      ]);
+
+      setDecorations((curr) => {
+        curr?.clear?.();
+        return decorations;
+      });
+    } catch {
+      //
+    }
+  }, [error, editor]);
 
   return (
     <div

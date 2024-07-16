@@ -43,7 +43,7 @@ const meta: Meta<typeof Function> = {
   args: {
     disabled: false,
     defaultValue: defaultFunctionValue,
-    trace: exampleTrace,
+    trace: exampleTrace as any,
   },
   argTypes: {
     value: { table: { disable: true } },
@@ -65,5 +65,28 @@ export const Controlled: Story = {
     const [value, setValue] = useState<string>(defaultFunctionValue);
 
     return <Function {...args} value={value} onChange={setValue} />;
+  },
+};
+
+export const WithError: Story = {
+  args: {
+    defaultValue: `import http from 'http';
+import zen from 'zen';
+
+export const handler = async (input) => {
+  throw new Error('hello worldd');
+
+  return input;
+};
+    `,
+    error: {
+      data: {
+        nodeId: '6a5bc11c-41ef-43d5-b3ae-93c51ecebc19',
+        source: 'Error:5:9 hello worldd\n    at handler (node:function1:5:9)\n',
+      },
+    },
+  },
+  render: (args) => {
+    return <Function {...args} />;
   },
 };

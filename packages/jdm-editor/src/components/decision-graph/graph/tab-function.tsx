@@ -1,8 +1,10 @@
+import type { Monaco } from '@monaco-editor/react';
 import { Spin } from 'antd';
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { P, match } from 'ts-pattern';
 
-import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
+import { useDecisionGraphActions, useDecisionGraphListeners, useDecisionGraphState } from '../context/dg-store.context';
+import { FunctionKind, useFunctionKind } from '../nodes/specifications/function.specification';
 import type { SimulationTrace, SimulationTraceDataFunction } from '../types/simulation.types';
 
 const Function = React.lazy(async () => {
@@ -15,25 +17,69 @@ export type TabFunctionProps = {
 };
 
 export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
+  const kind = useFunctionKind(id);
   const graphActions = useDecisionGraphActions();
-  const { nodeTrace, disabled, content } = useDecisionGraphState(
+  const onFunctionReady = useDecisionGraphListeners((s) => s.onFunctionReady);
+  const [monaco, setMonaco] = useState<Monaco>();
+  const { nodeTrace, disabled, content, additionalModules, nodeError } = useDecisionGraphState(
     ({ simulate, disabled, configurable, decisionGraph }) => ({
       nodeTrace: match(simulate)
         .with({ result: P._ }, ({ result }) => result?.trace?.[id])
         .otherwise(() => null),
+      nodeError: match(simulate)
+        .with({ error: { data: { nodeId: id } } }, ({ error }) => error)
+        .otherwise(() => null),
       disabled,
       configurable,
       content: (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content,
+      additionalModules: (decisionGraph?.nodes ?? [])
+        .filter((node) => node.type === 'functionNode')
+        .map((node) => ({
+          id: node.id,
+          name: node.name,
+          content: node.content,
+        })),
     }),
   );
+
+  useEffect(() => {
+    if (!monaco) {
+      return;
+    }
+
+    const extraLibs = monaco.languages.typescript.javascriptDefaults.getExtraLibs();
+    const newExtraLibs = Object.entries(extraLibs)
+      .map(([key, value]) => ({
+        filePath: key,
+        content: value.content,
+      }))
+      .filter((i) => !i.filePath.startsWith('node:'));
+
+    additionalModules.forEach((module) => {
+      newExtraLibs.push({
+        filePath: `node:${module.name}`,
+        content: `declare module 'node:${module.name}' { ${module.content} }`,
+      });
+    });
+
+    monaco.languages.typescript.javascriptDefaults.setExtraLibs(newExtraLibs);
+    onFunctionReady?.(monaco);
+  }, [JSON.stringify(additionalModules), monaco, onFunctionReady]);
 
   return (
     <Suspense fallback={<Spin />}>
       <Function
-        value={typeof content === 'string' ? content : ''}
+        onMonacoReady={(monaco) => setMonaco(monaco)}
+        value={kind === FunctionKind.Stable ? content.source : content}
+        error={nodeError ?? undefined}
         onChange={(val) => {
           graphActions.updateNode(id, (draft) => {
-            draft.content = val;
+            if (kind === FunctionKind.Stable) {
+              draft.content = { source: val };
+            } else {
+              draft.content = val;
+            }
+
             return draft;
           });
         }}

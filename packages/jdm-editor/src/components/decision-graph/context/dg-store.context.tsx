@@ -1,3 +1,4 @@
+import type { Monaco } from '@monaco-editor/react';
 import equal from 'fast-deep-equal/es6/react';
 import { produce } from 'immer';
 import type { WritableDraft } from 'immer/src/types/types-external';
@@ -109,6 +110,7 @@ export type DecisionGraphStoreType = {
     onPanelsChange?: (val?: string) => void;
     onReactFlowInit?: (instance: ReactFlowInstance) => void;
     onCodeExtension?: CodeEditorProps['extension'];
+    onFunctionReady?: (monaco: Monaco) => void;
   };
 };
 
