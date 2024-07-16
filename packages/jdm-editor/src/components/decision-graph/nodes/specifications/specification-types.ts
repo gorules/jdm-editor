@@ -25,7 +25,7 @@ export type NodeSpecification<T = any> = {
   type: string;
   color?: DecisionNodeProps['color'];
   group?: string;
-  displayName: string;
+  displayName: string | React.ReactNode;
   documentationUrl?: string;
   shortDescription?: string;
   generateNode: (params: GenerateNodeParams) => Omit<DecisionNode<T>, 'position' | 'id' | 'type'>;

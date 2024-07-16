@@ -1,5 +1,5 @@
-import { FunctionOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
+import { FunctionOutlined, WarningOutlined } from '@ant-design/icons';
+import { Button, Tooltip } from 'antd';
 import React from 'react';
 import { P, match } from 'ts-pattern';
 
@@ -18,7 +18,7 @@ export type NodeFunctionData =
 export const functionSpecification: NodeSpecification<NodeFunctionData> = {
   type: NodeKind.Function,
   icon: <FunctionOutlined />,
-  displayName: 'Function',
+  displayName: 'Function v2',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/functions',
   shortDescription: 'Javascript lambda',
   generateNode: ({ index }) => ({
@@ -37,7 +37,29 @@ export const functionSpecification: NodeSpecification<NodeFunctionData> = {
         specification={{
           ...specification,
           displayName:
-            kind === FunctionKind.Stable ? specification.displayName : `${specification.displayName} - Deprecated`,
+            kind === FunctionKind.Stable ? (
+              'Function v2'
+            ) : (
+              <span>
+                {'Function v1 '}
+                <Tooltip
+                  placement='top'
+                  title={
+                    <>
+                      {
+                        'Function v1 will be deprecated in one of the upcoming releases. To use a new Function v2, drag and drop a new Function Node and copy your logic. For more information click "Documentation". '
+                      }
+                    </>
+                  }
+                >
+                  <WarningOutlined
+                    style={{
+                      color: 'var(--grl-color-warning-text)',
+                    }}
+                  />
+                </Tooltip>
+              </span>
+            ),
         }}
         name={data.name}
         isSelected={selected}
