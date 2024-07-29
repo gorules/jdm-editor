@@ -31,6 +31,7 @@ export const switchSpecification: NodeSpecification<NodeSwitchData> = {
   generateNode: ({ index }) => ({
     name: `switch${index}`,
     content: {
+      hitPolicy: 'first',
       statements: [{ id: crypto.randomUUID(), condition: '', isDefault: false }],
     },
   }),

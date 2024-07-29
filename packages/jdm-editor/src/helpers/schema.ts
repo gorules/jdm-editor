@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+export const DECISION_GRAPH_CONTENT_TYPE = 'application/vnd.gorules.decision';
 const id = z.string().default(crypto.randomUUID);
 
 const nodeCommon = z.object({
@@ -49,7 +50,14 @@ export const decisionTableSchema = z
 export const functionNodeSchema = z
   .object({
     type: z.literal('functionNode'),
-    content: z.string().nullish(),
+    content: z
+      .string()
+      .or(
+        z.object({
+          source: z.string(),
+        }),
+      )
+      .nullish(),
   })
   .merge(nodeCommon);
 
@@ -86,7 +94,7 @@ export const switchNodeSchema = z
         z.object({
           id,
           condition: z.string().default(''),
-          isDefault: z.boolean().nullish(),
+          isDefault: z.boolean().nullish().default(false),
         }),
       ),
     }),
@@ -103,16 +111,25 @@ export const customNodeSchema = z
   })
   .merge(nodeCommon);
 
-export const nodeSchema = z.discriminatedUnion('type', [
-  decisionNodeSchema,
-  expressionNodeSchema,
-  functionNodeSchema,
-  decisionTableSchema,
-  switchNodeSchema,
-  customNodeSchema,
-  inputNodeSchema,
-  outputNodeSchema,
-]);
+export const anyNodeSchema = z
+  .object({
+    type: z.string(),
+    content: z.any().nullish(),
+  })
+  .merge(nodeCommon);
+
+export const nodeSchema = z
+  .discriminatedUnion('type', [
+    decisionNodeSchema,
+    expressionNodeSchema,
+    functionNodeSchema,
+    decisionTableSchema,
+    switchNodeSchema,
+    customNodeSchema,
+    inputNodeSchema,
+    outputNodeSchema,
+  ])
+  .or(anyNodeSchema);
 
 export const edgeSchema = z.object({
   id: z.string(),
@@ -123,7 +140,6 @@ export const edgeSchema = z.object({
 });
 
 export const decisionModelSchema = z.object({
-  contentType: z.string().default('application/vnd.gorules.decision'),
   nodes: z.array(nodeSchema).default([]),
   edges: z.array(edgeSchema).default([]),
 });

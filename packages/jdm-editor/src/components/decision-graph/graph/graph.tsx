@@ -7,6 +7,7 @@ import ReactFlow, { Background, Controls, useEdgesState, useNodesState } from 'r
 import 'reactflow/dist/style.css';
 import { P, match } from 'ts-pattern';
 
+import { nodeSchema } from '../../../helpers/schema';
 import {
   type DecisionGraphStoreType,
   type DecisionNode,
@@ -205,6 +206,11 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
     }
 
     graphActions.addNodes([newNode]);
+    const parsed = nodeSchema.safeParse(newNode);
+    if (parsed.success) {
+      return graphActions.addNodes([nodeSchema.parse(newNode)]);
+    }
+    message.error(parsed.error?.message);
   };
 
   const isValidConnection = (connection: Connection): boolean => {
