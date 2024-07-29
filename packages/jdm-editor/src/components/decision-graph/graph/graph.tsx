@@ -205,7 +205,6 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
       }
     }
 
-    graphActions.addNodes([newNode]);
     const parsed = nodeSchema.safeParse(newNode);
     if (parsed.success) {
       return graphActions.addNodes([nodeSchema.parse(newNode)]);
