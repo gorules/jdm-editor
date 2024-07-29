@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.11.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.10.0...@gorules/jdm-editor@1.11.0) (2024-07-29)
+
+### Features
+
+- decision model schema ([#66](https://github.com/gorules/jdm-editor/issues/66)) ([6babdbe](https://github.com/gorules/jdm-editor/commit/6babdbe3a1c25e1b1f59ce121db959b84f2eeb07))
+
 # [1.10.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.9.0...@gorules/jdm-editor@1.10.0) (2024-07-16)
 
 ### Features
