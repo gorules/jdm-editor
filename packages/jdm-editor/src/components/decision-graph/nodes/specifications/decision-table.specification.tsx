@@ -40,7 +40,6 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
         {
           id: crypto.randomUUID(),
           name: 'Input',
-          type: 'expression',
         },
       ],
       outputs: [
@@ -48,7 +47,6 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
           id: crypto.randomUUID(),
           field: 'output',
           name: 'Output',
-          type: 'expression',
         },
       ],
       rules: [],

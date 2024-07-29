@@ -20,7 +20,6 @@ export type TableSchemaItem = {
   id: string;
   name: string;
   field?: string;
-  type: string;
   defaultValue?: string;
 };
 
@@ -84,7 +83,6 @@ export const parseDecisionTable = (decisionTable?: DecisionTableType) => {
       {
         id: crypto.randomUUID(),
         name: 'Input',
-        type: 'expression',
       },
     ];
   }
@@ -95,7 +93,6 @@ export const parseDecisionTable = (decisionTable?: DecisionTableType) => {
         id: crypto.randomUUID(),
         field: 'output',
         name: 'Output',
-        type: 'expression',
       },
     ];
   }

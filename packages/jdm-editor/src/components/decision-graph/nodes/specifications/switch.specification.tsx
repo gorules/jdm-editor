@@ -1,5 +1,5 @@
 import { BranchesOutlined, DeleteOutlined, DownOutlined } from '@ant-design/icons';
-import { Button, Dropdown, Typography } from 'antd';
+import { Button, Dropdown, Popconfirm, Typography } from 'antd';
 import clsx from 'clsx';
 import React, { useLayoutEffect, useState } from 'react';
 import { Handle, Position } from 'reactflow';
@@ -14,6 +14,7 @@ import { NodeKind } from './specification-types';
 export type SwitchStatement = {
   id?: string;
   condition?: string;
+  isDefault?: boolean;
 };
 
 export type NodeSwitchData = {
@@ -30,7 +31,8 @@ export const switchSpecification: NodeSpecification<NodeSwitchData> = {
   generateNode: ({ index }) => ({
     name: `switch${index}`,
     content: {
-      statements: [{ id: crypto.randomUUID(), condition: '' }],
+      hitPolicy: 'first',
+      statements: [{ id: crypto.randomUUID(), condition: '', isDefault: false }],
     },
   }),
   renderNode: ({ specification, ...props }) => <SwitchNode specification={specification} {...props} />,
@@ -71,17 +73,36 @@ const SwitchNode: React.FC<
       isSelected={selected}
       actions={[
         <Button
-          key='add row'
+          key='add condition'
           type='link'
           disabled={disabled}
           onClick={() => {
-            graphActions.updateNode(id, (draft) => {
-              draft.content.statements.push({ id: crypto.randomUUID(), condition: '' });
-              return draft;
-            });
+            if (hitPolicy === 'first' && statements?.length > 0) {
+              graphActions.updateNode(id, (draft) => {
+                draft.content.statements = ((draft.content.statements || []) as SwitchStatement[]).map((statement) => {
+                  if (statement.isDefault) {
+                    statement.isDefault = false;
+                  }
+                  return statement;
+                });
+                draft.content.statements.push({ id: crypto.randomUUID(), condition: '', isDefault: true });
+                return draft;
+              });
+            } else {
+              graphActions.updateNode(id, (draft) => {
+                draft.content.statements = ((draft.content.statements || []) as SwitchStatement[]).map((statement) => {
+                  if (statement.isDefault) {
+                    statement.isDefault = false;
+                  }
+                  return statement;
+                });
+                draft.content.statements.push({ id: crypto.randomUUID(), condition: '', isDefault: false });
+                return draft;
+              });
+            }
           }}
         >
-          Add row
+          Add Condition
         </Button>,
         <Dropdown
           key='hitPolicy'
@@ -98,7 +119,20 @@ const SwitchNode: React.FC<
               {
                 key: 'collect',
                 label: 'Collect',
-                onClick: () => changeHitPolicy('collect'),
+                onClick: () => {
+                  graphActions.updateNode(id, (draft) => {
+                    draft.content.statements = ((draft.content.statements || []) as SwitchStatement[]).map(
+                      (statement) => {
+                        if (statement.isDefault) {
+                          statement.isDefault = false;
+                        }
+                        return statement;
+                      },
+                    );
+                    return draft;
+                  });
+                  changeHitPolicy('collect');
+                },
               },
             ],
           }}
@@ -116,12 +150,28 @@ const SwitchNode: React.FC<
               No conditions
             </Typography.Text>
           )}
-          {statements.map((statement) => (
+          {statements.map((statement, index) => (
             <SwitchHandle
               key={statement.id}
+              index={index}
               value={statement.condition}
               id={statement.id}
+              isDefault={statement.isDefault}
+              totalStatements={statements.length}
               disabled={disabled}
+              hitPolicy={hitPolicy}
+              onSetIsDefault={(val) => {
+                graphActions.updateNode(id, (draft) => {
+                  const draftStatement = draft.content.statements.find((s: SwitchStatement) => {
+                    return s.id === statement.id;
+                  });
+                  if (val) {
+                    draftStatement.condition = '';
+                  }
+                  draftStatement.isDefault = val;
+                  return draft;
+                });
+              }}
               isActive={match(nodeTrace)
                 .with({ statements: P.array(P._) }, ({ statements }) =>
                   statements.some((s) => typeof s === 'object' && s && 'id' in s && s.id === statement?.id),
@@ -132,6 +182,17 @@ const SwitchNode: React.FC<
                   draft.content.statements = draft.content.statements.filter(
                     (s: SwitchStatement) => s?.id !== statement?.id,
                   );
+
+                  if ((draft.content.statements || []).length === 1) {
+                    draft.content.statements = ((draft.content.statements || []) as SwitchStatement[]).map(
+                      (statement) => {
+                        if (statement.isDefault) {
+                          statement.isDefault = false;
+                        }
+                        return statement;
+                      },
+                    );
+                  }
 
                   return draft;
                 });
@@ -157,12 +218,30 @@ const SwitchNode: React.FC<
 const SwitchHandle: React.FC<{
   id?: string;
   value?: string;
+  isDefault?: boolean;
   onChange?: (value: string) => void;
+  onSetIsDefault?: (isDefault: boolean) => void;
   onDelete?: () => void;
   disabled?: boolean;
   isActive?: boolean;
   configurable?: boolean;
-}> = ({ id, value, onChange, disabled, configurable = true, onDelete, isActive }) => {
+  hitPolicy: 'first' | 'collect';
+  totalStatements: number;
+  index: number;
+}> = ({
+  id,
+  value,
+  onChange,
+  disabled,
+  configurable = true,
+  onDelete,
+  isActive,
+  index = 0,
+  isDefault = false,
+  onSetIsDefault,
+  totalStatements,
+  hitPolicy,
+}) => {
   const [inner, setInner] = useState(value);
   useLayoutEffect(() => {
     if (inner !== value) {
@@ -175,38 +254,81 @@ const SwitchHandle: React.FC<{
     onChange?.(val);
   };
 
+  const isLastIndex = index === totalStatements - 1;
+
+  const isElse = isDefault && hitPolicy === 'first' && isLastIndex && index > 0;
+
   return (
-    <div className={clsx('switchNode__statement')}>
-      <div className='switchNode__statement__inputArea'>
-        <LocalCodeEditor
-          placeholder={`Condition (e.g. x > 10)`}
+    <div className={clsx('switchNode__statement', isActive && 'active')}>
+      <div
+        className={clsx('switchNode__statement__heading', isElse && 'switchNode__statement__heading--without-input')}
+      >
+        {(index === 0 || hitPolicy === 'collect') && (
+          <Button className={clsx('switchNode__statement__heading__action')} size={'small'} type={'text'}>
+            If
+          </Button>
+        )}
+        {hitPolicy !== 'collect' && index > 0 && (
+          <Button
+            className={clsx('switchNode__statement__heading__action', isElse && 'inactive')}
+            size={'small'}
+            type={'text'}
+            onClick={() => {
+              if (isLastIndex && hitPolicy === 'first') {
+                onSetIsDefault?.(false);
+              }
+            }}
+          >
+            Else If
+          </Button>
+        )}
+        {hitPolicy !== 'collect' && index > 0 && isLastIndex && (
+          <Button
+            className={clsx('switchNode__statement__heading__action', !isElse && 'inactive')}
+            size={'small'}
+            type={'text'}
+            onClick={() => {
+              if (isLastIndex && hitPolicy === 'first') {
+                onSetIsDefault?.(true);
+              }
+            }}
+          >
+            Else
+          </Button>
+        )}
+        <div
           style={{
-            fontSize: 12,
-            lineHeight: '20px',
-            width: '100%',
+            flexGrow: 1,
           }}
-          value={inner}
-          maxRows={4}
-          disabled={disabled}
-          onChange={handleChange}
         />
         {!disabled && configurable && (
-          <Button
-            className='switchNode__statement__more'
-            size='small'
-            type='text'
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => onDelete?.()}
-          />
+          <Popconfirm title='Remove condition?' okText='Remove' onConfirm={() => onDelete?.()}>
+            <Button className='switchNode__statement__delete' size='small' type='text' icon={<DeleteOutlined />} />
+          </Popconfirm>
         )}
+        <Handle
+          id={id}
+          type='source'
+          position={Position.Right}
+          className={clsx(isActive && 'switchNode__activeHandle')}
+        />
       </div>
-      <Handle
-        id={id}
-        type='source'
-        position={Position.Right}
-        className={clsx(isActive && 'switchNode__activeHandle')}
-      />
+      {!isElse && (
+        <div className='switchNode__statement__inputArea'>
+          <LocalCodeEditor
+            placeholder={`cart.total > 100`}
+            style={{
+              fontSize: 12,
+              lineHeight: '20px',
+              width: '100%',
+            }}
+            value={inner}
+            maxRows={4}
+            disabled={disabled}
+            onChange={handleChange}
+          />
+        </div>
+      )}
     </div>
   );
 };
