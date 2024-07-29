@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.11.1](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.11.0...@gorules/jdm-editor@1.11.1) (2024-07-29)
+
+### Bug Fixes
+
+- add node parse issue ([d117c87](https://github.com/gorules/jdm-editor/commit/d117c87fa905c5c76790f2d3483be5449a897712))
+
 # [1.11.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.10.0...@gorules/jdm-editor@1.11.0) (2024-07-29)
 
 ### Features
