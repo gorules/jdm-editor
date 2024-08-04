@@ -919,7 +919,7 @@ dependencies = [
  "serde",
  "serde_json",
  "wasm-bindgen",
- "zen-expression",
+ "zen-expression 0.24.3",
  "zen-tmpl",
 ]
 
@@ -937,6 +937,29 @@ dependencies = [
  "nohash-hasher",
  "once_cell",
  "regex",
+ "rust_decimal",
+ "rust_decimal_macros",
+ "serde",
+ "serde_json",
+ "strsim",
+ "strum",
+ "strum_macros",
+ "thiserror",
+]
+
+[[package]]
+name = "zen-expression"
+version = "0.24.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2607504089bd4dc887b490734eb890c2bb841eb0d26bdd9fcb56741e0d37b69d"
+dependencies = [
+ "ahash 0.8.11",
+ "bumpalo",
+ "chrono",
+ "fastrand",
+ "humantime",
+ "nohash-hasher",
+ "once_cell",
  "regex-lite",
  "rust_decimal",
  "rust_decimal_macros",
@@ -958,7 +981,7 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror",
- "zen-expression",
+ "zen-expression 0.22.0",
 ]
 
 [[package]]
