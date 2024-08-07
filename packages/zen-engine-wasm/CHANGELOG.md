@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/gorules/jdm-editor/compare/@gorules/zen-engine-wasm@0.5.0...@gorules/zen-engine-wasm@0.6.0) (2024-08-07)
+
+### Bug Fixes
+
+- bump zen wasm version ([#74](https://github.com/gorules/jdm-editor/issues/74)) ([69efc49](https://github.com/gorules/jdm-editor/commit/69efc4930286127990d99ec0a3551d16cbd7ca8e))
+
+### Features
+
+- bump zen wasm ([#73](https://github.com/gorules/jdm-editor/issues/73)) ([60ad00d](https://github.com/gorules/jdm-editor/commit/60ad00dc8fa4833d1f5ee185b605c204d854ef55))
+- template string ([#75](https://github.com/gorules/jdm-editor/issues/75)) ([89dacc2](https://github.com/gorules/jdm-editor/commit/89dacc25d2d647260a059a1e57aefdb9f905d20d))
+
 # [0.5.0](https://github.com/gorules/jdm-editor/compare/@gorules/zen-engine-wasm@0.4.0...@gorules/zen-engine-wasm@0.5.0) (2024-08-04)
 
 ### Features
