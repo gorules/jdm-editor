@@ -28,21 +28,21 @@ SequenceExpression {
 expressionNoComma {
   Number |
   String |
-  // TemplateString |
+  TemplateString |
   CallbackReference |
   VariableName |
   boolean |
   kw<"null"> |
   ArrayExpression |
-  // ObjectExpression { "{" commaSep<Property> ~destructure "}" } | Disabled until object support added
+  ObjectExpression { "{" commaSep<Property> ~destructure "}" } |
   UnaryExpression |
   ParenthesizedExpression |
   MemberExpression |
   BinaryExpression |
   ConditionalExpression { expressionNoComma !ternary questionOp expressionNoComma LogicOp<":"> expressionNoComma } |
   PostfixExpression { expressionNoComma !postfix (LogicOp<"!">) } |
-  CallExpression { expressionNoComma !call ArgList }
-  // TaggedTemplateExpression { expressionNoComma !taggedTemplate TemplateString } Disabled until template string support added
+  CallExpression { expressionNoComma !call ArgList } |
+  TaggedTemplateExpression { expressionNoComma !taggedTemplate TemplateString }
 }
 
 ParenthesizedExpression { "(" expression ")" }
@@ -51,11 +51,11 @@ ArrayExpression {
   "[" commaSep1<expressionNoComma | ""> ~destructure "]"
 }
 
-// propName { PropertyDefinition | "[" expression "]" | Number | String }
+propName { PropertyDefinition | "[" expression "]" | Number | String }
 
-// Property {
-//   propName ~destructure (":" expressionNoComma)?
-// }
+Property {
+  propName ~destructure (":" expressionNoComma)?
+}
 
 UnaryExpression {
   !prefix (LogicOp<"!"> | ArithOp<"+" | "-">)
@@ -81,9 +81,9 @@ ArgList {
 }
 
 @skip {} {
-  // TemplateString[isolate] {
-  //   templateStart (templateContent | templateExpr)* templateEnd
-  // }
+  TemplateString[isolate] {
+    templateStart (templateContent | templateExpr)* templateEnd
+  }
 
   String[isolate] {
     '"' (stringContentDouble)* ('"' | "\n") |
@@ -91,7 +91,7 @@ ArgList {
   }
 }
 
-// templateExpr[@name=Interpolation,isolate] { InterpolationStart expression InterpolationEnd }
+templateExpr[@name=Interpolation,isolate] { InterpolationStart expression? InterpolationEnd }
 
 commaSep<content> {
   "" | content ("," content?)*
@@ -113,17 +113,17 @@ VariableName { identifier ~arrow }
 
 PropertyName { word }
 
-// PropertyDefinition { word }
+PropertyDefinition { word }
 
 questionOp[@name=LogicOp] { "?" }
 
 @skip { spaces }
 
-// @local tokens {
-//   InterpolationStart[closedBy=InterpolationEnd] { "${" }
-//   templateEnd { "`" }
-//   @else templateContent
-// }
+@local tokens {
+  InterpolationStart[closedBy=InterpolationEnd] { "${" }
+  templateEnd { "`" }
+  @else templateContent
+}
 
 @tokens {
   spaces { $[\n\u0009 \u000b\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\ufeff]+ }
@@ -150,8 +150,8 @@ questionOp[@name=LogicOp] { "?" }
   stringContentSingle { ![\n']+ }
   stringContentDouble { ![\n"]+ }
 
-  // templateStart { "`" }
-  // InterpolationEnd[openedBy=InterpolationStart] { "}" }
+  templateStart { "`" }
+  InterpolationEnd[openedBy=InterpolationStart] { "}" }
 
   ArithOp<expr> { expr }
   LogicOp<expr> { expr }
@@ -160,7 +160,7 @@ questionOp[@name=LogicOp] { "?" }
   LessThan[@name=CompareOp] { "<" }
 
   "(" ")" "[" "]" "<" ">"
-  // "{" "}" 
+  "{" "}"
 
   "." "," ";" ":" "@"
 }

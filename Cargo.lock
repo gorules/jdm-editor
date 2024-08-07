@@ -919,15 +919,15 @@ dependencies = [
  "serde",
  "serde_json",
  "wasm-bindgen",
- "zen-expression 0.24.3",
+ "zen-expression",
  "zen-tmpl",
 ]
 
 [[package]]
 name = "zen-expression"
-version = "0.22.0"
+version = "0.25.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a209c3333717c6b5152b72e516c638127036cfb4ac1c72686a6aea7130283a73"
+checksum = "3912b0173da6bdd0d0de74546c2adb0d5118ad2de539307d69d9505811ae59e2"
 dependencies = [
  "ahash 0.8.11",
  "bumpalo",
@@ -937,29 +937,6 @@ dependencies = [
  "nohash-hasher",
  "once_cell",
  "regex",
- "rust_decimal",
- "rust_decimal_macros",
- "serde",
- "serde_json",
- "strsim",
- "strum",
- "strum_macros",
- "thiserror",
-]
-
-[[package]]
-name = "zen-expression"
-version = "0.24.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2607504089bd4dc887b490734eb890c2bb841eb0d26bdd9fcb56741e0d37b69d"
-dependencies = [
- "ahash 0.8.11",
- "bumpalo",
- "chrono",
- "fastrand",
- "humantime",
- "nohash-hasher",
- "once_cell",
  "regex-lite",
  "rust_decimal",
  "rust_decimal_macros",
@@ -973,15 +950,15 @@ dependencies = [
 
 [[package]]
 name = "zen-tmpl"
-version = "0.22.0"
+version = "0.25.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "20f7798f77f30e7636fff05b1acb47bdd14b8f2645ed80544857fa4aebf56504"
+checksum = "3652f2193af8b96158ed545b680e245f618440c7ff375a1fecb2484b845841ce"
 dependencies = [
  "itertools",
  "serde",
  "serde_json",
  "thiserror",
- "zen-expression 0.22.0",
+ "zen-expression",
 ]
 
 [[package]]
