@@ -188,6 +188,7 @@ export const Function: React.FC<FunctionProps> = ({
   return (
     <div
       className='grl-function'
+      data-theme={token.mode}
       style={
         {
           'height': '100%',

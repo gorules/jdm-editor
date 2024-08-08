@@ -19,6 +19,13 @@
     background: #fff1f0;
   }
 
+  $this: &;
+  &[data-theme='dark'] {
+    #{$this}__errorLineContent {
+      background: #4e3534;
+    }
+  }
+
   &__debugger {
     &__panel {
       position: absolute;

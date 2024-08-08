@@ -75,7 +75,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
           placeholder='Key'
           disabled={!configurable || disabled}
           value={expression?.key}
-          onChange={(e) => onChange({ key: e.target.value })}
+          onChange={(e) => onChange({ key: e.target.value.trim() })}
           autoComplete='off'
         />
       </div>
@@ -113,7 +113,9 @@ const ResultOverlay: React.FC<{ expression: ExpressionEntry }> = ({ expression }
 
   return (
     <div className='expression-list-item__resultOverlay'>
-      <Typography.Text>= {trace as string}</Typography.Text>
+      <Typography.Text ellipsis={{ tooltip: trace }} style={{ maxWidth: 120 }}>
+        = {trace as string}
+      </Typography.Text>
     </div>
   );
 };

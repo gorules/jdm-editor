@@ -1,12 +1,12 @@
 use bumpalo::Bump;
 use gloo_utils::format::JsValueSerdeExt;
 use serde_json::Value;
-use wasm_bindgen::JsValue;
 use wasm_bindgen::prelude::wasm_bindgen;
+use wasm_bindgen::JsValue;
 use zen_expression::compiler::Compiler;
-use zen_expression::IsolateError;
 use zen_expression::lexer::Lexer;
 use zen_expression::parser::Parser;
+use zen_expression::IsolateError;
 
 #[wasm_bindgen(js_name = "validateUnaryExpression")]
 pub fn validate_unary_expression(expression: &str) -> JsValue {
@@ -29,24 +29,38 @@ pub fn validate_expression(expression: &str) -> JsValue {
 fn get_unary_error(expression: &str) -> Option<Value> {
     let mut lexer = Lexer::new();
     let tokens = match lexer.tokenize(expression) {
-        Err(e) => return serde_json::to_value(IsolateError::LexerError { source: e }).ok().into(),
+        Err(e) => {
+            return serde_json::to_value(IsolateError::LexerError { source: e })
+                .ok()
+                .into()
+        }
         Ok(tokens) => tokens,
     };
 
     let bump = Bump::new();
     let parser = match Parser::try_new(tokens, &bump) {
-        Err(e) => return serde_json::to_value(IsolateError::ParserError { source: e }).ok().into(),
+        Err(e) => {
+            return serde_json::to_value(IsolateError::ParserError { source: e })
+                .ok()
+                .into()
+        }
         Ok(p) => p.unary(),
     };
 
     let ast = match parser.parse() {
-        Err(e) => return serde_json::to_value(IsolateError::ParserError { source: e }).ok().into(),
+        Err(e) => {
+            return serde_json::to_value(IsolateError::ParserError { source: e })
+                .ok()
+                .into()
+        }
         Ok(n) => n,
     };
 
     let mut compiler = Compiler::new();
     if let Err(e) = compiler.compile(ast) {
-        return serde_json::to_value(IsolateError::CompilerError { source: e }).ok().into();
+        return serde_json::to_value(IsolateError::CompilerError { source: e })
+            .ok()
+            .into();
     }
 
     None
@@ -55,24 +69,38 @@ fn get_unary_error(expression: &str) -> Option<Value> {
 fn get_error(expression: &str) -> Option<Value> {
     let mut lexer = Lexer::new();
     let tokens = match lexer.tokenize(expression) {
-        Err(e) => return serde_json::to_value(IsolateError::LexerError { source: e }).ok().into(),
+        Err(e) => {
+            return serde_json::to_value(IsolateError::LexerError { source: e })
+                .ok()
+                .into()
+        }
         Ok(tokens) => tokens,
     };
 
     let bump = Bump::new();
     let parser = match Parser::try_new(tokens, &bump) {
-        Err(e) => return serde_json::to_value(IsolateError::ParserError { source: e }).ok().into(),
+        Err(e) => {
+            return serde_json::to_value(IsolateError::ParserError { source: e })
+                .ok()
+                .into()
+        }
         Ok(p) => p.standard(),
     };
 
     let ast = match parser.parse() {
-        Err(e) => return serde_json::to_value(IsolateError::ParserError { source: e }).ok().into(),
+        Err(e) => {
+            return serde_json::to_value(IsolateError::ParserError { source: e })
+                .ok()
+                .into()
+        }
         Ok(n) => n,
     };
 
     let mut compiler = Compiler::new();
     if let Err(e) = compiler.compile(ast) {
-        return serde_json::to_value(IsolateError::CompilerError { source: e }).ok().into();
+        return serde_json::to_value(IsolateError::CompilerError { source: e })
+            .ok()
+            .into();
     }
 
     None
