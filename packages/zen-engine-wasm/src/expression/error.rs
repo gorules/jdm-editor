@@ -1,5 +1,5 @@
-use std::ops::Deref;
 use serde::Serialize;
+use std::ops::Deref;
 use wasm_bindgen::JsError;
 use zen_expression::IsolateError;
 

@@ -20,9 +20,9 @@
   }
 
   $this: &;
-  &[data-theme="dark"] {
+  &[data-theme='dark'] {
     #{$this}__errorLineContent {
-      background: #4E3534;
+      background: #4e3534;
     }
   }
 
