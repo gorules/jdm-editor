@@ -22,6 +22,8 @@ export type DecisionGraphEmptyType = {
   components?: DecisionGraphStoreType['state']['components'];
   customNodes?: DecisionGraphStoreType['state']['customNodes'];
 
+  name?: DecisionGraphStoreType['state']['name'];
+
   defaultActivePanel?: string;
   panels?: DecisionGraphStoreType['state']['panels'];
   onPanelsChange?: DecisionGraphStoreType['listeners']['onPanelsChange'];
@@ -39,6 +41,7 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
   id,
   defaultValue,
   value,
+  name,
   disabled = false,
   configurable = true,
   onChange,
@@ -73,6 +76,10 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
       panels,
     });
   }, [id, disabled, configurable, components, customNodes, panels]);
+
+  useEffect(() => {
+    stateStore.setState({ name: name ?? 'graph.json' });
+  }, [name]);
 
   useEffect(() => {
     stateStore.setState({

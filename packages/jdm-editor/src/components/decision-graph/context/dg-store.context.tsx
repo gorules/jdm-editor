@@ -64,6 +64,8 @@ export type DecisionGraphStoreType = {
     openTabs: string[];
     activeTab: string;
 
+    name: string;
+
     customNodes: CustomNodeSpecification<object, string>[];
 
     panels?: PanelType[];
@@ -141,6 +143,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         hoveredEdgeId: null,
         openTabs: [],
         activeTab: 'graph',
+        name: 'graph.json',
         disabled: false,
         configurable: true,
         components: [],

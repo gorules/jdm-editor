@@ -8,6 +8,7 @@ import {
   type DecisionEdge,
   type DecisionNode,
   useDecisionGraphActions,
+  useDecisionGraphRaw,
   useDecisionGraphState,
 } from '../context/dg-store.context';
 import { NodeKind } from '../nodes/specifications/specification-types';
@@ -22,6 +23,7 @@ export type GraphAsideProps = {
 };
 
 export const GraphAside: React.FC<GraphAsideProps> = ({ defaultOpenMenu = 'components' }) => {
+  const decisionGraphRaw = useDecisionGraphRaw();
   const fileInput = useRef<HTMLInputElement>(null);
   const excelFileInput = useRef<HTMLInputElement>(null);
 
@@ -105,8 +107,9 @@ export const GraphAside: React.FC<GraphAsideProps> = ({ defaultOpenMenu = 'compo
     }
   };
 
-  const downloadJDM = async (name: string = 'graph') => {
+  const downloadJDM = async () => {
     try {
+      const { name } = decisionGraphRaw.stateStore.getState();
       // create file in browser
       const fileName = `${name.replaceAll('.json', '')}.json`;
       const json = JSON.stringify(
