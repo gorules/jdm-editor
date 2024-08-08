@@ -316,7 +316,6 @@ const SwitchHandle: React.FC<{
       {!isElse && (
         <div className='switchNode__statement__inputArea'>
           <LocalCodeEditor
-            placeholder={`cart.total > 100`}
             style={{
               fontSize: 12,
               lineHeight: '20px',
