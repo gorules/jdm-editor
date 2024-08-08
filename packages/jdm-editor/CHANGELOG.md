@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.14.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.13.0...@gorules/jdm-editor@1.14.0) (2024-08-08)
+
+### Features
+
+- allow name customisation ([#77](https://github.com/gorules/jdm-editor/issues/77)) ([fd2aa01](https://github.com/gorules/jdm-editor/commit/fd2aa0119f1bd0693a684e97707fc91ef90ba118))
+
 # [1.13.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.12.0...@gorules/jdm-editor@1.13.0) (2024-08-08)
 
 ### Features
