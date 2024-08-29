@@ -3,7 +3,6 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding-bottom: 3rem;
   min-height: 1px;
   //overscroll-behavior: none;
 
@@ -28,17 +27,14 @@
     }
   }
 
-  &__add-row {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100% !important;
-    max-width: var(--dt-container-width);
+  &__add-row-wrapper {
+    padding: 8px;
     position: sticky;
     bottom: 0;
-    left: 1px;
-    border-radius: 0;
-    color: var(--grl-color-text-secondary);
+  }
+
+  &__add-row {
+    max-width: var(--dt-container-width);
     transition: 0.2s cubic-bezier(0.645, 0.045, 0.355, 1) background-color !important;
   }
 
@@ -164,10 +160,6 @@
 
     tfoot {
       background-color: var(--grl-color-bg-elevated);
-
-      td {
-        height: 32px;
-      }
     }
 
     .add-row {

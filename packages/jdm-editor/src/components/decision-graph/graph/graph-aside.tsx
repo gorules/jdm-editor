@@ -1,7 +1,7 @@
-import { CloseOutlined, CloudDownloadOutlined, CloudUploadOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { CloudDownloadOutlined, CloudUploadOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { Button, Dropdown, Tooltip, Typography, message } from 'antd';
-import React, { useRef, useState } from 'react';
+import { Button, Dropdown, message } from 'antd';
+import React, { useRef } from 'react';
 
 import { exportExcelFile, readFromExcel } from '../../../helpers/excel-file-utils';
 import {
@@ -12,34 +12,27 @@ import {
   useDecisionGraphState,
 } from '../context/dg-store.context';
 import { NodeKind } from '../nodes/specifications/specification-types';
-import { GraphComponents } from './graph-components';
 
 const DecisionContentType = 'application/vnd.gorules.decision';
 
-type Menu = 'components';
-
 export type GraphAsideProps = {
-  defaultOpenMenu?: Menu | false;
+  //
 };
 
-export const GraphAside: React.FC<GraphAsideProps> = ({ defaultOpenMenu = 'components' }) => {
+export const GraphAside: React.FC<GraphAsideProps> = () => {
   const decisionGraphRaw = useDecisionGraphRaw();
   const fileInput = useRef<HTMLInputElement>(null);
   const excelFileInput = useRef<HTMLInputElement>(null);
 
   const { setDecisionGraph, setActivePanel } = useDecisionGraphActions();
-  const { decisionGraph, activeNodeId, disabled, hasInputNode, panels, activePanel } = useDecisionGraphState(
-    ({ decisionGraph, activeTab, disabled, panels, activePanel }) => ({
+  const { decisionGraph, disabled, panels, activePanel } = useDecisionGraphState(
+    ({ decisionGraph, disabled, panels, activePanel }) => ({
       decisionGraph,
-      activeNodeId: (decisionGraph?.nodes ?? []).find((node) => node.id === activeTab)?.id,
       disabled,
-      hasInputNode: (decisionGraph?.nodes || []).some((n) => n.type === NodeKind.Input),
       panels,
       activePanel,
     }),
   );
-
-  const [menu, setMenu] = useState<Menu | false>(disabled ? false : defaultOpenMenu);
 
   const handleUploadInput = async (event: any) => {
     const fileList = event?.target?.files as FileList;
@@ -207,15 +200,6 @@ export const GraphAside: React.FC<GraphAsideProps> = ({ defaultOpenMenu = 'compo
       <div className={'grl-dg__aside__side-bar'}>
         <div className={'grl-dg__aside__side-bar__top'}>
           {!disabled && (
-            <Tooltip placement='right' title='Components'>
-              <Button
-                type={'primary'}
-                icon={<PlusCircleOutlined />}
-                onClick={() => setMenu((m) => (m !== 'components' ? 'components' : false))}
-              />
-            </Tooltip>
-          )}
-          {!disabled && (
             <Dropdown menu={{ items: uploadItems }} placement='bottomRight' trigger={['click']} arrow>
               <Button type={'text'} disabled={disabled} icon={<CloudUploadOutlined />} />
             </Dropdown>
@@ -238,25 +222,6 @@ export const GraphAside: React.FC<GraphAsideProps> = ({ defaultOpenMenu = 'compo
           ))}
         </div>
       </div>
-      {menu && !disabled && (
-        <div className={'grl-dg__aside__menu'}>
-          {menu === 'components' && (
-            <>
-              <div className={'grl-dg__aside__menu__heading'}>
-                <div className={'grl-dg__aside__menu__heading__text'}>
-                  <Typography.Text strong style={{ marginBottom: 0 }}>
-                    Components
-                  </Typography.Text>
-                </div>
-                <Button type={'text'} size='small' icon={<CloseOutlined />} onClick={() => setMenu(false)}></Button>
-              </div>
-              <div className={'grl-dg__aside__menu__content'}>
-                <GraphComponents inputDisabled={hasInputNode} disabled={!!activeNodeId || disabled} />
-              </div>
-            </>
-          )}
-        </div>
-      )}
     </div>
   );
 };

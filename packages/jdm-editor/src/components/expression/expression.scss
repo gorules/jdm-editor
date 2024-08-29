@@ -1,7 +1,6 @@
 .expression-list {
   display: flex;
   flex-direction: column;
-  margin-bottom: 1rem;
   box-sizing: border-box;
 
   &__item {
@@ -40,6 +39,10 @@
       bottom: -1px;
       height: 2px;
     }
+  }
+
+  &__button-wrapper {
+    padding: 12px 0;
   }
 
   &__button {

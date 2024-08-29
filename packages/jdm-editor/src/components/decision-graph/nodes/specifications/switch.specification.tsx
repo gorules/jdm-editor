@@ -1,7 +1,7 @@
 import { BranchesOutlined, DeleteOutlined, DownOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Popconfirm, Typography } from 'antd';
 import clsx from 'clsx';
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useLayoutEffect, useMemo, useState } from 'react';
 import { Handle, Position } from 'reactflow';
 import { P, match } from 'ts-pattern';
 
@@ -44,13 +44,16 @@ const SwitchNode: React.FC<
   }
 > = ({ id, data, selected, specification }) => {
   const graphActions = useDecisionGraphActions();
-  const { content, disabled, nodeTrace } = useDecisionGraphState(({ decisionGraph, disabled, simulate }) => ({
-    nodeTrace: match(simulate)
-      .with({ result: P._ }, ({ result }) => result?.trace?.[id]?.traceData)
-      .otherwise(() => null),
-    content: (decisionGraph?.nodes || []).find((n) => n?.id === id)?.content as NodeSwitchData | undefined,
-    disabled,
-  }));
+  const { content, disabled, nodeTrace, compactMode } = useDecisionGraphState(
+    ({ decisionGraph, disabled, simulate, compactMode }) => ({
+      nodeTrace: match(simulate)
+        .with({ result: P._ }, ({ result }) => result?.trace?.[id]?.traceData)
+        .otherwise(() => null),
+      content: (decisionGraph?.nodes || []).find((n) => n?.id === id)?.content as NodeSwitchData | undefined,
+      disabled,
+      compactMode,
+    }),
+  );
 
   const statements: SwitchStatement[] = content?.statements || [];
   const hitPolicy = content?.hitPolicy || 'first';
@@ -61,6 +64,8 @@ const SwitchNode: React.FC<
       return node;
     });
   };
+
+  const Handle = useMemo(() => (compactMode ? SwitchHandleCompact : SwitchHandle), [compactMode]);
 
   return (
     <GraphNode
@@ -151,7 +156,7 @@ const SwitchNode: React.FC<
             </Typography.Text>
           )}
           {statements.map((statement, index) => (
-            <SwitchHandle
+            <Handle
               key={statement.id}
               index={index}
               value={statement.condition}
@@ -196,6 +201,7 @@ const SwitchNode: React.FC<
 
                   return draft;
                 });
+                graphActions.removeEdgeByHandleId(statement?.id as string);
               }}
               onChange={(condition) => {
                 graphActions.updateNode(id, (draft) => {
@@ -256,7 +262,8 @@ const SwitchHandle: React.FC<{
 
   const isLastIndex = index === totalStatements - 1;
 
-  const isElse = isDefault && hitPolicy === 'first' && isLastIndex && index > 0;
+  const isElse =
+    isDefault && hitPolicy === 'first' && isLastIndex && index > 0 && (value || '')?.trim?.()?.length === 0;
 
   return (
     <div className={clsx('switchNode__statement', isActive && 'active')}>
@@ -328,6 +335,64 @@ const SwitchHandle: React.FC<{
           />
         </div>
       )}
+    </div>
+  );
+};
+
+const SwitchHandleCompact: React.FC<{
+  id?: string;
+  value?: string;
+  isDefault?: boolean;
+  onChange?: (value: string) => void;
+  onSetIsDefault?: (isDefault: boolean) => void;
+  onDelete?: () => void;
+  disabled?: boolean;
+  isActive?: boolean;
+  configurable?: boolean;
+  hitPolicy: 'first' | 'collect';
+  totalStatements: number;
+  index: number;
+}> = ({ id, value, onChange, disabled, configurable = true, onDelete, isActive }) => {
+  const [inner, setInner] = useState(value);
+  useLayoutEffect(() => {
+    if (inner !== value) {
+      setInner(value);
+    }
+  }, [value]);
+
+  const handleChange = (val: string) => {
+    setInner(val);
+    onChange?.(val);
+  };
+
+  return (
+    <div className={clsx('switchNode__statement', 'compact', isActive && 'active')}>
+      <div className={clsx('switchNode__statement__inputArea')}>
+        <LocalCodeEditor
+          style={{
+            fontSize: 12,
+            lineHeight: '20px',
+            width: '100%',
+          }}
+          value={inner}
+          maxRows={4}
+          disabled={disabled}
+          onChange={handleChange}
+        />
+      </div>
+      {!disabled && configurable && (
+        <div className='switchNode__statement__button'>
+          <Popconfirm title='Remove condition?' okText='Remove' onConfirm={() => onDelete?.()}>
+            <Button className='switchNode__statement__delete' size='small' type='text' icon={<DeleteOutlined />} />
+          </Popconfirm>
+        </div>
+      )}
+      <Handle
+        id={id}
+        type='source'
+        position={Position.Right}
+        className={clsx(isActive && 'switchNode__activeHandle')}
+      />
     </div>
   );
 };

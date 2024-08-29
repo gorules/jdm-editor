@@ -1,4 +1,4 @@
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusCircleOutlined } from '@ant-design/icons';
 import type { ColumnDef, Table as ReactTable } from '@tanstack/react-table';
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
@@ -168,13 +168,17 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
         <tfoot>
           <tr>
             <td colSpan={inputs.length + outputs.length + 2}>
-              <Button
-                className='grl-dt__add-row'
-                type='text'
-                disabled={disabled}
-                icon={<PlusOutlined />}
-                onClick={() => tableActions.addRowBelow()}
-              />
+              <div className='grl-dt__add-row-wrapper'>
+                <Button
+                  className='grl-dt__add-row'
+                  type='link'
+                  disabled={disabled}
+                  icon={<PlusCircleOutlined />}
+                  onClick={() => tableActions.addRowBelow()}
+                >
+                  Add row
+                </Button>
+              </div>
             </td>
           </tr>
         </tfoot>

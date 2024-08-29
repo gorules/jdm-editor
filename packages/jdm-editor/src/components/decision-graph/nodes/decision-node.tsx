@@ -19,6 +19,7 @@ export type DecisionNodeProps = {
   color?: 'primary' | 'secondary' | string;
   menuItems?: MenuProps['items'];
   onNameChange?: (name: string) => void;
+  compactMode?: boolean;
 };
 
 export const DecisionNode: React.FC<DecisionNodeProps> = ({
@@ -34,11 +35,13 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
   onNameChange,
   menuItems = [],
   status,
+  compactMode,
 }) => {
   const { token } = theme.useToken();
   const [contentEditing, setContentEditing] = useState(false);
   const nameRef = useRef<HTMLInputElement>(null);
 
+  console.log(compactMode);
   useEffect(() => {
     if (nameRef.current && contentEditing) {
       nameRef.current.value = name as string;
@@ -67,8 +70,8 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
           <CloseOutlined />
         </div>
       )}
-      <div className='grl-dn__header'>
-        <div className='grl-dn__header__icon'>{icon}</div>
+      <div className={clsx('grl-dn__header', compactMode && 'compact')}>
+        <div className={clsx('grl-dn__header__icon', compactMode && 'compact')}>{icon}</div>
         <div className='grl-dn__header__text'>
           {!contentEditing && (
             <Typography.Text
@@ -105,14 +108,16 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
               }}
             />
           )}
-          <Typography.Text type='secondary' style={{ fontSize: token.fontSizeSM }}>
-            {type}
-          </Typography.Text>
+          {!compactMode && (
+            <Typography.Text type='secondary' style={{ fontSize: token.fontSizeSM }}>
+              {type}
+            </Typography.Text>
+          )}
         </div>
         {menuItems.length > 0 && (
           <div className='grl-dn__header__actions'>
             <Dropdown trigger={['click']} overlayStyle={{ minWidth: 250 }} menu={{ items: menuItems }}>
-              <Button type='text' icon={<MoreOutlined />} />
+              <Button type='text' size={compactMode ? 'small' : 'middle'} icon={<MoreOutlined />} />
             </Dropdown>
           </div>
         )}

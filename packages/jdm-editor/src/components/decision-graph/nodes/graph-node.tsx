@@ -1,4 +1,5 @@
 import { BookOutlined, CopyOutlined, DeleteOutlined } from '@ant-design/icons';
+import type { MenuProps } from 'antd';
 import { Modal, Typography } from 'antd';
 import clsx from 'clsx';
 import React from 'react';
@@ -33,15 +34,18 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
   ...decisionNodeProps
 }) => {
   const graphActions = useDecisionGraphActions();
-  const { nodeError, nodeTrace, disabled } = useDecisionGraphState(({ simulate, disabled }) => ({
-    disabled,
-    nodeTrace: match(simulate)
-      .with({ result: P._ }, ({ result }) => result?.trace?.[id])
-      .otherwise(() => null),
-    nodeError: match(simulate)
-      .with({ error: { data: { nodeId: id } } }, ({ error }) => error)
-      .otherwise(() => null),
-  }));
+  const { nodeError, nodeTrace, disabled, compactMode } = useDecisionGraphState(
+    ({ simulate, disabled, compactMode }) => ({
+      disabled,
+      nodeTrace: match(simulate)
+        .with({ result: P._ }, ({ result }) => result?.trace?.[id])
+        .otherwise(() => null),
+      nodeError: match(simulate)
+        .with({ error: { data: { nodeId: id } } }, ({ error }) => error)
+        .otherwise(() => null),
+      compactMode,
+    }),
+  );
 
   const menuItems = [
     specification.documentationUrl
@@ -86,20 +90,20 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
           onOk: () => graphActions.removeNodes([id]),
         }),
     },
-  ];
+  ].filter((i) => i !== false);
 
   return (
     <div className={clsx('grl-graph-node', className)} style={{ minWidth: 250 }}>
       {handleLeft && (
         <Handle
-          className='grl-graph-node__handle-left'
+          className={clsx('grl-graph-node__handle-left', compactMode && 'compact')}
           type='target'
           position={Position.Left}
           {...(typeof handleLeft !== 'boolean' ? handleLeft : {})}
         />
       )}
       <DecisionNode
-        menuItems={menuItems}
+        menuItems={menuItems as MenuProps['items']}
         {...decisionNodeProps}
         disabled={disabled}
         icon={specification.icon}
@@ -117,10 +121,11 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
             return draft;
           });
         }}
+        compactMode={compactMode}
       />
       {handleRight && (
         <Handle
-          className='grl-graph-node__handle-right'
+          className={clsx('grl-graph-node__handle-right', compactMode && 'compact')}
           type='source'
           position={Position.Right}
           {...(typeof handleRight !== 'boolean' ? handleRight : {})}

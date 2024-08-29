@@ -230,6 +230,7 @@
       position: relative;
       display: none;
       background-color: var(--grl-color-bg-container);
+      min-height: 0;
 
       &.active {
         display: flex;
@@ -579,11 +580,19 @@
     z-index: 20;
     // TODO: fix size
     top: 30px;
+
+    &.compact {
+      top: 20px;
+    }
   }
 
   &__handle-right {
     z-index: 20;
     top: 30px;
+
+    &.compact {
+      top: 20px;
+    }
   }
 }
 
@@ -695,6 +704,24 @@
         &:active,
         &:focus {
           z-index: 1;
+        }
+      }
+
+      &.compact {
+        position: relative;
+
+        .switchNode__statement__inputArea {
+          padding: 8px 10px;
+
+          .cm-editor {
+            padding-right: 14px;
+          }
+        }
+
+        .switchNode__statement__button {
+          position: absolute;
+          top: 10px;
+          right: 14px;
         }
       }
     }

@@ -1,3 +1,4 @@
+import { bracketMatching } from '@codemirror/language';
 import { Compartment, EditorState, type Extension, Text } from '@codemirror/state';
 import { EditorView, placeholder as placeholderExt } from '@codemirror/view';
 import { theme } from 'antd';
@@ -82,6 +83,7 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
           doc: value,
           extensions: [
             EditorView.lineWrapping,
+            bracketMatching(), // ADD THIS LINE
             compartment.zenExtension.of(zenExtensions({ type })),
             compartment.updateListener.of(updateListener(onChange, onStateChange)),
             compartment.theme.of(editorTheme(token.mode === 'dark')),

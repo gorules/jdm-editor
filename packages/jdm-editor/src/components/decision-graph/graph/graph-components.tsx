@@ -83,7 +83,7 @@ export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inp
           (el) =>
             !(search?.trim?.().length > 0) ||
             (el.type || '').toLowerCase().indexOf(search.toLowerCase()) > -1 ||
-            (el.displayName || '').toLowerCase().indexOf(search.toLowerCase()) > -1 ||
+            ((el.displayName || '') as string).toLowerCase().indexOf(search.toLowerCase()) > -1 ||
             (el.shortDescription || '').toLowerCase().indexOf(search.toLowerCase()) > -1 ||
             (el.group || '').toLowerCase().indexOf(search.toLowerCase()) > -1,
         ),
@@ -190,7 +190,7 @@ const DragDecisionNode: React.FC<
         <DecisionNode
           color={specification.color}
           icon={specification.icon}
-          name={specification.displayName}
+          name={specification.displayName as string}
           type={specification.shortDescription}
         />
       </div>

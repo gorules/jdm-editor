@@ -1,4 +1,4 @@
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusCircleOutlined } from '@ant-design/icons';
 import { Button, Typography } from 'antd';
 import clsx from 'clsx';
 import equal from 'fast-deep-equal/es6/react';
@@ -34,11 +34,11 @@ export const ExpressionList: React.FC<ExpressionListProps> = ({}) => {
         <ExpressionItem key={expression.id} expression={expression} index={index} />
       ))}
       {configurable && !disabled && (
-        <div className={clsx('expression-list__item')}>
+        <div className={'expression-list__button-wrapper'}>
           <Button
             className='expression-list__button'
-            icon={<PlusOutlined />}
-            type='dashed'
+            icon={<PlusCircleOutlined />}
+            type='link'
             onClick={() => addRowBelow()}
           >
             Add row
