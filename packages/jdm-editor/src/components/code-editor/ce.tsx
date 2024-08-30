@@ -83,7 +83,7 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
           doc: value,
           extensions: [
             EditorView.lineWrapping,
-            bracketMatching(), // ADD THIS LINE
+            bracketMatching(),
             compartment.zenExtension.of(zenExtensions({ type })),
             compartment.updateListener.of(updateListener(onChange, onStateChange)),
             compartment.theme.of(editorTheme(token.mode === 'dark')),
