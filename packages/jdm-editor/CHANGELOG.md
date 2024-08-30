@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.15.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.14.0...@gorules/jdm-editor@1.15.0) (2024-08-30)
+
+### Features
+
+- compact mode ([#78](https://github.com/gorules/jdm-editor/issues/78)) ([efd4536](https://github.com/gorules/jdm-editor/commit/efd4536b966c34d7f0070fb56eaa349a984b125d))
+
 # [1.14.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.13.0...@gorules/jdm-editor@1.14.0) (2024-08-08)
 
 ### Features
