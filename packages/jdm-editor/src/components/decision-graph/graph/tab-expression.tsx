@@ -25,7 +25,7 @@ export const TabExpression: React.FC<TabExpressionProps> = ({ id, manager }) => 
   );
 
   return (
-    <div style={{ maxWidth: 900, height: '100%', overflowY: 'auto', boxSizing: 'border-box', paddingBottom: '1.5rem' }}>
+    <div style={{ maxWidth: 900, height: '100%', overflowY: 'auto', boxSizing: 'border-box' }}>
       <Expression
         traceData={traceData}
         value={content?.expressions}

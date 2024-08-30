@@ -1,8 +1,9 @@
-import { WarningOutlined } from '@ant-design/icons';
-import { Modal, Typography, message } from 'antd';
+import { CloseOutlined, CompressOutlined, RightOutlined, WarningOutlined } from '@ant-design/icons';
+import { Button, Modal, Tooltip, Typography, message } from 'antd';
 import clsx from 'clsx';
-import React, { type MutableRefObject, forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
+import React, { type MutableRefObject, forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import type { Connection, ProOptions, ReactFlowInstance, XYPosition } from 'reactflow';
+import { ControlButton } from 'reactflow';
 import ReactFlow, { Background, Controls, useEdgesState, useNodesState } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { P, match } from 'ts-pattern';
@@ -23,7 +24,9 @@ import { useGraphClipboard } from '../hooks/use-graph-clipboard';
 import type { CustomNodeSpecification } from '../nodes/custom-node/index';
 import { GraphNode } from '../nodes/graph-node';
 import type { MinimalNodeProps } from '../nodes/specifications/specification-types';
+import { NodeKind } from '../nodes/specifications/specification-types';
 import { nodeSpecification } from '../nodes/specifications/specifications';
+import { GraphComponents } from './graph-components';
 
 export type GraphProps = {
   className?: string;
@@ -61,14 +64,19 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
   const nodesState = useNodesState([]);
   const edgesState = useEdgesState([]);
 
+  const [componentsOpened, setComponentsOpened] = useState(true);
+
   const graphActions = useDecisionGraphActions();
   const graphReferences = useDecisionGraphReferences((s) => s);
   const { onReactFlowInit } = useDecisionGraphListeners(({ onReactFlowInit }) => ({ onReactFlowInit }));
-  const { disabled, components, customNodes } = useDecisionGraphState(({ disabled, components, customNodes }) => ({
-    disabled,
-    components,
-    customNodes,
-  }));
+  const { disabled, hasInputNode, components, customNodes } = useDecisionGraphState(
+    ({ disabled, components, customNodes, decisionGraph }) => ({
+      disabled,
+      components,
+      customNodes,
+      hasInputNode: (decisionGraph?.nodes || []).some((n) => n.type === NodeKind.Input),
+    }),
+  );
 
   graphReferences.nodesState.current = nodesState;
   graphReferences.edgesState.current = edgesState;
@@ -293,97 +301,147 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
         }
       }}
     >
-      <div className={'content-wrapper'}>
-        <div className={clsx(['react-flow'])} ref={reactFlowWrapper}>
-          <ReactFlow
-            elevateEdgesOnSelect={false}
-            elevateNodesOnSelect={true}
-            zoomOnDoubleClick={false}
-            nodes={nodesState[0]}
-            edges={edgesState[0]}
-            onInit={(instance) => {
-              (reactFlowInstance as MutableRefObject<ReactFlowInstance>).current = instance;
-              onReactFlowInit?.(instance);
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          position: 'relative',
+          display: 'flex',
+        }}
+      >
+        {!disabled && !componentsOpened && (
+          <div
+            className={'grl-dg__components__floating'}
+            style={{
+              position: 'absolute',
+              top: 8,
+              left: 8,
+              zIndex: 1,
             }}
-            snapToGrid={true}
-            snapGrid={[5, 5]}
-            nodeTypes={nodeTypes}
-            edgeTypes={edgeTypes}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            onConnect={onConnect}
-            isValidConnection={isValidConnection}
-            proOptions={reactFlowProOptions}
-            nodesConnectable={!disabled}
-            nodesDraggable={!disabled}
-            edgesUpdatable={!disabled}
-            onNodesChange={graphActions.handleNodesChange}
-            onEdgesChange={graphActions.handleEdgesChange}
-            onNodesDelete={(e) => {
-              e.forEach((node) => {
-                graphActions.closeTab(node?.id);
-              });
-            }}
-            onKeyDown={(e) => {
-              const [nodes] = nodesState;
-              const [edges] = edgesState;
+          >
+            <Tooltip placement='right' title='Components'>
+              <Button icon={<RightOutlined />} onClick={() => setComponentsOpened(true)} />
+            </Tooltip>
+          </div>
+        )}
+        {!disabled && componentsOpened && (
+          <div className={'grl-dg__aside__menu'}>
+            <>
+              <div className={'grl-dg__aside__menu__heading'}>
+                <div className={'grl-dg__aside__menu__heading__text'}>
+                  <Typography.Text strong style={{ marginBottom: 0 }}>
+                    Components
+                  </Typography.Text>
+                </div>
+                <Button
+                  type={'text'}
+                  size='small'
+                  icon={<CloseOutlined />}
+                  onClick={() => setComponentsOpened(false)}
+                ></Button>
+              </div>
+              <div className={'grl-dg__aside__menu__content'}>
+                <GraphComponents inputDisabled={hasInputNode} disabled={disabled} />
+              </div>
+            </>
+          </div>
+        )}
+        <div className={'content-wrapper'}>
+          <div className={clsx(['react-flow'])} ref={reactFlowWrapper}>
+            <ReactFlow
+              elevateEdgesOnSelect={false}
+              elevateNodesOnSelect={true}
+              zoomOnDoubleClick={false}
+              nodes={nodesState[0]}
+              edges={edgesState[0]}
+              onInit={(instance) => {
+                (reactFlowInstance as MutableRefObject<ReactFlowInstance>).current = instance;
+                onReactFlowInit?.(instance);
+              }}
+              snapToGrid={true}
+              snapGrid={[5, 5]}
+              nodeTypes={nodeTypes}
+              edgeTypes={edgeTypes}
+              onDrop={onDrop}
+              onDragOver={onDragOver}
+              onConnect={onConnect}
+              isValidConnection={isValidConnection}
+              proOptions={reactFlowProOptions}
+              nodesConnectable={!disabled}
+              nodesDraggable={!disabled}
+              edgesUpdatable={!disabled}
+              onNodesChange={graphActions.handleNodesChange}
+              onEdgesChange={graphActions.handleEdgesChange}
+              onNodesDelete={(e) => {
+                e.forEach((node) => {
+                  graphActions.closeTab(node?.id);
+                });
+              }}
+              onKeyDown={(e) => {
+                const [nodes] = nodesState;
+                const [edges] = edgesState;
 
-              if (e.key === 'c' && e.metaKey) {
-                const selectedNodeIds = nodesState[0].filter((n) => n.selected).map(({ id }) => id);
-                if (selectedNodeIds.length === 0) {
-                  return;
-                }
-
-                graphActions.copyNodes(selectedNodeIds);
-                e.preventDefault();
-              } else if (e.key === 'd' && e.metaKey) {
-                if (!disabled) {
-                  const selectedNodeIds = nodes.filter((n) => n.selected).map(({ id }) => id);
+                if (e.key === 'c' && e.metaKey) {
+                  const selectedNodeIds = nodesState[0].filter((n) => n.selected).map(({ id }) => id);
                   if (selectedNodeIds.length === 0) {
                     return;
                   }
 
-                  graphActions.duplicateNodes(selectedNodeIds);
-                }
-                e.preventDefault();
-              } else if (e.key === 'Backspace') {
-                if (!disabled) {
-                  const selectedNodes = nodes.filter((n) => n.selected);
-                  const selectedEdges = edges.filter((e) => e.selected);
+                  graphActions.copyNodes(selectedNodeIds);
+                  e.preventDefault();
+                } else if (e.key === 'd' && e.metaKey) {
+                  if (!disabled) {
+                    const selectedNodeIds = nodes.filter((n) => n.selected).map(({ id }) => id);
+                    if (selectedNodeIds.length === 0) {
+                      return;
+                    }
 
-                  if (selectedNodes.length > 0) {
-                    const length = selectedNodes.length;
-                    const text = length > 1 ? 'nodes' : 'node';
-                    Modal.confirm({
-                      icon: null,
-                      title: `Delete ${text}`,
-                      content: (
-                        <Typography.Text>
-                          Are you sure you want to delete {length > 1 ? `${length} ${text}` : text}?
-                        </Typography.Text>
-                      ),
-                      okButtonProps: { danger: true },
-                      onOk: () => {
-                        if (selectedEdges.length > 0) {
-                          graphActions.removeEdges(selectedEdges.map((e) => e.id));
-                        }
-                        graphActions.removeNodes(selectedNodes.map((n) => n.id));
-                      },
-                    });
-                  } else if (selectedEdges.length > 0) {
-                    graphActions.removeEdges(selectedEdges.map((e) => e.id));
+                    graphActions.duplicateNodes(selectedNodeIds);
                   }
+                  e.preventDefault();
+                } else if (e.key === 'Backspace') {
+                  if (!disabled) {
+                    const selectedNodes = nodes.filter((n) => n.selected);
+                    const selectedEdges = edges.filter((e) => e.selected);
+
+                    if (selectedNodes.length > 0) {
+                      const length = selectedNodes.length;
+                      const text = length > 1 ? 'nodes' : 'node';
+                      Modal.confirm({
+                        icon: null,
+                        title: `Delete ${text}`,
+                        content: (
+                          <Typography.Text>
+                            Are you sure you want to delete {length > 1 ? `${length} ${text}` : text}?
+                          </Typography.Text>
+                        ),
+                        okButtonProps: { danger: true },
+                        onOk: () => {
+                          if (selectedEdges.length > 0) {
+                            graphActions.removeEdges(selectedEdges.map((e) => e.id));
+                          }
+                          graphActions.removeNodes(selectedNodes.map((n) => n.id));
+                        },
+                      });
+                    } else if (selectedEdges.length > 0) {
+                      graphActions.removeEdges(selectedEdges.map((e) => e.id));
+                    }
+                  }
+                  e.stopPropagation();
+                  e.preventDefault();
                 }
-                e.stopPropagation();
-                e.preventDefault();
-              }
-            }}
-            onEdgeMouseEnter={(_, edge) => graphActions.setHoveredEdgeId(edge.id)}
-            onEdgeMouseLeave={() => graphActions.setHoveredEdgeId(null)}
-          >
-            <Controls showInteractive={false} />
-            <Background color='var(--grl-color-border)' gap={20} />
-          </ReactFlow>
+              }}
+              onEdgeMouseEnter={(_, edge) => graphActions.setHoveredEdgeId(edge.id)}
+              onEdgeMouseLeave={() => graphActions.setHoveredEdgeId(null)}
+            >
+              <Controls showInteractive={false}>
+                <ControlButton onClick={() => graphActions.toggleCompactMode()}>
+                  <CompressOutlined />
+                </ControlButton>
+              </Controls>
+              <Background color='var(--grl-color-border)' gap={20} />
+            </ReactFlow>
+          </div>
         </div>
       </div>
     </div>

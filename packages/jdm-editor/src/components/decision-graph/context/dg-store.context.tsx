@@ -73,6 +73,8 @@ export type DecisionGraphStoreType = {
     onPanelsChange?: (val?: string) => void;
 
     simulate?: Simulation;
+
+    compactMode?: boolean;
   };
 
   references: {
@@ -99,12 +101,16 @@ export type DecisionGraphStoreType = {
     setEdges: (edges: DecisionEdge[]) => void;
     addEdges: (edge: DecisionEdge[]) => void;
     removeEdges: (ids: string[]) => void;
+    removeEdgeByHandleId: (handleId: string) => void;
     setHoveredEdgeId: (edgeId: string | null) => void;
 
     closeTab: (id: string) => void;
     openTab: (id: string) => void;
 
     setActivePanel: (panel?: string) => void;
+
+    setCompactMode: (mode: boolean) => void;
+    toggleCompactMode: () => void;
   };
 
   listeners: {
@@ -150,6 +156,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         customNodes: [],
         activePanel: undefined,
         panels: [],
+        compactMode: localStorage.getItem('jdm-compact-mode') === 'true',
       })),
     [],
   );
@@ -384,6 +391,18 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         stateStore.setState({ decisionGraph: newDecisionGraph });
         listenerStore.getState().onChange?.(newDecisionGraph);
       },
+      removeEdgeByHandleId: (handleId: string) => {
+        if (!handleId) return;
+        const { edgesState } = referenceStore.getState();
+        const { decisionGraph } = stateStore.getState();
+        edgesState?.current?.[1]?.((edges) => edges.filter((e) => e.sourceHandle !== handleId));
+        const newDecisionGraph = produce(decisionGraph, (draft) => {
+          draft.edges = draft.edges.filter((e) => e.sourceHandle !== handleId);
+        });
+
+        stateStore.setState({ decisionGraph: newDecisionGraph });
+        listenerStore.getState().onChange?.(newDecisionGraph);
+      },
       updateNode: (id, updater) => {
         const { decisionGraph } = stateStore.getState();
         const { nodesState } = referenceStore.getState();
@@ -450,6 +469,22 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
           activePanel: panel === undefined ? undefined : (panels || []).find((p) => p.id === panel)?.id,
         };
         listenerStore.getState()?.onPanelsChange?.(panel);
+        stateStore.setState(updatedState);
+      },
+      setCompactMode: (mode: boolean) => {
+        const updatedState: Partial<DecisionGraphStoreType['state']> = {
+          compactMode: mode,
+        };
+        localStorage.setItem('jdm-compact-mode', `${mode}`);
+        stateStore.setState(updatedState);
+      },
+      toggleCompactMode: () => {
+        const { compactMode } = stateStore.getState();
+        const mode = !compactMode;
+        const updatedState: Partial<DecisionGraphStoreType['state']> = {
+          compactMode: mode,
+        };
+        localStorage.setItem('jdm-compact-mode', `${mode}`);
         stateStore.setState(updatedState);
       },
     }),
