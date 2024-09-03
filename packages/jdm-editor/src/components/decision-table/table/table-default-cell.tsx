@@ -1,6 +1,6 @@
 import type { CellContext } from '@tanstack/react-table';
 import React, { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { match, P } from 'ts-pattern';
+import { P, match } from 'ts-pattern';
 
 import { columnIdSelector } from '../../../helpers/components';
 import { AutosizeTextArea } from '../../autosize-text-area';
