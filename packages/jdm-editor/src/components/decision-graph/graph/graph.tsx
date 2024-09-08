@@ -1,4 +1,4 @@
-import { CloseOutlined, CompressOutlined, RightOutlined, WarningOutlined } from '@ant-design/icons';
+import { CloseOutlined, CompressOutlined, LeftOutlined, WarningOutlined } from '@ant-design/icons';
 import { Button, Modal, Tooltip, Typography, message } from 'antd';
 import clsx from 'clsx';
 import React, { type MutableRefObject, forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
@@ -315,35 +315,13 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
             style={{
               position: 'absolute',
               top: 8,
-              left: 8,
+              right: 8,
               zIndex: 1,
             }}
           >
             <Tooltip placement='right' title='Components'>
-              <Button icon={<RightOutlined />} onClick={() => setComponentsOpened(true)} />
+              <Button icon={<LeftOutlined />} onClick={() => setComponentsOpened(true)} />
             </Tooltip>
-          </div>
-        )}
-        {!disabled && componentsOpened && (
-          <div className={'grl-dg__aside__menu'}>
-            <>
-              <div className={'grl-dg__aside__menu__heading'}>
-                <div className={'grl-dg__aside__menu__heading__text'}>
-                  <Typography.Text strong style={{ marginBottom: 0 }}>
-                    Components
-                  </Typography.Text>
-                </div>
-                <Button
-                  type={'text'}
-                  size='small'
-                  icon={<CloseOutlined />}
-                  onClick={() => setComponentsOpened(false)}
-                ></Button>
-              </div>
-              <div className={'grl-dg__aside__menu__content'}>
-                <GraphComponents inputDisabled={hasInputNode} disabled={disabled} />
-              </div>
-            </>
           </div>
         )}
         <div className={'content-wrapper'}>
@@ -443,6 +421,28 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
             </ReactFlow>
           </div>
         </div>
+        {!disabled && componentsOpened && (
+          <div className={'grl-dg__aside__menu'}>
+            <>
+              <div className={'grl-dg__aside__menu__heading'}>
+                <div className={'grl-dg__aside__menu__heading__text'}>
+                  <Typography.Text strong style={{ marginBottom: 0 }}>
+                    Components
+                  </Typography.Text>
+                </div>
+                <Button
+                  type={'text'}
+                  size='small'
+                  icon={<CloseOutlined />}
+                  onClick={() => setComponentsOpened(false)}
+                ></Button>
+              </div>
+              <div className={'grl-dg__aside__menu__content'}>
+                <GraphComponents inputDisabled={hasInputNode} disabled={disabled} />
+              </div>
+            </>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 .grl-dn {
-  --node-border-radius: 8px;
+  --node-border-radius: 4px;
   --node-horizontal-padding: 12px;
   --node-color: var(--grl-color-primary);
 
@@ -61,17 +61,22 @@
     }
   }
 
+  &--list {
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid var(--grl-color-border);
+  }
+
   &__header {
     display: grid;
-    padding: 4px var(--node-horizontal-padding);
-    gap: 8px;
+    padding: 4px 8px;
+    gap: 0;
     grid-template-columns: min-content 1fr min-content;
     align-items: center;
     box-sizing: border-box;
-    height: 60px;
+    height: 40px;
 
     &.compact {
-      height: 40px;
       padding: 4px 8px;
     }
 
@@ -80,22 +85,13 @@
       justify-content: center;
       align-items: center;
 
-      font-size: 24px;
-      border-radius: 4px;
-      padding: 6px;
-      background-color: var(--node-color);
-      color: white;
       height: 26px;
       width: 26px;
-
-      &.compact {
-        height: 16px;
-        width: 16px;
-        font-size: 16px;
-      }
-
-      //background-color: #e6f4ff;
-      //color: black;
+      border-radius: 2px;
+      font-size: 16px;
+      color: white;
+      background-color: var(--node-color);
+      margin-right: 2px;
     }
 
     &__text {

@@ -15,11 +15,11 @@ import { NodeKind } from '../nodes/specifications/specification-types';
 
 const DecisionContentType = 'application/vnd.gorules.decision';
 
-export type GraphAsideProps = {
+export type GraphSideToolbarProps = {
   //
 };
 
-export const GraphAside: React.FC<GraphAsideProps> = () => {
+export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
   const decisionGraphRaw = useDecisionGraphRaw();
   const fileInput = useRef<HTMLInputElement>(null);
   const excelFileInput = useRef<HTMLInputElement>(null);

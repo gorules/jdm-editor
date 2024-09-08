@@ -6,6 +6,7 @@ import { P, match } from 'ts-pattern';
 import { defaultFunctionValue } from '../../../function/helpers/libs';
 import { useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
 import { GraphNode } from '../graph-node';
+import { ORANGE_COLOR } from './colors';
 import type { NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
 
@@ -21,6 +22,7 @@ export const functionSpecification: NodeSpecification<NodeFunctionData> = {
   displayName: 'Function v2',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/functions',
   shortDescription: 'Javascript lambda',
+  color: ORANGE_COLOR,
   generateNode: ({ index }) => ({
     name: `function${index}`,
     content: {

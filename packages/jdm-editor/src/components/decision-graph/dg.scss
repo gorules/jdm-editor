@@ -354,9 +354,9 @@
     &__menu {
       background-color: var(--grl-color-bg-container);
       width: 260px;
-      min-width: 220px;
+      min-width: 260px;
       height: 100%;
-      border-right: 1px solid var(--grl-color-border);
+      border-left: 1px solid var(--grl-color-border);
       display: flex;
       flex-direction: column;
 
@@ -385,8 +385,6 @@
         flex-grow: 1;
         display: flex;
         flex-direction: column;
-        gap: 16px;
-        padding: 1rem;
 
         &__search {
           border-left: none;
@@ -400,14 +398,6 @@
           z-index: 1;
         }
 
-        .divider {
-          grid-column: 1 / -1;
-          height: 1px;
-          background-color: var(--grl-color-border);
-          margin-top: 0.25rem;
-          margin-bottom: 0.25rem;
-        }
-
         .draggable-component {
           cursor: grab;
           transform: translate(0);
@@ -417,7 +407,7 @@
             user-select: none;
 
             .grl-dn {
-              background-color: var(--grl-color-bg-container-disabled);
+              color: var(--grl-color-bg-container-disabled);
             }
 
             .grl-dn__header__icon {
@@ -579,7 +569,7 @@
   &__handle-left {
     z-index: 20;
     // TODO: fix size
-    top: 30px;
+    top: 20px;
 
     &.compact {
       top: 20px;
@@ -588,7 +578,7 @@
 
   &__handle-right {
     z-index: 20;
-    top: 30px;
+    top: 20px;
 
     &.compact {
       top: 20px;
@@ -597,7 +587,7 @@
 }
 
 .switch {
-  width: 240px;
+  width: 220px;
   height: auto;
   padding: 0;
   border-radius: 4px;
@@ -679,7 +669,7 @@
         position: relative;
         display: flex;
         flex-direction: row;
-        padding: 7px var(--node-horizontal-padding);
+        padding: 4px var(--node-horizontal-padding);
 
         &__action {
           font-size: 12px;

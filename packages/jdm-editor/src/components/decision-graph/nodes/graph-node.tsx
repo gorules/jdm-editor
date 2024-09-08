@@ -93,7 +93,7 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
   ].filter((i) => i !== false);
 
   return (
-    <div className={clsx('grl-graph-node', className)} style={{ minWidth: 250 }}>
+    <div className={clsx('grl-graph-node', className)} style={{ minWidth: 220, maxWidth: 220 }}>
       {handleLeft && (
         <Handle
           className={clsx('grl-graph-node__handle-left', compactMode && 'compact')}
