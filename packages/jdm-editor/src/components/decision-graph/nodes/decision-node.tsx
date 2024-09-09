@@ -11,6 +11,7 @@ export type DecisionNodeProps = {
   name?: string;
   icon: React.ReactNode;
   type: React.ReactNode;
+  helper?: React.ReactNode;
   disabled?: boolean;
   isSelected?: boolean;
   children?: React.ReactNode;
@@ -39,6 +40,7 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
   status,
   compactMode,
   listMode,
+  helper,
 }) => {
   const { token } = theme.useToken();
   const [contentEditing, setContentEditing] = useState(false);
@@ -77,6 +79,7 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
           <CloseOutlined />
         </div>
       )}
+      {status !== 'error' && helper && <div className={clsx('grl-dn__status-icon')}>{helper}</div>}
       <div className={clsx('grl-dn__header', compactMode && 'compact')}>
         <div className={clsx('grl-dn__header__icon', compactMode && 'compact')}>{icon}</div>
         <div className='grl-dn__header__text'>

@@ -31,6 +31,7 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
   specification,
   name,
   displayError,
+  helper,
   ...decisionNodeProps
 }) => {
   const graphActions = useDecisionGraphActions();
@@ -109,6 +110,7 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
         icon={specification.icon}
         color={specification.color}
         type={specification.displayName}
+        helper={helper}
         name={name}
         status={match([nodeTrace, nodeError, displayError])
           .with([P._, P._, true], () => 'error' as const)
