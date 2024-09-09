@@ -1,6 +1,6 @@
 .grl-dn {
   --node-border-radius: 4px;
-  --node-horizontal-padding: 12px;
+  --node-horizontal-padding: 8px;
   --node-color: var(--grl-color-primary);
 
   display: flex;
@@ -69,15 +69,18 @@
 
   &__header {
     display: grid;
-    padding: 4px 8px;
+    //padding: 8px 12px;
+    padding: 8px;
     gap: 0;
     grid-template-columns: min-content 1fr min-content;
     align-items: center;
     box-sizing: border-box;
+    //height: 50px;
     height: 40px;
 
     &.compact {
-      padding: 4px 8px;
+      height: 40px;
+      padding: 8px;
     }
 
     &__icon {
@@ -85,13 +88,24 @@
       justify-content: center;
       align-items: center;
 
-      height: 26px;
-      width: 26px;
-      border-radius: 2px;
+      height: 24px;
+      width: 24px;
       font-size: 16px;
+
+      //height: 28px;
+      //width: 28px;
+      //font-size: 20px;
+
+      border-radius: 2px;
       color: white;
       background-color: var(--node-color);
       margin-right: 2px;
+
+      &.compact {
+        height: 24px;
+        width: 24px;
+        font-size: 16px;
+      }
     }
 
     &__text {
@@ -137,7 +151,7 @@
   }
 
   &__body {
-    padding: 16px var(--node-horizontal-padding);
+    padding: var(--node-horizontal-padding);
     border-top: 1px solid var(--grl-color-border);
 
     &--no-footer {

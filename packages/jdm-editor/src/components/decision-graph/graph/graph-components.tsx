@@ -161,8 +161,8 @@ const DragDecisionNode: React.FC<
     <div className={clsx('draggable-component')} draggable={!disabled} {...props}>
       <div style={{ pointerEvents: 'none' }}>
         <DecisionNode
-          compactMode={true}
-          listMode={true}
+          listMode
+          compactMode
           color={specification.color}
           icon={specification.icon}
           name={specification.displayName as string}

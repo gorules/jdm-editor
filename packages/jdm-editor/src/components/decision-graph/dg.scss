@@ -568,7 +568,7 @@
 .grl-graph-node {
   &__handle-left {
     z-index: 20;
-    // TODO: fix size
+    //top: 25px;
     top: 20px;
 
     &.compact {
@@ -578,6 +578,7 @@
 
   &__handle-right {
     z-index: 20;
+    //top: 25px;
     top: 20px;
 
     &.compact {
