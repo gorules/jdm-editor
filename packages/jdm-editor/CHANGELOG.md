@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.15.1](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.15.0...@gorules/jdm-editor@1.15.1) (2024-09-11)
+
+### Bug Fixes
+
+- code editor type in decision table ([#81](https://github.com/gorules/jdm-editor/issues/81)) ([91e082d](https://github.com/gorules/jdm-editor/commit/91e082d4f395ce986ecbc873b01cecdc2b35c24f))
+- use correct value prop for boolean fields ([#83](https://github.com/gorules/jdm-editor/issues/83)) ([e5993f5](https://github.com/gorules/jdm-editor/commit/e5993f55723d11407b8f79fc61979454cdb565dd)), closes [#79](https://github.com/gorules/jdm-editor/issues/79)
+
 # [1.15.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.14.0...@gorules/jdm-editor@1.15.0) (2024-08-30)
 
 ### Features
