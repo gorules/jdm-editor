@@ -1,6 +1,6 @@
 import type { CellContext } from '@tanstack/react-table';
 import React, { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { match } from 'ts-pattern';
+import { P, match } from 'ts-pattern';
 
 import { columnIdSelector } from '../../../helpers/components';
 import { AutosizeTextArea } from '../../autosize-text-area';
@@ -119,8 +119,8 @@ const TableInputCell: React.FC<TableCellProps> = ({ column, value, onChange, dis
     <LocalCodeEditor
       ref={textareaRef as any}
       id={id}
-      type={match(column.colType)
-        .with('input', () => 'unary' as const)
+      type={match(column)
+        .with({ colType: 'input', field: P.string }, () => 'unary' as const)
         .otherwise(() => 'standard' as const)}
       className='grl-dt__cell__input'
       maxRows={3}

@@ -41,7 +41,6 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
   const [contentEditing, setContentEditing] = useState(false);
   const nameRef = useRef<HTMLInputElement>(null);
 
-  console.log(compactMode);
   useEffect(() => {
     if (nameRef.current && contentEditing) {
       nameRef.current.value = name as string;

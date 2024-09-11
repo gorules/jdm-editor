@@ -192,6 +192,7 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
           className,
         )}
         style={{ '--editorMaxRows': maxRows } as any}
+        data-type={type}
         {...props}
       />
     );
