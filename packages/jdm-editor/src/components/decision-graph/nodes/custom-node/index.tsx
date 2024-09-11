@@ -166,11 +166,16 @@ export const createJdmNode = <
                         <Typography.Text style={{ fontSize: token.fontSizeSM }}>{label}</Typography.Text>
                       ));
 
+                    const valuePropName = match({ control })
+                      .with({ control: 'bool' }, () => 'checked')
+                      .otherwise(() => undefined);
+
                     return (
                       <Form.Item
                         key={name}
                         name={name as string}
                         label={outerLabel}
+                        valuePropName={valuePropName}
                         style={{
                           marginBottom: 4,
                         }}

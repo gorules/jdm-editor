@@ -160,6 +160,60 @@ export const defaultGraphCustomNode = {
   ],
 };
 
+export const defaultGraphInputsFormCustomNode = {
+  nodes: [
+    {
+      id: 'ca98730e-a40f-4601-98cc-b5a57429596d',
+      type: 'inputNode',
+      position: {
+        x: 70,
+        y: 250,
+      },
+      name: 'Request',
+    },
+    {
+      id: 'c5e747fe-b74b-4b74-9fd0-bfd7d67007c3',
+      type: 'outputNode',
+      position: {
+        x: 675,
+        y: 250,
+      },
+      name: 'Response',
+    },
+    {
+      id: 'a70ede61-ba67-46fb-af25-c2d22afb2f0e',
+      type: 'customNode',
+      name: 'inputsNode1',
+      position: {
+        x: 375,
+        y: 250,
+      },
+      content: {
+        kind: 'inputsNode',
+        config: {
+          'hello.nested.something': 'My',
+          'second': 'Name',
+          'checkbox': true,
+        },
+      },
+    },
+  ],
+  edges: [
+    {
+      id: 'd306fcd9-5d16-4f15-8677-c59098db5bfe',
+      sourceId: 'ca98730e-a40f-4601-98cc-b5a57429596d',
+      type: 'edge',
+      targetId: 'a70ede61-ba67-46fb-af25-c2d22afb2f0e',
+    },
+    {
+      id: 'a1a64d21-4248-45cd-8502-30d47ac685d0',
+      sourceId: 'a70ede61-ba67-46fb-af25-c2d22afb2f0e',
+      type: 'edge',
+      targetId: 'c5e747fe-b74b-4b74-9fd0-bfd7d67007c3',
+    },
+  ],
+};
+
 export const defaultGraphUnknownNode = {
   nodes: [
     {

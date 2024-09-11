@@ -7,7 +7,12 @@ import React, { useRef, useState } from 'react';
 import type { PanelType } from './context/dg-store.context';
 import { DecisionGraph } from './dg';
 import { GraphSimulator } from './dg-simulator';
-import { defaultGraph, defaultGraphCustomNode, defaultGraphUnknownNode } from './dg.stories-values';
+import {
+  defaultGraph,
+  defaultGraphCustomNode,
+  defaultGraphInputsFormCustomNode,
+  defaultGraphUnknownNode,
+} from './dg.stories-values';
 import type { GraphRef } from './graph/graph';
 import { createJdmNode } from './nodes/custom-node';
 import { GraphNode } from './nodes/graph-node';
@@ -182,6 +187,30 @@ export const CustomNode: Story = {
   render: (args) => {
     const ref = useRef<GraphRef>(null);
     const [value, setValue] = useState<any>(defaultGraphCustomNode);
+
+    return (
+      <div
+        style={{
+          height: '100%',
+        }}
+      >
+        <DecisionGraph
+          customNodes={customNodes}
+          {...args}
+          ref={ref}
+          value={value}
+          onChange={(val) => setValue(val)}
+          components={components}
+        />
+      </div>
+    );
+  },
+};
+
+export const InputFormCustomNode: Story = {
+  render: (args) => {
+    const ref = useRef<GraphRef>(null);
+    const [value, setValue] = useState<any>(defaultGraphInputsFormCustomNode);
 
     return (
       <div
