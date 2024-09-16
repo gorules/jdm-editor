@@ -97,7 +97,7 @@ export const DecisionTableCommandBar: React.FC = () => {
           >
             Import Excel
           </Button>
-          {cursor && (
+          {cursor && !disabled && (
             <>
               <Divider
                 type={'vertical'}
