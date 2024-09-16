@@ -46,7 +46,6 @@ export type DecisionGraphProps = {
   onChange?: (val: DecisionGraphType) => void;
   manager?: DragDropManager;
   reactFlowProOptions?: ProOptions;
-  defaultOpenMenu?: boolean;
   onReactFlowInit?: () => void;
 };
 ```

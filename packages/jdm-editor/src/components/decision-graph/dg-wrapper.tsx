@@ -10,7 +10,7 @@ import { GraphPanel } from './dg-panel';
 import './dg.scss';
 import type { GraphRef } from './graph/graph';
 import { Graph } from './graph/graph';
-import { GraphAside, type GraphAsideProps } from './graph/graph-aside';
+import { GraphSideToolbar } from './graph/graph-side-toolbar';
 import { GraphTabs } from './graph/graph-tabs';
 import { TabDecisionTable } from './graph/tab-decision-table';
 import { TabExpression } from './graph/tab-expression';
@@ -18,11 +18,10 @@ import { TabFunction } from './graph/tab-function';
 
 export type DecisionGraphWrapperProps = {
   reactFlowProOptions?: ProOptions;
-  defaultOpenMenu?: GraphAsideProps['defaultOpenMenu'];
 };
 
 export const DecisionGraphWrapper = React.memo(
-  forwardRef<GraphRef, DecisionGraphWrapperProps>(({ reactFlowProOptions, defaultOpenMenu }, ref) => {
+  forwardRef<GraphRef, DecisionGraphWrapperProps>(({ reactFlowProOptions }, ref) => {
     const [disableTabs, setDisableTabs] = useState(false);
     const hasActiveNode = useDecisionGraphState(({ decisionGraph, activeTab }) => {
       return (decisionGraph?.nodes ?? []).some((node) => node.id === activeTab);
@@ -30,7 +29,7 @@ export const DecisionGraphWrapper = React.memo(
 
     return (
       <>
-        <GraphAside defaultOpenMenu={defaultOpenMenu} />
+        <GraphSideToolbar />
         <div className={'grl-dg__graph'}>
           <GraphTabs disabled={disableTabs} />
           <Graph

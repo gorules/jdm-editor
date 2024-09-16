@@ -8,6 +8,7 @@ import { P, match } from 'ts-pattern';
 import { LocalCodeEditor } from '../../../code-editor/local-ce';
 import { useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
 import { GraphNode } from '../graph-node';
+import { PURPLE_COLOR } from './colors';
 import type { MinimalNodeProps, NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
 
@@ -28,6 +29,7 @@ export const switchSpecification: NodeSpecification<NodeSwitchData> = {
   displayName: 'Switch',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/switch',
   shortDescription: 'Conditional branching',
+  color: PURPLE_COLOR,
   generateNode: ({ index }) => ({
     name: `switch${index}`,
     content: {

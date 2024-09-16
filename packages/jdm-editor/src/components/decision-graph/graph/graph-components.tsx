@@ -1,4 +1,4 @@
-import { Divider, Input, Typography } from 'antd';
+import { Input } from 'antd';
 import clsx from 'clsx';
 import React, { useCallback, useMemo, useState } from 'react';
 import type { XYPosition } from 'reactflow';
@@ -108,18 +108,6 @@ export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inp
               () =>
                 groups['core']?.length > 0 && (
                   <React.Fragment key={group}>
-                    <Divider orientationMargin={4} style={{ margin: '4px 0 -4px 0' }} orientation='left' plain>
-                      <Typography.Text
-                        type='secondary'
-                        strong
-                        style={{
-                          fontSize: 12,
-                          textTransform: 'uppercase',
-                        }}
-                      >
-                        Core
-                      </Typography.Text>
-                    </Divider>
                     {(groups['core'] || []).map((node) => (
                       <React.Fragment key={'kind' in node ? (node.kind as string) : node.type}>
                         <DragDecisionNode
@@ -133,9 +121,6 @@ export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inp
                               : onDragStart(event, 'customNode', 'kind' in node ? (node.kind as string) : '')
                           }
                         />
-                        {node.type === NodeKind.Output && (
-                          <Divider style={{ margin: '4px 0' }} orientation='left' plain />
-                        )}
                       </React.Fragment>
                     ))}
                   </React.Fragment>
@@ -145,18 +130,6 @@ export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inp
               (group) =>
                 groups[group]?.length > 0 && (
                   <React.Fragment key={group}>
-                    <Divider orientationMargin={4} style={{ margin: '4px 0 -4px 0' }} orientation='left' plain>
-                      <Typography.Text
-                        type='secondary'
-                        strong
-                        style={{
-                          fontSize: 12,
-                          textTransform: 'uppercase',
-                        }}
-                      >
-                        {group}
-                      </Typography.Text>
-                    </Divider>
                     {(groups?.[group] || []).map((customNode) => (
                       <DragDecisionNode
                         key={'kind' in customNode ? (customNode.kind as string) : customNode.type}
@@ -188,6 +161,8 @@ const DragDecisionNode: React.FC<
     <div className={clsx('draggable-component')} draggable={!disabled} {...props}>
       <div style={{ pointerEvents: 'none' }}>
         <DecisionNode
+          listMode
+          compactMode
           color={specification.color}
           icon={specification.icon}
           name={specification.displayName as string}

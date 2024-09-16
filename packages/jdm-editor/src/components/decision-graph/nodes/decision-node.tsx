@@ -5,11 +5,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { match } from 'ts-pattern';
 
 import './decision-node.scss';
+import { PRIMARY_BLUE_COLOR } from './specifications/colors';
 
 export type DecisionNodeProps = {
   name?: string;
   icon: React.ReactNode;
   type: React.ReactNode;
+  helper?: React.ReactNode;
   disabled?: boolean;
   isSelected?: boolean;
   children?: React.ReactNode;
@@ -20,6 +22,7 @@ export type DecisionNodeProps = {
   menuItems?: MenuProps['items'];
   onNameChange?: (name: string) => void;
   compactMode?: boolean;
+  listMode?: boolean;
 };
 
 export const DecisionNode: React.FC<DecisionNodeProps> = ({
@@ -36,6 +39,8 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
   menuItems = [],
   status,
   compactMode,
+  listMode,
+  helper,
 }) => {
   const { token } = theme.useToken();
   const [contentEditing, setContentEditing] = useState(false);
@@ -50,13 +55,18 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
   }, [contentEditing]);
 
   const nodeColor = match(color)
-    .with('primary', () => undefined)
-    .with('secondary', () => '#722ed1')
+    .with('primary', () => PRIMARY_BLUE_COLOR)
     .otherwise((c) => c);
 
   return (
     <div
-      className={clsx('grl-dn', isSelected && `grl-dn--selected`, status && `grl-dn--${status}`)}
+      className={clsx(
+        'grl-dn',
+        compactMode && 'grl-dn--compact',
+        listMode && 'grl-dn--list',
+        isSelected && `grl-dn--selected`,
+        status && `grl-dn--${status}`,
+      )}
       style={
         {
           '--node-color': nodeColor,
@@ -69,6 +79,7 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
           <CloseOutlined />
         </div>
       )}
+      {status !== 'error' && helper && <div className={clsx('grl-dn__status-icon')}>{helper}</div>}
       <div className={clsx('grl-dn__header', compactMode && 'compact')}>
         <div className={clsx('grl-dn__header__icon', compactMode && 'compact')}>{icon}</div>
         <div className='grl-dn__header__text'>
@@ -107,7 +118,7 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
               }}
             />
           )}
-          {!compactMode && (
+          {false && !compactMode && (
             <Typography.Text type='secondary' style={{ fontSize: token.fontSizeSM }}>
               {type}
             </Typography.Text>
@@ -116,7 +127,7 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
         {menuItems.length > 0 && (
           <div className='grl-dn__header__actions'>
             <Dropdown trigger={['click']} overlayStyle={{ minWidth: 250 }} menu={{ items: menuItems }}>
-              <Button type='text' size={compactMode ? 'small' : 'middle'} icon={<MoreOutlined />} />
+              <Button type='text' size={'small'} icon={<MoreOutlined />} />
             </Dropdown>
           </div>
         )}

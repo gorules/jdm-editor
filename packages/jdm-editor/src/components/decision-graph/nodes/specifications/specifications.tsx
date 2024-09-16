@@ -19,7 +19,7 @@ export const nodeSpecification = makeNodeSpecification({
   // @ts-expect-error
   [NodeKind.Output]: outputSpecification,
   [NodeKind.DecisionTable]: decisionTableSpecification,
-  [NodeKind.Function]: functionSpecification,
   [NodeKind.Expression]: expressionSpecification,
+  [NodeKind.Function]: functionSpecification,
   [NodeKind.Switch]: switchSpecification,
 });

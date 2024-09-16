@@ -1,6 +1,6 @@
 .grl-dn {
   --node-border-radius: 8px;
-  --node-horizontal-padding: 12px;
+  --node-horizontal-padding: 8px;
   --node-color: var(--grl-color-primary);
 
   display: flex;
@@ -61,41 +61,34 @@
     }
   }
 
+  &--list {
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid var(--grl-color-border);
+  }
+
   &__header {
     display: grid;
-    padding: 4px var(--node-horizontal-padding);
-    gap: 8px;
+    padding: 4px 8px;
+    gap: 0;
     grid-template-columns: min-content 1fr min-content;
     align-items: center;
     box-sizing: border-box;
-    height: 60px;
-
-    &.compact {
-      height: 40px;
-      padding: 4px 8px;
-    }
+    height: 40px;
 
     &__icon {
       display: flex;
       justify-content: center;
       align-items: center;
 
-      font-size: 24px;
+      height: 28px;
+      width: 28px;
+      font-size: 16px;
+
       border-radius: 4px;
-      padding: 6px;
-      background-color: var(--node-color);
       color: white;
-      height: 26px;
-      width: 26px;
-
-      &.compact {
-        height: 16px;
-        width: 16px;
-        font-size: 16px;
-      }
-
-      //background-color: #e6f4ff;
-      //color: black;
+      background-color: var(--node-color);
+      margin-right: 2px;
     }
 
     &__text {
@@ -141,7 +134,7 @@
   }
 
   &__body {
-    padding: 16px var(--node-horizontal-padding);
+    padding: var(--node-horizontal-padding);
     border-top: 1px solid var(--grl-color-border);
 
     &--no-footer {

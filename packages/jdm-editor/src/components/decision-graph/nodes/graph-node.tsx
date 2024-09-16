@@ -31,6 +31,7 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
   specification,
   name,
   displayError,
+  helper,
   ...decisionNodeProps
 }) => {
   const graphActions = useDecisionGraphActions();
@@ -93,7 +94,7 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
   ].filter((i) => i !== false);
 
   return (
-    <div className={clsx('grl-graph-node', className)} style={{ minWidth: 250 }}>
+    <div className={clsx('grl-graph-node', className)} style={{ minWidth: 220, maxWidth: 220 }}>
       {handleLeft && (
         <Handle
           className={clsx('grl-graph-node__handle-left', compactMode && 'compact')}
@@ -109,6 +110,7 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
         icon={specification.icon}
         color={specification.color}
         type={specification.displayName}
+        helper={helper}
         name={name}
         status={match([nodeTrace, nodeError, displayError])
           .with([P._, P._, true], () => 'error' as const)
