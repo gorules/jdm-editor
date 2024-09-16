@@ -1,5 +1,5 @@
 .grl-dn {
-  --node-border-radius: 4px;
+  --node-border-radius: 8px;
   --node-horizontal-padding: 8px;
   --node-color: var(--grl-color-primary);
 
@@ -69,37 +69,26 @@
 
   &__header {
     display: grid;
-    padding: 8px;
+    padding: 4px 8px;
     gap: 0;
     grid-template-columns: min-content 1fr min-content;
     align-items: center;
     box-sizing: border-box;
     height: 40px;
 
-    &.compact {
-      height: 40px;
-      padding: 8px;
-    }
-
     &__icon {
       display: flex;
       justify-content: center;
       align-items: center;
 
-      height: 24px;
-      width: 24px;
+      height: 28px;
+      width: 28px;
       font-size: 16px;
 
-      border-radius: 2px;
+      border-radius: 4px;
       color: white;
       background-color: var(--node-color);
       margin-right: 2px;
-
-      &.compact {
-        height: 24px;
-        width: 24px;
-        font-size: 16px;
-      }
     }
 
     &__text {

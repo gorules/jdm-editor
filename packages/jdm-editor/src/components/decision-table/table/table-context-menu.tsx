@@ -1,7 +1,6 @@
 import { Dropdown } from 'antd';
 import React from 'react';
 
-import { platform } from '../../../helpers/platform';
 import { SpacedText } from '../../spaced-text';
 import { useDecisionTableActions, useDecisionTableState } from '../context/dt-store.context';
 
@@ -26,14 +25,14 @@ const ContextMenu: React.FC<React.PropsWithChildren> = (props) => {
         items: [
           {
             key: 'addRowAbove',
-            label: <SpacedText left='Add row above' right={platform.shortcut('Ctrl + Up')} />,
+            label: <SpacedText left='Add row above' />,
             onClick: () => {
               if (cursor) tableActions.addRowAbove(cursor?.y);
             },
           },
           {
             key: 'addRowBelow',
-            label: <SpacedText left='Add row below' right={platform.shortcut('Ctrl + Down')} />,
+            label: <SpacedText left='Add row below' />,
             onClick: () => {
               if (cursor) tableActions.addRowBelow(cursor?.y);
             },
@@ -43,7 +42,7 @@ const ContextMenu: React.FC<React.PropsWithChildren> = (props) => {
           },
           {
             key: 'remove',
-            label: <SpacedText left='Remove row' right={platform.shortcut('Ctrl + Backspace')} />,
+            label: <SpacedText left='Remove row' />,
             onClick: () => {
               if (cursor) tableActions.removeRow(cursor?.y);
             },
