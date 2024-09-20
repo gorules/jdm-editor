@@ -5,9 +5,9 @@ declare class HttpResponse {
 }
 
 interface HttpConfig {
-  headers: Record<string, string>;
-  params: Record<string, string>;
-  data: any;
+  headers?: Record<string, string>;
+  params?: Record<string, string>;
+  data?: any;
 }
 
 class Http {
