@@ -58,24 +58,26 @@ export const typeField = StateField.define<TypeField>({
 
 type BuildTypeCompletionParams = {
   kind: any;
+  type?: string;
 };
 
-export const buildTypeCompletion = ({ kind }: BuildTypeCompletionParams): Completion[] => {
+export const buildTypeCompletion = ({ kind, type = 'property' }: BuildTypeCompletionParams): Completion[] => {
   return match(kind)
-    .with({ Object: P.when((t) => typeof t === 'object') }, (t) =>
+    .with({ Object: P._ }, (t) =>
       Object.entries(t.Object as object).map(([k, v]) => ({
         label: k,
-        type: 'property',
+        type,
         boost: 10,
-        detail: match(v)
-          .with(P.string, (s) => s.toLowerCase())
-          .with(
-            P.when((t) => typeof t === 'object'),
-            (t) => Object.keys(t)[0].toLowerCase(),
-          )
-          .otherwise(() => 'unknown'),
+        detail: typeToString(v),
         apply: applyCompletion,
       })),
     )
     .otherwise(() => []);
 };
+
+const typeToString = (type: unknown): string =>
+  match(type)
+    .with(P.string, (s) => s.toLowerCase())
+    .with({ Object: P._ }, () => 'object')
+    .with({ Array: P._ }, (t) => `${typeToString(t.Array)}[]`)
+    .otherwise(() => 'unknown');

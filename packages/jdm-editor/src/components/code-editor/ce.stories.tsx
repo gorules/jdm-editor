@@ -100,6 +100,7 @@ export const AutoComplete: Story = {
       customer: {
         firstName: 'John',
         lastName: 'Doe',
+        tags: ['a', 'b', 'c'],
         groups: [
           { id: 1, name: 'test 1' },
           { id: 2, name: 'test 2' },

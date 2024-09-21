@@ -29,15 +29,10 @@ export const applyCompletion = (view: EditorView, completion: Completion, from: 
         selection: { anchor: from + insert.length - 1 }, // Place the caret inside the parentheses
       });
     })
-    .with('property', () =>
-      view.state.update({
-        changes: { from: from, to: to, insert: completion.label },
-        selection: { anchor: from + completion.label.length },
-      }),
-    )
     .otherwise(() =>
       view.state.update({
         changes: { from: from, to: to, insert: completion.label },
+        selection: { anchor: from + completion.label.length },
       }),
     );
 
@@ -81,7 +76,7 @@ const makeExpressionCompletion =
 
         return {
           from,
-          options: [...buildTypeCompletion({ kind: tField.rootKind }), ...extendedCompletion],
+          options: [...buildTypeCompletion({ type: 'variable', kind: tField.rootKind }), ...extendedCompletion],
         };
       }
       case 'String': {

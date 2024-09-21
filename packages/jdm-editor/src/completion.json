@@ -3,12 +3,7 @@
     "label": "$root",
     "type": "variable",
     "detail": "Root variable",
-    "info": ""
-  },
-  {
-    "label": "$nodes",
-    "type": "variable",
-    "detail": "Nodes variable",
+    "boost": -10,
     "info": ""
   },
   {
@@ -188,7 +183,7 @@
   {
     "label": "duration",
     "type": "function",
-    "detail": "(duration: string) -> Duration",
+    "detail": "(duration: string) -> number",
     "info": "e.g. 1h30min"
   },
   {
