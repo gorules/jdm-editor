@@ -1,9 +1,11 @@
 import type { Diagnostic } from '@codemirror/lint';
 import type { EditorView } from '@codemirror/view';
 import { validateExpression, validateUnaryExpression } from '@gorules/zen-engine-wasm';
+import { renderToString } from 'react-dom/server';
 import { P, match } from 'ts-pattern';
 
 import { codemirror } from '../../../helpers/codemirror';
+import { renderDiagnosticMessage } from './diagnostic';
 import { typeField } from './types';
 import type { WasmWindow } from './wasm';
 
@@ -54,7 +56,7 @@ const lintExpression = (type: string, view: EditorView): Diagnostic[] => {
     .with([P.number, P.number], ([l, r]) => ({ from: l, to: r }))
     .otherwise(() => ({ from: 0, to: view.state.doc.length }));
 
-  const errorMessage = match(error.type)
+  const errorSource = match(error.type)
     .with('parserError', () => 'Parser error')
     .with('lexerError', () => 'Lexer error')
     .with('compilerError', () => 'Compiler error')
@@ -65,8 +67,8 @@ const lintExpression = (type: string, view: EditorView): Diagnostic[] => {
     {
       from: position.from,
       to: position.to,
-      message: errorMessage,
-      source: error.source,
+      message: error.source,
+      source: errorSource,
       severity: 'error',
     },
   ];
@@ -85,13 +87,24 @@ export const zenLinter = (type: string) => {
     const expressionDiagnostics = lintExpression(type, view);
     const typeDiagnostics: Diagnostic[] = tFields.types
       .filter((t) => !!t.error)
-      .map((t) => ({
-        from: t.span[0],
-        to: t.span[1],
-        severity: 'warning',
-        message: t.error as string,
-        source: 'Type check',
-      }));
+      .map((t) => {
+        const diagnostic: Diagnostic = {
+          from: t.span[0],
+          to: t.span[1],
+          severity: 'warning',
+          message: t.error as string,
+          source: 'Type check',
+        };
+
+        diagnostic.renderMessage = (_) => {
+          const element = document.createElement('div');
+          element.innerHTML = renderDiagnosticMessage(diagnostic.message);
+
+          return element;
+        };
+
+        return diagnostic;
+      });
 
     const diagnostics = [...expressionDiagnostics, ...typeDiagnostics];
     if (diagnostics.length === 0) {

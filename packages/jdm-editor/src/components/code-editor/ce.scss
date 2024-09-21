@@ -3,6 +3,12 @@
   --ce-verticalPadding: 4px;
   --ce-horizontalPadding: 11px;
 
+  .cm-diagnosticMessageToken {
+    padding: 2px 5px 3px;
+    border-radius: 5px;
+    background: #2B2D30;
+  }
+
   &.max-rows {
     .cm-editor {
       max-height: calc(var(--editorMaxRows) * var(--ce-lineHeight) + 2 * var(--ce-verticalPadding));
