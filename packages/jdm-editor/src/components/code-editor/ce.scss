@@ -55,6 +55,16 @@
     }
   }
 
+  .cm-editor[data-severity='error'] {
+    background: var(--grl-color-error-bg) !important;
+    border-color: var(--grl-color-error-border) !important;
+  }
+
+  .cm-editor[data-severity='warning'] {
+    background: var(--grl-color-warning-bg) !important;
+    border-color: var(--grl-color-warning-border) !important;
+  }
+
   .cm-scroller {
     line-height: inherit;
   }

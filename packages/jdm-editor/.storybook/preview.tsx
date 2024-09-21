@@ -4,6 +4,11 @@ import * as React from 'react';
 import { useDarkMode } from 'storybook-dark-mode';
 
 import { JdmConfigProvider } from '../src';
+import * as ZenEngineWasm from '@gorules/zen-engine-wasm';
+
+await ZenEngineWasm.default();
+
+(window as any).zenWasm = ZenEngineWasm;
 
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },

@@ -19,6 +19,7 @@ const meta: Meta<typeof CodeEditor> = {
     disabled: { type: 'boolean' },
     placeholder: { type: 'string' },
     type: { control: { type: 'radio' }, options: ['standard', 'template'] },
+    variableType: { control: { type: 'object' } },
   },
   args: {
     maxRows: 3,
@@ -91,6 +92,31 @@ export const NoStyle: Story = {
       </StoryWrapper>
     );
   },
+};
+
+export const AutoComplete: Story = {
+  args: {
+    variableType: {
+      customer: {
+        firstName: 'John',
+        lastName: 'Doe',
+        groups: [
+          { id: 1, name: 'test 1' },
+          { id: 2, name: 'test 2' },
+        ],
+      },
+      cart: {
+        totals: 100,
+        items: [{ id: 1, qty: 2, price: 20 }],
+      },
+      array: [{ a: 10 }, { a: 5 }],
+    },
+  },
+  render: (args) => (
+    <StoryWrapper>
+      <CodeEditor {...args} />
+    </StoryWrapper>
+  ),
 };
 
 export const Debug: Story = {

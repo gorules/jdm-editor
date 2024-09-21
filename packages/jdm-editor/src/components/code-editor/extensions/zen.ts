@@ -16,8 +16,10 @@ import { tags as t } from '@lezer/highlight';
 import { match } from 'ts-pattern';
 
 import completion from '../../../completion.json';
+import { zenLinter } from './linter';
+import { buildTypeCompletion, typeField } from './types';
 
-const applyCompletion = (view: EditorView, completion: Completion, from: number, to: number) => {
+export const applyCompletion = (view: EditorView, completion: Completion, from: number, to: number) => {
   const transaction = match(completion.type)
     .with('function', () => {
       const insert = `${completion.label}()`;
@@ -27,6 +29,12 @@ const applyCompletion = (view: EditorView, completion: Completion, from: number,
         selection: { anchor: from + insert.length - 1 }, // Place the caret inside the parentheses
       });
     })
+    .with('property', () =>
+      view.state.update({
+        changes: { from: from, to: to, insert: completion.label },
+        selection: { anchor: from + completion.label.length },
+      }),
+    )
     .otherwise(() =>
       view.state.update({
         changes: { from: from, to: to, insert: completion.label },
@@ -56,20 +64,84 @@ const makeExpressionCompletion =
     const tree = syntaxTree(context.state);
 
     const word = context.state.wordAt(context.pos);
-    if (!context.explicit && (!word || word.empty)) {
+    const node = tree.resolveInner(context.pos, -1);
+    if (
+      !hasAutoComplete(node) ||
+      (!context.explicit && context.pos === 0) ||
+      (!context.explicit && !word && node.name !== '.')
+    ) {
       return null;
     }
 
-    const node = tree.resolve(context.pos);
-    if (node.name === 'String' || !hasAutoComplete(node)) {
-      return null;
-    }
+    const from = word?.from ?? context.pos;
+    switch (node.name) {
+      case 'Standard':
+      case 'VariableName': {
+        const tField = context.state.field(typeField);
 
-    return {
-      from: word?.from ?? 0,
-      options: extendedCompletion,
-    };
+        return {
+          from,
+          options: [...buildTypeCompletion({ kind: tField.rootKind }), ...extendedCompletion],
+        };
+      }
+      case 'String': {
+        const tField = context.state.field(typeField);
+        const tBase = findStringBase(node);
+        const targetType = tField.types.find((t) => t.span[0] === tBase?.from && t.span[1] === tBase.to);
+        if (!targetType) {
+          return null;
+        }
+
+        return {
+          from: node.from + 1,
+          options: buildTypeCompletion({ kind: targetType.kind }),
+        };
+      }
+      case '.':
+      case 'PropertyName': {
+        const tField = context.state.field(typeField);
+        const tBase = findBase(node);
+        const targetType = tField.types.find((t) => t.span[0] === tBase?.from && t.span[1] === tBase.to);
+        if (!targetType) {
+          return null;
+        }
+
+        return {
+          from,
+          options: buildTypeCompletion({ kind: targetType.kind }),
+        };
+      }
+      default:
+        return null;
+    }
   };
+
+const findBase = (node: SyntaxNode): SyntaxNode | null => {
+  let targetNode = node;
+  while (
+    targetNode.prevSibling &&
+    !['MemberExpression', 'VariableName', 'ArrayExpression', 'CallbackReference', 'CallExpression'].includes(
+      targetNode.prevSibling.name,
+    )
+  ) {
+    targetNode = targetNode.prevSibling;
+  }
+
+  return targetNode.prevSibling ? targetNode.prevSibling : null;
+};
+
+const findStringBase = (node: SyntaxNode): SyntaxNode | null => {
+  if (node.parent?.name !== 'ArrayExpression') {
+    return null;
+  }
+
+  let targetNode = node.parent;
+  while (targetNode.prevSibling && !['MemberExpression', 'VariableName'].includes(targetNode.prevSibling.name)) {
+    targetNode = targetNode.prevSibling;
+  }
+
+  return targetNode.prevSibling ? targetNode.prevSibling : null;
+};
 
 export const completionExtension = () =>
   autocompletion({
@@ -162,5 +234,7 @@ export const zenExtensions = ({ type }: extensionOptions) => [
   completionExtension(),
   hoverExtension(),
   closeBrackets(),
+  zenLinter(type),
+  typeField,
   keymap.of(closeBracketsKeymap),
 ];

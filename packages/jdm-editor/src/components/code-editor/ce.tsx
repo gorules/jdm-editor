@@ -7,6 +7,8 @@ import React, { useEffect, useMemo, useRef } from 'react';
 
 import { composeRefs } from '../../helpers/compose-refs';
 import './ce.scss';
+import { updateTypeEffect } from './extensions/types';
+import type { WasmWindow } from './extensions/wasm';
 import { zenExtensions, zenHighlightDark, zenHighlightLight } from './extensions/zen';
 
 const updateListener = (onChange?: (data: string) => void, onStateChange?: (state: EditorState) => void) =>
@@ -36,7 +38,10 @@ export type CodeEditorProps = {
   fullHeight?: boolean;
   noStyle?: boolean;
   extension?: (params: ExtensionParams) => Extension;
+  variableType?: any;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, 'disabled' | 'onChange'>;
+
+declare const window: WasmWindow;
 
 export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
   (
@@ -52,6 +57,7 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
       onStateChange,
       type = 'standard',
       extension,
+      variableType,
       ...props
     },
     ref,
@@ -180,6 +186,34 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
         effects: compartment.userProvided.reconfigure(extension?.({ type }) ?? []),
       });
     }, [extension, type]);
+
+    useEffect(() => {
+      if (!codeMirror.current || !window.zenWasm) {
+        return;
+      }
+
+      if (variableType === null || variableType === undefined) {
+        codeMirror.current.dispatch({
+          effects: updateTypeEffect.of(null),
+        });
+        return;
+      }
+
+      if (variableType instanceof window.zenWasm.VariableType) {
+        codeMirror.current.dispatch({
+          effects: updateTypeEffect.of(variableType),
+        });
+      } else {
+        const dataType = new window.zenWasm.VariableType(variableType);
+        codeMirror.current.dispatch({
+          effects: updateTypeEffect.of(dataType),
+        });
+
+        return () => {
+          dataType.free();
+        };
+      }
+    }, [variableType]);
 
     return (
       <div

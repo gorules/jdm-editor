@@ -14,7 +14,7 @@ pub fn validate_unary_expression(expression: &str) -> JsValue {
         return JsValue::NULL;
     };
 
-    return JsValue::from_serde(&err).unwrap();
+    JsValue::from_serde(&err).unwrap()
 }
 
 #[wasm_bindgen(js_name = "validateExpression")]
@@ -23,7 +23,7 @@ pub fn validate_expression(expression: &str) -> JsValue {
         return JsValue::NULL;
     };
 
-    return JsValue::from_serde(&err).unwrap();
+    JsValue::from_serde(&err).unwrap()
 }
 
 fn get_unary_error(expression: &str) -> Option<Value> {
@@ -47,7 +47,8 @@ fn get_unary_error(expression: &str) -> Option<Value> {
         Ok(p) => p.unary(),
     };
 
-    let ast = match parser.parse() {
+    let parser_result = parser.parse();
+    match parser_result.error() {
         Err(e) => {
             return serde_json::to_value(IsolateError::ParserError { source: e })
                 .ok()
@@ -57,7 +58,7 @@ fn get_unary_error(expression: &str) -> Option<Value> {
     };
 
     let mut compiler = Compiler::new();
-    if let Err(e) = compiler.compile(ast) {
+    if let Err(e) = compiler.compile(parser_result.root) {
         return serde_json::to_value(IsolateError::CompilerError { source: e })
             .ok()
             .into();
@@ -87,7 +88,8 @@ fn get_error(expression: &str) -> Option<Value> {
         Ok(p) => p.standard(),
     };
 
-    let ast = match parser.parse() {
+    let parser_result = parser.parse();
+    match parser_result.error() {
         Err(e) => {
             return serde_json::to_value(IsolateError::ParserError { source: e })
                 .ok()
@@ -97,7 +99,7 @@ fn get_error(expression: &str) -> Option<Value> {
     };
 
     let mut compiler = Compiler::new();
-    if let Err(e) = compiler.compile(ast) {
+    if let Err(e) = compiler.compile(parser_result.root) {
         return serde_json::to_value(IsolateError::CompilerError { source: e })
             .ok()
             .into();
