@@ -44,6 +44,7 @@ const meta: Meta<typeof Function> = {
     disabled: false,
     defaultValue: defaultFunctionValue,
     trace: exampleTrace as any,
+    inputData: { customer: { firstName: 'John', lastName: 'Doe' } },
   },
   argTypes: {
     value: { table: { disable: true } },

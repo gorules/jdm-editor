@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use gloo_utils::format::JsValueSerdeExt;
 use serde_json::Value;
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -37,6 +38,21 @@ impl JsVariableType {
         let res = is.type_check(source, &self.vt);
         let rr = serde_json::to_value(res);
         JsValue::from_serde(&rr.unwrap_or_default()).unwrap()
+    }
+
+    #[wasm_bindgen(js_name = "calculateReference")]
+    pub fn calculate_reference(&self, source: &str) -> JsVariableType {
+        let mut is = IntelliSense::new();
+        let type_data = is.type_check(source, &self.vt);
+        let Some(vt) = type_data.map(|s| s.first().map(|t| t.kind.clone())).flatten() else {
+            return Self { vt: VariableType::Any }
+        };
+
+        let mut hmap = HashMap::default();
+        hmap.insert("$".to_string(), vt);
+        let ref_object = VariableType::Object(hmap);
+
+        Self { vt: self.vt.merge(&ref_object) }
     }
 
     #[wasm_bindgen(js_name = "typeCheckUnary")]

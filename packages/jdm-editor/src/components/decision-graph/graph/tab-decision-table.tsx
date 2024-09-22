@@ -44,6 +44,7 @@ export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager 
       manager={manager}
       disabled={disabled}
       configurable={configurable}
+      inputData={nodeTrace?.input}
       activeRules={(activeRules || []).filter((id) => !!id)}
     />
   );

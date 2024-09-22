@@ -72,6 +72,7 @@ export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
         onMonacoReady={(monaco) => setMonaco(monaco)}
         value={kind === FunctionKind.Stable ? content.source : content}
         error={nodeError ?? undefined}
+        inputData={nodeTrace?.input}
         onChange={(val) => {
           graphActions.updateNode(id, (draft) => {
             if (kind === FunctionKind.Stable) {

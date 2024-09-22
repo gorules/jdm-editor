@@ -1,3 +1,4 @@
+import type { VariableType } from '@gorules/zen-engine-wasm';
 import equal from 'fast-deep-equal/es6/react';
 import { produce } from 'immer';
 import React, { useMemo } from 'react';
@@ -123,6 +124,10 @@ export type DecisionTableStoreType = {
     minColWidth: number;
     colWidth: number;
 
+    inputData?: unknown;
+    inputVariableType?: VariableType;
+    derivedVariableTypes: Record<string, VariableType>;
+
     inputsSchema?: SchemaSelectProps[];
     outputsSchema?: SchemaSelectProps[];
   };
@@ -184,6 +189,10 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
 
         inputsSchema: undefined,
         outputsSchema: undefined,
+
+        derivedVariableTypes: {},
+        inputVariableType: undefined,
+        inputData: undefined,
       })),
     [],
   );

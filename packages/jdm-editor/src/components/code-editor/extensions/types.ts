@@ -55,7 +55,7 @@ export const typeField = StateField.define<TypeField>({
       root: variableType,
       rootKind: variableType.toJson(),
       types: match(expressionType)
-        .with('unary', () => variableType.typeCheck(source))
+        .with('unary', () => variableType.typeCheckUnary(source))
         .otherwise(() => variableType.typeCheck(source)),
     } satisfies TypeField;
   },

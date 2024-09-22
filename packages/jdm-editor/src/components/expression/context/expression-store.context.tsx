@@ -1,3 +1,4 @@
+import type { VariableType } from '@gorules/zen-engine-wasm';
 import equal from 'fast-deep-equal/es6/react';
 import { produce } from 'immer';
 import React, { useMemo } from 'react';
@@ -32,6 +33,9 @@ export type ExpressionStore = {
   swapRows: (sourceIndex: number, targetIndex: number) => void;
   updateRow: (index: number, update: Partial<Omit<ExpressionEntry, 'id'>>) => void;
   removeRow: (index: number) => void;
+
+  inputData?: unknown;
+  inputVariableType?: VariableType;
 };
 
 type ExpressionStoreProviderProps = {

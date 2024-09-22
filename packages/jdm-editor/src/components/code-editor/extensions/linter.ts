@@ -1,14 +1,9 @@
 import type { Diagnostic } from '@codemirror/lint';
-import type { EditorView } from '@codemirror/view';
-import { validateExpression, validateUnaryExpression } from '@gorules/zen-engine-wasm';
 import { P, match } from 'ts-pattern';
 
 import { codemirror } from '../../../helpers/codemirror';
 import { renderDiagnosticMessage } from './diagnostic';
 import { typeField, updateExpressionTypeEffect, updateVariableTypeEffect } from './types';
-import type { WasmWindow } from './wasm';
-
-declare const window: WasmWindow;
 
 type ExpressionError = {
   type: string;
@@ -36,15 +31,14 @@ const extractPosition = (error: string): [number, number] | number | null => {
   }
 };
 
-const lintExpression = (type: string, view: EditorView): Diagnostic[] => {
-  const value = view.state.doc.toString();
-  if (!value) {
+const lintExpression = (type: string, source: string): Diagnostic[] => {
+  if (!window.zenWasm) {
     return [];
   }
 
   const error: ExpressionError = match(type)
-    .with('standard', () => validateExpression(value))
-    .with('unary', () => validateUnaryExpression(value))
+    .with('standard', () => window.zenWasm!.validateExpression(source))
+    .with('unary', () => window.zenWasm!.validateUnaryExpression(source))
     .otherwise(() => null);
   if (!error) {
     return [];
@@ -53,7 +47,7 @@ const lintExpression = (type: string, view: EditorView): Diagnostic[] => {
   const position = match(extractPosition(error.source))
     .with(P.number, (n) => ({ from: n, to: n }))
     .with([P.number, P.number], ([l, r]) => ({ from: l, to: r }))
-    .otherwise(() => ({ from: 0, to: view.state.doc.length }));
+    .otherwise(() => ({ from: 0, to: source.length }));
 
   const errorSource = match(error.type)
     .with('parserError', () => 'Parser error')
@@ -83,7 +77,12 @@ export const zenLinter = (type: string) => {
       view.dom.setAttribute('data-severity', 'none');
       const tFields = view.state.field(typeField);
 
-      const expressionDiagnostics = lintExpression(type, view);
+      const source = view.state.doc.toString();
+      if (source.trim().length === 0) {
+        return [];
+      }
+
+      const expressionDiagnostics = source ? lintExpression(type, source) : [];
       const typeDiagnostics: Diagnostic[] = tFields.types
         .filter((t) => !!t.error)
         .map((t) => {

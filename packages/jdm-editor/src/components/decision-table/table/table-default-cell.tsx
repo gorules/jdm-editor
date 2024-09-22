@@ -5,7 +5,12 @@ import { P, match } from 'ts-pattern';
 import { columnIdSelector } from '../../../helpers/components';
 import { AutosizeTextArea } from '../../autosize-text-area';
 import { LocalCodeEditor } from '../../code-editor/local-ce';
-import { type TableSchemaItem, useDecisionTableActions, useDecisionTableState } from '../context/dt-store.context';
+import {
+  type TableSchemaItem,
+  useDecisionTableActions,
+  useDecisionTableRaw,
+  useDecisionTableState,
+} from '../context/dt-store.context';
 
 export type TableDefaultCellProps = {
   context: CellContext<Record<string, string>, string>;
@@ -68,9 +73,45 @@ export type TableCellProps = {
   disabled?: boolean;
 };
 
+enum LocalVariableKind {
+  Root,
+  Derived,
+}
+
 const TableInputCell: React.FC<TableCellProps> = ({ column, value, onChange, disabled }) => {
   const id = useMemo(() => crypto.randomUUID(), []);
   const textareaRef = useRef<HTMLTextAreaElement | HTMLDivElement>(null);
+  const raw = useDecisionTableRaw();
+
+  const { inputVariableType, localVariableType } = useDecisionTableState(
+    ({ inputVariableType, derivedVariableTypes }) => ({
+      inputVariableType,
+      localVariableType: match(column)
+        .with({ colType: 'input', field: P.string }, (c) => ({
+          type: LocalVariableKind.Derived,
+          value: derivedVariableTypes[c.field] ?? null,
+        }))
+        .otherwise(() => ({ type: LocalVariableKind.Root, value: inputVariableType })),
+    }),
+  );
+
+  useEffect(() => {
+    if (!inputVariableType || localVariableType.value) {
+      return;
+    }
+
+    if (!column?.field || localVariableType.type !== LocalVariableKind.Derived) {
+      return;
+    }
+
+    const state = raw.stateStore.getState();
+    raw.stateStore.setState({
+      derivedVariableTypes: {
+        ...state.derivedVariableTypes,
+        [column.field]: inputVariableType.calculateReference(column.field),
+      },
+    });
+  }, [inputVariableType, column]);
 
   useEffect(() => {
     if (!textareaRef.current) {
@@ -123,6 +164,7 @@ const TableInputCell: React.FC<TableCellProps> = ({ column, value, onChange, dis
         .with({ colType: 'input', field: P.string }, () => 'unary' as const)
         .otherwise(() => 'standard' as const)}
       className='grl-dt__cell__input'
+      variableType={localVariableType.value}
       maxRows={3}
       value={value}
       disabled={disabled}

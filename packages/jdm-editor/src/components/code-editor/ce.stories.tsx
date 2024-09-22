@@ -7,10 +7,6 @@ import React, { useState } from 'react';
 import { CodeEditor } from './ce';
 
 const meta: Meta<typeof CodeEditor> = {
-  /* 👇 The title prop is optional.
-   * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
-   * to learn how to generate automatic titles
-   */
   title: 'CodeEditor',
   component: CodeEditor,
   argTypes: {
@@ -25,6 +21,17 @@ const meta: Meta<typeof CodeEditor> = {
     maxRows: 3,
     placeholder: 'Type expression...',
     type: 'standard',
+    variableType: {
+      customer: {
+        firstName: 'John',
+        lastName: 'Doe',
+        groups: ['admin'],
+      },
+      cart: {
+        totals: 100,
+        items: [{ id: 1, qty: 2, price: 20 }],
+      },
+    },
   },
 };
 
@@ -94,36 +101,7 @@ export const NoStyle: Story = {
   },
 };
 
-const variableType = {
-  customer: {
-    firstName: 'John',
-    lastName: 'Doe',
-    tags: ['a', 'b', 'c'],
-    groups: [
-      { id: 1, name: 'test 1' },
-      { id: 2, name: 'test 2' },
-    ],
-  },
-  cart: {
-    totals: 100,
-    items: [{ id: 1, qty: 2, price: 20 }],
-  },
-  array: [{ a: 10 }, { a: 5 }],
-};
-
-export const AutoComplete: Story = {
-  args: {
-    variableType,
-  },
-  render: (args) => (
-    <StoryWrapper>
-      <CodeEditor {...args} />
-    </StoryWrapper>
-  ),
-};
-
 export const Debug: Story = {
-  args: { variableType },
   render: (args) => {
     const { token } = theme.useToken();
     const [editorState, setEditorState] = useState('');

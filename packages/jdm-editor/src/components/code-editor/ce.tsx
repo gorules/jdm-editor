@@ -4,11 +4,11 @@ import { EditorView, placeholder as placeholderExt } from '@codemirror/view';
 import { theme } from 'antd';
 import clsx from 'clsx';
 import React, { useEffect, useMemo, useRef } from 'react';
+import { match } from 'ts-pattern';
 
 import { composeRefs } from '../../helpers/compose-refs';
 import './ce.scss';
-import { updateVariableTypeEffect } from './extensions/types';
-import type { WasmWindow } from './extensions/wasm';
+import { updateExpressionTypeEffect, updateVariableTypeEffect } from './extensions/types';
 import { zenExtensions, zenHighlightDark, zenHighlightLight } from './extensions/zen';
 
 const updateListener = (onChange?: (data: string) => void, onStateChange?: (state: EditorState) => void) =>
@@ -40,8 +40,6 @@ export type CodeEditorProps = {
   extension?: (params: ExtensionParams) => Extension;
   variableType?: any;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, 'disabled' | 'onChange'>;
-
-declare const window: WasmWindow;
 
 export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
   (
@@ -173,7 +171,14 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
       }
 
       codeMirror.current.dispatch({
-        effects: compartment.zenExtension.reconfigure(zenExtensions({ type })),
+        effects: [
+          compartment.zenExtension.reconfigure(zenExtensions({ type })),
+          updateExpressionTypeEffect.of(
+            match(type)
+              .with('unary', () => 'unary' as const)
+              .otherwise(() => 'standard' as const),
+          ),
+        ],
       });
     }, [type]);
 
