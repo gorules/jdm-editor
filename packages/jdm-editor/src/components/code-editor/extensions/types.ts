@@ -17,42 +17,50 @@ type TypeField = {
   source?: string;
   types: ZenType[];
   rootKind: any;
+  expressionType: 'standard' | 'unary';
 };
 
-const defaultTypeField: TypeField = { types: [], rootKind: 'Any' };
+const defaultTypeField: TypeField = { types: [], rootKind: 'Any', expressionType: 'standard' };
 
-export const updateTypeEffect = StateEffect.define<VariableType | null>();
+export const updateVariableTypeEffect = StateEffect.define<VariableType | null>();
+export const updateExpressionTypeEffect = StateEffect.define<'standard' | 'unary'>();
 
 export const typeField = StateField.define<TypeField>({
   create() {
     return defaultTypeField;
   },
   update(value, transaction) {
-    const effect = transaction.effects.find((e) => e.is(updateTypeEffect));
-    if (effect) {
-      const root = effect.value as VariableType | null;
-      const newSource = transaction.newDoc.toString();
-      if (root === null) {
-        return defaultTypeField;
-      }
+    const updateExpressionType = transaction.effects.find((e) => e.is(updateExpressionTypeEffect));
+    const expressionType: TypeField['expressionType'] = match(updateExpressionType)
+      .with({ value: P.string }, (e) => e.value)
+      .otherwise(() => value.expressionType);
 
-      return {
-        root,
-        source: newSource,
-        types: root.typeCheck(newSource),
-        rootKind: root.toJson(),
-      };
+    const updateVariableType = transaction.effects.find((e) => e.is(updateVariableTypeEffect));
+    const variableType: VariableType | null = match(updateVariableType)
+      .with({ value: P._ }, (e) => e.value)
+      .otherwise(() => value.root || null);
+    if (!variableType) {
+      return { ...value, expressionType };
     }
 
-    if (!transaction.docChanged || !value.root) {
-      return value;
+    // Triggered without effect and no changes, bail
+    if (!transaction.docChanged && !updateExpressionType && !updateVariableType) {
+      return { ...value, expressionType };
     }
 
-    const newSource = transaction.newDoc.toString();
-    return { types: value.root.typeCheck(newSource), source: newSource, rootKind: value.rootKind, root: value.root };
+    const source = transaction.newDoc.toString();
+    return {
+      source,
+      expressionType,
+      root: variableType,
+      rootKind: variableType.toJson(),
+      types: match(expressionType)
+        .with('unary', () => variableType.typeCheck(source))
+        .otherwise(() => variableType.typeCheck(source)),
+    } satisfies TypeField;
   },
   compare(a, b) {
-    return a.source === b.source;
+    return a.source === b.source && a.expressionType === b.expressionType && a.root === b.root;
   },
 });
 

@@ -94,24 +94,26 @@ export const NoStyle: Story = {
   },
 };
 
+const variableType = {
+  customer: {
+    firstName: 'John',
+    lastName: 'Doe',
+    tags: ['a', 'b', 'c'],
+    groups: [
+      { id: 1, name: 'test 1' },
+      { id: 2, name: 'test 2' },
+    ],
+  },
+  cart: {
+    totals: 100,
+    items: [{ id: 1, qty: 2, price: 20 }],
+  },
+  array: [{ a: 10 }, { a: 5 }],
+};
+
 export const AutoComplete: Story = {
   args: {
-    variableType: {
-      customer: {
-        firstName: 'John',
-        lastName: 'Doe',
-        tags: ['a', 'b', 'c'],
-        groups: [
-          { id: 1, name: 'test 1' },
-          { id: 2, name: 'test 2' },
-        ],
-      },
-      cart: {
-        totals: 100,
-        items: [{ id: 1, qty: 2, price: 20 }],
-      },
-      array: [{ a: 10 }, { a: 5 }],
-    },
+    variableType,
   },
   render: (args) => (
     <StoryWrapper>
@@ -121,6 +123,7 @@ export const AutoComplete: Story = {
 };
 
 export const Debug: Story = {
+  args: { variableType },
   render: (args) => {
     const { token } = theme.useToken();
     const [editorState, setEditorState] = useState('');

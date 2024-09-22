@@ -1,12 +1,11 @@
 import type { Diagnostic } from '@codemirror/lint';
 import type { EditorView } from '@codemirror/view';
 import { validateExpression, validateUnaryExpression } from '@gorules/zen-engine-wasm';
-import { renderToString } from 'react-dom/server';
 import { P, match } from 'ts-pattern';
 
 import { codemirror } from '../../../helpers/codemirror';
 import { renderDiagnosticMessage } from './diagnostic';
-import { typeField } from './types';
+import { typeField, updateExpressionTypeEffect, updateVariableTypeEffect } from './types';
 import type { WasmWindow } from './wasm';
 
 declare const window: WasmWindow;
@@ -79,44 +78,52 @@ export const zenLinter = (type: string) => {
     return [];
   }
 
-  return codemirror.linter((view) => {
-    view.dom.setAttribute('data-severity', 'none');
+  return codemirror.linter(
+    (view) => {
+      view.dom.setAttribute('data-severity', 'none');
+      const tFields = view.state.field(typeField);
 
-    const tFields = view.state.field(typeField);
+      const expressionDiagnostics = lintExpression(type, view);
+      const typeDiagnostics: Diagnostic[] = tFields.types
+        .filter((t) => !!t.error)
+        .map((t) => {
+          const diagnostic: Diagnostic = {
+            from: t.span[0],
+            to: t.span[1],
+            severity: 'warning',
+            message: t.error as string,
+            source: 'Type check',
+          };
 
-    const expressionDiagnostics = lintExpression(type, view);
-    const typeDiagnostics: Diagnostic[] = tFields.types
-      .filter((t) => !!t.error)
-      .map((t) => {
-        const diagnostic: Diagnostic = {
-          from: t.span[0],
-          to: t.span[1],
-          severity: 'warning',
-          message: t.error as string,
-          source: 'Type check',
-        };
+          diagnostic.renderMessage = (_) => {
+            const element = document.createElement('div');
+            element.innerHTML = renderDiagnosticMessage(diagnostic.message);
 
-        diagnostic.renderMessage = (_) => {
-          const element = document.createElement('div');
-          element.innerHTML = renderDiagnosticMessage(diagnostic.message);
+            return element;
+          };
 
-          return element;
-        };
+          return diagnostic;
+        });
 
-        return diagnostic;
-      });
+      const diagnostics = [...expressionDiagnostics, ...typeDiagnostics];
+      if (diagnostics.length === 0) {
+        return [];
+      }
 
-    const diagnostics = [...expressionDiagnostics, ...typeDiagnostics];
-    if (diagnostics.length === 0) {
-      return [];
-    }
+      if (expressionDiagnostics.length > 0) {
+        view.dom.setAttribute('data-has-error', 'error');
+      } else {
+        view.dom.setAttribute('data-has-error', 'warning');
+      }
 
-    if (expressionDiagnostics.length > 0) {
-      view.dom.setAttribute('data-has-error', 'error');
-    } else {
-      view.dom.setAttribute('data-has-error', 'warning');
-    }
-
-    return diagnostics;
-  });
+      return diagnostics;
+    },
+    {
+      needsRefresh: (update) => {
+        return update.transactions.some((t) =>
+          t.effects.some((effect) => effect.is(updateExpressionTypeEffect) || effect.is(updateVariableTypeEffect)),
+        );
+      },
+    },
+  );
 };

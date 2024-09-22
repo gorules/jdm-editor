@@ -1,7 +1,7 @@
 import * as path from 'path';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
-import wasm from "vite-plugin-wasm";
+import wasm from 'vite-plugin-wasm';
 
 export default defineConfig({
   plugins: [

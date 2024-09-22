@@ -81,8 +81,8 @@ const makeExpressionCompletion =
       }
       case 'String': {
         const tField = context.state.field(typeField);
-        const tBase = findStringBase(node);
-        const targetType = tField.types.find((t) => t.span[0] === tBase?.from && t.span[1] === tBase.to);
+        const tBase = findBaseSpan(node);
+        const targetType = (tField.types ?? []).find((t) => t.span[0] === tBase?.[0] && t.span[1] === tBase[1]);
         if (!targetType) {
           return null;
         }
@@ -95,8 +95,8 @@ const makeExpressionCompletion =
       case '.':
       case 'PropertyName': {
         const tField = context.state.field(typeField);
-        const tBase = findBase(node);
-        const targetType = tField.types.find((t) => t.span[0] === tBase?.from && t.span[1] === tBase.to);
+        const tBase = findBaseSpan(node);
+        const targetType = (tField.types ?? []).find((t) => t.span[0] === tBase?.[0] && t.span[1] === tBase[1]);
         if (!targetType) {
           return null;
         }
@@ -111,31 +111,18 @@ const makeExpressionCompletion =
     }
   };
 
-const findBase = (node: SyntaxNode): SyntaxNode | null => {
-  let targetNode = node;
-  while (
-    targetNode.prevSibling &&
-    !['MemberExpression', 'VariableName', 'ArrayExpression', 'CallbackReference', 'CallExpression'].includes(
-      targetNode.prevSibling.name,
-    )
-  ) {
-    targetNode = targetNode.prevSibling;
+const findBaseSpan = (node: SyntaxNode): [number, number] | null => {
+  let lastNode = node;
+  if (['PropertyExpression', 'PropertyAccess'].includes(lastNode.parent?.name ?? '') && lastNode.parent?.prevSibling) {
+    lastNode = lastNode.parent.prevSibling;
   }
 
-  return targetNode.prevSibling ? targetNode.prevSibling : null;
-};
-
-const findStringBase = (node: SyntaxNode): SyntaxNode | null => {
-  if (node.parent?.name !== 'ArrayExpression') {
-    return null;
+  let firstNode = lastNode;
+  while (firstNode.prevSibling) {
+    firstNode = firstNode.prevSibling;
   }
 
-  let targetNode = node.parent;
-  while (targetNode.prevSibling && !['MemberExpression', 'VariableName'].includes(targetNode.prevSibling.name)) {
-    targetNode = targetNode.prevSibling;
-  }
-
-  return targetNode.prevSibling ? targetNode.prevSibling : null;
+  return [firstNode.from, lastNode.to];
 };
 
 export const completionExtension = () =>
@@ -195,7 +182,7 @@ const zenLanguage = new LanguageSupport(
     parser: zenParser,
     name: 'zen',
     languageData: {
-      closeBrackets: { brackets: ['(', '[', "'", '"', '`'] },
+      closeBrackets: { brackets: ['(', '[', '{', "'", '"', '`'] },
       wordChars: '$',
     },
   }),

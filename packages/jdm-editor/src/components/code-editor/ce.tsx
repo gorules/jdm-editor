@@ -7,7 +7,7 @@ import React, { useEffect, useMemo, useRef } from 'react';
 
 import { composeRefs } from '../../helpers/compose-refs';
 import './ce.scss';
-import { updateTypeEffect } from './extensions/types';
+import { updateVariableTypeEffect } from './extensions/types';
 import type { WasmWindow } from './extensions/wasm';
 import { zenExtensions, zenHighlightDark, zenHighlightLight } from './extensions/zen';
 
@@ -194,19 +194,19 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
 
       if (variableType === null || variableType === undefined) {
         codeMirror.current.dispatch({
-          effects: updateTypeEffect.of(null),
+          effects: updateVariableTypeEffect.of(null),
         });
         return;
       }
 
       if (variableType instanceof window.zenWasm.VariableType) {
         codeMirror.current.dispatch({
-          effects: updateTypeEffect.of(variableType),
+          effects: updateVariableTypeEffect.of(variableType),
         });
       } else {
         const dataType = new window.zenWasm.VariableType(variableType);
         codeMirror.current.dispatch({
-          effects: updateTypeEffect.of(dataType),
+          effects: updateVariableTypeEffect.of(dataType),
         });
 
         return () => {
