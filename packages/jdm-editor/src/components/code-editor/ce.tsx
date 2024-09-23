@@ -4,9 +4,11 @@ import { EditorView, placeholder as placeholderExt } from '@codemirror/view';
 import { theme } from 'antd';
 import clsx from 'clsx';
 import React, { useEffect, useMemo, useRef } from 'react';
+import { match } from 'ts-pattern';
 
 import { composeRefs } from '../../helpers/compose-refs';
 import './ce.scss';
+import { updateExpressionTypeEffect, updateVariableTypeEffect } from './extensions/types';
 import { zenExtensions, zenHighlightDark, zenHighlightLight } from './extensions/zen';
 
 const updateListener = (onChange?: (data: string) => void, onStateChange?: (state: EditorState) => void) =>
@@ -36,6 +38,7 @@ export type CodeEditorProps = {
   fullHeight?: boolean;
   noStyle?: boolean;
   extension?: (params: ExtensionParams) => Extension;
+  variableType?: any;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, 'disabled' | 'onChange'>;
 
 export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
@@ -52,6 +55,7 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
       onStateChange,
       type = 'standard',
       extension,
+      variableType,
       ...props
     },
     ref,
@@ -167,7 +171,14 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
       }
 
       codeMirror.current.dispatch({
-        effects: compartment.zenExtension.reconfigure(zenExtensions({ type })),
+        effects: [
+          compartment.zenExtension.reconfigure(zenExtensions({ type })),
+          updateExpressionTypeEffect.of(
+            match(type)
+              .with('unary', () => 'unary' as const)
+              .otherwise(() => 'standard' as const),
+          ),
+        ],
       });
     }, [type]);
 
@@ -180,6 +191,34 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
         effects: compartment.userProvided.reconfigure(extension?.({ type }) ?? []),
       });
     }, [extension, type]);
+
+    useEffect(() => {
+      if (!codeMirror.current || !window.zenWasm) {
+        return;
+      }
+
+      if (variableType === null || variableType === undefined) {
+        codeMirror.current.dispatch({
+          effects: updateVariableTypeEffect.of(null),
+        });
+        return;
+      }
+
+      if (variableType instanceof window.zenWasm.VariableType) {
+        codeMirror.current.dispatch({
+          effects: updateVariableTypeEffect.of(variableType),
+        });
+      } else {
+        const dataType = new window.zenWasm.VariableType(variableType);
+        codeMirror.current.dispatch({
+          effects: updateVariableTypeEffect.of(dataType),
+        });
+
+        return () => {
+          dataType.free();
+        };
+      }
+    }, [variableType]);
 
     return (
       <div

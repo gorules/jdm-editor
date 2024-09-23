@@ -14,9 +14,10 @@ import './expression.scss';
 export type ExpressionProps = {
   manager?: DragDropManager;
   traceData?: SimulationTraceDataExpression;
+  inputData?: unknown;
 } & ExpressionControllerProps;
 
-export const Expression: React.FC<ExpressionProps> = ({ manager, traceData, ...props }) => {
+export const Expression: React.FC<ExpressionProps> = ({ manager, traceData, inputData, ...props }) => {
   const [_, setMounted] = useState(false);
   const container = useRef<HTMLDivElement>(null);
 
@@ -46,7 +47,7 @@ export const Expression: React.FC<ExpressionProps> = ({ manager, traceData, ...p
           <ExpressionStoreProvider>
             <ExpressionController {...props} />
             <ExpressionList />
-            <SimulateDataSync traceData={traceData} />
+            <SimulateDataSync traceData={traceData} inputData={inputData} />
           </ExpressionStoreProvider>
         </DndProvider>
       )}
@@ -54,7 +55,7 @@ export const Expression: React.FC<ExpressionProps> = ({ manager, traceData, ...p
   );
 };
 
-const SimulateDataSync: React.FC<Pick<ExpressionProps, 'traceData'>> = ({ traceData }) => {
+const SimulateDataSync: React.FC<Pick<ExpressionProps, 'traceData' | 'inputData'>> = ({ traceData, inputData }) => {
   const expressionStoreRaw = useExpressionStoreRaw();
 
   useEffect(() => {
@@ -66,6 +67,22 @@ const SimulateDataSync: React.FC<Pick<ExpressionProps, 'traceData'>> = ({ traceD
 
     expressionStoreRaw.setState({ traceData });
   }, [traceData]);
+
+  useEffect(() => {
+    if (!window.zenWasm) {
+      return;
+    }
+
+    const vt = new window.zenWasm.VariableType(inputData);
+    expressionStoreRaw.setState({
+      inputData,
+      inputVariableType: vt,
+    });
+
+    return () => {
+      vt.free();
+    };
+  }, [inputData]);
 
   return null;
 };

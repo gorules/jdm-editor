@@ -21,6 +21,7 @@ export type FunctionProps = {
   onChange?: (value: string) => void;
   trace?: SimulationTrace<SimulationTraceDataFunction>;
   onMonacoReady?: (monaco: Monaco) => void;
+  inputData?: unknown;
   error?: {
     data: { nodeId: string; source?: string };
   };
@@ -36,6 +37,7 @@ export const Function: React.FC<FunctionProps> = ({
   trace,
   onMonacoReady,
   error,
+  inputData,
 }) => {
   const monaco = useMonaco();
   const mountedRef = useRef(false);
@@ -97,6 +99,21 @@ export const Function: React.FC<FunctionProps> = ({
     setInnerValue(value === undefined ? defaultValue : value);
     mountedRef.current = true;
   }, []);
+
+  useEffect(() => {
+    if (!monaco) return;
+
+    const data = JSON.stringify(inputData) ?? 'any';
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(
+      `
+    type Input = ${data};
+    type Output = Promise<any> | any;
+    
+    type Handler = (input: Input) => Output; 
+    `,
+      'ts:input.d.ts',
+    );
+  }, [monaco, inputData]);
 
   useEffect(() => {
     if (!monaco) {

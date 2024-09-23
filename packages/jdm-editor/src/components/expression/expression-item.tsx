@@ -16,13 +16,14 @@ export type ExpressionItemProps = {
 
 export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, index }) => {
   const expressionRef = useRef<HTMLDivElement>(null);
-  const { updateRow, removeRow, swapRows, disabled, configurable } = useExpressionStore(
-    ({ updateRow, removeRow, swapRows, disabled, configurable }) => ({
+  const { updateRow, removeRow, swapRows, disabled, configurable, inputVariableType } = useExpressionStore(
+    ({ updateRow, removeRow, swapRows, disabled, configurable, inputVariableType }) => ({
       updateRow,
       removeRow,
       swapRows,
       disabled,
       configurable,
+      inputVariableType,
     }),
   );
 
@@ -86,6 +87,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
           disabled={disabled}
           value={expression?.value}
           onChange={(value) => onChange({ value })}
+          variableType={inputVariableType}
         />
         <ResultOverlay expression={expression} />
       </div>

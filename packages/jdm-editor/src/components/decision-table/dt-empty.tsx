@@ -24,6 +24,7 @@ export type DecisionTableEmptyType = {
   cellRenderer?: (props: TableCellProps) => JSX.Element | null | undefined;
   inputsSchema?: SchemaSelectProps[];
   outputsSchema?: SchemaSelectProps[];
+  inputData?: unknown;
   minColWidth?: number;
   colWidth?: number;
   onChange?: (val: DecisionTableType) => void;
@@ -38,6 +39,7 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
   activeRules,
   inputsSchema,
   outputsSchema,
+  inputData,
   colWidth,
   minColWidth,
   cellRenderer,
@@ -84,7 +86,28 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
   useEffect(() => {
     tableActions.setDecisionTable(parseDecisionTable(value === undefined ? defaultValue : value));
     mountedRef.current = true;
+
+    return () => {
+      const { derivedVariableTypes } = stateStore.getState();
+
+      Object.values(derivedVariableTypes).forEach((vt) => {
+        vt.free();
+      });
+    };
   }, []);
+
+  useEffect(() => {
+    if (!window.zenWasm) {
+      return;
+    }
+
+    const vt = new window.zenWasm.VariableType(inputData ?? {});
+    stateStore.setState({ inputVariableType: vt });
+
+    return () => {
+      vt.free();
+    };
+  }, [inputData]);
 
   return null;
 };

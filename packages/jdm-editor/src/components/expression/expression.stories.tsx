@@ -10,6 +10,15 @@ const expressionDefault: ExpressionEntry[] = [
   { id: '3', key: 'customer.purchaseTotals', value: 'sum(map(customer.purchases, #.amount))' },
 ];
 
+const expressionDefaultObject = {
+  customer: {
+    firstName: 'John',
+    lastName: 'Doe',
+    tags: ['premium'],
+    purchases: [{ id: '', amount: 100 }],
+  },
+};
+
 const meta: Meta<typeof Expression> = {
   /* 👇 The title prop is optional.
    * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
@@ -21,10 +30,12 @@ const meta: Meta<typeof Expression> = {
     configurable: true,
     disabled: false,
     defaultValue: expressionDefault,
+    inputData: expressionDefaultObject,
   },
   argTypes: {
     manager: { table: { disable: true } },
     value: { table: { disable: true } },
+    inputData: { control: 'object' },
   },
 };
 

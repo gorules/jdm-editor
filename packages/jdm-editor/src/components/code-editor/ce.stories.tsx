@@ -7,10 +7,6 @@ import React, { useState } from 'react';
 import { CodeEditor } from './ce';
 
 const meta: Meta<typeof CodeEditor> = {
-  /* 👇 The title prop is optional.
-   * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
-   * to learn how to generate automatic titles
-   */
   title: 'CodeEditor',
   component: CodeEditor,
   argTypes: {
@@ -19,11 +15,23 @@ const meta: Meta<typeof CodeEditor> = {
     disabled: { type: 'boolean' },
     placeholder: { type: 'string' },
     type: { control: { type: 'radio' }, options: ['standard', 'template'] },
+    variableType: { control: { type: 'object' } },
   },
   args: {
     maxRows: 3,
     placeholder: 'Type expression...',
     type: 'standard',
+    variableType: {
+      customer: {
+        firstName: 'John',
+        lastName: 'Doe',
+        groups: ['admin'],
+      },
+      cart: {
+        totals: 100,
+        items: [{ id: 1, qty: 2, price: 20 }],
+      },
+    },
   },
 };
 

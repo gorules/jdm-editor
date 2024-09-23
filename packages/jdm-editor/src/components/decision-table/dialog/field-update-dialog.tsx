@@ -6,6 +6,7 @@ import { getPath, recursiveSelect } from '../../../helpers/components';
 import { AutosizeTextArea } from '../../autosize-text-area';
 import { LocalCodeEditor } from '../../code-editor/local-ce';
 import type { ColumnType, TableSchemaItem } from '../context/dt-store.context';
+import { useDecisionTableState } from '../context/dt-store.context';
 
 export type FieldUpdateProps = {
   id?: string;
@@ -20,6 +21,7 @@ export type FieldUpdateProps = {
 
 export const FieldUpdate: React.FC<React.PropsWithChildren<FieldUpdateProps>> = (props) => {
   const { isOpen, onDismiss, onSuccess, field, schema, getContainer } = props;
+  const { inputVariableType } = useDecisionTableState(({ inputVariableType }) => ({ inputVariableType }));
   const [form] = Form.useForm();
 
   const [selectorValue, setSelectorValue] = useState<(string | number)[]>();
@@ -91,7 +93,11 @@ export const FieldUpdate: React.FC<React.PropsWithChildren<FieldUpdateProps>> = 
           <Input />
         </Form.Item>
         <Form.Item name='field' label='Selector' rules={[{ required: props.columnType === 'outputs' }]}>
-          {props.columnType === 'inputs' ? <LocalCodeEditor /> : <AutosizeTextArea maxRows={3} />}
+          {props.columnType === 'inputs' ? (
+            <LocalCodeEditor variableType={inputVariableType} />
+          ) : (
+            <AutosizeTextArea maxRows={3} />
+          )}
         </Form.Item>
         <Form.Item name='defaultValue' label='Default Value'>
           <Input autoComplete='off' />

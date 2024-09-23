@@ -1,12 +1,14 @@
 import { BranchesOutlined, DeleteOutlined, DownOutlined } from '@ant-design/icons';
+import type { VariableType } from '@gorules/zen-engine-wasm';
 import { Button, Dropdown, Popconfirm, Typography } from 'antd';
 import clsx from 'clsx';
-import React, { useLayoutEffect, useMemo, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Handle, Position } from 'reactflow';
 import { P, match } from 'ts-pattern';
 
 import { LocalCodeEditor } from '../../../code-editor/local-ce';
 import { useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
+import type { SimulationTrace, SimulationTraceDataSwitch } from '../../types/simulation.types';
 import { GraphNode } from '../graph-node';
 import { PURPLE_COLOR } from './colors';
 import type { MinimalNodeProps, NodeSpecification } from './specification-types';
@@ -49,7 +51,7 @@ const SwitchNode: React.FC<
   const { content, disabled, nodeTrace, compactMode } = useDecisionGraphState(
     ({ decisionGraph, disabled, simulate, compactMode }) => ({
       nodeTrace: match(simulate)
-        .with({ result: P._ }, ({ result }) => result?.trace?.[id]?.traceData)
+        .with({ result: P._ }, ({ result }) => result?.trace?.[id] as SimulationTrace<SimulationTraceDataSwitch>)
         .otherwise(() => null),
       content: (decisionGraph?.nodes || []).find((n) => n?.id === id)?.content as NodeSwitchData | undefined,
       disabled,
@@ -59,6 +61,20 @@ const SwitchNode: React.FC<
 
   const statements: SwitchStatement[] = content?.statements || [];
   const hitPolicy = content?.hitPolicy || 'first';
+  const [variableType, setVariableType] = useState<VariableType>();
+
+  useEffect(() => {
+    if (!window.zenWasm) {
+      return;
+    }
+
+    const vt = new window.zenWasm.VariableType(nodeTrace?.input ?? undefined);
+    setVariableType(vt);
+
+    return () => {
+      vt.free();
+    };
+  }, [nodeTrace?.input]);
 
   const changeHitPolicy = (hitPolicy: string) => {
     graphActions.updateNode(id, (node) => {
@@ -167,6 +183,7 @@ const SwitchNode: React.FC<
               totalStatements={statements.length}
               disabled={disabled}
               hitPolicy={hitPolicy}
+              variableType={variableType}
               onSetIsDefault={(val) => {
                 graphActions.updateNode(id, (draft) => {
                   const draftStatement = draft.content.statements.find((s: SwitchStatement) => {
@@ -179,7 +196,7 @@ const SwitchNode: React.FC<
                   return draft;
                 });
               }}
-              isActive={match(nodeTrace)
+              isActive={match(nodeTrace?.traceData)
                 .with({ statements: P.array(P._) }, ({ statements }) =>
                   statements.some((s) => typeof s === 'object' && s && 'id' in s && s.id === statement?.id),
                 )
@@ -236,6 +253,7 @@ const SwitchHandle: React.FC<{
   hitPolicy: 'first' | 'collect';
   totalStatements: number;
   index: number;
+  variableType?: VariableType;
 }> = ({
   id,
   value,
@@ -249,6 +267,7 @@ const SwitchHandle: React.FC<{
   onSetIsDefault,
   totalStatements,
   hitPolicy,
+  variableType,
 }) => {
   const [inner, setInner] = useState(value);
   useLayoutEffect(() => {
@@ -334,6 +353,7 @@ const SwitchHandle: React.FC<{
             maxRows={4}
             disabled={disabled}
             onChange={handleChange}
+            variableType={variableType}
           />
         </div>
       )}
@@ -354,7 +374,8 @@ const SwitchHandleCompact: React.FC<{
   hitPolicy: 'first' | 'collect';
   totalStatements: number;
   index: number;
-}> = ({ id, value, onChange, disabled, configurable = true, onDelete, isActive }) => {
+  variableType?: VariableType;
+}> = ({ id, value, onChange, disabled, configurable = true, onDelete, isActive, variableType }) => {
   const [inner, setInner] = useState(value);
   useLayoutEffect(() => {
     if (inner !== value) {
@@ -380,6 +401,7 @@ const SwitchHandleCompact: React.FC<{
           maxRows={4}
           disabled={disabled}
           onChange={handleChange}
+          variableType={variableType}
         />
       </div>
       {!disabled && configurable && (
