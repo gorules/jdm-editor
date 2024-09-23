@@ -16,8 +16,9 @@ import { tags as t } from '@lezer/highlight';
 import { match } from 'ts-pattern';
 
 import completion from '../../../completion.json';
+import { renderDiagnosticMessage } from './diagnostic';
 import { zenLinter } from './linter';
-import { buildTypeCompletion, typeField } from './types';
+import { buildTypeCompletion, typeField, zenKindToString } from './types';
 
 export const applyCompletion = (view: EditorView, completion: Completion, from: number, to: number) => {
   const transaction = match(completion.type)
@@ -39,10 +40,14 @@ export const applyCompletion = (view: EditorView, completion: Completion, from: 
   view.dispatch(transaction);
 };
 
-const extendedCompletion = completion.map((c) => ({
-  ...c,
-  apply: applyCompletion,
-}));
+const extendedCompletion = completion.map(
+  (c) =>
+    ({
+      ...c,
+      detail: c.detail.replaceAll('`', ''),
+      apply: applyCompletion,
+    }) satisfies Completion,
+);
 
 const hasAutoComplete = (n: SyntaxNode | null): boolean => {
   if (!n) {
@@ -81,7 +86,7 @@ const makeExpressionCompletion =
       }
       case 'String': {
         const tField = context.state.field(typeField);
-        const tBase = findBaseSpan(node);
+        const tBase = autoCompleteSpan(node);
         const targetType = (tField.types ?? []).find((t) => t.span[0] === tBase?.[0] && t.span[1] === tBase[1]);
         if (!targetType) {
           return null;
@@ -95,7 +100,7 @@ const makeExpressionCompletion =
       case '.':
       case 'PropertyName': {
         const tField = context.state.field(typeField);
-        const tBase = findBaseSpan(node);
+        const tBase = autoCompleteSpan(node);
         const targetType = (tField.types ?? []).find((t) => t.span[0] === tBase?.[0] && t.span[1] === tBase[1]);
         if (!targetType) {
           return null;
@@ -111,10 +116,24 @@ const makeExpressionCompletion =
     }
   };
 
-const findBaseSpan = (node: SyntaxNode): [number, number] | null => {
+const autoCompleteSpan = (node: SyntaxNode): [number, number] | null => {
   let lastNode = node;
   if (['PropertyExpression', 'PropertyAccess'].includes(lastNode.parent?.name ?? '') && lastNode.parent?.prevSibling) {
     lastNode = lastNode.parent.prevSibling;
+  }
+
+  let firstNode = lastNode;
+  while (firstNode.prevSibling) {
+    firstNode = firstNode.prevSibling;
+  }
+
+  return [firstNode.from, lastNode.to];
+};
+
+const hoverSpan = (node: SyntaxNode): [number, number] | null => {
+  let lastNode = node;
+  if (lastNode.parent && ['PropertyExpression', 'PropertyAccess'].includes(lastNode.parent.name)) {
+    lastNode = lastNode.parent;
   }
 
   let firstNode = lastNode;
@@ -148,7 +167,38 @@ export const hoverExtension = () =>
           const dom = document.createElement('div');
           dom.classList.add('grl-ce-hover-tooltip');
           dom.style.whiteSpace = 'pre';
-          dom.textContent = `${details.label}: ${details.detail}\n\n${details.info}`;
+          dom.innerHTML = renderDiagnosticMessage({
+            text: `<span style="font-size: 12px">${details.info}</span>\n${details.label}: ${details.detail}\n`,
+            className: 'cm-hoverTooltipMessageToken',
+          });
+          return { dom };
+        },
+      };
+    }
+
+    const tree = syntaxTree(view.state);
+    const node = tree.resolveInner(pos, -1);
+
+    const tField = view.state.field(typeField);
+    const tBase = hoverSpan(node);
+    console.log(tBase);
+    const targetType = (tField.types ?? []).find((t) => t.span[0] === tBase?.[0] && t.span[1] === tBase[1]);
+    if (targetType && tBase) {
+      const source = view.state.doc.toString();
+      console.log(source.slice(tBase[0], tBase[1]));
+
+      return {
+        pos: tBase[0],
+        end: tBase[1],
+        above: true,
+        create() {
+          const dom = document.createElement('div');
+          dom.classList.add('grl-ce-hover-tooltip');
+          dom.style.whiteSpace = 'pre';
+          dom.innerHTML = renderDiagnosticMessage({
+            text: `${source.slice(tBase[0], tBase[1])}: \`${zenKindToString(targetType.kind)}\``,
+            className: 'cm-hoverTooltipMessageToken',
+          });
           return { dom };
         },
       };

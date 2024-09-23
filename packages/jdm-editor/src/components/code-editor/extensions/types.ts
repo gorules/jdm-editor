@@ -76,16 +76,16 @@ export const buildTypeCompletion = ({ kind, type = 'property' }: BuildTypeComple
         label: k,
         type,
         boost: 10,
-        detail: typeToString(v),
+        detail: zenKindToString(v),
         apply: applyCompletion,
       })),
     )
     .otherwise(() => []);
 };
 
-const typeToString = (type: unknown): string =>
+export const zenKindToString = (type: unknown): string =>
   match(type)
     .with(P.string, (s) => s.toLowerCase())
     .with({ Object: P._ }, () => 'object')
-    .with({ Array: P._ }, (t) => `${typeToString(t.Array)}[]`)
+    .with({ Array: P._ }, (t) => `${zenKindToString(t.Array)}[]`)
     .otherwise(() => 'unknown');

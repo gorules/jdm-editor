@@ -1,4 +1,9 @@
-export const renderDiagnosticMessage = (text: string) => {
+type RenderDiagnosticMessageParams = {
+  text: string;
+  className?: string;
+};
+
+export const renderDiagnosticMessage = ({ text, className }: RenderDiagnosticMessageParams) => {
   return text.replace(/`([^`]+)`/g, (match, content) => {
     let color;
     if (/^["'].*["']$/.test(content)) {
@@ -8,6 +13,6 @@ export const renderDiagnosticMessage = (text: string) => {
     } else {
       color = '#CE8E6D'; // Everything else
     }
-    return `<span class="cm-diagnosticMessageToken" style="color: ${color};">${content}</span>`;
+    return `<span class="${className}" style="color: ${color};">${content}</span>`;
   });
 };

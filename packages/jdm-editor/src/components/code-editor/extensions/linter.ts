@@ -96,7 +96,10 @@ export const zenLinter = (type: string) => {
 
           diagnostic.renderMessage = (_) => {
             const element = document.createElement('div');
-            element.innerHTML = renderDiagnosticMessage(diagnostic.message);
+            element.innerHTML = renderDiagnosticMessage({
+              text: diagnostic.message,
+              className: 'cm-diagnosticMessageToken',
+            });
 
             return element;
           };
@@ -110,9 +113,9 @@ export const zenLinter = (type: string) => {
       }
 
       if (expressionDiagnostics.length > 0) {
-        view.dom.setAttribute('data-has-error', 'error');
+        view.dom.setAttribute('data-severity', 'error');
       } else {
-        view.dom.setAttribute('data-has-error', 'warning');
+        view.dom.setAttribute('data-severity', 'warning');
       }
 
       return diagnostics;
