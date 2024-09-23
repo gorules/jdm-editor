@@ -114,11 +114,6 @@
     padding: var(--ce-verticalPadding) var(--ce-horizontalPadding);
   }
 
-  .cm-completionDetail {
-    font-style: normal;
-    color: var(--grl-color-text-secondary);
-  }
-
   .cm-line {
     padding: 0;
     caret-color: var(--grl-color-text);
@@ -159,6 +154,16 @@
       padding: 4px;
     }
 
+    .cm-completionMatchedText {
+      text-decoration: none !important;
+      color: var(--grl-color-primary-hover);
+    }
+
+    .cm-completionDetail {
+      font-style: normal;
+      color: var(--grl-color-text-secondary) !important;
+    }
+
     .cm-tooltip-lint {
       background: #fff1f0;
       border: 1px solid #ffccc7;
@@ -174,10 +179,22 @@
     }
   }
 
-  .cm-tooltip-autocomplete li {
-    padding: 4px 4px !important;
-    display: flex;
-    font-size: 12px;
+  .cm-tooltip-autocomplete {
+    ul {
+      padding: 4px !important;
+    }
+
+    li {
+      padding: 4px 4px !important;
+      display: flex;
+      font-size: 12px;
+      color: var(--grl-color-text-base) !important;
+      border-radius: 4px;
+
+      &[aria-selected='true'] {
+        background-color: var(--grl-color-border) !important;
+      }
+    }
   }
 
   .cm-completionIcon::after {
@@ -203,52 +220,56 @@
   .cm-completionIcon-function::after,
   .cm-completionIcon-method::after {
     content: 'f';
-    --icon-primary: #db3e4e;
-    --icon-secondary: #fff8f7;
+    --icon-primary: var(--grl-color-error);
+    --icon-secondary: var(--grl-color-error-bg);
   }
 
   .cm-completionIcon-class::after {
     content: 'C';
-    --icon-primary: #3876f0;
-    --icon-secondary: #e7eefd;
+    --icon-primary: var(--grl-color-primary);
+    --icon-secondary: var(--grl-color-primary-bg);
   }
 
   .cm-completionIcon-interface::after,
   .cm-completionIcon-type::after {
     content: 'I';
-    --icon-primary: #238b3e;
-    --icon-secondary: #f2fcf3;
+    --icon-primary: var(--grl-color-success);
+    --icon-secondary: var(--grl-color-success-bg);
   }
 
   .cm-completionIcon-variable::after,
   .cm-completionIcon-constant::after {
     content: 'v';
-    --icon-primary: #e66f1a;
-    --icon-secondary: #fff5eb;
+    --icon-primary: var(--grl-color-warning);
+    --icon-secondary: var(--grl-color-warning-bg);
+    filter: hue-rotate(-20deg);
   }
 
   .cm-completionIcon-enum::after {
     content: 'E';
-    --icon-primary: #3876f0;
-    --icon-secondary: #e7eefd;
+    --icon-primary: var(--grl-color-primary);
+    --icon-secondary: var(--grl-color-primary-bg);
+    filter: hue-rotate(35deg);
   }
 
   .cm-completionIcon-property::after {
     content: 'P';
-    --icon-primary: #8450ef;
-    --icon-secondary: #faf5ff;
+    --icon-primary: var(--grl-color-primary);
+    --icon-secondary: var(--grl-color-primary-bg);
+    filter: hue-rotate(40deg);
   }
 
   .cm-completionIcon-keyword::after {
     content: 'k';
-    --icon-primary: #e66f1a;
-    --icon-secondary: #fff5eb;
+    --icon-primary: var(--grl-color-warning);
+    --icon-secondary: var(--grl-color-warning-bg);
+    filter: hue-rotate(-20deg);
   }
 
   .cm-completionIcon-namespace::after {
     content: 'n';
-    --icon-primary: #238b3e;
-    --icon-secondary: #f2fcf3;
+    --icon-primary: var(--grl-color-success);
+    --icon-secondary: var(--grl-color-success-bg);
   }
 
   .cm-completionIcon-text::after {
