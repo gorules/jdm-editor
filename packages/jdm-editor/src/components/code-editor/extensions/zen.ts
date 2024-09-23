@@ -181,11 +181,9 @@ export const hoverExtension = () =>
 
     const tField = view.state.field(typeField);
     const tBase = hoverSpan(node);
-    console.log(tBase);
     const targetType = (tField.types ?? []).find((t) => t.span[0] === tBase?.[0] && t.span[1] === tBase[1]);
     if (targetType && tBase) {
       const source = view.state.doc.toString();
-      console.log(source.slice(tBase[0], tBase[1]));
 
       return {
         pos: tBase[0],
