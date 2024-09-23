@@ -82,6 +82,7 @@ const makeExpressionCompletion =
         return {
           from,
           options: [...buildTypeCompletion({ type: 'variable', kind: tField.rootKind }), ...extendedCompletion],
+          validFor: /\w*/,
         };
       }
       case 'String': {
@@ -95,6 +96,7 @@ const makeExpressionCompletion =
         return {
           from: node.from + 1,
           options: buildTypeCompletion({ kind: targetType.kind }),
+          validFor: /\w*/,
         };
       }
       case '.':
@@ -109,6 +111,7 @@ const makeExpressionCompletion =
         return {
           from,
           options: buildTypeCompletion({ kind: targetType.kind }),
+          validFor: /\w*/,
         };
       }
       default:
