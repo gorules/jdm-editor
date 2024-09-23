@@ -105,10 +105,14 @@ const TableInputCell: React.FC<TableCellProps> = ({ column, value, onChange, dis
     }
 
     const state = raw.stateStore.getState();
+
+    const calculatedType = inputVariableType.calculateType(column.field);
+    const resultingType = inputVariableType.cloneWithType('$', calculatedType);
+
     raw.stateStore.setState({
       derivedVariableTypes: {
         ...state.derivedVariableTypes,
-        [column.field]: inputVariableType.calculateReference(column.field),
+        [column.field]: resultingType,
       },
     });
   }, [inputVariableType, column]);

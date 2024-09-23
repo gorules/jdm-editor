@@ -4,6 +4,7 @@ import { Button, Input, Popconfirm, Typography } from 'antd';
 import clsx from 'clsx';
 import React, { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
+import type { VariableType } from 'zen-engine-wasm/dist/zen_engine_wasm';
 
 import { LocalCodeEditor } from '../code-editor/local-ce';
 import type { ExpressionEntry } from './context/expression-store.context';
@@ -12,18 +13,18 @@ import { useExpressionStore } from './context/expression-store.context';
 export type ExpressionItemProps = {
   expression: ExpressionEntry;
   index: number;
+  variableType?: VariableType;
 };
 
-export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, index }) => {
+export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, index, variableType }) => {
   const expressionRef = useRef<HTMLDivElement>(null);
-  const { updateRow, removeRow, swapRows, disabled, configurable, inputVariableType } = useExpressionStore(
-    ({ updateRow, removeRow, swapRows, disabled, configurable, inputVariableType }) => ({
+  const { updateRow, removeRow, swapRows, disabled, configurable } = useExpressionStore(
+    ({ updateRow, removeRow, swapRows, disabled, configurable }) => ({
       updateRow,
       removeRow,
       swapRows,
       disabled,
       configurable,
-      inputVariableType,
     }),
   );
 
@@ -87,7 +88,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
           disabled={disabled}
           value={expression?.value}
           onChange={(value) => onChange({ value })}
-          variableType={inputVariableType}
+          variableType={variableType}
         />
         <ResultOverlay expression={expression} />
       </div>

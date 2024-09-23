@@ -1,6 +1,7 @@
-use std::collections::HashMap;
+use crate::intellisense::recursive_set::RecursiveSet;
 use gloo_utils::format::JsValueSerdeExt;
 use serde_json::Value;
+use std::rc::Rc;
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
 use zen_expression::intellisense::IntelliSense;
@@ -8,7 +9,7 @@ use zen_expression::variable::VariableType;
 
 #[wasm_bindgen(js_name = "VariableType")]
 pub struct JsVariableType {
-    vt: VariableType,
+    vt: Rc<VariableType>,
 }
 
 #[wasm_bindgen(js_class = "VariableType")]
@@ -17,7 +18,7 @@ impl JsVariableType {
     pub fn new(value: JsValue) -> Self {
         let serde_value = value.into_serde::<Value>().unwrap();
         Self {
-            vt: VariableType::from(serde_value)
+            vt: Rc::new(VariableType::from(serde_value))
         }
     }
 
@@ -28,7 +29,7 @@ impl JsVariableType {
 
     pub fn merge(&self, vt: &JsVariableType) -> Self {
         let vt = self.vt.merge(&vt.vt);
-        Self { vt }
+        Self { vt: Rc::new(vt) }
     }
 
     #[wasm_bindgen(js_name = "typeCheck")]
@@ -40,19 +41,24 @@ impl JsVariableType {
         JsValue::from_serde(&rr.unwrap_or_default()).unwrap()
     }
 
-    #[wasm_bindgen(js_name = "calculateReference")]
-    pub fn calculate_reference(&self, source: &str) -> JsVariableType {
+    #[wasm_bindgen(js_name = "calculateType")]
+    pub fn calculate_type(&self, source: &str) -> JsVariableType {
         let mut is = IntelliSense::new();
         let type_data = is.type_check(source, &self.vt);
         let Some(vt) = type_data.map(|s| s.first().map(|t| t.kind.clone())).flatten() else {
-            return Self { vt: VariableType::Any }
+            return Self { vt: Rc::new(VariableType::Any) }
         };
 
-        let mut hmap = HashMap::default();
-        hmap.insert("$".to_string(), vt);
-        let ref_object = VariableType::Object(hmap);
+        Self { vt }
+    }
 
-        Self { vt: self.vt.merge(&ref_object) }
+    #[wasm_bindgen(js_name = "cloneWithType")]
+    pub fn clone_with_type(&self, path: &str, jvt: JsVariableType) -> JsVariableType {
+        let self_vt = self.vt.as_ref().clone();
+        let vt = jvt.vt.as_ref().clone();
+
+        let new_vt = self_vt.set_type(path, vt);
+        Self { vt: Rc::new(new_vt) }
     }
 
     #[wasm_bindgen(js_name = "typeCheckUnary")]
