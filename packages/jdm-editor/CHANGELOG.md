@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.17.1](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.17.0...@gorules/jdm-editor@1.17.1) (2024-09-23)
+
+### Bug Fixes
+
+- improve intellisense ([#87](https://github.com/gorules/jdm-editor/issues/87)) ([7e9631b](https://github.com/gorules/jdm-editor/commit/7e9631b28bbe451e10cbd0050fb88ac8692c7acf))
+
 # [1.17.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.16.1...@gorules/jdm-editor@1.17.0) (2024-09-23)
 
 ### Features
