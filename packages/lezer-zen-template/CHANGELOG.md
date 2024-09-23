@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/lezer-parser/json/compare/@gorules/lezer-zen-template@0.2.0...@gorules/lezer-zen-template@0.3.0) (2024-09-23)
+
+### Features
+
+- intellisense ([#86](https://github.com/lezer-parser/json/issues/86)) ([63f939a](https://github.com/lezer-parser/json/commit/63f939a1a06bdeef1f647bcccc9b7a18c2e956c1))
+
 # 0.2.0 (2024-04-26)
 
 ### Features
