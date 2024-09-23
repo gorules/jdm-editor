@@ -165,13 +165,24 @@
     }
 
     .cm-tooltip-lint {
-      background: #fff1f0;
-      border: 1px solid #ffccc7;
+      background: var(--grl-color-bg-elevated);
+      border: 1px solid var(--grl-color-border);
       padding: 4px;
-    }
+      color: var(--grl-color-text);
 
-    .cm-diagnostic-error {
-      border-left-color: #ff7875;
+      .cm-diagnostic {
+        &:not(:last-of-type) {
+          margin-bottom: 4px;
+        }
+
+        &-error {
+          border-left-color: var(--grl-color-error-border);
+        }
+
+        &-warning {
+          border-left-color: var(--grl-color-warning-border);
+        }
+      }
     }
 
     .cm-diagnosticSource {
