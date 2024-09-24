@@ -15,6 +15,7 @@ export default defineConfig({
     dedupe: ['@lezer/common', '@lezer/lr', '@lezer/highlight'],
   },
   build: {
+    target: 'esnext',
     lib: {
       entry: path.resolve(__dirname, 'src', 'index.ts'),
       name: 'JDM Editor',
