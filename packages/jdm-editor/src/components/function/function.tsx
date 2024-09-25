@@ -107,7 +107,7 @@ export const Function: React.FC<FunctionProps> = ({
     monaco.languages.typescript.javascriptDefaults.addExtraLib(
       `
     type Input = ${data};
-    type Output = Promise<any> | any;
+    type Output = Promise<any>;
     
     type Handler = (input: Input) => Output; 
     `,
