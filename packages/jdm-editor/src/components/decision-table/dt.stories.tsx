@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
 import { Checkbox } from 'antd';
 import { createDragDropManager } from 'dnd-core';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -137,6 +138,7 @@ const meta: Meta<typeof DecisionTable> = {
     configurable: true,
     disabled: false,
     inputData: { cart: { weight: 100, total: 100 }, customer: { country: 'US', firstName: 'John', lastName: 'Doe' } },
+    onChange: fn(),
   },
 };
 

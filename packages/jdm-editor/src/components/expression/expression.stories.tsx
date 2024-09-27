@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
 import React, { useState } from 'react';
 
 import type { ExpressionEntry } from './context/expression-store.context';
@@ -31,11 +32,12 @@ const meta: Meta<typeof Expression> = {
     disabled: false,
     defaultValue: expressionDefault,
     inputData: expressionDefaultObject,
+    onChange: fn(),
   },
   argTypes: {
+    inputData: { control: 'object' },
     manager: { table: { disable: true } },
     value: { table: { disable: true } },
-    inputData: { control: 'object' },
   },
 };
 

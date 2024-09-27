@@ -5,6 +5,7 @@ import { Typography, theme } from 'antd';
 import React, { useState } from 'react';
 
 import { CodeEditor } from './ce';
+import { fn } from '@storybook/test';
 
 const meta: Meta<typeof CodeEditor> = {
   title: 'CodeEditor',
@@ -16,11 +17,19 @@ const meta: Meta<typeof CodeEditor> = {
     placeholder: { type: 'string' },
     type: { control: { type: 'radio' }, options: ['standard', 'template'] },
     variableType: { control: { type: 'object' } },
+    noStyle: { control: 'boolean' },
+    onChange: { table: { disable: true } },
+    onBlur: { table: { disable: true } },
+    onFocus: { table: { disable: true } },
   },
   args: {
     maxRows: 3,
     placeholder: 'Type expression...',
     type: 'standard',
+    disabled: false,
+    onChange: fn(),
+    onBlur: fn(),
+    onFocus: fn(),
     variableType: {
       customer: {
         firstName: 'John',

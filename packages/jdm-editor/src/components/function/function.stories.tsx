@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
 import { useState } from 'react';
 
 import { Function } from './function';
@@ -45,8 +46,13 @@ const meta: Meta<typeof Function> = {
     defaultValue: defaultFunctionValue,
     trace: exampleTrace as any,
     inputData: { customer: { firstName: 'John', lastName: 'Doe' } },
+    onMonacoReady: fn(),
+    onChange: fn(),
   },
   argTypes: {
+    disabled: { control: 'boolean' },
+    defaultValue: { control: 'text' },
+    inputData: { control: 'object' },
     value: { table: { disable: true } },
   },
 };
