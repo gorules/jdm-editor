@@ -330,6 +330,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
               elevateEdgesOnSelect={false}
               elevateNodesOnSelect={true}
               zoomOnDoubleClick={false}
+              connectionRadius={35}
               nodes={nodesState[0]}
               edges={edgesState[0]}
               onInit={(instance) => {

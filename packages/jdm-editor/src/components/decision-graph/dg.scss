@@ -5,6 +5,18 @@
   grid-template-columns: min-content 1fr min-content;
   grid-template-rows: 1fr auto;
 
+  .react-flow__handle {
+    cursor: crosshair !important;
+    transition: 0.2s all;
+    transform-origin: 50% calc(50% + 7px);
+
+    &-connecting,
+    &:hover {
+      transform: scale(1.75);
+      background-color: var(--grl-color-primary-bg-hover);
+    }
+  }
+
   .nodrag {
     cursor: initial;
   }
