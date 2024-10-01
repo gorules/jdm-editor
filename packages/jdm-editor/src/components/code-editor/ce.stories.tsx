@@ -1,11 +1,11 @@
 import { syntaxTree } from '@codemirror/language';
 import type { SyntaxNodeRef } from '@lezer/common';
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
 import { Typography, theme } from 'antd';
 import React, { useState } from 'react';
 
 import { CodeEditor } from './ce';
-import { fn } from '@storybook/test';
 
 const meta: Meta<typeof CodeEditor> = {
   title: 'CodeEditor',

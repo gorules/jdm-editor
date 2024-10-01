@@ -73,7 +73,7 @@ const SimulateDataSync: React.FC<Pick<ExpressionProps, 'traceData' | 'inputData'
       return;
     }
 
-    const vt = new window.zenWasm.VariableType(inputData);
+    const vt = new window.zenWasm.VariableType(inputData ?? {});
     expressionStoreRaw.setState({
       inputData,
       inputVariableType: vt,

@@ -68,7 +68,7 @@ const SwitchNode: React.FC<
       return;
     }
 
-    const vt = new window.zenWasm.VariableType(nodeTrace?.input ?? undefined);
+    const vt = new window.zenWasm.VariableType(nodeTrace?.input ?? {});
     setVariableType(vt);
 
     return () => {
