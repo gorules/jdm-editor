@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.18.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.17.2...@gorules/jdm-editor@1.18.0) (2024-10-01)
+
+### Bug Fixes
+
+- function type signature ([18b917f](https://github.com/gorules/jdm-editor/commit/18b917f028904910271ce0ba06802eba1f27396c))
+- improve handle styles, fix intellisense for some nodes ([#89](https://github.com/gorules/jdm-editor/issues/89)) ([57465e2](https://github.com/gorules/jdm-editor/commit/57465e268c053241cf4d88c9fe8f8155b4dfb584))
+- storybook ([9d463ff](https://github.com/gorules/jdm-editor/commit/9d463ff642370023841956167255a8c106996223))
+- storybook components ([40e8d97](https://github.com/gorules/jdm-editor/commit/40e8d977514d222b49c7584dbf7a53a252ce8146))
+
 ## [1.17.2](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.17.1...@gorules/jdm-editor@1.17.2) (2024-09-23)
 
 **Note:** Version bump only for package @gorules/jdm-editor
