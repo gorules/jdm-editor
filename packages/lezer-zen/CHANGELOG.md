@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.1](https://github.com/lezer-parser/json/compare/@gorules/lezer-zen@0.5.0...@gorules/lezer-zen@0.5.1) (2024-10-04)
+
+### Bug Fixes
+
+- codemirror keymap ([#91](https://github.com/lezer-parser/json/issues/91)) ([2f05c46](https://github.com/lezer-parser/json/commit/2f05c467d6afe130becf927ed2bf948178972692))
+
 # [0.5.0](https://github.com/lezer-parser/json/compare/@gorules/lezer-zen@0.4.0...@gorules/lezer-zen@0.5.0) (2024-09-23)
 
 ### Features
