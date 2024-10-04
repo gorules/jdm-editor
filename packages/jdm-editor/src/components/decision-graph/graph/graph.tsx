@@ -255,7 +255,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
 
     try {
       elementPosition = JSON.parse(event.dataTransfer.getData('relativePosition'));
-    } catch (e) {
+    } catch {
       return;
     }
     const position = reactFlowInstance.current.project({

@@ -170,7 +170,7 @@ const parseSpreadsheetData = (spreadSheetData: any) => {
 
     try {
       headerMeta = JSON.parse(header.note);
-    } catch (error) {
+    } catch {
       message.error('Header note can not be parsed!');
     }
 

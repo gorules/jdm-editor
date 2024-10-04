@@ -25,6 +25,7 @@
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/no-unused-vars": ["error", { "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }],
     "@typescript-eslint/no-use-before-define": "off",
+    "@typescript-eslint/no-empty-object-type": "off",
     "file-progress/activate": "warn",
     "react-hooks/exhaustive-deps": "off",
     "react-hooks/rules-of-hooks": "off",

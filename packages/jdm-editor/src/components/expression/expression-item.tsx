@@ -84,7 +84,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
       <div className='expression-list-item__code'>
         <LocalCodeEditor
           placeholder='Expression'
-          maxRows={6}
+          maxRows={9}
           disabled={disabled}
           value={expression?.value}
           onChange={(value) => onChange({ value })}

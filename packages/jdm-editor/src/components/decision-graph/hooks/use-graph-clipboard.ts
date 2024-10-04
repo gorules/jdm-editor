@@ -155,7 +155,7 @@ export const useGraphClipboard = (
       if (anchor) {
         try {
           await copyToClipboard(JSON.stringify({ nodes }));
-        } catch (e) {
+        } catch {
           //
         }
       }

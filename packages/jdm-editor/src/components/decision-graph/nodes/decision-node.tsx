@@ -87,7 +87,9 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
             <Typography.Text
               className={clsx('grl-dn__header__text__name')}
               onClick={() => {
-                !disabled && setContentEditing(true);
+                if (!disabled) {
+                  setContentEditing(true);
+                }
               }}
             >
               {name}

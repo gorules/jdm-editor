@@ -76,7 +76,7 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
 
                     onChange?.(formatted);
                     setRequestValue(formatted);
-                  } catch (e) {
+                  } catch {
                     notification.error({
                       message: 'Invalid format',
                       description: 'Unable to format request, invalid JSON format',
