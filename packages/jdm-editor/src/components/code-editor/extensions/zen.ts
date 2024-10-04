@@ -6,6 +6,7 @@ import {
   closeBrackets,
   closeBracketsKeymap,
 } from '@codemirror/autocomplete';
+import { history, historyKeymap, insertNewlineAndIndent } from '@codemirror/commands';
 import { HighlightStyle, LRLanguage, LanguageSupport, syntaxHighlighting, syntaxTree } from '@codemirror/language';
 import type { EditorView } from '@codemirror/view';
 import { hoverTooltip, keymap } from '@codemirror/view';
@@ -269,5 +270,10 @@ export const zenExtensions = ({ type }: extensionOptions) => [
   closeBrackets(),
   zenLinter(type),
   typeField,
-  keymap.of(closeBracketsKeymap),
+  history(),
+  keymap.of([
+    ...closeBracketsKeymap,
+    ...historyKeymap,
+    { key: 'Enter', run: insertNewlineAndIndent, shift: insertNewlineAndIndent },
+  ]),
 ];

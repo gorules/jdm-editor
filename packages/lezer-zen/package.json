@@ -18,9 +18,9 @@
   "license": "MIT",
   "devDependencies": {
     "@lezer/generator": "^1.7.1",
-    "@rollup/plugin-node-resolve": "^15.2.4",
+    "@rollup/plugin-node-resolve": "^15.3.0",
     "mocha": "^10.7.3",
-    "rollup": "^4.22.4"
+    "rollup": "^4.24.0"
   },
   "repository": {
     "type": "git",
@@ -33,7 +33,7 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "@lezer/common": "^1.2.1",
+    "@lezer/common": "^1.2.2",
     "@lezer/highlight": "^1.2.1",
     "@lezer/lr": "^1.4.2"
   }

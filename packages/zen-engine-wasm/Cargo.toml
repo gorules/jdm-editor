@@ -9,8 +9,8 @@ crate-type = ["cdylib"]
 
 [dependencies]
 bumpalo = "3"
-zen-expression = { version = "0.30", default-features = false, features = ["regex-lite"] }
-zen-tmpl = { version = "0.30" }
+zen-expression = { version = "0.30.3", default-features = false, features = ["regex-lite"] }
+zen-tmpl = { version = "0.30.3" }
 getrandom = { version = "0.2", features = ["js"] }
 fastrand = { version = "2", features = ["js"] }
 
