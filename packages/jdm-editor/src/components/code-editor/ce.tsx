@@ -8,7 +8,12 @@ import { match } from 'ts-pattern';
 
 import { composeRefs } from '../../helpers/compose-refs';
 import './ce.scss';
-import { updateExpressionTypeEffect, updateVariableTypeEffect } from './extensions/types';
+import {
+  updateExpectedVariableTypeEffect,
+  updateExpressionTypeEffect,
+  updateStrictModeEffect,
+  updateVariableTypeEffect,
+} from './extensions/types';
 import { zenExtensions, zenHighlightDark, zenHighlightLight } from './extensions/zen';
 
 const updateListener = (onChange?: (data: string) => void, onStateChange?: (state: EditorState) => void) =>
@@ -35,10 +40,12 @@ export type CodeEditorProps = {
   placeholder?: string;
   disabled?: boolean;
   type?: 'unary' | 'standard' | 'template';
+  strict?: boolean;
   fullHeight?: boolean;
   noStyle?: boolean;
   extension?: (params: ExtensionParams) => Extension;
   variableType?: any;
+  expectedVariableType?: any;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, 'disabled' | 'onChange'>;
 
 export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
@@ -46,6 +53,7 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
     {
       noStyle = false,
       fullHeight = false,
+      strict = false,
       maxRows,
       disabled,
       value,
@@ -56,6 +64,7 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
       type = 'standard',
       extension,
       variableType,
+      expectedVariableType,
       ...props
     },
     ref,
@@ -209,7 +218,7 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
           effects: updateVariableTypeEffect.of(variableType),
         });
       } else {
-        const dataType = new window.zenWasm.VariableType(variableType);
+        const dataType = createVariableType(variableType);
         codeMirror.current.dispatch({
           effects: updateVariableTypeEffect.of(dataType),
         });
@@ -219,6 +228,44 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
         };
       }
     }, [variableType]);
+
+    useEffect(() => {
+      if (!codeMirror.current || !window.zenWasm) {
+        return;
+      }
+
+      if (expectedVariableType === null || expectedVariableType === undefined) {
+        codeMirror.current.dispatch({
+          effects: updateExpectedVariableTypeEffect.of(null),
+        });
+        return;
+      }
+
+      if (expectedVariableType instanceof window.zenWasm.VariableType) {
+        codeMirror.current.dispatch({
+          effects: updateExpectedVariableTypeEffect.of(expectedVariableType),
+        });
+      } else {
+        const dataType = createVariableType(expectedVariableType);
+        codeMirror.current.dispatch({
+          effects: updateExpectedVariableTypeEffect.of(dataType),
+        });
+
+        return () => {
+          dataType.free();
+        };
+      }
+    }, [expectedVariableType]);
+
+    useEffect(() => {
+      if (!codeMirror.current) {
+        return;
+      }
+
+      codeMirror.current.dispatch({
+        effects: updateStrictModeEffect.of(strict),
+      });
+    }, [strict]);
 
     return (
       <div
@@ -237,3 +284,11 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
     );
   },
 );
+
+const createVariableType = (data: any) => {
+  try {
+    return window.zenWasm!.VariableType.fromJson(data);
+  } catch {
+    return new window.zenWasm!.VariableType(data);
+  }
+};

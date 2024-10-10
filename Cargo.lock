@@ -945,9 +945,9 @@ dependencies = [
 
 [[package]]
 name = "zen-expression"
-version = "0.30.3"
+version = "0.32.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a990f14d31a5fe4a99ea46e1823eaa89e8fabb2a08475bdf041a70f278b166a6"
+checksum = "f628e0249bd07eb753febc92e11a2bad9b4d9a62989047fd4e7033b88bd375ff"
 dependencies = [
  "ahash 0.8.11",
  "bumpalo",
@@ -970,9 +970,9 @@ dependencies = [
 
 [[package]]
 name = "zen-tmpl"
-version = "0.30.3"
+version = "0.32.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "be00e8c4c5cf0525a085be261e66625a4effdb4de4ba327680c0d6e67b4032c4"
+checksum = "5b5ddb0226431ec50044485cc4e6c2c5f0a29e32d9cf2b65f8e0538b524c7c45"
 dependencies = [
  "itertools",
  "serde",
