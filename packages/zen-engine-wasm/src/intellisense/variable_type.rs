@@ -7,6 +7,12 @@ use wasm_bindgen::JsValue;
 use zen_expression::intellisense::IntelliSense;
 use zen_expression::variable::VariableType;
 
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(typescript_type = "VariableTypeJson")]
+    pub type VariableTypeJson;
+}
+
 #[wasm_bindgen(js_name = "VariableType")]
 pub struct JsVariableType {
     vt: Rc<VariableType>,
@@ -22,9 +28,18 @@ impl JsVariableType {
         }
     }
 
+    #[wasm_bindgen(js_name = "fromJson")]
+    pub fn from_json(value: VariableTypeJson) -> Self {
+        let js_value: JsValue = value.into();
+        let variable_type = js_value.into_serde::<VariableType>().unwrap();
+        Self {
+            vt: Rc::new(variable_type)
+        }
+    }
+
     #[wasm_bindgen(js_name = "toJson")]
-    pub fn to_json(&self) -> JsValue {
-        JsValue::from_serde(&self.vt).unwrap()
+    pub fn to_json(&self) -> VariableTypeJson {
+        JsValue::from_serde(&self.vt).unwrap().into()
     }
 
     pub fn merge(&self, vt: &JsVariableType) -> Self {
@@ -68,5 +83,13 @@ impl JsVariableType {
         let res = is.type_check_unary(source, &self.vt);
         let rr = serde_json::to_value(res);
         JsValue::from_serde(&rr.unwrap_or_default()).unwrap()
+    }
+
+    pub fn equal(&self, vt: &JsVariableType) -> bool {
+        self.vt == vt.vt
+    }
+
+    pub fn satisfies(&self, vt: &JsVariableType) -> bool {
+        self.vt.satisfies(&vt.vt)
     }
 }
