@@ -97,7 +97,7 @@ export const zenLinter = (type: string) => {
 
       if (diagnostics.some((d) => d.severity === 'error')) {
         view.dom.setAttribute('data-severity', 'error');
-      } else {
+      } else if (diagnostics.some((d) => d.severity === 'warning')) {
         view.dom.setAttribute('data-severity', 'warning');
       }
 
