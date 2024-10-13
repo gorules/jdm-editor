@@ -11,6 +11,7 @@ import type { DecisionGraphWrapperProps } from './dg-wrapper';
 import { DecisionGraphWrapper } from './dg-wrapper';
 import './dg.scss';
 import type { GraphRef } from './graph/graph';
+import { DecisionGraphInferTypes } from './dg-infer';
 
 export type DecisionGraphProps = {
   manager?: DragDropManager;
@@ -28,6 +29,7 @@ export const DecisionGraph = forwardRef<DecisionGraphRef, DecisionGraphProps>(
           <DecisionGraphProvider>
             <DecisionGraphWrapper ref={ref} reactFlowProOptions={reactFlowProOptions} />
             <DecisionGraphEmpty {...props} />
+            <DecisionGraphInferTypes />
           </DecisionGraphProvider>
         </ReactFlowProvider>
       </div>

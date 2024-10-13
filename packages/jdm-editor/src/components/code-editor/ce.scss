@@ -98,6 +98,11 @@
     border-color: var(--grl-color-warning-border) !important;
   }
 
+  .cm-editor[data-severity='info'] {
+    background: var(--grl-color-info-bg) !important;
+    border-color: var(--grl-color-info-border) !important;
+  }
+
   .cm-scroller {
     line-height: inherit;
   }

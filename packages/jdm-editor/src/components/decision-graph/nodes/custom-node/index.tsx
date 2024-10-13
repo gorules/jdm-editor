@@ -1,13 +1,24 @@
 import { DownOutlined } from '@ant-design/icons';
+import { type VariableType } from '@gorules/zen-engine-wasm';
 import { Button, Checkbox, Form, Typography, theme } from 'antd';
 import React, { useState } from 'react';
+import type { Position } from 'reactflow';
 import { match } from 'ts-pattern';
 
 import { CodeEditor } from '../../../code-editor';
 import type { DecisionNode } from '../../context/dg-store.context';
 import { useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
 import { GraphNode } from '../graph-node';
-import type { MinimalNodeProps, MinimalNodeSpecification } from '../specifications/specification-types';
+import type { InferTypeData, MinimalNodeProps, MinimalNodeSpecification } from '../specifications/specification-types';
+
+type CustomDecisionNode<T> = {
+  id: string;
+  name: string;
+  description?: string;
+  type?: string;
+  content?: T;
+  position: Position;
+};
 
 type GenerateNodeParams = {
   index: number;
@@ -21,13 +32,18 @@ export type CustomNodeSpecification<Data extends object, Component extends strin
   group?: string;
   documentationUrl?: string;
   shortDescription?: string;
-  generateNode: (params: GenerateNodeParams) => Omit<DecisionNode<Data>, 'position' | 'id' | 'type' | 'content'> & {
+  generateNode: (params: GenerateNodeParams) => Omit<DecisionNode, 'position' | 'id' | 'type' | 'content'> & {
     config?: Data;
   };
   renderNode: React.FC<MinimalNodeProps & { specification: MinimalNodeSpecification }>;
 
-  onNodeAdd?: (node: DecisionNode<{ kind: Component; config: Data }>) => Promise<
-    DecisionNode<{
+  inferTypes?: {
+    needsUpdate: (state: InferTypeData<Data>, prevState: InferTypeData<Data>) => boolean;
+    determineOutputType: (state: InferTypeData<Data>) => VariableType;
+  };
+
+  onNodeAdd?: (node: CustomDecisionNode<{ kind: Component; config: Data }>) => Promise<
+    CustomDecisionNode<{
       kind: Component;
       config: Data;
     }>

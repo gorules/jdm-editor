@@ -1,5 +1,7 @@
 import { NumberOutlined } from '@ant-design/icons';
+import { VariableType } from '@gorules/zen-engine-wasm';
 import { Button } from 'antd';
+import equal from 'fast-deep-equal/es6/react';
 import React from 'react';
 
 import { useDecisionGraphActions } from '../../context/dg-store.context';
@@ -23,6 +25,25 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
   displayName: 'Expression',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/expression',
   shortDescription: 'Mapping utility',
+  inferTypes: {
+    needsUpdate: (state, prevState) => !state.input.equal(prevState.input) || !equal(state.content, prevState.content),
+    determineOutputType: ({ input, content }) => {
+      const moddedInput = input.clone();
+      const baseType = VariableType.fromJson({ Object: {} });
+
+      (content.expressions || []).forEach((expression) => {
+        if (!expression.key || !expression.value) {
+          return;
+        }
+
+        const calculatedType = moddedInput.calculateType(expression.value);
+        moddedInput.set(`$.${expression.key}`, calculatedType);
+        baseType.setOwned(expression.key, calculatedType);
+      });
+
+      return baseType;
+    },
+  },
   generateNode: ({ index }) => ({
     name: `expression${index}`,
     content: {

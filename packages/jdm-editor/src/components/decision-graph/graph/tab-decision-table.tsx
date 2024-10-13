@@ -3,7 +3,7 @@ import React from 'react';
 import { P, match } from 'ts-pattern';
 
 import { DecisionTable } from '../../decision-table';
-import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
+import { NodeTypeKind, useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
 import type { SimulationTrace, SimulationTraceDataTable } from '../types/simulation.types';
 
 export type TabDecisionTableProps = {
@@ -13,14 +13,15 @@ export type TabDecisionTableProps = {
 
 export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager }) => {
   const graphActions = useDecisionGraphActions();
-  const { nodeTrace, disabled, configurable, content } = useDecisionGraphState(
-    ({ simulate, disabled, configurable, decisionGraph }) => ({
+  const { nodeTrace, disabled, configurable, content, inferredType } = useDecisionGraphState(
+    ({ simulate, disabled, configurable, decisionGraph, nodeTypes }) => ({
       nodeTrace: match(simulate)
         .with({ result: P._ }, ({ result }) => result?.trace?.[id] as SimulationTrace<SimulationTraceDataTable>)
         .otherwise(() => null),
       disabled,
       configurable,
       content: (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content,
+      inferredType: nodeTypes[id]?.[NodeTypeKind.Input] ?? nodeTypes[id]?.[NodeTypeKind.InferredInput],
     }),
   );
 
@@ -44,7 +45,7 @@ export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager 
       manager={manager}
       disabled={disabled}
       configurable={configurable}
-      inputData={nodeTrace?.input}
+      inputData={nodeTrace?.input ?? inferredType}
       activeRules={(activeRules || []).filter((id) => !!id)}
     />
   );

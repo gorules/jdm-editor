@@ -1,5 +1,7 @@
 import { TableOutlined } from '@ant-design/icons';
+import { VariableType } from '@gorules/zen-engine-wasm';
 import { Button } from 'antd';
+import equal from 'fast-deep-equal/es6/react';
 import React from 'react';
 
 import { useDecisionGraphActions } from '../../context/dg-store.context';
@@ -32,6 +34,19 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
   displayName: 'Decision table',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/decision-tables',
   shortDescription: 'Rules spreadsheet',
+  inferTypes: {
+    needsUpdate: (state, prevState) => !equal(state.content.outputs, prevState.content.outputs),
+    determineOutputType: ({ content }) => {
+      const fields = (content.outputs || []).map((output) => output.field).filter((f) => !!f);
+      const baseType = VariableType.fromJson({ Object: {} });
+
+      fields.forEach((field) => {
+        baseType.setJson(field as string, 'Any');
+      });
+
+      return baseType;
+    },
+  },
   generateNode: ({ index }) => ({
     name: `decisionTable${index}`,
     content: {

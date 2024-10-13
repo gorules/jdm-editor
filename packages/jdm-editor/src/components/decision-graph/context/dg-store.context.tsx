@@ -1,12 +1,15 @@
+import { type VariableType } from '@gorules/zen-engine-wasm';
 import type { Monaco } from '@monaco-editor/react';
 import equal from 'fast-deep-equal/es6/react';
 import { produce } from 'immer';
 import type { WritableDraft } from 'immer/src/types/types-external';
 import React, { type MutableRefObject, createRef, useMemo } from 'react';
 import type { EdgeChange, NodeChange, ReactFlowInstance, useEdgesState, useNodesState } from 'reactflow';
+import type { z } from 'zod';
 import type { StoreApi, UseBoundStore } from 'zustand';
 import { create } from 'zustand';
 
+import type { nodeSchema } from '../../../helpers/schema';
 import type { CodeEditorProps } from '../../code-editor';
 import { mapToGraphEdge, mapToGraphEdges, mapToGraphNode, mapToGraphNodes } from '../dg-util';
 import type { useGraphClipboard } from '../hooks/use-graph-clipboard';
@@ -19,11 +22,13 @@ export type Position = {
   y: number;
 };
 
+type NodeSchema = z.infer<typeof nodeSchema>;
+
 export type DecisionNode<T = any> = {
   id: string;
   name: string;
   description?: string;
-  type?: string;
+  type?: NodeSchema['type'] | string;
   content?: T;
   position: Position;
 };
@@ -53,6 +58,13 @@ export type PanelType = {
 
 type DraftUpdateCallback<T> = (draft: WritableDraft<T>) => WritableDraft<T>;
 
+export enum NodeTypeKind {
+  Input,
+  Output,
+  InferredInput,
+  InferredOutput,
+}
+
 export type DecisionGraphStoreType = {
   state: {
     id?: string;
@@ -75,6 +87,8 @@ export type DecisionGraphStoreType = {
     simulate?: Simulation;
 
     compactMode?: boolean;
+
+    nodeTypes: Record<string, Partial<Record<NodeTypeKind, VariableType>>>;
   };
 
   references: {
@@ -111,6 +125,9 @@ export type DecisionGraphStoreType = {
 
     setCompactMode: (mode: boolean) => void;
     toggleCompactMode: () => void;
+
+    setNodeType: (id: string, kind: NodeTypeKind, vt: VariableType) => void;
+    removeNodeType: (id: string, kind?: NodeTypeKind) => void;
   };
 
   listeners: {
@@ -157,6 +174,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         activePanel: undefined,
         panels: [],
         compactMode: localStorage.getItem('jdm-compact-mode') === 'true',
+        nodeTypes: {},
       })),
     [],
   );
@@ -334,7 +352,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
       },
       removeNodes: (ids = []) => {
         const { nodesState, edgesState } = referenceStore.getState();
-        const { decisionGraph } = stateStore.getState();
+        const { decisionGraph, nodeTypes } = stateStore.getState();
 
         nodesState.current[1]?.((nodes) => nodes.filter((n) => ids.every((id) => n.id !== id)));
         edgesState.current[1]?.((edges) =>
@@ -352,7 +370,15 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
           );
         });
 
-        stateStore.setState({ decisionGraph: newDecisionGraph });
+        const newNodeTypes = produce(nodeTypes, (draft) => {
+          ids.forEach((id) => {
+            if (id in draft) {
+              delete draft[id];
+            }
+          });
+        });
+
+        stateStore.setState({ decisionGraph: newDecisionGraph, nodeTypes: newNodeTypes });
         listenerStore.getState().onChange?.(newDecisionGraph);
       },
       addEdges: (edges: DecisionEdge[]) => {
@@ -486,6 +512,35 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         };
         localStorage.setItem('jdm-compact-mode', `${mode}`);
         stateStore.setState(updatedState);
+      },
+      setNodeType: (id, kind, vt) => {
+        const { nodeTypes } = stateStore.getState();
+
+        const newNodeTypes = produce(nodeTypes, (draft) => {
+          draft[id] ??= {};
+          draft[id][kind] = vt;
+        });
+
+        stateStore.setState({ nodeTypes: newNodeTypes });
+      },
+      removeNodeType: (id, kind) => {
+        const { nodeTypes } = stateStore.getState();
+
+        const newNodeTypes = produce(nodeTypes, (draft) => {
+          if (!(id in draft)) {
+            return;
+          }
+
+          if (kind) {
+            if (kind in draft[id]) {
+              delete draft[id][kind];
+            }
+          } else {
+            delete draft[id];
+          }
+        });
+
+        stateStore.setState({ nodeTypes: newNodeTypes });
       },
     }),
     [],

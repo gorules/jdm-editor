@@ -1,9 +1,11 @@
+import { createVariableType } from '@gorules/zen-engine-wasm';
 import equal from 'fast-deep-equal/es6/react';
 import type React from 'react';
 import { useEffect, useRef } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
 import type { SchemaSelectProps } from '../../helpers/components';
+import { isWasmAvailable } from '../../helpers/wasm';
 import {
   type DecisionTableType,
   parseDecisionTable,
@@ -97,16 +99,11 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
   }, []);
 
   useEffect(() => {
-    if (!window.zenWasm) {
+    if (!isWasmAvailable()) {
       return;
     }
 
-    const vt = new window.zenWasm.VariableType(inputData ?? {});
-    stateStore.setState({ inputVariableType: vt });
-
-    return () => {
-      vt.free();
-    };
+    stateStore.setState({ inputVariableType: createVariableType(inputData) });
   }, [inputData]);
 
   return null;

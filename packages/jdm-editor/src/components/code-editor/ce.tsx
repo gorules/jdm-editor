@@ -1,12 +1,14 @@
 import { bracketMatching } from '@codemirror/language';
 import { Compartment, EditorState, type Extension, Text } from '@codemirror/state';
 import { EditorView, placeholder as placeholderExt } from '@codemirror/view';
+import { createVariableType } from '@gorules/zen-engine-wasm';
 import { theme } from 'antd';
 import clsx from 'clsx';
 import React, { useEffect, useMemo, useRef } from 'react';
 import { match } from 'ts-pattern';
 
 import { composeRefs } from '../../helpers/compose-refs';
+import { isWasmAvailable } from '../../helpers/wasm';
 import './ce.scss';
 import {
   updateExpectedVariableTypeEffect,
@@ -202,7 +204,7 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
     }, [extension, type]);
 
     useEffect(() => {
-      if (!codeMirror.current || !window.zenWasm) {
+      if (!codeMirror.current || !isWasmAvailable()) {
         return;
       }
 
@@ -213,24 +215,13 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
         return;
       }
 
-      if (variableType instanceof window.zenWasm.VariableType) {
-        codeMirror.current.dispatch({
-          effects: updateVariableTypeEffect.of(variableType),
-        });
-      } else {
-        const dataType = createVariableType(variableType);
-        codeMirror.current.dispatch({
-          effects: updateVariableTypeEffect.of(dataType),
-        });
-
-        return () => {
-          dataType.free();
-        };
-      }
+      codeMirror.current.dispatch({
+        effects: updateVariableTypeEffect.of(createVariableType(variableType)),
+      });
     }, [variableType]);
 
     useEffect(() => {
-      if (!codeMirror.current || !window.zenWasm) {
+      if (!codeMirror.current || !isWasmAvailable()) {
         return;
       }
 
@@ -241,20 +232,9 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
         return;
       }
 
-      if (expectedVariableType instanceof window.zenWasm.VariableType) {
-        codeMirror.current.dispatch({
-          effects: updateExpectedVariableTypeEffect.of(expectedVariableType),
-        });
-      } else {
-        const dataType = createVariableType(expectedVariableType);
-        codeMirror.current.dispatch({
-          effects: updateExpectedVariableTypeEffect.of(dataType),
-        });
-
-        return () => {
-          dataType.free();
-        };
-      }
+      codeMirror.current.dispatch({
+        effects: updateExpectedVariableTypeEffect.of(createVariableType(expectedVariableType)),
+      });
     }, [expectedVariableType]);
 
     useEffect(() => {
@@ -284,11 +264,3 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
     );
   },
 );
-
-const createVariableType = (data: any) => {
-  try {
-    return window.zenWasm!.VariableType.fromJson(data);
-  } catch {
-    return new window.zenWasm!.VariableType(data);
-  }
-};

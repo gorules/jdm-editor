@@ -1,9 +1,11 @@
+import { createVariableType } from '@gorules/zen-engine-wasm';
 import type { DragDropManager } from 'dnd-core';
 import equal from 'fast-deep-equal/es6/react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
+import { isWasmAvailable } from '../../helpers/wasm';
 import type { SimulationTraceDataExpression } from '../decision-graph';
 import { ExpressionStoreProvider, useExpressionStoreRaw } from './context/expression-store.context';
 import type { ExpressionControllerProps } from './expression-controller';
@@ -69,19 +71,11 @@ const SimulateDataSync: React.FC<Pick<ExpressionProps, 'traceData' | 'inputData'
   }, [traceData]);
 
   useEffect(() => {
-    if (!window.zenWasm) {
+    if (!isWasmAvailable()) {
       return;
     }
 
-    const vt = new window.zenWasm.VariableType(inputData ?? {});
-    expressionStoreRaw.setState({
-      inputData,
-      inputVariableType: vt,
-    });
-
-    return () => {
-      vt.free();
-    };
+    expressionStoreRaw.setState({ inputVariableType: createVariableType(inputData) });
   }, [inputData]);
 
   return null;

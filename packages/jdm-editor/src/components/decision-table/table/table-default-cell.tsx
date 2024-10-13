@@ -96,7 +96,7 @@ const TableInputCell: React.FC<TableCellProps> = ({ column, value, onChange, dis
   );
 
   useEffect(() => {
-    if (!inputVariableType || localVariableType.value) {
+    if (!inputVariableType) {
       return;
     }
 
@@ -106,8 +106,9 @@ const TableInputCell: React.FC<TableCellProps> = ({ column, value, onChange, dis
 
     const state = raw.stateStore.getState();
 
+    const resultingType = inputVariableType.clone();
     const calculatedType = inputVariableType.calculateType(column.field);
-    const resultingType = inputVariableType.cloneWithType('$', calculatedType);
+    resultingType.setOwned('$', calculatedType);
 
     raw.stateStore.setState({
       derivedVariableTypes: {

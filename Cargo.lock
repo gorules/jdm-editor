@@ -936,6 +936,7 @@ dependencies = [
  "fastrand",
  "getrandom",
  "gloo-utils",
+ "js-sys",
  "serde",
  "serde_json",
  "wasm-bindgen",
@@ -945,9 +946,7 @@ dependencies = [
 
 [[package]]
 name = "zen-expression"
-version = "0.32.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f628e0249bd07eb753febc92e11a2bad9b4d9a62989047fd4e7033b88bd375ff"
+version = "0.31.0"
 dependencies = [
  "ahash 0.8.11",
  "bumpalo",
@@ -970,9 +969,7 @@ dependencies = [
 
 [[package]]
 name = "zen-tmpl"
-version = "0.32.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5b5ddb0226431ec50044485cc4e6c2c5f0a29e32d9cf2b65f8e0538b524c7c45"
+version = "0.31.0"
 dependencies = [
  "itertools",
  "serde",

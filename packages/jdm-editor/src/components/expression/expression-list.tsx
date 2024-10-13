@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 
 import { useExpressionStore } from './context/expression-store.context';
 import { ExpressionItem } from './expression-item';
+import { isWasmAvailable } from '../../helpers/wasm';
 
 export type ExpressionListProps = {
   //
@@ -27,17 +28,17 @@ export const ExpressionList: React.FC<ExpressionListProps> = ({}) => {
   const [variableType, setVariableType] = useState<VariableType>();
 
   useEffect(() => {
-    if (!window.zenWasm || !inputVariableType) {
+    if (!isWasmAvailable() || !inputVariableType) {
       return;
     }
 
-    const resultingVariableType = expressions
+    const resultingVariableType = inputVariableType.clone();
+    expressions
       .filter((e) => e.key.length > 0)
-      .reduce((vt, expr) => {
-        const calculatedType = vt.calculateType(expr.value);
-
-        return vt.cloneWithType(`$.${expr.key}`, calculatedType);
-      }, inputVariableType);
+      .forEach((expr) => {
+        const calculatedType = resultingVariableType.calculateType(expr.value);
+        resultingVariableType.setOwned(`$.${expr.key}`, calculatedType);
+      });
 
     setVariableType(resultingVariableType);
   }, [expressions, inputVariableType]);

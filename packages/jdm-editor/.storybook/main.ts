@@ -13,6 +13,10 @@ const config: StorybookConfig = {
     name: '@storybook/react-vite',
     options: {},
   },
+  viteFinal: (config) => {
+    delete config.resolve?.alias;
+    return config;
+  },
 };
 
 export default config;

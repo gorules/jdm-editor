@@ -1,8 +1,9 @@
 import type { Diagnostic } from '@codemirror/lint';
-import type { VariableType } from '@gorules/zen-engine-wasm';
+import { VariableType, validateExpression, validateUnaryExpression } from '@gorules/zen-engine-wasm';
 import { P, match } from 'ts-pattern';
 
 import { codemirror } from '../../../helpers/codemirror';
+import { isWasmAvailable } from '../../../helpers/wasm';
 import { renderDiagnosticMessage } from './diagnostic';
 import type { ZenType } from './types';
 import {
@@ -41,13 +42,13 @@ const extractPosition = (error: string): [number, number] | number | null => {
 };
 
 const lintExpression = (type: string, source: string): Diagnostic[] => {
-  if (!window.zenWasm) {
+  if (!isWasmAvailable()) {
     return [];
   }
 
   const error: ExpressionError = match(type)
-    .with('standard', () => window.zenWasm!.validateExpression(source))
-    .with('unary', () => window.zenWasm!.validateUnaryExpression(source))
+    .with('standard', () => validateExpression(source))
+    .with('unary', () => validateUnaryExpression(source))
     .otherwise(() => null);
   if (!error) {
     return [];
@@ -77,7 +78,7 @@ const lintExpression = (type: string, source: string): Diagnostic[] => {
 };
 
 export const zenLinter = (type: string) => {
-  if (!window.zenWasm) {
+  if (!isWasmAvailable()) {
     return [];
   }
 
@@ -99,6 +100,10 @@ export const zenLinter = (type: string) => {
         view.dom.setAttribute('data-severity', 'error');
       } else if (diagnostics.some((d) => d.severity === 'warning')) {
         view.dom.setAttribute('data-severity', 'warning');
+      } else if (diagnostics.some((d) => d.severity === 'info')) {
+        view.dom.setAttribute('data-severity', 'info');
+      } else if (diagnostics.some((d) => d.severity === 'hint')) {
+        view.dom.setAttribute('data-severity', 'hint');
       }
 
       return diagnostics;
@@ -146,7 +151,10 @@ export const validateZenExpression = ({
       createDiagnostic({
         from: t.span[0],
         to: t.span[1],
-        severity: 'warning',
+        severity: match(t.error as string)
+          .with(P.string.startsWith('Hint:'), () => 'hint' as const)
+          .with(P.string.startsWith('Info:'), () => 'info' as const)
+          .otherwise(() => 'warning' as const),
         message: t.error as string,
         source: 'Type check',
       }),
@@ -169,12 +177,10 @@ export const validateZenExpression = ({
     }
   } else if (expectedVariableType && types.length > 0) {
     const expressionResultKind = types[0].kind;
-    const expressionResultVt = window.zenWasm!.VariableType.fromJson(expressionResultKind);
+    const expressionResultVt = VariableType.fromJson(expressionResultKind);
     const typesEqual = match(strict)
       .with(true, () => expressionResultVt.equal(expectedVariableType))
       .otherwise(() => expressionResultVt.satisfies(expectedVariableType));
-
-    expressionResultVt.free();
 
     if (!typesEqual) {
       diagnostics.push(
