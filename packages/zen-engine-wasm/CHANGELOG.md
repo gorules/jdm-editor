@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.11.0](https://github.com/gorules/jdm-editor/compare/@gorules/zen-engine-wasm@0.10.0...@gorules/zen-engine-wasm@0.11.0) (2024-10-14)
+
+### Features
+
+- add type inference ([#95](https://github.com/gorules/jdm-editor/issues/95)) ([fa59876](https://github.com/gorules/jdm-editor/commit/fa5987668e2ae4c536677022dabc5f94472a34c9))
+
 # [0.10.0](https://github.com/gorules/jdm-editor/compare/@gorules/zen-engine-wasm@0.9.1...@gorules/zen-engine-wasm@0.10.0) (2024-10-11)
 
 ### Features
