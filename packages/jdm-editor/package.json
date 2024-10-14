@@ -33,6 +33,7 @@
     "@codemirror/view": "^6.34.1",
     "@gorules/lezer-zen": "workspace:*",
     "@gorules/lezer-zen-template": "workspace:*",
+    "@gorules/zen-engine-wasm": "workspace:*",
     "@lezer/common": "^1.2.2",
     "@lezer/highlight": "^1.2.1",
     "@lezer/lr": "^1.4.2",
@@ -85,9 +86,6 @@
     "vite": "5.4.8",
     "vite-plugin-dts": "^4.2.3",
     "vite-plugin-wasm": "^3.3.0"
-  },
-  "optionalDependencies": {
-    "@gorules/zen-engine-wasm": "workspace:*"
   },
   "jest": {
     "collectCoverageFrom": [

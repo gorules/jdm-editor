@@ -1,7 +1,7 @@
 import { VariableType } from '../dist/zen_engine_wasm.js';
 
 export function createVariableType(variable) {
-  if (!variable || !(typeof variable === 'object')) {
+  if (!variable) {
     return VariableType.fromJson('Any');
   }
 

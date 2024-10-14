@@ -27,7 +27,7 @@ type GenerateNodeParams = {
 export type InferTypeData<T> = {
   input: VariableType;
   content: T;
-}
+};
 
 export type NodeSpecification<T = any> = {
   icon?: React.ReactNode;

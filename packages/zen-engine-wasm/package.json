@@ -6,11 +6,11 @@
   "module": "index.js",
   "types": "index.d.ts",
   "sideEffects": [
-    "./wasm/zen_engine_wasm.js",
-    "./wasm/snippets/*"
+    "./dist/zen_engine_wasm.js",
+    "./dist/snippets/*"
   ],
   "files": [
-    "wasm/",
+    "dist/",
     "util/",
     "index.js",
     "index.d.ts",

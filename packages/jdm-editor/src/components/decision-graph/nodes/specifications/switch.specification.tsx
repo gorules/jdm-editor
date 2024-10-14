@@ -1,5 +1,6 @@
 import { BranchesOutlined, DeleteOutlined, DownOutlined } from '@ant-design/icons';
-import { VariableType, createVariableType } from '@gorules/zen-engine-wasm';
+import type { VariableType } from '@gorules/zen-engine-wasm';
+import { createVariableType } from '@gorules/zen-engine-wasm';
 import { Button, Dropdown, Popconfirm, Typography } from 'antd';
 import clsx from 'clsx';
 import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';

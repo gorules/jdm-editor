@@ -1,10 +1,10 @@
 import { DeleteOutlined, MenuOutlined } from '@ant-design/icons';
+import type { VariableType } from '@gorules/zen-engine-wasm';
 import type { Row } from '@tanstack/react-table';
 import { Button, Input, Popconfirm, Typography } from 'antd';
 import clsx from 'clsx';
 import React, { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import type { VariableType } from 'zen-engine-wasm/dist/zen_engine_wasm';
 
 import { LocalCodeEditor } from '../code-editor/local-ce';
 import type { ExpressionEntry } from './context/expression-store.context';

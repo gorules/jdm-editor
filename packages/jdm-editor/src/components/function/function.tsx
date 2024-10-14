@@ -226,7 +226,7 @@ export const Function: React.FC<FunctionProps> = ({
           <Button
             type='text'
             size={'small'}
-            color='secondary'
+            color='default'
             icon={<FormatPainterOutlined />}
             disabled={disabled}
             onClick={() => {

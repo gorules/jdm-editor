@@ -20,7 +20,7 @@ import { edgeFunction } from '../custom-edge';
 import { mapToDecisionEdge } from '../dg-util';
 import '../dg.scss';
 import { useGraphClipboard } from '../hooks/use-graph-clipboard';
-import type { CustomNodeSpecification } from '../nodes/custom-node/index';
+import type { CustomNodeSpecification } from '../nodes/custom-node';
 import { GraphNode } from '../nodes/graph-node';
 import type { MinimalNodeProps } from '../nodes/specifications/specification-types';
 import { NodeKind } from '../nodes/specifications/specification-types';
@@ -206,7 +206,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
 
     if (customSpecification.onNodeAdd) {
       try {
-        newNode = await customSpecification.onNodeAdd(newNode);
+        newNode = (await customSpecification.onNodeAdd(newNode as any)) as any;
       } catch {
         return;
       }

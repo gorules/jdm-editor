@@ -78,7 +78,7 @@ export type DecisionGraphStoreType = {
 
     name: string;
 
-    customNodes: CustomNodeSpecification<object, string>[];
+    customNodes: CustomNodeSpecification<object, any>[];
 
     panels?: PanelType[];
     activePanel?: string;

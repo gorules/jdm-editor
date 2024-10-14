@@ -5,9 +5,9 @@ import clsx from 'clsx';
 import equal from 'fast-deep-equal/es6/react';
 import React, { useEffect, useState } from 'react';
 
+import { isWasmAvailable } from '../../helpers/wasm';
 import { useExpressionStore } from './context/expression-store.context';
 import { ExpressionItem } from './expression-item';
-import { isWasmAvailable } from '../../helpers/wasm';
 
 export type ExpressionListProps = {
   //

@@ -11,24 +11,27 @@ export default defineConfig({
     dts({
       insertTypesEntry: true,
       rollupTypes: true,
-      aliasesExclude: ['@gorules/zen-engine-wasm'],
     }),
   ],
   resolve: {
     dedupe: ['@lezer/common', '@lezer/lr', '@lezer/highlight'],
-    alias: {
-      '@gorules/zen-engine-wasm': path.resolve(__dirname, 'src', 'zen-wasm-proxy.ts'),
-    },
   },
   build: {
     target: 'esnext',
+    minify: false,
     lib: {
       entry: path.resolve(__dirname, 'src', 'index.ts'),
       name: 'JDM Editor',
       fileName: 'jdm-editor',
     },
     rollupOptions: {
-      external: ['react', 'react-dom', ...Object.keys(packageJson.dependencies)],
+      external: [
+        'react/jsx-runtime',
+        'react',
+        'react-dom',
+        /ace-builds\/?.*/,
+        ...Object.keys(packageJson.dependencies),
+      ],
       output: {
         globals: {
           'react-dom': 'ReactDOM',

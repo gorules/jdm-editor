@@ -83,6 +83,9 @@ importers:
       '@gorules/lezer-zen-template':
         specifier: workspace:*
         version: link:../lezer-zen-template
+      '@gorules/zen-engine-wasm':
+        specifier: workspace:*
+        version: link:../zen-engine-wasm
       '@lezer/common':
         specifier: ^1.2.2
         version: 1.2.2
@@ -155,10 +158,6 @@ importers:
       zustand:
         specifier: ^4.5.5
         version: 4.5.5(@types/react@18.3.11)(immer@10.1.1)(react@18.3.1)
-    optionalDependencies:
-      '@gorules/zen-engine-wasm':
-        specifier: workspace:*
-        version: link:../zen-engine-wasm
     devDependencies:
       '@storybook/addon-actions':
         specifier: 8.3.5
@@ -6194,7 +6193,7 @@ snapshots:
       '@babel/traverse': 7.24.1
       '@babel/types': 7.24.0
       convert-source-map: 2.0.0
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@8.1.1)
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.1
@@ -6322,7 +6321,7 @@ snapshots:
       '@babel/helper-split-export-declaration': 7.22.6
       '@babel/parser': 7.24.4
       '@babel/types': 7.24.0
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@8.1.1)
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
@@ -9163,10 +9162,6 @@ snapshots:
     dependencies:
       ms: 2.1.2
 
-  debug@4.3.7:
-    dependencies:
-      ms: 2.1.3
-
   debug@4.3.7(supports-color@8.1.1):
     dependencies:
       ms: 2.1.3
@@ -9401,7 +9396,7 @@ snapshots:
 
   esbuild-register@3.5.0(esbuild@0.21.5):
     dependencies:
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@8.1.1)
       esbuild: 0.21.5
     transitivePeerDependencies:
       - supports-color
@@ -12707,7 +12702,7 @@ snapshots:
       '@volar/typescript': 2.4.5
       '@vue/language-core': 2.1.6(typescript@5.6.2)
       compare-versions: 6.1.1
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@8.1.1)
       kolorist: 1.8.0
       local-pkg: 0.5.0
       magic-string: 0.30.11

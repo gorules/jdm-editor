@@ -7,11 +7,11 @@ import type { DecisionGraphContextProps } from './context/dg-store.context';
 import { DecisionGraphProvider } from './context/dg-store.context';
 import type { DecisionGraphEmptyType } from './dg-empty';
 import { DecisionGraphEmpty } from './dg-empty';
+import { DecisionGraphInferTypes } from './dg-infer';
 import type { DecisionGraphWrapperProps } from './dg-wrapper';
 import { DecisionGraphWrapper } from './dg-wrapper';
 import './dg.scss';
 import type { GraphRef } from './graph/graph';
-import { DecisionGraphInferTypes } from './dg-infer';
 
 export type DecisionGraphProps = {
   manager?: DragDropManager;
