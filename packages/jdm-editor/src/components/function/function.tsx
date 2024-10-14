@@ -1,4 +1,5 @@
 import { FormatPainterOutlined } from '@ant-design/icons';
+import { createVariableType } from '@gorules/zen-engine-wasm';
 import { Editor, type Monaco, useMonaco } from '@monaco-editor/react';
 import { Button, Spin, theme } from 'antd';
 import { MarkerSeverity, type editor } from 'monaco-editor';
@@ -9,6 +10,7 @@ import type { SimulationTrace, SimulationTraceDataFunction } from '../decision-g
 import { Stack } from '../stack';
 import { FunctionDebugger } from './function-debugger';
 import './function.scss';
+import { variableTypeToTypescript } from './helpers/determine-type';
 import { functionDefinitions } from './helpers/libs';
 import './monaco';
 
@@ -103,7 +105,7 @@ export const Function: React.FC<FunctionProps> = ({
   useEffect(() => {
     if (!monaco) return;
 
-    const data = JSON.stringify(inputData) ?? 'any';
+    const data = variableTypeToTypescript(createVariableType(inputData));
     monaco.languages.typescript.javascriptDefaults.addExtraLib(
       `
     type Input = ${data};

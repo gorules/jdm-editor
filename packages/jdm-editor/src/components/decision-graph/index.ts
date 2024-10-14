@@ -15,6 +15,7 @@ export {
   useDecisionGraphReferences,
   useDecisionGraphListeners,
   useDecisionGraphRaw,
+  NodeTypeKind,
   type DecisionNode,
   type DecisionEdge,
   type DecisionGraphType,

@@ -2,7 +2,7 @@ import { VariableType } from '@gorules/zen-engine-wasm';
 import equal from 'fast-deep-equal/es6/react';
 import { produce } from 'immer';
 import { useEffect } from 'react';
-import type { Node } from 'reactflow';
+import type { Edge, Node } from 'reactflow';
 import { getIncomers, getOutgoers } from 'reactflow';
 
 import { isWasmAvailable } from '../../helpers/wasm';
@@ -134,45 +134,67 @@ function* walkGraph(decisionGraph: DecisionGraphType): Generator<WalkGraphReturn
     return;
   }
 
+  if (hasCycle(beginRf, nodes, edges)) {
+    return;
+  }
+
   yield { node: begin, incomers: [] };
   const visited = new Set<string>();
-  const inProgress = new Set<string>();
 
-  function* dfs(node: Node): Generator<WalkGraphReturn> {
+  visited.add(begin.id);
+
+  const stack = getOutgoers(beginRf, nodes, edges);
+  while (stack.length > 0) {
+    const current = stack.pop()!;
+    if (visited.has(current.id)) {
+      continue;
+    }
+
+    const incomers = getIncomers(current, nodes, edges);
+    const unvisitedIncomers = incomers.filter((incomer) => !visited.has(incomer.id));
+
+    if (unvisitedIncomers.length > 0) {
+      stack.push(current, ...unvisitedIncomers);
+      continue;
+    }
+
+    visited.add(current.id);
+    const decisionNode = decisionGraph.nodes.find((n) => n.id === current.id);
+    if (decisionNode) {
+      const mappedIncomers = decisionGraph.nodes.filter((n) => incomers.some((inc) => inc.id === n.id));
+      yield { node: decisionNode, incomers: mappedIncomers };
+    }
+
+    const outgoers = getOutgoers(current, nodes, edges);
+    stack.push(...outgoers);
+  }
+}
+
+const hasCycle = (begin: Node, nodes: Node[], edges: Edge[]): boolean => {
+  const visited = new Set<string>();
+  const recursionStack = new Set<string>();
+
+  const dfs = (node: Node): boolean => {
     visited.add(node.id);
-    inProgress.add(node.id);
+    recursionStack.add(node.id);
 
     const outgoers = getOutgoers(node, nodes, edges);
     for (const outgoer of outgoers) {
-      if (inProgress.has(outgoer.id)) {
-        // Cycle detected
-        return;
+      if (!visited.has(outgoer.id)) {
+        if (dfs(outgoer)) {
+          return true;
+        }
+      } else if (recursionStack.has(outgoer.id)) {
+        return true;
       }
-
-      if (visited.has(outgoer.id)) {
-        continue;
-      }
-
-      const incomers = getIncomers(outgoer, nodes, edges);
-      const unvisitedIncomers = incomers.filter((incomer) => !visited.has(incomer.id));
-      for (const unvisitedIncomer of unvisitedIncomers) {
-        yield* dfs(unvisitedIncomer);
-      }
-
-      const decisionNode = decisionGraph.nodes.find((n) => n.id === outgoer.id);
-      if (decisionNode) {
-        const mappedIncomers = decisionGraph.nodes.filter((n) => incomers.some((inc) => inc.id === n.id));
-        yield { node: decisionNode, incomers: mappedIncomers };
-      }
-
-      yield* dfs(outgoer);
     }
 
-    inProgress.delete(node.id);
-  }
+    recursionStack.delete(node.id);
+    return false;
+  };
 
-  yield* dfs(beginRf);
-}
+  return dfs(begin);
+};
 
 const inputStateDigest = ({
   decisionGraph,
