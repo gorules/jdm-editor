@@ -7,6 +7,7 @@ import type { DecisionGraphContextProps } from './context/dg-store.context';
 import { DecisionGraphProvider } from './context/dg-store.context';
 import type { DecisionGraphEmptyType } from './dg-empty';
 import { DecisionGraphEmpty } from './dg-empty';
+import { DecisionGraphInferTypes } from './dg-infer';
 import type { DecisionGraphWrapperProps } from './dg-wrapper';
 import { DecisionGraphWrapper } from './dg-wrapper';
 import './dg.scss';
@@ -28,6 +29,7 @@ export const DecisionGraph = forwardRef<DecisionGraphRef, DecisionGraphProps>(
           <DecisionGraphProvider>
             <DecisionGraphWrapper ref={ref} reactFlowProOptions={reactFlowProOptions} />
             <DecisionGraphEmpty {...props} />
+            <DecisionGraphInferTypes />
           </DecisionGraphProvider>
         </ReactFlowProvider>
       </div>

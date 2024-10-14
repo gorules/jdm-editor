@@ -33,6 +33,7 @@
     "@codemirror/view": "^6.34.1",
     "@gorules/lezer-zen": "workspace:*",
     "@gorules/lezer-zen-template": "workspace:*",
+    "@gorules/zen-engine-wasm": "workspace:*",
     "@lezer/common": "^1.2.2",
     "@lezer/highlight": "^1.2.1",
     "@lezer/lr": "^1.4.2",
@@ -59,7 +60,6 @@
     "zustand": "^4.5.5"
   },
   "devDependencies": {
-    "@gorules/zen-engine-wasm": "workspace:*",
     "@storybook/addon-actions": "8.3.5",
     "@storybook/addon-docs": "8.3.5",
     "@storybook/addon-essentials": "8.3.5",

@@ -472,9 +472,9 @@ dependencies = [
 
 [[package]]
 name = "regex"
-version = "1.10.6"
+version = "1.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4219d74c6b67a3654a9fbebc4b419e22126d13d2f3c4a07ee0cb61ff79a79619"
+checksum = "38200e5ee88914975b69f657f0801b6f6dccafd44fd9326302a4aaeecfacb1d8"
 dependencies = [
  "aho-corasick",
  "memchr",
@@ -484,9 +484,9 @@ dependencies = [
 
 [[package]]
 name = "regex-automata"
-version = "0.4.7"
+version = "0.4.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "38caf58cc5ef2fed281f89292ef23f6365465ed9a41b7a7754eb4e26496c92df"
+checksum = "368758f23274712b504848e9d5a6f010445cc8b87a7cdb4d7cbee666c1288da3"
 dependencies = [
  "aho-corasick",
  "memchr",
@@ -501,9 +501,9 @@ checksum = "53a49587ad06b26609c52e423de037e7f57f20d53535d66e08c695f347df952a"
 
 [[package]]
 name = "regex-syntax"
-version = "0.8.4"
+version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7a66a03ae7c801facd77a29370b4faec201768915ac14a721ba36f20bc9c209b"
+checksum = "2b15c43186be67a4fd63bee50d0303afffcef381492ebe2c5d87f324e1b8815c"
 
 [[package]]
 name = "rend"
@@ -936,6 +936,7 @@ dependencies = [
  "fastrand",
  "getrandom",
  "gloo-utils",
+ "js-sys",
  "serde",
  "serde_json",
  "wasm-bindgen",
@@ -945,9 +946,9 @@ dependencies = [
 
 [[package]]
 name = "zen-expression"
-version = "0.32.0"
+version = "0.32.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f628e0249bd07eb753febc92e11a2bad9b4d9a62989047fd4e7033b88bd375ff"
+checksum = "d8649440cc54ad9927fab270cb66dcb5866361da2250916f982739840e9c32a4"
 dependencies = [
  "ahash 0.8.11",
  "bumpalo",
@@ -970,9 +971,9 @@ dependencies = [
 
 [[package]]
 name = "zen-tmpl"
-version = "0.32.0"
+version = "0.32.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5b5ddb0226431ec50044485cc4e6c2c5f0a29e32d9cf2b65f8e0538b524c7c45"
+checksum = "aadf99bd4f1e967fe32d30de7fd31aafb772d3cc0dc17a96bb908ecac9f90a50"
 dependencies = [
  "itertools",
  "serde",

@@ -3,14 +3,17 @@
   "version": "0.10.0",
   "description": "ZEN Engine WASM",
   "type": "module",
-  "module": "dist/zen_engine_wasm.js",
-  "types": "dist/zen_engine_wasm.d.ts",
+  "module": "index.js",
+  "types": "index.d.ts",
   "sideEffects": [
     "./dist/zen_engine_wasm.js",
     "./dist/snippets/*"
   ],
   "files": [
     "dist/",
+    "util/",
+    "index.js",
+    "index.d.ts",
     "package.json",
     "README.md",
     "LICENSE"

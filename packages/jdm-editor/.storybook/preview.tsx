@@ -8,8 +8,6 @@ import { JdmConfigProvider } from '../src';
 
 await ZenEngineWasm.default();
 
-(window as any).zenWasm = ZenEngineWasm;
-
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },
   parameters: {

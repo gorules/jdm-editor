@@ -3,6 +3,8 @@ import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 import wasm from 'vite-plugin-wasm';
 
+import packageJson from './package.json';
+
 export default defineConfig({
   plugins: [
     wasm(),
@@ -22,7 +24,13 @@ export default defineConfig({
       fileName: 'jdm-editor',
     },
     rollupOptions: {
-      external: ['react', 'react-dom'],
+      external: [
+        'react/jsx-runtime',
+        'react',
+        'react-dom',
+        /ace-builds\/?.*/,
+        ...Object.keys(packageJson.dependencies),
+      ],
       output: {
         globals: {
           'react-dom': 'ReactDOM',

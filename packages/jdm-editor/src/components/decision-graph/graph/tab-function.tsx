@@ -3,7 +3,12 @@ import { Spin } from 'antd';
 import React, { Suspense, useEffect, useState } from 'react';
 import { P, match } from 'ts-pattern';
 
-import { useDecisionGraphActions, useDecisionGraphListeners, useDecisionGraphState } from '../context/dg-store.context';
+import {
+  NodeTypeKind,
+  useDecisionGraphActions,
+  useDecisionGraphListeners,
+  useDecisionGraphState,
+} from '../context/dg-store.context';
 import { FunctionKind, useFunctionKind } from '../nodes/specifications/function.specification';
 import type { SimulationTrace, SimulationTraceDataFunction } from '../types/simulation.types';
 
@@ -21,8 +26,8 @@ export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
   const graphActions = useDecisionGraphActions();
   const onFunctionReady = useDecisionGraphListeners((s) => s.onFunctionReady);
   const [monaco, setMonaco] = useState<Monaco>();
-  const { nodeTrace, disabled, content, additionalModules, nodeError } = useDecisionGraphState(
-    ({ simulate, disabled, configurable, decisionGraph }) => ({
+  const { nodeTrace, disabled, content, additionalModules, nodeError, inferredType } = useDecisionGraphState(
+    ({ simulate, disabled, configurable, decisionGraph, nodeTypes }) => ({
       nodeTrace: match(simulate)
         .with({ result: P._ }, ({ result }) => result?.trace?.[id])
         .otherwise(() => null),
@@ -31,6 +36,7 @@ export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
         .otherwise(() => null),
       disabled,
       configurable,
+      inferredType: nodeTypes[id]?.[NodeTypeKind.Input] ?? nodeTypes[id]?.[NodeTypeKind.InferredInput],
       content: (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content,
       additionalModules: (decisionGraph?.nodes ?? [])
         .filter((node) => node.type === 'functionNode')
@@ -72,7 +78,7 @@ export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
         onMonacoReady={(monaco) => setMonaco(monaco)}
         value={kind === FunctionKind.Stable ? content.source : content}
         error={nodeError ?? undefined}
-        inputData={nodeTrace?.input}
+        inputData={nodeTrace?.input ?? inferredType}
         onChange={(val) => {
           graphActions.updateNode(id, (draft) => {
             if (kind === FunctionKind.Stable) {

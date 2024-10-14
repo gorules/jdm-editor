@@ -34,7 +34,6 @@ export type ExpressionStore = {
   updateRow: (index: number, update: Partial<Omit<ExpressionEntry, 'id'>>) => void;
   removeRow: (index: number) => void;
 
-  inputData?: unknown;
   inputVariableType?: VariableType;
 };
 

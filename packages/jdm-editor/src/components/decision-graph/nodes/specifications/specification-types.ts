@@ -1,3 +1,4 @@
+import { type VariableType } from '@gorules/zen-engine-wasm';
 import type React from 'react';
 import type { NodeProps } from 'reactflow';
 
@@ -23,6 +24,11 @@ type GenerateNodeParams = {
   index: number;
 };
 
+export type InferTypeData<T> = {
+  input: VariableType;
+  content: T;
+};
+
 export type NodeSpecification<T = any> = {
   icon?: React.ReactNode;
   type: string;
@@ -34,6 +40,10 @@ export type NodeSpecification<T = any> = {
   helper?: string | React.ReactNode;
   generateNode: (params: GenerateNodeParams) => Omit<DecisionNode<T>, 'position' | 'id' | 'type'>;
   renderNode: React.FC<MinimalNodeProps & { specification: MinimalNodeSpecification }>;
+  inferTypes?: {
+    needsUpdate: (state: InferTypeData<T>, prevState: InferTypeData<T>) => boolean;
+    determineOutputType: (state: InferTypeData<T>) => VariableType;
+  };
 
   onNodeAdd?: (node: DecisionNode<T>) => Promise<DecisionNode<T>>;
 };

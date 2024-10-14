@@ -1,4 +1,5 @@
 import { ClearOutlined, FormatPainterOutlined, PlayCircleOutlined } from '@ant-design/icons';
+import { VariableType } from '@gorules/zen-engine-wasm';
 import 'ace-builds/src-noconflict/ext-language_tools';
 import 'ace-builds/src-noconflict/mode-json5';
 import 'ace-builds/src-noconflict/theme-chrome';
@@ -6,11 +7,17 @@ import 'ace-builds/src-noconflict/theme-github_dark';
 import { Button, Spin, Tooltip, Typography, notification, theme } from 'antd';
 import clsx from 'clsx';
 import json5 from 'json5';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import ReactAce from 'react-ace';
 import { P, match } from 'ts-pattern';
 
-import { type DecisionGraphType, useDecisionGraphRaw, useDecisionGraphState } from './context/dg-store.context';
+import { isWasmAvailable } from '../../helpers/wasm';
+import {
+  type DecisionGraphType,
+  NodeTypeKind,
+  useDecisionGraphRaw,
+  useDecisionGraphState,
+} from './context/dg-store.context';
 import { NodeKind } from './nodes/specifications/specification-types';
 
 type GraphSimulatorProps = {
@@ -31,7 +38,7 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
   const { token } = theme.useToken();
   const [requestValue, setRequestValue] = useState(defaultRequest);
 
-  const { stateStore } = useDecisionGraphRaw();
+  const { stateStore, actions } = useDecisionGraphRaw();
   const { nodeTypes, simulate } = useDecisionGraphState(({ decisionGraph, simulate }) => ({
     simulate,
     nodeTypes: (decisionGraph.nodes ?? []).reduce<Record<string, string | undefined>>(
@@ -54,6 +61,25 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
       .with('dark', () => 'github_dark')
       .otherwise(() => 'chrome');
   }, [token.mode]);
+
+  useEffect(() => {
+    if (!isWasmAvailable()) {
+      return;
+    }
+
+    const { decisionGraph } = stateStore.getState();
+    const requestNode = decisionGraph.nodes.find((n) => n.type === 'inputNode');
+    if (!requestNode) {
+      return;
+    }
+
+    try {
+      const value = requestValue ? json5.parse(requestValue) : 'Any';
+      actions.setNodeType(requestNode.id, NodeTypeKind.Output, new VariableType(value));
+    } catch {
+      // Skip
+    }
+  }, [requestValue]);
 
   return (
     <div className={'grl-dg__simulator'}>

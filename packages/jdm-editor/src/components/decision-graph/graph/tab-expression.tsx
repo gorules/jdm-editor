@@ -2,7 +2,7 @@ import type { DragDropManager } from 'dnd-core';
 import React from 'react';
 
 import { Expression } from '../../expression';
-import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
+import { NodeTypeKind, useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
 import type { SimulationTrace, SimulationTraceDataExpression } from '../types/simulation.types';
 
 export type TabExpressionProps = {
@@ -12,8 +12,8 @@ export type TabExpressionProps = {
 
 export const TabExpression: React.FC<TabExpressionProps> = ({ id, manager }) => {
   const graphActions = useDecisionGraphActions();
-  const { disabled, configurable, content, trace } = useDecisionGraphState(
-    ({ disabled, configurable, decisionGraph, simulate }) => ({
+  const { disabled, configurable, content, trace, inferredType } = useDecisionGraphState(
+    ({ disabled, configurable, decisionGraph, simulate, nodeTypes }) => ({
       disabled,
       configurable,
       content: (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content,
@@ -21,6 +21,7 @@ export const TabExpression: React.FC<TabExpressionProps> = ({ id, manager }) => 
         simulate && 'result' in simulate
           ? (simulate.result?.trace[id] as SimulationTrace<SimulationTraceDataExpression>)
           : undefined,
+      inferredType: nodeTypes[id]?.[NodeTypeKind.Input] ?? nodeTypes[id]?.[NodeTypeKind.InferredInput],
     }),
   );
 
@@ -32,7 +33,7 @@ export const TabExpression: React.FC<TabExpressionProps> = ({ id, manager }) => 
         disabled={disabled}
         configurable={configurable}
         manager={manager}
-        inputData={trace?.input}
+        inputData={trace?.input ?? inferredType}
         onChange={(val) => {
           graphActions.updateNode(id, (draft) => {
             draft.content.expressions = val;

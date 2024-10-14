@@ -2,9 +2,8 @@ import { CloseOutlined, CompressOutlined, LeftOutlined, WarningOutlined } from '
 import { Button, Modal, Tooltip, Typography, message } from 'antd';
 import clsx from 'clsx';
 import React, { type MutableRefObject, forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import type { Connection, ProOptions, ReactFlowInstance, XYPosition } from 'reactflow';
-import { ControlButton } from 'reactflow';
-import ReactFlow, { Background, Controls, useEdgesState, useNodesState } from 'reactflow';
+import type { Connection, Node, ProOptions, ReactFlowInstance, XYPosition } from 'reactflow';
+import ReactFlow, { Background, ControlButton, Controls, getOutgoers, useEdgesState, useNodesState } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { P, match } from 'ts-pattern';
 
@@ -21,7 +20,7 @@ import { edgeFunction } from '../custom-edge';
 import { mapToDecisionEdge } from '../dg-util';
 import '../dg.scss';
 import { useGraphClipboard } from '../hooks/use-graph-clipboard';
-import type { CustomNodeSpecification } from '../nodes/custom-node/index';
+import type { CustomNodeSpecification } from '../nodes/custom-node';
 import { GraphNode } from '../nodes/graph-node';
 import type { MinimalNodeProps } from '../nodes/specifications/specification-types';
 import { NodeKind } from '../nodes/specifications/specification-types';
@@ -207,7 +206,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
 
     if (customSpecification.onNodeAdd) {
       try {
-        newNode = await customSpecification.onNodeAdd(newNode);
+        newNode = (await customSpecification.onNodeAdd(newNode as any)) as any;
       } catch {
         return;
       }
@@ -230,7 +229,9 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
       return false;
     }
 
+    const [nodes] = nodesState;
     const [edges] = edgesState;
+
     const hasDuplicate = edges.some(
       (edge) =>
         edge.source === connection.source &&
@@ -239,7 +240,25 @@ export const Graph = forwardRef<GraphRef, GraphProps>(({ reactFlowProOptions, cl
         (edge.targetHandle ?? null) === (connection.targetHandle ?? null),
     );
 
-    return !hasDuplicate;
+    const target = nodes.find((node) => node.id === connection.target);
+    if (!target || target.id === connection.source) {
+      return false;
+    }
+
+    const hasCycle = (node: Node, visited = new Set()) => {
+      if (visited.has(node.id)) {
+        return false;
+      }
+
+      visited.add(node.id);
+
+      for (const outgoer of getOutgoers(node, nodes, edges)) {
+        if (outgoer.id === connection.source) return true;
+        if (hasCycle(outgoer, visited)) return true;
+      }
+    };
+
+    return !hasDuplicate && !hasCycle(target);
   };
 
   const onDrop = (event: React.DragEvent) => {
