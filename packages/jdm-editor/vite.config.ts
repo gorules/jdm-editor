@@ -18,7 +18,6 @@ export default defineConfig({
   },
   build: {
     target: 'esnext',
-    minify: false,
     lib: {
       entry: path.resolve(__dirname, 'src', 'index.ts'),
       name: 'JDM Editor',
