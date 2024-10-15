@@ -35,9 +35,9 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/decision-tables',
   shortDescription: 'Rules spreadsheet',
   inferTypes: {
-    needsUpdate: (state, prevState) => !equal(state.content.outputs, prevState.content.outputs),
+    needsUpdate: (state, prevState) => !equal(state.content?.outputs, prevState.content?.outputs),
     determineOutputType: ({ content }) => {
-      const fields = (content.outputs || []).map((output) => output.field).filter((f) => !!f);
+      const fields = (content?.outputs || []).map((output) => output.field).filter((f) => !!f);
       const baseType = VariableType.fromJson({ Object: {} });
 
       fields.forEach((field) => {
