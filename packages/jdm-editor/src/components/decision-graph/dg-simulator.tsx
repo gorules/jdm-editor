@@ -1,9 +1,9 @@
 import { ClearOutlined, FormatPainterOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { VariableType } from '@gorules/zen-engine-wasm';
-import 'ace-builds/src-noconflict/ext-language_tools';
-import 'ace-builds/src-noconflict/mode-json5';
-import 'ace-builds/src-noconflict/theme-chrome';
-import 'ace-builds/src-noconflict/theme-github_dark';
+import 'ace-builds/src-noconflict/ext-language_tools.js';
+import 'ace-builds/src-noconflict/mode-json5.js';
+import 'ace-builds/src-noconflict/theme-chrome.js';
+import 'ace-builds/src-noconflict/theme-github_dark.js';
 import { Button, Spin, Tooltip, Typography, notification, theme } from 'antd';
 import clsx from 'clsx';
 import json5 from 'json5';
