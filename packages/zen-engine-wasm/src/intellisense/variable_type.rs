@@ -71,6 +71,12 @@ impl JsVariableType {
         Self(self.0.clone())
     }
 
+
+    #[wasm_bindgen(js_name = "intoArray")]
+    pub fn into_array(self) -> Self {
+        Self(VariableType::Array(Rc::new(self.0)))
+    }
+
     #[wasm_bindgen(js_name = "calculateType")]
     pub fn calculate_type(&self, source: &str) -> JsVariableType {
         if source.is_empty() {

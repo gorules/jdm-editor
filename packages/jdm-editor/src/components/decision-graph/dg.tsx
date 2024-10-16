@@ -28,8 +28,8 @@ export const DecisionGraph = forwardRef<DecisionGraphRef, DecisionGraphProps>(
         <ReactFlowProvider>
           <DecisionGraphProvider>
             <DecisionGraphWrapper ref={ref} reactFlowProOptions={reactFlowProOptions} />
-            <DecisionGraphEmpty {...props} />
             <DecisionGraphInferTypes />
+            <DecisionGraphEmpty {...props} />
           </DecisionGraphProvider>
         </ReactFlowProvider>
       </div>
