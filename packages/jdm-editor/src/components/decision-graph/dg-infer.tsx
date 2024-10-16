@@ -48,7 +48,7 @@ export const DecisionGraphInferTypes = () => {
     });
   }, []);
 
-  // Infer input types for nodes
+  // Infer types for nodes
   useEffect(() => {
     if (!isWasmAvailable()) {
       return;
