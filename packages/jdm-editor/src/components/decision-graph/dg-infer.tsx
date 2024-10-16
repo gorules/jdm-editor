@@ -29,7 +29,19 @@ export const DecisionGraphInferTypes = () => {
 
       const trace = match(simulate)
         .with({ result: P.nonNullable }, ({ result }) => result.trace)
-        .otherwise(() => ({}));
+        .otherwise(() => null);
+      if (trace === null) {
+        const newNodeTypes = produce(nodeTypes, (draft) => {
+          Object.values(draft).forEach((nt) => {
+            delete nt[NodeTypeKind.Input];
+            delete nt[NodeTypeKind.Output];
+          });
+        });
+
+        stateStore.setState({ nodeTypes: newNodeTypes });
+        return;
+      }
+
       const traceValues = Object.values(trace);
       if (traceValues.length === 0) {
         return;

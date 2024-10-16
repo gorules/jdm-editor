@@ -75,7 +75,7 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
 
     try {
       const value = requestValue ? json5.parse(requestValue) : 'Any';
-      actions.setNodeType(requestNode.id, NodeTypeKind.Output, new VariableType(value));
+      actions.setNodeType(requestNode.id, NodeTypeKind.InferredOutput, new VariableType(value));
     } catch {
       // Skip
     }
