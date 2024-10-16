@@ -159,26 +159,23 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
 
   const stateStore = useMemo(
     () =>
-      create<DecisionGraphStoreType['state']>()(
-        () =>
-          ({
-            id: undefined,
-            simulate: undefined,
-            decisionGraph: { nodes: [], edges: [] },
-            hoveredEdgeId: null,
-            openTabs: [],
-            activeTab: 'graph',
-            name: 'graph.json',
-            disabled: false,
-            configurable: true,
-            components: [],
-            customNodes: [],
-            activePanel: undefined,
-            panels: [],
-            compactMode: localStorage.getItem('jdm-compact-mode') === 'true',
-            nodeTypes: {},
-          }) as DecisionGraphStoreType['state'],
-      ),
+      create<DecisionGraphStoreType['state']>()(() => ({
+        id: undefined,
+        simulate: undefined,
+        decisionGraph: { nodes: [], edges: [] },
+        hoveredEdgeId: null,
+        openTabs: [],
+        activeTab: 'graph',
+        name: 'graph.json',
+        disabled: false,
+        configurable: true,
+        components: [],
+        customNodes: [],
+        activePanel: undefined,
+        panels: [],
+        compactMode: localStorage.getItem('jdm-compact-mode') === 'true',
+        nodeTypes: {},
+      })),
     [],
   );
 
