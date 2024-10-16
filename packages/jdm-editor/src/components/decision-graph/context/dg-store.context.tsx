@@ -159,23 +159,26 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
 
   const stateStore = useMemo(
     () =>
-      create<DecisionGraphStoreType['state']>(() => ({
-        id: undefined,
-        simulate: undefined,
-        decisionGraph: { nodes: [], edges: [] },
-        hoveredEdgeId: null,
-        openTabs: [],
-        activeTab: 'graph',
-        name: 'graph.json',
-        disabled: false,
-        configurable: true,
-        components: [],
-        customNodes: [],
-        activePanel: undefined,
-        panels: [],
-        compactMode: localStorage.getItem('jdm-compact-mode') === 'true',
-        nodeTypes: {},
-      })),
+      create<DecisionGraphStoreType['state']>()(
+        () =>
+          ({
+            id: undefined,
+            simulate: undefined,
+            decisionGraph: { nodes: [], edges: [] },
+            hoveredEdgeId: null,
+            openTabs: [],
+            activeTab: 'graph',
+            name: 'graph.json',
+            disabled: false,
+            configurable: true,
+            components: [],
+            customNodes: [],
+            activePanel: undefined,
+            panels: [],
+            compactMode: localStorage.getItem('jdm-compact-mode') === 'true',
+            nodeTypes: {},
+          }) as DecisionGraphStoreType['state'],
+      ),
     [],
   );
 
@@ -201,6 +204,11 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
   const actions = useMemo<DecisionGraphStoreType['actions']>(
     () => ({
       handleNodesChange: (changes = []) => {
+        changes = changes.filter((c) => c.type !== 'dimensions');
+        if (changes.length === 0) {
+          return;
+        }
+
         const { decisionGraph } = stateStore.getState();
         const { nodesState } = referenceStore.getState();
 
@@ -226,7 +234,6 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         const { edgesState } = referenceStore.getState();
 
         edgesState?.current?.[2](changes);
-
         if (changes.find((c) => c.type === 'remove')) {
           const newDecisionGraph = produce(decisionGraph, (draft) => {
             const edges = (draft.edges || [])
@@ -432,6 +439,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
       updateNode: (id, updater) => {
         const { decisionGraph } = stateStore.getState();
         const { nodesState } = referenceStore.getState();
+        const [nodes, setNodes] = nodesState.current;
 
         const newDecisionGraph = produce(decisionGraph, (draft) => {
           const node = (draft.nodes ?? []).find((node) => node?.id === id);
@@ -442,14 +450,16 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
           updater(node);
         });
 
-        nodesState.current[1]?.((nodes) =>
-          nodes.map((n) => {
-            if (n.id === id) {
-              return mapToGraphNode((newDecisionGraph.nodes || []).find((node) => node.id === id) as DecisionNode);
-            }
-            return n;
-          }),
-        );
+        const changedNode = newDecisionGraph.nodes.find((n) => n.id === id);
+        if (!changedNode) {
+          return;
+        }
+
+        const graphChangedNode = mapToGraphNode(changedNode as DecisionNode);
+        const existingGraphNode = nodes.find((n) => n.id === id);
+        if (!equal(graphChangedNode, existingGraphNode)) {
+          setNodes((nodes) => nodes.map((n) => (n.id === id ? graphChangedNode : n)));
+        }
 
         stateStore.setState({ decisionGraph: newDecisionGraph });
         listenerStore.getState().onChange?.(newDecisionGraph);

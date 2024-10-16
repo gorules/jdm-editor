@@ -10,8 +10,8 @@ import { useDecisionGraphActions, useDecisionGraphState } from './context/dg-sto
 export const CustomEdge: React.FC<EdgeProps> = (props) => {
   const graphActions = useDecisionGraphActions();
   const { id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, style = {}, markerEnd } = props;
-  const { hoveredEdgeId, disabled } = useDecisionGraphState(({ hoveredEdgeId, disabled }) => ({
-    hoveredEdgeId,
+  const { isHovered, disabled } = useDecisionGraphState(({ hoveredEdgeId, disabled }) => ({
+    isHovered: hoveredEdgeId === id,
     disabled,
   }));
 
@@ -41,7 +41,7 @@ export const CustomEdge: React.FC<EdgeProps> = (props) => {
               icon={<DeleteOutlined />}
               danger
               className={clsx('grl-edge-delete-button')}
-              data-visible={id === hoveredEdgeId}
+              data-visible={isHovered}
               onClick={() => graphActions.removeEdges([id])}
             />
           )}

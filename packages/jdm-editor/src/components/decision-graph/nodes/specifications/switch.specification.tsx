@@ -35,7 +35,7 @@ export const switchSpecification: NodeSpecification<NodeSwitchData> = {
   shortDescription: 'Conditional branching',
   color: PURPLE_COLOR,
   inferTypes: {
-    needsUpdate: (state, prevState) => !state.input.equal(prevState.input),
+    needsUpdate: () => false,
     determineOutputType: (state) => state.input,
   },
   generateNode: ({ index }) => ({

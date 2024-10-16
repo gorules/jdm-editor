@@ -82,9 +82,7 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
   }, [name]);
 
   useEffect(() => {
-    stateStore.setState({
-      simulate,
-    });
+    stateStore.setState({ simulate });
   }, [simulate]);
 
   useEffect(() => {

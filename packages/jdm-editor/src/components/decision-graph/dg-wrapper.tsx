@@ -21,7 +21,7 @@ export type DecisionGraphWrapperProps = {
 };
 
 export const DecisionGraphWrapper = React.memo(
-  forwardRef<GraphRef, DecisionGraphWrapperProps>(({ reactFlowProOptions }, ref) => {
+  forwardRef<GraphRef, DecisionGraphWrapperProps>(function DecisionGraphWrapperInner({ reactFlowProOptions }, ref) {
     const [disableTabs, setDisableTabs] = useState(false);
     const hasActiveNode = useDecisionGraphState(({ decisionGraph, activeTab }) => {
       return (decisionGraph?.nodes ?? []).some((node) => node.id === activeTab);

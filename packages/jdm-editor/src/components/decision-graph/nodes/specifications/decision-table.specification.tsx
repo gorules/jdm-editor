@@ -1,5 +1,4 @@
 import { TableOutlined } from '@ant-design/icons';
-import { VariableType } from '@gorules/zen-engine-wasm';
 import { Button } from 'antd';
 import equal from 'fast-deep-equal/es6/react';
 import React from 'react';
@@ -10,22 +9,22 @@ import type { NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
 
 export type DecisionTableInput = {
-  id?: string;
-  name?: string;
+  id: string;
+  name: string;
   field?: string;
 };
 
 export type DecisionTableOutput = {
-  id?: string;
-  name?: string;
-  field?: string;
+  id: string;
+  name: string;
+  field: string;
 };
 
 export type NodeDecisionTableData = {
   hitPolicy?: 'first' | 'collect';
-  inputs?: DecisionTableInput[];
-  outputs?: DecisionTableOutput[];
-  rules?: Record<string, string>[];
+  inputs: DecisionTableInput[];
+  outputs: DecisionTableOutput[];
+  rules: Record<string, string>[];
 };
 
 export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData> = {
@@ -35,13 +34,26 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/decision-tables',
   shortDescription: 'Rules spreadsheet',
   inferTypes: {
-    needsUpdate: (state, prevState) => !equal(state.content?.outputs, prevState.content?.outputs),
-    determineOutputType: ({ content }) => {
-      const fields = (content?.outputs || []).map((output) => output.field).filter((f) => !!f);
-      const baseType = VariableType.fromJson({ Object: {} });
+    needsUpdate: (content, prevContent) => !equal(content, prevContent),
+    determineOutputType: ({ content, input }) => {
+      const outputs = (content?.outputs || []).filter((output) => !!output.field);
 
-      fields.forEach((field) => {
-        baseType.setJson(field as string, 'Any');
+      const baseType = input.clone();
+      outputs.forEach((output) => {
+        for (const rule of content.rules) {
+          if (!rule[output.id]) {
+            continue;
+          }
+
+          const calculatedType = input.calculateType(rule[output.id]);
+          const jsonType = calculatedType.toJson();
+          if (jsonType !== 'Any' && jsonType !== 'Null') {
+            baseType.setOwned(output.field, calculatedType);
+            return;
+          }
+        }
+
+        baseType.setJson(output.field, 'Any');
       });
 
       return baseType;

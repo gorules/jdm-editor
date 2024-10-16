@@ -26,7 +26,7 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/expression',
   shortDescription: 'Mapping utility',
   inferTypes: {
-    needsUpdate: (state, prevState) => !state.input.equal(prevState.input) || !equal(state.content, prevState.content),
+    needsUpdate: (content, prevContent) => !equal(content, prevContent),
     determineOutputType: ({ input, content }) => {
       const moddedInput = input.clone();
       const baseType = VariableType.fromJson({ Object: {} });
