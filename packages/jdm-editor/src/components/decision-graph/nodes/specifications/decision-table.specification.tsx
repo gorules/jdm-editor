@@ -56,6 +56,10 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
         baseType.setJson(output.field, 'Any');
       });
 
+      if (content.hitPolicy === 'collect') {
+        return baseType.intoArray();
+      }
+
       return baseType;
     },
   },

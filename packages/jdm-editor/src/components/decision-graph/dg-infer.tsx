@@ -94,7 +94,10 @@ const inferNodeTypes: InferNodeTypes = ({ decisionGraph, nodeTypes, customNodes 
         })
         .filter((t) => !!t)
         .map((t) => t.clone());
-      const inferredInputType = VariableType.fromIncoming(incomerTypes);
+      const inferredInputType = match(incomerTypes.length)
+        .with(1, () => incomerTypes[0])
+        .otherwise(() => VariableType.fromIncoming(incomerTypes));
+
       const currentInputType = draft?.[node.id]?.[NodeTypeKind.InferredInput];
       // Mutation block
       if (!currentInputType?.equal(inferredInputType)) {
