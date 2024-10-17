@@ -247,7 +247,12 @@ const inferTypesStateDigest = ({ decisionGraph, nodeTypes, customNodes }: Decisi
     output: variableTypeHash(value[NodeTypeKind.Output]),
   }));
 
-  return { edgesData, nodesData, typesData, customNodesData };
+  const inputNodeId = decisionGraph.nodes.find((n) => n.type === 'inputNode')?.id;
+  const inputNodeType = match(nodeTypes?.[inputNodeId ?? '']?.[NodeTypeKind.InferredOutput])
+    .with(P.nonNullable, (type) => type.hash())
+    .otherwise(() => null);
+
+  return { edgesData, nodesData, typesData, customNodesData, inputNodeType };
 };
 
 const inferTypesNeedsUpdate = (
