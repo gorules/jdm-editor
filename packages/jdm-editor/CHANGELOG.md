@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.20.5](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.20.4...@gorules/jdm-editor@1.20.5) (2024-10-17)
+
+### Bug Fixes
+
+- incorrect type cache ([#102](https://github.com/gorules/jdm-editor/issues/102)) ([606e129](https://github.com/gorules/jdm-editor/commit/606e1296ef03f703a08e27a3a1c1dd245a6b6b5c))
+
 ## [1.20.4](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.20.3...@gorules/jdm-editor@1.20.4) (2024-10-16)
 
 ### Bug Fixes
