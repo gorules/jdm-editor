@@ -1,23 +1,55 @@
 .grl-dn {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
   --node-border-radius: 8px;
   --node-horizontal-padding: 8px;
   --node-color: var(--grl-color-primary);
-
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--grl-color-border);
-  background: var(--grl-color-bg-container);
-  cursor: grab;
-  border-radius: var(--node-border-radius);
-  transition: var(--grl-transition);
-  position: relative;
+  --node-background: var(--grl-color-bg-container);
+  --node-small-text: 12px;
 
   &--success {
-    background: var(--grl-color-success-bg);
+    --node-background: var(--grl-color-success-bg);
   }
 
   &--error {
-    background: var(--grl-color-error-bg);
+    --node-background: var(--grl-color-error-bg);
+  }
+
+  &--color {
+    &--primary {
+      --node-color: var(--grl-color-primary);
+    }
+
+    &--secondary {
+      --node-color: #722ed1;
+    }
+  }
+
+  &--list &__graphCard {
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid var(--grl-color-border);
+  }
+
+  &--selected &__graphCard {
+    border-color: var(--grl-color-primary-active) !important;
+  }
+
+  &:hover &__graphCard {
+    border-color: var(--grl-color-border-hover);
+  }
+
+  &__graphCard {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--grl-color-border);
+    background: var(--node-background);
+    cursor: grab;
+    border-radius: var(--node-border-radius);
+    transition: var(--grl-transition);
+    position: relative;
   }
 
   &__status-icon {
@@ -43,33 +75,9 @@
     }
   }
 
-  &:hover {
-    border-color: var(--grl-color-border-hover);
-  }
-
-  &--selected {
-    border-color: var(--grl-color-primary-active) !important;
-  }
-
-  &--color {
-    &--primary {
-      --node-color: var(--grl-color-primary);
-    }
-
-    &--secondary {
-      --node-color: #722ed1;
-    }
-  }
-
-  &--list {
-    border-radius: 0;
-    border: none;
-    border-bottom: 1px solid var(--grl-color-border);
-  }
-
   &__header {
     display: grid;
-    padding: 4px 8px;
+    padding: 8px;
     gap: 0;
     grid-template-columns: min-content 1fr min-content;
     align-items: center;
@@ -81,9 +89,9 @@
       justify-content: center;
       align-items: center;
 
-      height: 28px;
-      width: 28px;
-      font-size: 16px;
+      height: 24px;
+      width: 24px;
+      font-size: 15px;
 
       border-radius: 4px;
       color: white;
@@ -150,22 +158,104 @@
     background: var(--grl-color-primary-bg-fade);
     border-radius: 0 0 var(--node-border-radius) var(--node-border-radius);
     border-top: 1px solid var(--grl-color-border);
+    overflow: hidden;
 
     &__actions {
       display: flex;
+
+      button {
+        padding: 2px 8px;
+        font-size: 12px;
+        color: var(--grl-color-text-secondary);
+        height: auto;
+        border-radius: 0;
+      }
     }
   }
 
   &__cn {
     &__form {
       padding: 0.5rem;
-      font-size: 12px;
+      font-size: var(--node-small-text);
       .ant-form-item-label {
         padding: 0 !important;
       }
 
       .grl-ce {
         font-size: 12px;
+      }
+    }
+  }
+
+  &__details {
+    display: flex;
+    flex-direction: column;
+
+    &__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-left: 10px;
+      background-color: var(--grl-color-primary-bg-fade);
+      border-radius: var(--node-border-radius) var(--node-border-radius) 0 0;
+      border-bottom: 1px solid var(--grl-color-border);
+
+      &__text {
+        font-size: var(--node-small-text);
+        color: var(--grl-color-text-secondary);
+      }
+
+      &__close {
+        color: var(--grl-color-text-secondary);
+        font-size: 0;
+      }
+    }
+
+    &__body {
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      gap: 8px;
+
+      .ant-typography {
+        font-size: var(--node-small-text) !important;
+      }
+
+      form {
+        .ant-form-item-label {
+          padding-bottom: 0 !important;
+        }
+
+        [role='separator'] {
+          margin: 12px 0;
+        }
+
+        .grl-ce {
+          font-size: var(--node-small-text);
+        }
+
+        .ant-input {
+          padding: 4px 11px;
+          line-height: 1.34;
+          font-size: var(--node-small-text);
+          border-radius: 6px;
+        }
+
+        label {
+          font-size: var(--node-small-text) !important;
+
+          &::after {
+            content: none !important;
+          }
+        }
+
+        .ant-form-item {
+          margin-bottom: 8px !important;
+
+          &:last-of-type {
+            margin-bottom: 0 !important;
+          }
+        }
       }
     }
   }

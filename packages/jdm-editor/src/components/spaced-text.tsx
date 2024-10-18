@@ -4,8 +4,8 @@ import React from 'react';
 import { Stack } from './stack';
 
 export type SpacedTextProps = {
-  left: string;
-  right?: string;
+  left: React.ReactNode;
+  right?: React.ReactNode;
   gap?: number;
 };
 

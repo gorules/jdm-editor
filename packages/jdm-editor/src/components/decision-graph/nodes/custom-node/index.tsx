@@ -144,7 +144,7 @@ export const createJdmNode = <
                   ? [
                       <Button
                         key='edit-table'
-                        type='link'
+                        type='text'
                         style={{ marginLeft: 'auto', transform: open ? 'rotate(180deg)' : undefined }}
                         onClick={() => setOpen((o) => !o)}
                       >

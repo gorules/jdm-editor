@@ -29,7 +29,7 @@ export default defineConfig({
         'react',
         'react-dom',
         /ace-builds\/?.*/,
-        ...Object.keys(packageJson.dependencies),
+        ...Object.keys(packageJson.dependencies).filter((d) => d !== 'antd'),
       ],
       output: {
         globals: {
