@@ -1,12 +1,12 @@
-import { FunctionOutlined, WarningFilled, WarningOutlined } from '@ant-design/icons';
-import { Button, Tooltip } from 'antd';
+import { WarningFilled, WarningOutlined } from '@ant-design/icons';
+import { Button, Tooltip, Typography } from 'antd';
 import React from 'react';
 import { P, match } from 'ts-pattern';
 
 import { defaultFunctionValue } from '../../../function/helpers/libs';
 import { useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
 import { GraphNode } from '../graph-node';
-import { ORANGE_COLOR } from './colors';
+import { NodeColor } from './colors';
 import type { NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
 
@@ -18,11 +18,11 @@ export type NodeFunctionData =
 
 export const functionSpecification: NodeSpecification<NodeFunctionData> = {
   type: NodeKind.Function,
-  icon: <FunctionOutlined />,
+  icon: <Typography.Text style={{ color: 'white' }}>JS</Typography.Text>,
   displayName: 'Function',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/functions',
   shortDescription: 'Javascript lambda',
-  color: ORANGE_COLOR,
+  color: NodeColor.Orange,
   generateNode: ({ index }) => ({
     name: `function${index}`,
     content: {
@@ -87,7 +87,7 @@ export const functionSpecification: NodeSpecification<NodeFunctionData> = {
           )
         }
         actions={[
-          <Button key='edit-function' type='link' onClick={() => graphActions.openTab(id)}>
+          <Button key='edit-function' type='text' onClick={() => graphActions.openTab(id)}>
             Edit Function
           </Button>,
         ]}

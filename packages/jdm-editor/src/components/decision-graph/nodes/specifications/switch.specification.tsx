@@ -12,7 +12,7 @@ import { LocalCodeEditor } from '../../../code-editor/local-ce';
 import { NodeTypeKind, useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
 import type { SimulationTrace, SimulationTraceDataSwitch } from '../../types/simulation.types';
 import { GraphNode } from '../graph-node';
-import { PURPLE_COLOR } from './colors';
+import { NodeColor } from './colors';
 import type { MinimalNodeProps, NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
 
@@ -33,7 +33,7 @@ export const switchSpecification: NodeSpecification<NodeSwitchData> = {
   displayName: 'Switch',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/switch',
   shortDescription: 'Conditional branching',
-  color: PURPLE_COLOR,
+  color: NodeColor.Purple,
   inferTypes: {
     needsUpdate: () => false,
     determineOutputType: (state) => state.input,
@@ -99,7 +99,7 @@ const SwitchNode: React.FC<
       actions={[
         <Button
           key='add condition'
-          type='link'
+          type='text'
           disabled={disabled}
           onClick={() => {
             if (hitPolicy === 'first' && statements?.length > 0) {
@@ -162,7 +162,7 @@ const SwitchNode: React.FC<
             ],
           }}
         >
-          <Button type='link' style={{ textTransform: 'capitalize', marginLeft: 'auto' }}>
+          <Button type='text' style={{ textTransform: 'capitalize', marginLeft: 'auto' }}>
             {hitPolicy} <DownOutlined />
           </Button>
         </Dropdown>,

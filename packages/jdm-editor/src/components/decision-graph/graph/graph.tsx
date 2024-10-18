@@ -343,9 +343,67 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
             </Tooltip>
           </div>
         )}
-        <div className={'content-wrapper'}>
+        <div
+          tabIndex={0}
+          className={'content-wrapper'}
+          onKeyDown={(e) => {
+            const [nodes] = nodesState;
+            const [edges] = edgesState;
+
+            if (e.key === 'c' && e.metaKey) {
+              const selectedNodeIds = nodesState[0].filter((n) => n.selected).map(({ id }) => id);
+              if (selectedNodeIds.length === 0) {
+                return;
+              }
+
+              graphActions.copyNodes(selectedNodeIds);
+              e.preventDefault();
+            } else if (e.key === 'd' && e.metaKey) {
+              if (!disabled) {
+                const selectedNodeIds = nodes.filter((n) => n.selected).map(({ id }) => id);
+                if (selectedNodeIds.length === 0) {
+                  return;
+                }
+
+                graphActions.duplicateNodes(selectedNodeIds);
+              }
+              e.preventDefault();
+            } else if (e.key === 'Backspace') {
+              if (!disabled) {
+                const selectedNodes = nodes.filter((n) => n.selected);
+                const selectedEdges = edges.filter((e) => e.selected);
+
+                if (selectedNodes.length > 0) {
+                  const length = selectedNodes.length;
+                  const text = length > 1 ? 'nodes' : 'node';
+                  Modal.confirm({
+                    icon: null,
+                    title: `Delete ${text}`,
+                    content: (
+                      <Typography.Text>
+                        Are you sure you want to delete {length > 1 ? `${length} ${text}` : text}?
+                      </Typography.Text>
+                    ),
+                    okButtonProps: { danger: true },
+                    onOk: () => {
+                      if (selectedEdges.length > 0) {
+                        graphActions.removeEdges(selectedEdges.map((e) => e.id));
+                      }
+                      graphActions.removeNodes(selectedNodes.map((n) => n.id));
+                    },
+                  });
+                } else if (selectedEdges.length > 0) {
+                  graphActions.removeEdges(selectedEdges.map((e) => e.id));
+                }
+              }
+              e.stopPropagation();
+              e.preventDefault();
+            }
+          }}
+        >
           <div className={clsx(['react-flow'])} ref={reactFlowWrapper}>
             <ReactFlow
+              deleteKeyCode={null}
               elevateEdgesOnSelect={false}
               elevateNodesOnSelect={true}
               zoomOnDoubleClick={false}
@@ -374,60 +432,6 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
                 e.forEach((node) => {
                   graphActions.closeTab(node?.id);
                 });
-              }}
-              onKeyDown={(e) => {
-                const [nodes] = nodesState;
-                const [edges] = edgesState;
-
-                if (e.key === 'c' && e.metaKey) {
-                  const selectedNodeIds = nodesState[0].filter((n) => n.selected).map(({ id }) => id);
-                  if (selectedNodeIds.length === 0) {
-                    return;
-                  }
-
-                  graphActions.copyNodes(selectedNodeIds);
-                  e.preventDefault();
-                } else if (e.key === 'd' && e.metaKey) {
-                  if (!disabled) {
-                    const selectedNodeIds = nodes.filter((n) => n.selected).map(({ id }) => id);
-                    if (selectedNodeIds.length === 0) {
-                      return;
-                    }
-
-                    graphActions.duplicateNodes(selectedNodeIds);
-                  }
-                  e.preventDefault();
-                } else if (e.key === 'Backspace') {
-                  if (!disabled) {
-                    const selectedNodes = nodes.filter((n) => n.selected);
-                    const selectedEdges = edges.filter((e) => e.selected);
-
-                    if (selectedNodes.length > 0) {
-                      const length = selectedNodes.length;
-                      const text = length > 1 ? 'nodes' : 'node';
-                      Modal.confirm({
-                        icon: null,
-                        title: `Delete ${text}`,
-                        content: (
-                          <Typography.Text>
-                            Are you sure you want to delete {length > 1 ? `${length} ${text}` : text}?
-                          </Typography.Text>
-                        ),
-                        okButtonProps: { danger: true },
-                        onOk: () => {
-                          if (selectedEdges.length > 0) {
-                            graphActions.removeEdges(selectedEdges.map((e) => e.id));
-                          }
-                          graphActions.removeNodes(selectedNodes.map((n) => n.id));
-                        },
-                      });
-                    } else if (selectedEdges.length > 0) {
-                      graphActions.removeEdges(selectedEdges.map((e) => e.id));
-                    }
-                  }
-                  e.stopPropagation();
-                  e.preventDefault();
-                }
               }}
               onEdgeMouseEnter={(_, edge) => graphActions.setHoveredEdgeId(edge.id)}
               onEdgeMouseLeave={() => graphActions.setHoveredEdgeId(null)}

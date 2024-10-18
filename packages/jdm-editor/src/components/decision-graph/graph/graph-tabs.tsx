@@ -4,7 +4,7 @@ import { Avatar, Tabs } from 'antd';
 import React from 'react';
 
 import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
-import { PRIMARY_BLUE_COLOR } from '../nodes/specifications/colors';
+import { NodeColor } from '../nodes/specifications/colors';
 import type { NodeKind } from '../nodes/specifications/specification-types';
 import { nodeSpecification } from '../nodes/specifications/specifications';
 
@@ -65,7 +65,7 @@ export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled }) => {
 const TabLabel: React.FC<{ icon?: React.ReactNode; name?: string; color?: string }> = ({
   icon,
   name,
-  color = PRIMARY_BLUE_COLOR,
+  color = NodeColor.Blue,
 }) => {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -73,9 +73,8 @@ const TabLabel: React.FC<{ icon?: React.ReactNode; name?: string; color?: string
         size='small'
         shape='square'
         style={{
-          color,
-          background: 'transparent',
-          fontSize: 16,
+          background: color,
+          fontSize: 14,
           width: 20,
           height: 20,
           lineHeight: '18px',
