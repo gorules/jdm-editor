@@ -117,7 +117,7 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
         type={specification.displayName}
         helper={helper}
         name={name}
-        details={<Settings id={id} />}
+        details={Settings ? <Settings id={id} /> : undefined}
         detailsOpen={detailsOpen}
         detailsTitle={match(currentDetails)
           .with(Details.Settings, () => 'Settings')

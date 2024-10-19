@@ -1,6 +1,6 @@
-import { ArrowRightOutlined, NumberOutlined } from '@ant-design/icons';
+import { ArrowRightOutlined, NumberOutlined, SyncOutlined } from '@ant-design/icons';
 import { VariableType } from '@gorules/zen-engine-wasm';
-import { Button, Divider, Form, Input, Radio, Switch } from 'antd';
+import { Button, Form, Input, Radio, Switch } from 'antd';
 import equal from 'fast-deep-equal/es6/react';
 import React from 'react';
 import type { z } from 'zod';
@@ -77,10 +77,11 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
   }),
   renderNode: ({ id, data, selected, specification }) => {
     const graphActions = useDecisionGraphActions();
-    const { passThrough } = useDecisionGraphState(({ decisionGraph }) => {
+    const { passThrough, executionMode } = useDecisionGraphState(({ decisionGraph }) => {
       const content = (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content as NodeExpressionData;
       return {
         passThrough: content?.passThrough || false,
+        executionMode: content?.executionMode,
       };
     });
 
@@ -95,7 +96,10 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
             Edit Expression
           </Button>,
         ]}
-        helper={passThrough && <ArrowRightOutlined style={{ color: 'var(--grl-color-text-secondary)' }} />}
+        helper={[
+          passThrough && <ArrowRightOutlined />,
+          executionMode && <SyncOutlined />,
+        ]}
       />
     );
   },
@@ -131,7 +135,6 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
         <Form.Item label='Passthrough' name='passThrough' valuePropName='checked'>
           <Switch />
         </Form.Item>
-        <Divider />
         <Form.Item label='Input field' name='inputField'>
           <CodeEditor
             variableType={inputType}

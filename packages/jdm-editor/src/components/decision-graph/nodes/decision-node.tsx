@@ -13,7 +13,7 @@ export type DecisionNodeProps = {
   name?: string;
   icon: React.ReactNode;
   type: React.ReactNode;
-  helper?: React.ReactNode;
+  helper?: (React.ReactNode | false)[];
   disabled?: boolean;
   isSelected?: boolean;
   children?: React.ReactNode;
@@ -83,12 +83,21 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
       onKeyDown={(e) => e.stopPropagation()}
     >
       <GraphCard>
-        {status === 'error' && (
-          <div className={clsx('grl-dn__status-icon', `grl-dn__status-icon--${status}`)}>
-            <CloseOutlined />
-          </div>
-        )}
-        {status !== 'error' && helper && <div className={clsx('grl-dn__status-icon')}>{helper}</div>}
+        <div className={'grl-dn__status-bar'}>
+          {Array.isArray(helper) &&
+            helper
+              .filter((h) => !!h)
+              .map((h, i) => (
+                <div key={i} className={clsx('grl-dn__status-icon')}>
+                  {h}
+                </div>
+              ))}
+          {status === 'error' && (
+            <div className={clsx('grl-dn__status-icon', `grl-dn__status-icon--${status}`)}>
+              <CloseOutlined />
+            </div>
+          )}
+        </div>
         <div className={clsx('grl-dn__header', compactMode && 'compact')}>
           <div className={clsx('grl-dn__header__icon', compactMode && 'compact')}>{icon}</div>
           <div className='grl-dn__header__text'>

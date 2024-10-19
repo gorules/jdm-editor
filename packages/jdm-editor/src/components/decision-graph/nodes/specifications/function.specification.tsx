@@ -65,8 +65,8 @@ export const functionSpecification: NodeSpecification<NodeFunctionData> = {
         }}
         name={data.name}
         isSelected={selected}
-        helper={
-          kind === FunctionKind.Stable ? undefined : (
+        helper={[
+          kind === FunctionKind.Stable && (
             <Tooltip
               placement='top'
               title={
@@ -84,8 +84,8 @@ export const functionSpecification: NodeSpecification<NodeFunctionData> = {
                 }}
               />
             </Tooltip>
-          )
-        }
+          ),
+        ]}
         actions={[
           <Button key='edit-function' type='text' onClick={() => graphActions.openTab(id)}>
             Edit Function

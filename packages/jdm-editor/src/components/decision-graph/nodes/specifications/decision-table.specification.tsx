@@ -1,6 +1,6 @@
-import { ArrowRightOutlined, TableOutlined } from '@ant-design/icons';
+import { ArrowRightOutlined, SyncOutlined, TableOutlined } from '@ant-design/icons';
 import { VariableType } from '@gorules/zen-engine-wasm';
-import { Button, Divider, Form, Input, Radio, Switch } from 'antd';
+import { Button, Divider, Form, Input, Radio, Select, Switch } from 'antd';
 import equal from 'fast-deep-equal/es6/react';
 import React from 'react';
 import type { z } from 'zod';
@@ -91,10 +91,11 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
   }),
   renderNode: ({ id, data, selected, specification }) => {
     const graphActions = useDecisionGraphActions();
-    const { passThrough } = useDecisionGraphState(({ decisionGraph }) => {
+    const { passThrough, executionMode } = useDecisionGraphState(({ decisionGraph }) => {
       const content = (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content as NodeDecisionTableData;
       return {
         passThrough: content?.passThrough || false,
+        executionMode: content?.executionMode,
       };
     });
 
@@ -104,7 +105,7 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
         specification={specification}
         name={data.name}
         isSelected={selected}
-        helper={passThrough && <ArrowRightOutlined style={{ color: 'var(--grl-color-text-secondary)' }} />}
+        helper={[passThrough && <ArrowRightOutlined />, executionMode === 'loop' && <SyncOutlined />]}
         actions={[
           <Button key='edit-table' type='text' onClick={() => graphActions.openTab(id)}>
             Edit Table
@@ -125,6 +126,7 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
           inputField: content?.inputField,
           outputPath: content?.outputPath,
           executionMode: content?.executionMode,
+          hitPolicy: content?.hitPolicy,
         },
       };
     });
@@ -142,10 +144,17 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
           });
         }}
       >
+        <Form.Item label='Hit Policy' name='hitPolicy'>
+          <Radio.Group defaultValue='single'>
+            <Radio defaultChecked value='first'>
+              First
+            </Radio>
+            <Radio value='collect'>Collect</Radio>
+          </Radio.Group>
+        </Form.Item>
         <Form.Item label='Passthrough' name='passThrough' valuePropName='checked'>
           <Switch />
         </Form.Item>
-        <Divider />
         <Form.Item label='Input field' name='inputField'>
           <CodeEditor
             variableType={inputType}
@@ -159,12 +168,10 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
         </Form.Item>
         <Form.Item label='Execution mode' name='executionMode'>
           <Radio.Group defaultValue='single'>
-            <Radio defaultChecked className={'xs-form-control'} value='single'>
+            <Radio defaultChecked value='single'>
               Single
             </Radio>
-            <Radio className={'xs-form-control'} value='loop'>
-              Loop
-            </Radio>
+            <Radio value='loop'>Loop</Radio>
           </Radio.Group>
         </Form.Item>
       </Form>
