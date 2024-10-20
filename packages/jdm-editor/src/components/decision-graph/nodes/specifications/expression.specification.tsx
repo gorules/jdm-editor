@@ -37,7 +37,7 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
       }
 
       if (content.executionMode === 'loop') {
-        nodeInput = nodeInput.unwrapArray();
+        nodeInput = nodeInput.arrayItem();
       }
 
       (content.expressions || []).forEach((expression) => {
@@ -52,7 +52,7 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
       });
 
       if (content.executionMode === 'loop') {
-        determinedType = determinedType.intoArray();
+        determinedType = determinedType.toArray();
       }
 
       if (content.outputPath) {
@@ -96,10 +96,7 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
             Edit Expression
           </Button>,
         ]}
-        helper={[
-          passThrough && <ArrowRightOutlined />,
-          executionMode && <SyncOutlined />,
-        ]}
+        helper={[executionMode === 'loop' && <SyncOutlined />, passThrough && <ArrowRightOutlined />]}
       />
     );
   },

@@ -3,6 +3,8 @@ import { MarkerType } from 'reactflow';
 
 import type { DecisionEdge, DecisionNode } from './context/dg-store.context';
 
+export const dimensionsSymbol = Symbol('dimensions');
+
 export const mapToDecisionEdge = (edge: Edge): DecisionEdge => {
   return {
     id: edge?.id,
@@ -20,6 +22,8 @@ export const mapToGraphNode = (node: DecisionNode): Node => {
     id: node.id,
     type: node.type,
     position: node.position,
+    height: node[dimensionsSymbol]?.height,
+    width: node[dimensionsSymbol]?.width,
     data: {
       name: node.name,
       kind: node?.content?.kind,

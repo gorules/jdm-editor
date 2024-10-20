@@ -5,13 +5,14 @@ import { produce } from 'immer';
 import type { WritableDraft } from 'immer/src/types/types-external';
 import React, { type MutableRefObject, createRef, useMemo } from 'react';
 import type { EdgeChange, NodeChange, ReactFlowInstance, useEdgesState, useNodesState } from 'reactflow';
+import { match } from 'ts-pattern';
 import type { z } from 'zod';
 import type { StoreApi, UseBoundStore } from 'zustand';
 import { create } from 'zustand';
 
 import type { nodeSchema } from '../../../helpers/schema';
 import type { CodeEditorProps } from '../../code-editor';
-import { mapToGraphEdge, mapToGraphEdges, mapToGraphNode, mapToGraphNodes } from '../dg-util';
+import { dimensionsSymbol, mapToGraphEdge, mapToGraphEdges, mapToGraphNode, mapToGraphNodes } from '../dg-util';
 import type { useGraphClipboard } from '../hooks/use-graph-clipboard';
 import type { CustomNodeSpecification } from '../nodes/custom-node';
 import { NodeKind, type NodeSpecification } from '../nodes/specifications/specification-types';
@@ -31,6 +32,7 @@ export type DecisionNode<T = any> = {
   type?: NodeSchema['type'] | string;
   content?: T;
   position: Position;
+  [dimensionsSymbol]?: { height?: number; width?: number };
 };
 
 export type DecisionEdge = {
@@ -201,30 +203,42 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
   const actions = useMemo<DecisionGraphStoreType['actions']>(
     () => ({
       handleNodesChange: (changes = []) => {
-        changes = changes.filter((c) => c.type !== 'dimensions');
-        if (changes.length === 0) {
+        const { nodesState } = referenceStore.getState();
+        const { decisionGraph } = stateStore.getState();
+        const [, , onNodesChange] = nodesState.current;
+
+        let hasChanges = false;
+
+        onNodesChange?.(changes);
+        const newDecisionGraph = produce(decisionGraph, (draft) => {
+          changes.forEach((c) =>
+            match(c)
+              .with({ type: 'position' }, (p) => {
+                const node = draft.nodes.find((n) => n.id === p.id);
+                if (node && p.position && !equal(node.position, p.position)) {
+                  hasChanges = true;
+                  node.position = p.position;
+                }
+              })
+              .with({ type: 'dimensions' }, (d) => {
+                const node = draft.nodes.find((n) => n.id === d.id);
+                if (node && !equal(node[dimensionsSymbol], d.dimensions)) {
+                  hasChanges = true;
+                  node[dimensionsSymbol] = { height: d.dimensions?.height, width: d.dimensions?.width };
+                }
+              })
+              .otherwise(() => {
+                // No-op
+              }),
+          );
+        });
+
+        if (!hasChanges) {
           return;
         }
 
-        const { decisionGraph } = stateStore.getState();
-        const { nodesState } = referenceStore.getState();
-
-        nodesState.current[2]?.(changes);
-        if (changes.find((c) => c.type === 'position')) {
-          const newDecisionGraph = produce(decisionGraph, (draft) => {
-            const nodes = (draft.nodes || []).map((node) => {
-              const change = changes.find((change) => 'id' in change && change.id === node.id);
-              if (change?.type === 'position' && change?.position) {
-                node.position = change.position as Position;
-              }
-              return node;
-            });
-            draft.nodes = nodes;
-          });
-
-          stateStore.setState({ decisionGraph: newDecisionGraph });
-          listenerStore.getState().onChange?.(newDecisionGraph);
-        }
+        stateStore.setState({ decisionGraph: newDecisionGraph });
+        listenerStore.getState().onChange?.(newDecisionGraph);
       },
       handleEdgesChange: (changes = []) => {
         const { decisionGraph } = stateStore.getState();

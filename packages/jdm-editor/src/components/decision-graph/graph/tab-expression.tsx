@@ -36,7 +36,7 @@ export const TabExpression: React.FC<TabExpressionProps> = ({ id, manager }) => 
       .with(P.string, (inputField) => inferredType.get(inputField))
       .otherwise(() => inferredType);
 
-    return content?.executionMode === 'loop' ? computedType.unwrapArray() : computedType;
+    return content?.executionMode === 'loop' ? computedType.arrayItem() : computedType;
   }, [inferredType, content?.inputField, content?.executionMode]);
 
   return (

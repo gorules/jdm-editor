@@ -1,6 +1,6 @@
 import { ArrowRightOutlined, SyncOutlined, TableOutlined } from '@ant-design/icons';
 import { VariableType } from '@gorules/zen-engine-wasm';
-import { Button, Divider, Form, Input, Radio, Select, Switch } from 'antd';
+import { Button, Form, Input, Radio, Switch } from 'antd';
 import equal from 'fast-deep-equal/es6/react';
 import React from 'react';
 import type { z } from 'zod';
@@ -30,7 +30,7 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
       }
 
       if (content.executionMode === 'loop') {
-        nodeInput = nodeInput.unwrapArray();
+        nodeInput = nodeInput.arrayItem();
       }
 
       const outputs = (content?.outputs || []).filter((output) => !!output.field);
@@ -51,8 +51,12 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
         determinedType.setJson(output.field, 'Any');
       });
 
+      if (content.hitPolicy === 'collect') {
+        determinedType = determinedType.toArray();
+      }
+
       if (content.executionMode === 'loop') {
-        determinedType = determinedType.intoArray();
+        determinedType = determinedType.toArray();
       }
 
       if (content.outputPath) {
@@ -105,7 +109,7 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
         specification={specification}
         name={data.name}
         isSelected={selected}
-        helper={[passThrough && <ArrowRightOutlined />, executionMode === 'loop' && <SyncOutlined />]}
+        helper={[executionMode === 'loop' && <SyncOutlined />, passThrough && <ArrowRightOutlined />]}
         actions={[
           <Button key='edit-table' type='text' onClick={() => graphActions.openTab(id)}>
             Edit Table

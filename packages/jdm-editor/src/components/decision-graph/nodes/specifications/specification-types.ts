@@ -40,7 +40,7 @@ export type NodeSpecification<T = any> = {
   helper?: string | React.ReactNode;
   generateNode: (params: GenerateNodeParams) => Omit<DecisionNode<T>, 'position' | 'id' | 'type'>;
   renderNode: React.FC<MinimalNodeProps & { specification: MinimalNodeSpecification }>;
-  renderSettings: React.FC<{ id: string }>;
+  renderSettings?: React.FC<{ id: string }>;
   inferTypes?: {
     needsUpdate: (content: T, prevContent: T) => boolean;
     determineOutputType: (state: InferTypeData<T>) => VariableType;

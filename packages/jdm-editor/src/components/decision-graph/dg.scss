@@ -592,6 +592,8 @@
 }
 
 .grl-graph-node {
+  visibility: visible !important;
+
   &__handle-left {
     z-index: 20;
     top: 20px;
