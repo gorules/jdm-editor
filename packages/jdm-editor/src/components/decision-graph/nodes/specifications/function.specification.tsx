@@ -1,4 +1,4 @@
-import { WarningFilled, WarningOutlined } from '@ant-design/icons';
+import { WarningFilled } from '@ant-design/icons';
 import { Button, Tooltip, Typography } from 'antd';
 import React from 'react';
 import { P, match } from 'ts-pattern';
@@ -40,52 +40,17 @@ export const functionSpecification: NodeSpecification<NodeFunctionData> = {
           ...specification,
           displayName:
             kind === FunctionKind.Stable ? (
-              'Function v2'
+              'Function'
             ) : (
               <span>
                 {'Function v1 '}
-                <Tooltip
-                  placement='top'
-                  title={
-                    <>
-                      {
-                        'Function v1 will be deprecated in one of the upcoming releases. To use a new Function v2, drag and drop a new Function Node and copy your logic. For more information click "Documentation". '
-                      }
-                    </>
-                  }
-                >
-                  <WarningOutlined
-                    style={{
-                      color: 'var(--grl-color-warning-text)',
-                    }}
-                  />
-                </Tooltip>
+                <DeprecatedFunctionWarning />
               </span>
             ),
         }}
         name={data.name}
         isSelected={selected}
-        helper={[
-          kind === FunctionKind.Stable && (
-            <Tooltip
-              placement='top'
-              title={
-                <>
-                  {
-                    'Function v1 will be deprecated in one of the upcoming releases. To use a new Function v2, drag and drop a new Function Node and copy your logic. For more information click "Documentation". '
-                  }
-                </>
-              }
-            >
-              <WarningFilled
-                style={{
-                  fontSize: 16,
-                  color: 'var(--grl-color-warning-text)',
-                }}
-              />
-            </Tooltip>
-          ),
-        ]}
+        helper={[kind === FunctionKind.Deprecated && <DeprecatedFunctionWarning size={16} />]}
         actions={[
           <Button key='edit-function' type='text' onClick={() => graphActions.openTab(id)}>
             Edit Function
@@ -110,3 +75,12 @@ export const useFunctionKind = (id: string) => {
 
   return kind;
 };
+
+const DeprecatedFunctionWarning: React.FC<{ size?: number }> = ({ size }) => (
+  <Tooltip
+    placement='top'
+    title='Function v1 will be deprecated in one of the upcoming releases. To use a new Function, drag and drop a new Function Node and copy your logic. For more information click "Documentation". '
+  >
+    <WarningFilled style={{ color: 'var(--grl-color-warning-text)', fontSize: size }} />
+  </Tooltip>
+);
