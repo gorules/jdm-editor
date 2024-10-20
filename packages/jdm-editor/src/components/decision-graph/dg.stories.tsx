@@ -292,47 +292,7 @@ const panels: PanelType[] = [
 
 export const Simulator: Story = {
   render: (args) => {
-    const [value, setValue] = useState<any>({
-      contentType: 'application/vnd.gorules.decision',
-      nodes: [
-        {
-          id: 'ca98730e-a40f-4601-98cc-b5a57429596d',
-          type: 'inputNode',
-          position: {
-            x: 70,
-            y: 250,
-          },
-          name: 'Request',
-        },
-        {
-          type: 'switchNode',
-          content: {
-            hitPolicy: 'first',
-            statements: [
-              {
-                id: '8bea55ca-0c43-4c5f-824d-bd8726baad38',
-                condition: '',
-                isDefault: false,
-              },
-            ],
-          },
-          id: 'f0378d4b-d1aa-4655-939b-fb806f8b335d',
-          name: 'switch1',
-          position: {
-            x: 375,
-            y: 250,
-          },
-        },
-      ],
-      edges: [
-        {
-          id: '3b66dc26-8a8b-4bb2-98d7-b2c6cc23521e',
-          sourceId: 'ca98730e-a40f-4601-98cc-b5a57429596d',
-          type: 'edge',
-          targetId: 'f0378d4b-d1aa-4655-939b-fb806f8b335d',
-        },
-      ],
-    });
+    const [value, setValue] = useState<any>(defaultGraph);
     return (
       <div
         style={{
