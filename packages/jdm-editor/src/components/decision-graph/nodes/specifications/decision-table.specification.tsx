@@ -129,56 +129,95 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
           passThrough: content?.passThrough || false,
           inputField: content?.inputField,
           outputPath: content?.outputPath,
-          executionMode: content?.executionMode,
-          hitPolicy: content?.hitPolicy,
+          executionMode: content?.executionMode || 'single',
+          hitPolicy: content?.hitPolicy || 'first',
         },
       };
     });
 
+    const updateNode = (data: Partial<NodeDecisionTableData>) => {
+      graphActions.updateNode(id, (draft) => {
+        Object.assign(draft.content, data);
+        return draft;
+      });
+    };
+
     return (
-      <Form
-        layout='vertical'
-        size='small'
-        initialValues={fields}
-        disabled={disabled}
-        onValuesChange={(changedValues) => {
-          graphActions.updateNode(id, (draft) => {
-            Object.assign(draft.content, changedValues);
-            return draft;
-          });
-        }}
-      >
-        <Form.Item label='Hit Policy' name='hitPolicy'>
-          <Radio.Group defaultValue='single'>
+      <div className={'settings-form'}>
+        <Form.Item label='Hit Policy'>
+          <Radio.Group
+            size={'small'}
+            disabled={disabled}
+            value={fields?.hitPolicy}
+            onChange={(e) => {
+              updateNode({
+                hitPolicy: e?.target?.value,
+              });
+            }}
+          >
             <Radio defaultChecked value='first'>
               First
             </Radio>
             <Radio value='collect'>Collect</Radio>
           </Radio.Group>
         </Form.Item>
-        <Form.Item label='Passthrough' name='passThrough' valuePropName='checked'>
-          <Switch />
-        </Form.Item>
-        <Form.Item label='Input field' name='inputField'>
-          <CodeEditor
-            variableType={inputType}
-            expectedVariableType={fields?.executionMode === 'loop' ? { Array: 'Any' } : undefined}
-            style={{ fontSize: 12, lineHeight: '20px', width: '100%' }}
-            maxRows={4}
+        <Form.Item label='Passthrough'>
+          <Switch
+            size={'small'}
+            disabled={disabled}
+            checked={fields?.passThrough}
+            onChange={(e) => {
+              updateNode({
+                passThrough: e,
+              });
+            }}
           />
         </Form.Item>
-        <Form.Item label='Output path' name='outputPath'>
-          <Input />
+        <Form.Item label='Input field'>
+          <CodeEditor
+            variableType={inputType}
+            disabled={disabled}
+            style={{ fontSize: 12, lineHeight: '20px', width: '100%' }}
+            expectedVariableType={fields?.executionMode === 'loop' ? { Array: 'Any' } : undefined}
+            maxRows={4}
+            value={fields?.inputField ?? undefined}
+            onChange={(val) => {
+              updateNode({
+                inputField: val,
+              });
+            }}
+          />
         </Form.Item>
-        <Form.Item label='Execution mode' name='executionMode'>
-          <Radio.Group defaultValue='single'>
+        <Form.Item label='Output path'>
+          <Input
+            size={'small'}
+            disabled={disabled}
+            value={fields?.outputPath ?? undefined}
+            onChange={(e) => {
+              updateNode({
+                outputPath: e?.target?.value,
+              });
+            }}
+          />
+        </Form.Item>
+        <Form.Item label='Execution mode'>
+          <Radio.Group
+            size={'small'}
+            disabled={disabled}
+            value={fields?.executionMode}
+            onChange={(e) => {
+              updateNode({
+                executionMode: e?.target?.value,
+              });
+            }}
+          >
             <Radio defaultChecked value='single'>
               Single
             </Radio>
             <Radio value='loop'>Loop</Radio>
           </Radio.Group>
         </Form.Item>
-      </Form>
+      </div>
     );
   },
 };

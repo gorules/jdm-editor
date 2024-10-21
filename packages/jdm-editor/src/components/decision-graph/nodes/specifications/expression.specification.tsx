@@ -111,49 +111,77 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
           passThrough: content?.passThrough || false,
           inputField: content?.inputField,
           outputPath: content?.outputPath,
-          executionMode: content?.executionMode,
+          executionMode: content?.executionMode || 'single',
         },
       };
     });
 
+    const updateNode = (data: Partial<NodeExpressionData>) => {
+      graphActions.updateNode(id, (draft) => {
+        Object.assign(draft.content, data);
+        return draft;
+      });
+    };
+
     return (
-      <Form
-        layout='vertical'
-        size='small'
-        initialValues={fields}
-        disabled={disabled}
-        onValuesChange={(changedValues) => {
-          graphActions.updateNode(id, (draft) => {
-            Object.assign(draft.content, changedValues);
-            return draft;
-          });
-        }}
-      >
-        <Form.Item label='Passthrough' name='passThrough' valuePropName='checked'>
-          <Switch />
+      <div className={'settings-form'}>
+        <Form.Item label='Passthrough'>
+          <Switch
+            disabled={disabled}
+            size={'small'}
+            checked={fields?.passThrough}
+            onChange={(e) => {
+              updateNode({
+                passThrough: e,
+              });
+            }}
+          />
         </Form.Item>
-        <Form.Item label='Input field' name='inputField'>
+        <Form.Item label='Input field'>
           <CodeEditor
             variableType={inputType}
+            disabled={disabled}
             style={{ fontSize: 12, lineHeight: '20px', width: '100%' }}
             expectedVariableType={fields?.executionMode === 'loop' ? { Array: 'Any' } : undefined}
             maxRows={4}
+            value={fields?.inputField ?? undefined}
+            onChange={(val) => {
+              updateNode({
+                inputField: val,
+              });
+            }}
           />
         </Form.Item>
-        <Form.Item label='Output path' name='outputPath'>
-          <Input />
+        <Form.Item label='Output path'>
+          <Input
+            size={'small'}
+            disabled={disabled}
+            value={fields?.outputPath ?? undefined}
+            onChange={(e) => {
+              updateNode({
+                outputPath: e?.target?.value,
+              });
+            }}
+          />
         </Form.Item>
-        <Form.Item label='Execution mode' name='executionMode'>
-          <Radio.Group defaultValue='single'>
-            <Radio defaultChecked className={'xs-form-control'} value='single'>
+        <Form.Item label='Execution mode'>
+          <Radio.Group
+            size={'small'}
+            disabled={disabled}
+            value={fields?.executionMode}
+            onChange={(e) => {
+              updateNode({
+                executionMode: e?.target?.value,
+              });
+            }}
+          >
+            <Radio defaultChecked value='single'>
               Single
             </Radio>
-            <Radio className={'xs-form-control'} value='loop'>
-              Loop
-            </Radio>
+            <Radio value='loop'>Loop</Radio>
           </Radio.Group>
         </Form.Item>
-      </Form>
+      </div>
     );
   },
 };

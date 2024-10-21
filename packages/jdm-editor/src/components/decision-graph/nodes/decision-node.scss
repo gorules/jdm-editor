@@ -78,10 +78,12 @@
 
     &--success {
       background-color: var(--grl-color-success);
+      color: #fff;
     }
 
     &--error {
       background-color: var(--grl-color-error);
+      color: #fff;
     }
   }
 
@@ -231,9 +233,23 @@
         font-size: var(--node-small-text) !important;
       }
 
-      form {
+      .settings-form {
+        .ant-typography {
+          font-size: var(--node-small-text) !important;
+        }
+
+        .ant-form-item-row {
+          text-align: start;
+          display: flex;
+          flex-direction: column !important;
+          flex-flow: row wrap;
+          min-width: 100%;
+        }
+
         .ant-form-item-label {
           padding-bottom: 0 !important;
+          height: unset;
+          text-align: start;
         }
 
         .grl-ce {
@@ -249,6 +265,7 @@
 
         label {
           font-size: var(--node-small-text) !important;
+          height: unset;
 
           &::after {
             content: none !important;

@@ -1,4 +1,4 @@
-import { BranchesOutlined, DeleteOutlined, DownOutlined } from '@ant-design/icons';
+import { ArrowRightOutlined, BranchesOutlined, DeleteOutlined, DownOutlined } from '@ant-design/icons';
 import type { VariableType } from '@gorules/zen-engine-wasm';
 import { createVariableType } from '@gorules/zen-engine-wasm';
 import { Button, Dropdown, Popconfirm, Typography } from 'antd';
@@ -94,6 +94,7 @@ const SwitchNode: React.FC<
       specification={specification}
       name={data.name}
       handleRight={false}
+      helper={[<ArrowRightOutlined key='arrow-right' />]}
       noBodyPadding
       isSelected={selected}
       actions={[

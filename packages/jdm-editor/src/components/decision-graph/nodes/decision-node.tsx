@@ -164,12 +164,12 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
           </div>
         )}
       </GraphCard>
-      <Transition state={detailsOpen} timeout={150}>
+      <Transition state={detailsOpen} timeout={100}>
         {(stage, shouldMount) =>
           shouldMount && (
             <GraphCard
               style={{
-                transition: '0.15s ease-in-out',
+                transition: '0.1s ease-in-out',
                 transform: stage === 'enter' ? 'translateY(0)' : 'translateY(-10px)',
                 opacity: stage === 'enter' ? 1 : 0,
               }}
