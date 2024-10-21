@@ -91,6 +91,7 @@ export type DecisionGraphStoreType = {
     compactMode?: boolean;
 
     nodeTypes: Record<string, Partial<Record<NodeTypeKind, VariableType>>>;
+    globalType: Record<string, VariableType>;
   };
 
   references: {
@@ -177,6 +178,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         panels: [],
         compactMode: localStorage.getItem('jdm-compact-mode') === 'true',
         nodeTypes: {},
+        globalType: {},
       })),
     [],
   );

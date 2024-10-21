@@ -2,8 +2,9 @@ import type { DragDropManager } from 'dnd-core';
 import React, { useMemo } from 'react';
 import { P, match } from 'ts-pattern';
 
+import { useNodeType } from '../../../helpers/node-type';
 import { DecisionTable } from '../../decision-table';
-import { NodeTypeKind, useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
+import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
 import type { NodeDecisionTableData } from '../nodes/specifications/decision-table.specification';
 import type { SimulationTrace, SimulationTraceDataTable } from '../types/simulation.types';
 
@@ -14,15 +15,16 @@ export type TabDecisionTableProps = {
 
 export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager }) => {
   const graphActions = useDecisionGraphActions();
-  const { nodeTrace, disabled, configurable, content, inferredType } = useDecisionGraphState(
-    ({ simulate, disabled, configurable, decisionGraph, nodeTypes }) => ({
+  const nodeType = useNodeType(id, { attachGlobals: false });
+  const { nodeTrace, disabled, configurable, content, globalType } = useDecisionGraphState(
+    ({ simulate, disabled, configurable, decisionGraph, globalType }) => ({
       nodeTrace: match(simulate)
         .with({ result: P._ }, ({ result }) => result?.trace?.[id] as SimulationTrace<SimulationTraceDataTable>)
         .otherwise(() => null),
       disabled,
       configurable,
       content: (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content as NodeDecisionTableData,
-      inferredType: nodeTypes[id]?.[NodeTypeKind.Input] ?? nodeTypes[id]?.[NodeTypeKind.InferredInput],
+      globalType,
     }),
   );
 
@@ -34,16 +36,19 @@ export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager 
       : [];
 
   const computedType = useMemo(() => {
-    if (!inferredType) {
+    if (!nodeType) {
       return undefined;
     }
 
     const computedType = match(content?.inputField)
-      .with(P.string, (inputField) => inferredType.get(inputField))
-      .otherwise(() => inferredType);
+      .with(P.string, (inputField) => nodeType.get(inputField))
+      .otherwise(() => nodeType);
 
-    return content?.executionMode === 'loop' ? computedType.arrayItem() : computedType;
-  }, [inferredType, content?.inputField, content?.executionMode]);
+    const newType = content?.executionMode === 'loop' ? computedType.arrayItem() : computedType;
+
+    Object.entries(globalType).forEach(([k, v]) => newType.set(k, v));
+    return newType;
+  }, [nodeType, globalType, content?.inputField, content?.executionMode]);
 
   return (
     <DecisionTable

@@ -5,9 +5,10 @@ import equal from 'fast-deep-equal/es6/react';
 import React from 'react';
 import type { z } from 'zod';
 
+import { useNodeType } from '../../../../helpers/node-type';
 import type { decisionTableSchema } from '../../../../helpers/schema';
 import { CodeEditor } from '../../../code-editor';
-import { NodeTypeKind, useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
+import { useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
 import { GraphNode } from '../graph-node';
 import type { NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
@@ -120,11 +121,11 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
   },
   renderSettings: ({ id }) => {
     const graphActions = useDecisionGraphActions();
-    const { fields, disabled, inputType } = useDecisionGraphState(({ decisionGraph, disabled, nodeTypes }) => {
+    const inputType = useNodeType(id);
+    const { fields, disabled } = useDecisionGraphState(({ decisionGraph, disabled }) => {
       const content = (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content as NodeDecisionTableData;
       return {
         disabled,
-        inputType: nodeTypes?.[id]?.[NodeTypeKind.Input] ?? nodeTypes?.[id]?.[NodeTypeKind.InferredInput],
         fields: {
           passThrough: content?.passThrough || false,
           inputField: content?.inputField,

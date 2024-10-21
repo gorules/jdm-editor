@@ -1,15 +1,14 @@
 import { ArrowRightOutlined, BranchesOutlined, DeleteOutlined, DownOutlined } from '@ant-design/icons';
 import type { VariableType } from '@gorules/zen-engine-wasm';
-import { createVariableType } from '@gorules/zen-engine-wasm';
 import { Button, Dropdown, Popconfirm, Typography } from 'antd';
 import clsx from 'clsx';
-import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, { useLayoutEffect, useMemo, useState } from 'react';
 import { Handle, Position } from 'reactflow';
 import { P, match } from 'ts-pattern';
 
-import { isWasmAvailable } from '../../../../helpers/wasm';
+import { useNodeType } from '../../../../helpers/node-type';
 import { LocalCodeEditor } from '../../../code-editor/local-ce';
-import { NodeTypeKind, useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
+import { useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
 import type { SimulationTrace, SimulationTraceDataSwitch } from '../../types/simulation.types';
 import { GraphNode } from '../graph-node';
 import { NodeColor } from './colors';
@@ -54,29 +53,20 @@ const SwitchNode: React.FC<
   }
 > = ({ id, data, selected, specification }) => {
   const graphActions = useDecisionGraphActions();
-  const { content, disabled, nodeTrace, compactMode, inferredType } = useDecisionGraphState(
-    ({ decisionGraph, disabled, simulate, compactMode, nodeTypes }) => ({
+  const nodeType = useNodeType(id);
+  const { content, disabled, nodeTrace, compactMode } = useDecisionGraphState(
+    ({ decisionGraph, disabled, simulate, compactMode }) => ({
       nodeTrace: match(simulate)
         .with({ result: P._ }, ({ result }) => result?.trace?.[id] as SimulationTrace<SimulationTraceDataSwitch>)
         .otherwise(() => null),
       content: (decisionGraph?.nodes || []).find((n) => n?.id === id)?.content as NodeSwitchData | undefined,
       disabled,
       compactMode,
-      inferredType: nodeTypes[id]?.[NodeTypeKind.Input] ?? nodeTypes[id]?.[NodeTypeKind.InferredInput],
     }),
   );
 
   const statements: SwitchStatement[] = content?.statements || [];
   const hitPolicy = content?.hitPolicy || 'first';
-  const [variableType, setVariableType] = useState<VariableType>();
-
-  useEffect(() => {
-    if (!isWasmAvailable()) {
-      return;
-    }
-
-    setVariableType(createVariableType(nodeTrace?.input ?? inferredType));
-  }, [nodeTrace?.input, inferredType]);
 
   const changeHitPolicy = (hitPolicy: string) => {
     graphActions.updateNode(id, (node) => {
@@ -186,7 +176,7 @@ const SwitchNode: React.FC<
               totalStatements={statements.length}
               disabled={disabled}
               hitPolicy={hitPolicy}
-              variableType={variableType}
+              variableType={nodeType}
               onSetIsDefault={(val) => {
                 graphActions.updateNode(id, (draft) => {
                   const draftStatement = draft.content.statements.find((s: SwitchStatement) => {
