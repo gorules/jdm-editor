@@ -10,7 +10,8 @@ pub trait RecursiveGetSet {
 
 impl RecursiveGetSet for VariableType {
     fn set_type(&mut self, path: &str, variable_type: VariableType) -> VariableType {
-        let (first, rest) = path.split_once('.')
+        let (first, rest) = path
+            .split_once('.')
             .map(|(a, b)| (a, Some(b)))
             .unwrap_or((path, None));
 
@@ -18,7 +19,7 @@ impl RecursiveGetSet for VariableType {
             VariableType::Object(map) => {
                 let mut vt = match map.remove(first) {
                     Some(vt) => (*vt).clone(),
-                    None => VariableType::Object(HashMap::default())
+                    None => VariableType::Object(HashMap::default()),
                 };
 
                 if let Some(r) = rest {
@@ -30,12 +31,13 @@ impl RecursiveGetSet for VariableType {
                 map.insert(first.to_string(), Rc::new(vt));
                 VariableType::Object(map.clone())
             }
-            _ => VariableType::Any
+            _ => VariableType::Any,
         }
     }
 
     fn get_type(&self, path: &str) -> VariableType {
-        let (first, rest) = path.split_once('.')
+        let (first, rest) = path
+            .split_once('.')
             .map(|(a, b)| (a, Some(b)))
             .unwrap_or((path, None));
 
@@ -51,7 +53,7 @@ impl RecursiveGetSet for VariableType {
                     (**vt).clone()
                 }
             }
-            _ => VariableType::Any
+            _ => VariableType::Any,
         }
     }
 }

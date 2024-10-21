@@ -1,12 +1,12 @@
-import { FunctionOutlined, WarningFilled, WarningOutlined } from '@ant-design/icons';
-import { Button, Tooltip } from 'antd';
+import { WarningFilled } from '@ant-design/icons';
+import { Button, Tooltip, Typography } from 'antd';
 import React from 'react';
 import { P, match } from 'ts-pattern';
 
 import { defaultFunctionValue } from '../../../function/helpers/libs';
 import { useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
 import { GraphNode } from '../graph-node';
-import { ORANGE_COLOR } from './colors';
+import { NodeColor } from './colors';
 import type { NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
 
@@ -18,11 +18,11 @@ export type NodeFunctionData =
 
 export const functionSpecification: NodeSpecification<NodeFunctionData> = {
   type: NodeKind.Function,
-  icon: <FunctionOutlined />,
+  icon: <Typography.Text style={{ color: 'white' }}>JS</Typography.Text>,
   displayName: 'Function',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/functions',
   shortDescription: 'Javascript lambda',
-  color: ORANGE_COLOR,
+  color: NodeColor.Orange,
   generateNode: ({ index }) => ({
     name: `function${index}`,
     content: {
@@ -40,54 +40,19 @@ export const functionSpecification: NodeSpecification<NodeFunctionData> = {
           ...specification,
           displayName:
             kind === FunctionKind.Stable ? (
-              'Function v2'
+              'Function'
             ) : (
               <span>
                 {'Function v1 '}
-                <Tooltip
-                  placement='top'
-                  title={
-                    <>
-                      {
-                        'Function v1 will be deprecated in one of the upcoming releases. To use a new Function v2, drag and drop a new Function Node and copy your logic. For more information click "Documentation". '
-                      }
-                    </>
-                  }
-                >
-                  <WarningOutlined
-                    style={{
-                      color: 'var(--grl-color-warning-text)',
-                    }}
-                  />
-                </Tooltip>
+                <DeprecatedFunctionWarning />
               </span>
             ),
         }}
         name={data.name}
         isSelected={selected}
-        helper={
-          kind === FunctionKind.Stable ? undefined : (
-            <Tooltip
-              placement='top'
-              title={
-                <>
-                  {
-                    'Function v1 will be deprecated in one of the upcoming releases. To use a new Function v2, drag and drop a new Function Node and copy your logic. For more information click "Documentation". '
-                  }
-                </>
-              }
-            >
-              <WarningFilled
-                style={{
-                  fontSize: 16,
-                  color: 'var(--grl-color-warning-text)',
-                }}
-              />
-            </Tooltip>
-          )
-        }
+        helper={[kind === FunctionKind.Deprecated && <DeprecatedFunctionWarning size={16} />]}
         actions={[
-          <Button key='edit-function' type='link' onClick={() => graphActions.openTab(id)}>
+          <Button key='edit-function' type='text' onClick={() => graphActions.openTab(id)}>
             Edit Function
           </Button>,
         ]}
@@ -110,3 +75,12 @@ export const useFunctionKind = (id: string) => {
 
   return kind;
 };
+
+const DeprecatedFunctionWarning: React.FC<{ size?: number }> = ({ size }) => (
+  <Tooltip
+    placement='top'
+    title='Function v1 will be deprecated in one of the upcoming releases. To use a new Function, drag and drop a new Function Node and copy your logic. For more information click "Documentation". '
+  >
+    <WarningFilled style={{ color: 'var(--grl-color-warning-text)', fontSize: size }} />
+  </Tooltip>
+);

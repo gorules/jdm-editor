@@ -37,7 +37,7 @@ export const ExpressionList: React.FC<ExpressionListProps> = ({}) => {
       .filter((e) => e.key.length > 0)
       .forEach((expr) => {
         const calculatedType = resultingVariableType.calculateType(expr.value);
-        resultingVariableType.setOwned(`$.${expr.key}`, calculatedType);
+        resultingVariableType.set(`$.${expr.key}`, calculatedType);
       });
 
     setVariableType(resultingVariableType);

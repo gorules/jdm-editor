@@ -54,6 +54,7 @@
     "react-dnd-html5-backend": "16.0.1",
     "react-json-tree": "^0.19.0",
     "reactflow": "11.11.4",
+    "transition-hook": "^1.5.2",
     "ts-pattern": "^5.4.0",
     "use-debounce": "^10.0.3",
     "zod": "^3.23.8",

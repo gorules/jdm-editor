@@ -50,7 +50,8 @@ impl JsVariableType {
     #[wasm_bindgen(js_name = "fromIncoming")]
     pub fn from_incoming(values: Vec<JsVariableType>) -> Self {
         let empty_object = VariableType::Object(Default::default());
-        let vt: VariableType = values.into_iter()
+        let vt: VariableType = values
+            .into_iter()
             .filter(|v| !matches!(v.0, VariableType::Any))
             .fold(empty_object, |a, b| a.merge(&b));
 
@@ -71,10 +72,17 @@ impl JsVariableType {
         Self(self.0.clone())
     }
 
+    #[wasm_bindgen(js_name = "toArray")]
+    pub fn to_array(&self) -> Self {
+        Self(VariableType::Array(Rc::new(self.0.clone())))
+    }
 
-    #[wasm_bindgen(js_name = "intoArray")]
-    pub fn into_array(self) -> Self {
-        Self(VariableType::Array(Rc::new(self.0)))
+    #[wasm_bindgen(js_name = "arrayItem")]
+    pub fn array_item(&self) -> Self {
+        match &self.0 {
+            VariableType::Array(item) => Self((**item).clone()),
+            _ => Self::any(),
+        }
     }
 
     #[wasm_bindgen(js_name = "calculateType")]
@@ -107,11 +115,6 @@ impl JsVariableType {
     pub fn set(&mut self, path: &str, value: &JsVariableType) {
         let variable_type = value.0.clone();
         self.0.set_type(path, variable_type);
-    }
-
-    #[wasm_bindgen(js_name = "setOwned")]
-    pub fn set_owned(&mut self, path: &str, value: JsVariableType) {
-        self.0.set_type(path, value.0);
     }
 
     #[wasm_bindgen(js_name = "setJson")]

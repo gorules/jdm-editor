@@ -17,7 +17,7 @@ export enum NodeKind {
 export type MinimalNodeProps = Pick<NodeProps, 'id' | 'data' | 'selected'>;
 export type MinimalNodeSpecification = Pick<
   NodeSpecification,
-  'color' | 'icon' | 'displayName' | 'documentationUrl' | 'helper'
+  'color' | 'icon' | 'displayName' | 'documentationUrl' | 'helper' | 'renderSettings'
 >;
 
 type GenerateNodeParams = {
@@ -40,6 +40,7 @@ export type NodeSpecification<T = any> = {
   helper?: string | React.ReactNode;
   generateNode: (params: GenerateNodeParams) => Omit<DecisionNode<T>, 'position' | 'id' | 'type'>;
   renderNode: React.FC<MinimalNodeProps & { specification: MinimalNodeSpecification }>;
+  renderSettings?: React.FC<{ id: string }>;
   inferTypes?: {
     needsUpdate: (content: T, prevContent: T) => boolean;
     determineOutputType: (state: InferTypeData<T>) => VariableType;

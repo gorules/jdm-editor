@@ -20,6 +20,7 @@ export {
   type DecisionEdge,
   type DecisionGraphType,
 } from './context/dg-store.context';
+export { NodeColor } from './nodes/specifications/colors';
 
 export type {
   Simulation,

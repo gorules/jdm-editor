@@ -108,7 +108,7 @@ const TableInputCell: React.FC<TableCellProps> = ({ column, value, onChange, dis
 
     const resultingType = inputVariableType.clone();
     const calculatedType = inputVariableType.calculateType(column.field);
-    resultingType.setOwned('$', calculatedType);
+    resultingType.set('$', calculatedType);
 
     raw.stateStore.setState({
       derivedVariableTypes: {

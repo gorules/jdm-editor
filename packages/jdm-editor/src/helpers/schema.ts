@@ -38,11 +38,15 @@ export const decisionTableSchema = z
       outputs: z.array(
         z.object({
           id,
-          name: z.string().nullish(),
-          field: z.string().nullish(),
+          name: z.string(),
+          field: z.string(),
           defaultValue: z.string().nullish(),
         }),
       ),
+      passThrough: z.boolean().default(true).nullish(),
+      inputField: z.string().nullish(),
+      outputPath: z.string().nullish(),
+      executionMode: z.enum(['single', 'loop']).default('single').nullish(),
     }),
   })
   .merge(nodeCommon);
@@ -72,6 +76,10 @@ export const expressionNodeSchema = z
           value: z.string().default(''),
         }),
       ),
+      passThrough: z.boolean().default(true),
+      inputField: z.string().nullish(),
+      outputPath: z.string().nullish(),
+      executionMode: z.enum(['single', 'loop']).default('single').nullish(),
     }),
   })
   .merge(nodeCommon);

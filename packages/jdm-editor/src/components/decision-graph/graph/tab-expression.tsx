@@ -1,8 +1,11 @@
 import type { DragDropManager } from 'dnd-core';
-import React from 'react';
+import React, { useMemo } from 'react';
+import { P, match } from 'ts-pattern';
 
+import { useNodeType } from '../../../helpers/node-type';
 import { Expression } from '../../expression';
-import { NodeTypeKind, useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
+import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
+import type { NodeExpressionData } from '../nodes/specifications/expression.specification';
 import type { SimulationTrace, SimulationTraceDataExpression } from '../types/simulation.types';
 
 export type TabExpressionProps = {
@@ -12,18 +15,34 @@ export type TabExpressionProps = {
 
 export const TabExpression: React.FC<TabExpressionProps> = ({ id, manager }) => {
   const graphActions = useDecisionGraphActions();
-  const { disabled, configurable, content, trace, inferredType } = useDecisionGraphState(
-    ({ disabled, configurable, decisionGraph, simulate, nodeTypes }) => ({
+  const nodeType = useNodeType(id, { attachGlobals: false });
+  const { disabled, configurable, content, trace, globalType } = useDecisionGraphState(
+    ({ disabled, configurable, decisionGraph, simulate, globalType }) => ({
       disabled,
       configurable,
-      content: (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content,
+      content: (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content as NodeExpressionData,
       trace:
         simulate && 'result' in simulate
           ? (simulate.result?.trace[id] as SimulationTrace<SimulationTraceDataExpression>)
           : undefined,
-      inferredType: nodeTypes[id]?.[NodeTypeKind.Input] ?? nodeTypes[id]?.[NodeTypeKind.InferredInput],
+      globalType,
     }),
   );
+
+  const computedType = useMemo(() => {
+    if (!nodeType) {
+      return undefined;
+    }
+
+    const computedType = match(content?.inputField)
+      .with(P.string, (inputField) => nodeType.get(inputField))
+      .otherwise(() => nodeType);
+
+    const newType = content?.executionMode === 'loop' ? computedType.arrayItem() : computedType;
+
+    Object.entries(globalType).forEach(([k, v]) => newType.set(k, v));
+    return newType;
+  }, [nodeType, globalType, content?.inputField, content?.executionMode]);
 
   return (
     <div style={{ height: '100%', overflowY: 'auto', boxSizing: 'border-box' }}>
@@ -33,7 +52,7 @@ export const TabExpression: React.FC<TabExpressionProps> = ({ id, manager }) => 
         disabled={disabled}
         configurable={configurable}
         manager={manager}
-        inputData={trace?.input ?? inferredType}
+        inputData={computedType}
         onChange={(val) => {
           graphActions.updateNode(id, (draft) => {
             draft.content.expressions = val;
