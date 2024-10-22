@@ -131,11 +131,7 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
             disabled={disabled}
             size={'small'}
             checked={fields?.passThrough}
-            onChange={(e) => {
-              updateNode({
-                passThrough: e,
-              });
-            }}
+            onChange={(e) => updateNode({ passThrough: e })}
           />
         </Form.Item>
         <Form.Item label='Input field'>
@@ -145,24 +141,16 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
             style={{ fontSize: 12, lineHeight: '20px', width: '100%' }}
             expectedVariableType={fields?.executionMode === 'loop' ? { Array: 'Any' } : undefined}
             maxRows={4}
-            value={fields?.inputField ?? undefined}
-            onChange={(val) => {
-              updateNode({
-                inputField: val,
-              });
-            }}
+            value={fields?.inputField ?? ''}
+            onChange={(val) => updateNode({ inputField: val?.trim() || null })}
           />
         </Form.Item>
         <Form.Item label='Output path'>
           <Input
             size={'small'}
             disabled={disabled}
-            value={fields?.outputPath ?? undefined}
-            onChange={(e) => {
-              updateNode({
-                outputPath: e?.target?.value,
-              });
-            }}
+            value={fields?.outputPath ?? ''}
+            onChange={(e) => updateNode({ outputPath: e?.target?.value?.trim() || null })}
           />
         </Form.Item>
         <Form.Item label='Execution mode'>
@@ -170,11 +158,7 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
             size={'small'}
             disabled={disabled}
             value={fields?.executionMode}
-            onChange={(e) => {
-              updateNode({
-                executionMode: e?.target?.value,
-              });
-            }}
+            onChange={(e) => updateNode({ executionMode: e?.target?.value })}
           >
             <Radio defaultChecked value='single'>
               Single
