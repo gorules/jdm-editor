@@ -56,7 +56,7 @@ export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager 
       value={content as any}
       onChange={(val) => {
         graphActions.updateNode(id, (draft) => {
-          draft.content = val;
+          Object.assign(draft.content, val);
           return draft;
         });
       }}
