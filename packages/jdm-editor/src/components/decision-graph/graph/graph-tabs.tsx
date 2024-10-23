@@ -110,11 +110,12 @@ const TabLabel: React.FC<{
         label: 'Close all Tabs',
         onClick: () => onContextClick?.('close-all'),
       },
-    total > 0 && {
-      key: 'close-other',
-      label: 'Close other Tabs',
-      onClick: () => onContextClick?.('close-other'),
-    },
+    total > 0 &&
+      index !== -1 && {
+        key: 'close-other',
+        label: 'Close other Tabs',
+        onClick: () => onContextClick?.('close-other'),
+      },
     total > 0 &&
       index + 1 < total && {
         key: 'close-right',
