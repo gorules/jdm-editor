@@ -25,13 +25,7 @@ export default defineConfig({
       formats: ['es'],
     },
     rollupOptions: {
-      external: [
-        'react/jsx-runtime',
-        'react',
-        'react-dom',
-        /ace-builds\/?.*/,
-        ...Object.keys(packageJson.dependencies),
-      ],
+      external: ['react/jsx-runtime', 'react', 'react-dom', ...Object.keys(packageJson.dependencies)],
       output: {
         globals: {
           'react-dom': 'ReactDOM',
