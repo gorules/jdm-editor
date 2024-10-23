@@ -75,7 +75,7 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
 
   return (
     <PanelGroup className='grl-dg__simulator' direction='horizontal' autoSaveId='jdm-editor:simulator:layout'>
-      <Panel minSize={25} defaultSize={25} className='grl-dg__simulator__section grl-dg__simulator__request'>
+      <Panel minSize={20} defaultSize={30} className='grl-dg__simulator__section grl-dg__simulator__request'>
         <div className={'grl-dg__simulator__section__bar grl-dg__simulator__section__bar--request'}>
           <Typography.Text>Request (json5)</Typography.Text>
           <div className={'grl-dg__simulator__section__bar__actions'}>
@@ -154,7 +154,7 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
         </div>
       </Panel>
       <PanelResizeHandle />
-      <Panel minSize={15} maxSize={15} className={'grl-dg__simulator__section grl-dg__simulator__nodes'}>
+      <Panel minSize={20} maxSize={20} className={'grl-dg__simulator__section grl-dg__simulator__nodes'}>
         <div className={'grl-dg__simulator__section__bar grl-dg__simulator__section__bar--nodes'}>
           <Typography.Text>Nodes</Typography.Text>
           <div className={'grl-dg__simulator__section__bar__actions'}>
@@ -204,7 +204,7 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
         </div>
       </Panel>
       <PanelResizeHandle />
-      <Panel minSize={10} defaultSize={60} className={'grl-dg__simulator__section grl-dg__simulator__response'}>
+      <Panel minSize={30} defaultSize={50} className={'grl-dg__simulator__section grl-dg__simulator__response'}>
         <div className={'grl-dg__simulator__section__bar grl-dg__simulator__section__bar--response'}>
           <Typography.Text>Response</Typography.Text>
         </div>
