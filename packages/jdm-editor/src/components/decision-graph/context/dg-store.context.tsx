@@ -534,8 +534,8 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
           openTabs: updatedTabs,
         };
 
-        const newIndex = updatedTabs?.findIndex((i) => i === activeTab);
-        if (newIndex === -1) {
+        const newActiveTabId = updatedTabs?.find((i) => i === activeTab);
+        if (!newActiveTabId) {
           updatedState.activeTab = updatedTabs?.[index - 1] ?? 'graph';
         }
 
