@@ -22,6 +22,7 @@ export default defineConfig({
       entry: path.resolve(__dirname, 'src', 'index.ts'),
       name: 'JDM Editor',
       fileName: 'jdm-editor',
+      formats: ['es'],
     },
     rollupOptions: {
       external: [
@@ -29,7 +30,7 @@ export default defineConfig({
         'react',
         'react-dom',
         /ace-builds\/?.*/,
-        ...Object.keys(packageJson.dependencies).filter((d) => d !== 'antd'),
+        ...Object.keys(packageJson.dependencies),
       ],
       output: {
         globals: {

@@ -3,7 +3,7 @@
   "version": "0.11.2",
   "description": "ZEN Engine WASM",
   "type": "module",
-  "module": "index.js",
+  "main": "index.js",
   "types": "index.d.ts",
   "sideEffects": [
     "./dist/zen_engine_wasm.js",

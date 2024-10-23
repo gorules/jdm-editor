@@ -7,8 +7,7 @@
   "license": "MIT",
   "keywords": [],
   "type": "module",
-  "main": "dist/jdm-editor.umd.cjs",
-  "module": "dist/jdm-editor.js",
+  "main": "dist/jdm-editor.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist/",
