@@ -140,7 +140,7 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
             )}
           </div>
           {menuItems.length > 0 && (
-            <div className='grl-dn__header__actions'>
+            <div className={clsx('grl-dn__header__actions', 'nodrag')}>
               <Dropdown trigger={['click']} overlayStyle={{ minWidth: 250 }} menu={{ items: menuItems }}>
                 <Button type='text' size={'small'} icon={<MoreOutlined />} />
               </Dropdown>
@@ -159,7 +159,7 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
           </div>
         )}
         {actions.length > 0 && (
-          <div className='grl-dn__footer'>
+          <div className={clsx('grl-dn__footer', 'nodrag')}>
             <div className='grl-dn__footer__actions'>{actions}</div>
           </div>
         )}
@@ -168,6 +168,7 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
         {(stage, shouldMount) =>
           shouldMount && (
             <GraphCard
+              className='nodrag'
               style={{
                 transition: '0.1s ease-in-out',
                 transform: stage === 'enter' ? 'translateY(0)' : 'translateY(-10px)',

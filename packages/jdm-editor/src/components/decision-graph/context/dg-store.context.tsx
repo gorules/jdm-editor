@@ -12,7 +12,7 @@ import { create } from 'zustand';
 
 import type { nodeSchema } from '../../../helpers/schema';
 import type { CodeEditorProps } from '../../code-editor';
-import { dimensionsSymbol, mapToGraphEdge, mapToGraphEdges, mapToGraphNode, mapToGraphNodes } from '../dg-util';
+import { mapToGraphEdge, mapToGraphEdges, mapToGraphNode, mapToGraphNodes, privateSymbol } from '../dg-util';
 import type { useGraphClipboard } from '../hooks/use-graph-clipboard';
 import type { CustomNodeSpecification } from '../nodes/custom-node';
 import { NodeKind, type NodeSpecification } from '../nodes/specifications/specification-types';
@@ -32,7 +32,10 @@ export type DecisionNode<T = any> = {
   type?: NodeSchema['type'] | string;
   content?: T;
   position: Position;
-  [dimensionsSymbol]?: { height?: number; width?: number };
+  [privateSymbol]?: {
+    dimensions?: { height?: number; width?: number };
+    selected?: boolean;
+  };
 };
 
 export type DecisionEdge = {
@@ -131,6 +134,8 @@ export type DecisionGraphStoreType = {
 
     setNodeType: (id: string, kind: NodeTypeKind, vt: VariableType) => void;
     removeNodeType: (id: string, kind?: NodeTypeKind) => void;
+
+    triggerNodeSelect: (id: string, mode: 'toggle' | 'only') => void;
   };
 
   listeners: {
@@ -224,9 +229,19 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
               })
               .with({ type: 'dimensions' }, (d) => {
                 const node = draft.nodes.find((n) => n.id === d.id);
-                if (node && !equal(node[dimensionsSymbol], d.dimensions)) {
+                if (node && !equal(node[privateSymbol]?.dimensions, d.dimensions)) {
                   hasChanges = true;
-                  node[dimensionsSymbol] = { height: d.dimensions?.height, width: d.dimensions?.width };
+                  node[privateSymbol] ??= {};
+                  node[privateSymbol].dimensions = { height: d.dimensions?.height, width: d.dimensions?.width };
+                }
+              })
+              .with({ type: 'select' }, (s) => {
+                const node = draft.nodes.find((n) => n.id === s.id);
+
+                if (node && node[privateSymbol]?.selected !== s.selected) {
+                  hasChanges = true;
+                  node[privateSymbol] ??= {};
+                  node[privateSymbol].selected = s.selected;
                 }
               })
               .otherwise(() => {
@@ -564,6 +579,35 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         });
 
         stateStore.setState({ nodeTypes: newNodeTypes });
+      },
+      triggerNodeSelect: (id, mode) => {
+        const { decisionGraph } = stateStore.getState();
+        const { nodesState } = referenceStore.getState();
+        const [, setNodes] = nodesState.current;
+
+        const newDecisionGraph = produce(decisionGraph, (draft) => {
+          const chosenNode = draft.nodes.find((n) => n.id === id);
+          if (!chosenNode) {
+            return;
+          }
+
+          if (mode === 'only') {
+            draft.nodes.forEach((n) => {
+              if (n[privateSymbol]) {
+                n[privateSymbol].selected = false;
+              }
+            });
+          }
+
+          chosenNode[privateSymbol] ??= {};
+          chosenNode[privateSymbol].selected = match(mode)
+            .with('only', () => true)
+            .otherwise(() => !chosenNode[privateSymbol]?.selected);
+        });
+
+        setNodes(mapToGraphNodes(newDecisionGraph.nodes));
+        stateStore.setState({ decisionGraph: newDecisionGraph });
+        listenerStore.getState().onChange?.(newDecisionGraph);
       },
     }),
     [],
