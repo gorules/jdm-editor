@@ -2,7 +2,7 @@ import { LogoutOutlined } from '@ant-design/icons';
 import React from 'react';
 
 import { GraphNode } from '../graph-node';
-import { GREEN_COLOR } from './colors';
+import { NodeColor } from './colors';
 import type { NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
 
@@ -11,7 +11,7 @@ export type NodeOutputData = never;
 export const outputSpecification: NodeSpecification<NodeOutputData> = {
   type: NodeKind.Output,
   icon: <LogoutOutlined />,
-  color: GREEN_COLOR,
+  color: NodeColor.Green,
   displayName: 'Response',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions',
   shortDescription: 'Outputs the context',

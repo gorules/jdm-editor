@@ -6,7 +6,7 @@ import { platform } from '../../../../helpers/platform';
 import { SpacedText } from '../../../spaced-text';
 import { useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
 import { GraphNode } from '../graph-node';
-import { GREEN_COLOR } from './colors';
+import { NodeColor } from './colors';
 import type { NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
 
@@ -16,7 +16,7 @@ export const inputSpecification: NodeSpecification<NodeInputData> = {
   type: NodeKind.Input,
   icon: <LoginOutlined />,
   displayName: 'Request',
-  color: GREEN_COLOR,
+  color: NodeColor.Green,
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions',
   shortDescription: 'Provides input context',
   generateNode: () => ({ name: 'request' }),

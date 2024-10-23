@@ -22,7 +22,7 @@ export const DecisionGraphInferTypes = () => {
       return;
     }
 
-    return stateStore.subscribe(({ simulate, nodeTypes }, prevState) => {
+    return stateStore.subscribe(({ simulate, nodeTypes, decisionGraph }, prevState) => {
       if (equal(simulate, prevState?.simulate)) {
         return;
       }
@@ -49,6 +49,11 @@ export const DecisionGraphInferTypes = () => {
 
       const newNodeTypes = produce(nodeTypes, (draft) => {
         traceValues.forEach((t) => {
+          const node = decisionGraph.nodes.find((n) => n.id === t.id);
+          if (node?.type === 'inputNode') {
+            return;
+          }
+
           draft[t.id] ??= {};
 
           draft[t.id][NodeTypeKind.Output] = new VariableType(t.output ?? {});
@@ -78,6 +83,33 @@ export const DecisionGraphInferTypes = () => {
       if (infer.isModified) {
         stateStore.setState({ nodeTypes: infer.nodeTypes });
       }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!isWasmAvailable()) {
+      return;
+    }
+
+    return stateStore.subscribe((state, prevState) => {
+      const stateDigest = globalTypesStateDigest(state);
+      const prevStateDigest = globalTypesStateDigest(prevState);
+      if (equal(stateDigest, prevStateDigest)) {
+        return;
+      }
+
+      const $nodesType = VariableType.fromJson({ Object: {} });
+      state.decisionGraph.nodes.forEach((node) => {
+        const nodeType = state.nodeTypes[node.id];
+        const nodeOutput =
+          nodeType?.[NodeTypeKind.Output] ??
+          nodeType?.[NodeTypeKind.InferredOutput] ??
+          VariableType.fromJson({ Object: {} });
+
+        $nodesType.set(node.name, nodeOutput);
+      });
+
+      stateStore.setState({ globalType: { $nodes: $nodesType } });
     });
   }, []);
 
@@ -295,4 +327,18 @@ const variableTypeHash = (vt?: VariableType): string | undefined => {
 
   vt.__hash = vt.hash();
   return vt.__hash;
+};
+
+const globalTypesStateDigest = (state: DecisionGraphStoreType['state']) => {
+  const nodeInfo = state.decisionGraph.nodes.map((node) => {
+    const nodeType = state.nodeTypes[node.id];
+    const typ = nodeType?.[NodeTypeKind.Output] ?? nodeType?.[NodeTypeKind.InferredOutput];
+    return {
+      id: node.id,
+      type: variableTypeHash(typ),
+      name: node.name,
+    };
+  });
+
+  return { nodeInfo };
 };

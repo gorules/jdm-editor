@@ -1,16 +1,15 @@
-import { ClearOutlined, FormatPainterOutlined, PlayCircleOutlined } from '@ant-design/icons';
+import { ClearOutlined, CopyOutlined, FormatPainterOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { VariableType } from '@gorules/zen-engine-wasm';
-import 'ace-builds/src-noconflict/ext-language_tools.js';
-import 'ace-builds/src-noconflict/mode-json5.js';
-import 'ace-builds/src-noconflict/theme-chrome.js';
-import 'ace-builds/src-noconflict/theme-github_dark.js';
-import { Button, Spin, Tooltip, Typography, notification, theme } from 'antd';
+import { Editor } from '@monaco-editor/react';
+import { Button, Spin, Tooltip, Typography, message, notification, theme } from 'antd';
 import clsx from 'clsx';
 import json5 from 'json5';
-import React, { useEffect, useMemo, useState } from 'react';
-import ReactAce from 'react-ace';
+import React, { useEffect, useState } from 'react';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { P, match } from 'ts-pattern';
 
+import '../../helpers/monaco';
+import { copyToClipboard } from '../../helpers/utility';
 import { isWasmAvailable } from '../../helpers/wasm';
 import {
   type DecisionGraphType,
@@ -35,7 +34,6 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
   onClear,
   loading = false,
 }) => {
-  const { token } = theme.useToken();
   const [requestValue, setRequestValue] = useState(defaultRequest);
 
   const { stateStore, actions } = useDecisionGraphRaw();
@@ -55,12 +53,6 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
   const simulateResult = match(simulate)
     .with({ result: P._ }, ({ result }) => result)
     .otherwise(() => undefined);
-
-  const codeEditorTheme = useMemo(() => {
-    return match(token.mode)
-      .with('dark', () => 'github_dark')
-      .otherwise(() => 'chrome');
-  }, [token.mode]);
 
   useEffect(() => {
     if (!isWasmAvailable()) {
@@ -82,11 +74,26 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
   }, [requestValue]);
 
   return (
-    <div className={'grl-dg__simulator'}>
-      <div className={'grl-dg__simulator__section grl-dg__simulator__request'}>
+    <PanelGroup className='grl-dg__simulator' direction='horizontal' autoSaveId='jdm-editor:simulator:layout'>
+      <Panel minSize={20} defaultSize={30} className='grl-dg__simulator__section grl-dg__simulator__request'>
         <div className={'grl-dg__simulator__section__bar grl-dg__simulator__section__bar--request'}>
           <Typography.Text>Request (json5)</Typography.Text>
           <div className={'grl-dg__simulator__section__bar__actions'}>
+            <Tooltip title='Copy JSON to Clipboard'>
+              <Button
+                type={'text'}
+                size={'small'}
+                icon={<CopyOutlined />}
+                onClick={async () => {
+                  try {
+                    await copyToClipboard(JSON.stringify(json5.parse(requestValue ?? '')));
+                    message.success('Copied to clipboard!');
+                  } catch {
+                    message.error('Failed to copy to clipboard.');
+                  }
+                }}
+              />
+            </Tooltip>
             <Tooltip title={'Format json'}>
               <Button
                 size={'small'}
@@ -137,24 +144,17 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
           </div>
         </div>
         <div className={'grl-dg__simulator__section__content'}>
-          <ReactAce
+          <SimulatorEditor
             value={requestValue}
-            onChange={(e) => {
-              setRequestValue(e);
-              onChange?.(e);
-            }}
-            mode='json5'
-            theme={codeEditorTheme}
-            width='100%'
-            height='100%'
-            tabSize={2}
-            setOptions={{
-              useWorker: false,
+            onChange={(text) => {
+              setRequestValue(text);
+              onChange?.(text ?? '');
             }}
           />
         </div>
-      </div>
-      <div className={'grl-dg__simulator__section grl-dg__simulator__nodes'}>
+      </Panel>
+      <PanelResizeHandle />
+      <Panel minSize={20} maxSize={20} className={'grl-dg__simulator__section grl-dg__simulator__nodes'}>
         <div className={'grl-dg__simulator__section__bar grl-dg__simulator__section__bar--nodes'}>
           <Typography.Text>Nodes</Typography.Text>
           <div className={'grl-dg__simulator__section__bar__actions'}>
@@ -202,13 +202,15 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
             </div>
           </Spin>
         </div>
-      </div>
-      <div className={'grl-dg__simulator__section grl-dg__simulator__response'}>
+      </Panel>
+      <PanelResizeHandle />
+      <Panel minSize={30} defaultSize={50} className={'grl-dg__simulator__section grl-dg__simulator__response'}>
         <div className={'grl-dg__simulator__section__bar grl-dg__simulator__section__bar--response'}>
           <Typography.Text>Response</Typography.Text>
         </div>
         <div className={'grl-dg__simulator__section__content'}>
-          <ReactAce
+          <SimulatorEditor
+            readOnly
             value={match(simulate)
               .with({ result: P._ }, ({ result }) =>
                 match(selectedNode)
@@ -219,16 +221,61 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
                   }),
               )
               .otherwise(() => '')}
-            readOnly
-            mode='json5'
-            theme={codeEditorTheme}
-            width='100%'
-            height='100%'
-            tabSize={2}
-            setOptions={{ useWorker: false }}
           />
         </div>
-      </div>
-    </div>
+      </Panel>
+    </PanelGroup>
+  );
+};
+
+type SimulatorEditorProps = {
+  value?: string;
+  onChange?: (value: string | undefined) => void;
+  readOnly?: boolean;
+};
+
+const SimulatorEditor: React.FC<SimulatorEditorProps> = ({ value, onChange, readOnly }) => {
+  const { token } = theme.useToken();
+
+  return (
+    <Editor
+      loading={<Spin size='large' />}
+      language='javascript'
+      value={value}
+      onChange={onChange}
+      theme={token.mode === 'dark' ? 'vs-dark' : 'light'}
+      height='100%'
+      onMount={(editor, monaco) => {
+        monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+          noSyntaxValidation: true,
+        });
+
+        monaco.languages.typescript.javascriptDefaults.setModeConfiguration({
+          codeActions: false,
+          inlayHints: false,
+        });
+      }}
+      options={{
+        readOnly: readOnly,
+        automaticLayout: true,
+        contextmenu: false,
+        minimap: { enabled: false },
+        fontSize: 12,
+        fontFamily: 'var(--mono-font-family)',
+        tabSize: 2,
+        lineDecorationsWidth: 2,
+        find: {
+          addExtraSpaceOnTop: false,
+          seedSearchStringFromSelection: 'never',
+        },
+        scrollbar: {
+          verticalSliderSize: 4,
+          verticalScrollbarSize: 4,
+          horizontalScrollbarSize: 4,
+          horizontalSliderSize: 4,
+        },
+        lineNumbersMinChars: 3,
+      }}
+    />
   );
 };

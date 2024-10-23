@@ -1,18 +1,17 @@
-import { BranchesOutlined, DeleteOutlined, DownOutlined } from '@ant-design/icons';
+import { ArrowRightOutlined, BranchesOutlined, DeleteOutlined, DownOutlined } from '@ant-design/icons';
 import type { VariableType } from '@gorules/zen-engine-wasm';
-import { createVariableType } from '@gorules/zen-engine-wasm';
 import { Button, Dropdown, Popconfirm, Typography } from 'antd';
 import clsx from 'clsx';
-import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, { useLayoutEffect, useMemo, useState } from 'react';
 import { Handle, Position } from 'reactflow';
 import { P, match } from 'ts-pattern';
 
-import { isWasmAvailable } from '../../../../helpers/wasm';
+import { useNodeType } from '../../../../helpers/node-type';
 import { LocalCodeEditor } from '../../../code-editor/local-ce';
-import { NodeTypeKind, useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
+import { useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
 import type { SimulationTrace, SimulationTraceDataSwitch } from '../../types/simulation.types';
 import { GraphNode } from '../graph-node';
-import { PURPLE_COLOR } from './colors';
+import { NodeColor } from './colors';
 import type { MinimalNodeProps, NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
 
@@ -33,7 +32,7 @@ export const switchSpecification: NodeSpecification<NodeSwitchData> = {
   displayName: 'Switch',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/switch',
   shortDescription: 'Conditional branching',
-  color: PURPLE_COLOR,
+  color: NodeColor.Purple,
   inferTypes: {
     needsUpdate: () => false,
     determineOutputType: (state) => state.input,
@@ -54,29 +53,20 @@ const SwitchNode: React.FC<
   }
 > = ({ id, data, selected, specification }) => {
   const graphActions = useDecisionGraphActions();
-  const { content, disabled, nodeTrace, compactMode, inferredType } = useDecisionGraphState(
-    ({ decisionGraph, disabled, simulate, compactMode, nodeTypes }) => ({
+  const nodeType = useNodeType(id);
+  const { content, disabled, nodeTrace, compactMode } = useDecisionGraphState(
+    ({ decisionGraph, disabled, simulate, compactMode }) => ({
       nodeTrace: match(simulate)
         .with({ result: P._ }, ({ result }) => result?.trace?.[id] as SimulationTrace<SimulationTraceDataSwitch>)
         .otherwise(() => null),
       content: (decisionGraph?.nodes || []).find((n) => n?.id === id)?.content as NodeSwitchData | undefined,
       disabled,
       compactMode,
-      inferredType: nodeTypes[id]?.[NodeTypeKind.Input] ?? nodeTypes[id]?.[NodeTypeKind.InferredInput],
     }),
   );
 
   const statements: SwitchStatement[] = content?.statements || [];
   const hitPolicy = content?.hitPolicy || 'first';
-  const [variableType, setVariableType] = useState<VariableType>();
-
-  useEffect(() => {
-    if (!isWasmAvailable()) {
-      return;
-    }
-
-    setVariableType(createVariableType(nodeTrace?.input ?? inferredType));
-  }, [nodeTrace?.input, inferredType]);
 
   const changeHitPolicy = (hitPolicy: string) => {
     graphActions.updateNode(id, (node) => {
@@ -94,12 +84,13 @@ const SwitchNode: React.FC<
       specification={specification}
       name={data.name}
       handleRight={false}
+      helper={[<ArrowRightOutlined key='arrow-right' />]}
       noBodyPadding
       isSelected={selected}
       actions={[
         <Button
           key='add condition'
-          type='link'
+          type='text'
           disabled={disabled}
           onClick={() => {
             if (hitPolicy === 'first' && statements?.length > 0) {
@@ -162,7 +153,7 @@ const SwitchNode: React.FC<
             ],
           }}
         >
-          <Button type='link' style={{ textTransform: 'capitalize', marginLeft: 'auto' }}>
+          <Button type='text' style={{ textTransform: 'capitalize', marginLeft: 'auto' }}>
             {hitPolicy} <DownOutlined />
           </Button>
         </Dropdown>,
@@ -185,7 +176,7 @@ const SwitchNode: React.FC<
               totalStatements={statements.length}
               disabled={disabled}
               hitPolicy={hitPolicy}
-              variableType={variableType}
+              variableType={nodeType}
               onSetIsDefault={(val) => {
                 graphActions.updateNode(id, (draft) => {
                   const draftStatement = draft.content.statements.find((s: SwitchStatement) => {

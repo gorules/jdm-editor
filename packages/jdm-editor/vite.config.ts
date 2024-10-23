@@ -22,15 +22,10 @@ export default defineConfig({
       entry: path.resolve(__dirname, 'src', 'index.ts'),
       name: 'JDM Editor',
       fileName: 'jdm-editor',
+      formats: ['es'],
     },
     rollupOptions: {
-      external: [
-        'react/jsx-runtime',
-        'react',
-        'react-dom',
-        /ace-builds\/?.*/,
-        ...Object.keys(packageJson.dependencies),
-      ],
+      external: ['react/jsx-runtime', 'react', 'react-dom', ...Object.keys(packageJson.dependencies)],
       output: {
         globals: {
           'react-dom': 'ReactDOM',

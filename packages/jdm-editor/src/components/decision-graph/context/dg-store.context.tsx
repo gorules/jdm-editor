@@ -5,13 +5,14 @@ import { produce } from 'immer';
 import type { WritableDraft } from 'immer/src/types/types-external';
 import React, { type MutableRefObject, createRef, useMemo } from 'react';
 import type { EdgeChange, NodeChange, ReactFlowInstance, useEdgesState, useNodesState } from 'reactflow';
+import { match } from 'ts-pattern';
 import type { z } from 'zod';
 import type { StoreApi, UseBoundStore } from 'zustand';
 import { create } from 'zustand';
 
 import type { nodeSchema } from '../../../helpers/schema';
 import type { CodeEditorProps } from '../../code-editor';
-import { mapToGraphEdge, mapToGraphEdges, mapToGraphNode, mapToGraphNodes } from '../dg-util';
+import { mapToGraphEdge, mapToGraphEdges, mapToGraphNode, mapToGraphNodes, privateSymbol } from '../dg-util';
 import type { useGraphClipboard } from '../hooks/use-graph-clipboard';
 import type { CustomNodeSpecification } from '../nodes/custom-node';
 import { NodeKind, type NodeSpecification } from '../nodes/specifications/specification-types';
@@ -31,6 +32,10 @@ export type DecisionNode<T = any> = {
   type?: NodeSchema['type'] | string;
   content?: T;
   position: Position;
+  [privateSymbol]?: {
+    dimensions?: { height?: number; width?: number };
+    selected?: boolean;
+  };
 };
 
 export type DecisionEdge = {
@@ -89,6 +94,7 @@ export type DecisionGraphStoreType = {
     compactMode?: boolean;
 
     nodeTypes: Record<string, Partial<Record<NodeTypeKind, VariableType>>>;
+    globalType: Record<string, VariableType>;
   };
 
   references: {
@@ -118,7 +124,7 @@ export type DecisionGraphStoreType = {
     removeEdgeByHandleId: (handleId: string) => void;
     setHoveredEdgeId: (edgeId: string | null) => void;
 
-    closeTab: (id: string) => void;
+    closeTab: (id: string, action?: string) => void;
     openTab: (id: string) => void;
 
     setActivePanel: (panel?: string) => void;
@@ -128,6 +134,8 @@ export type DecisionGraphStoreType = {
 
     setNodeType: (id: string, kind: NodeTypeKind, vt: VariableType) => void;
     removeNodeType: (id: string, kind?: NodeTypeKind) => void;
+
+    triggerNodeSelect: (id: string, mode: 'toggle' | 'only') => void;
   };
 
   listeners: {
@@ -175,6 +183,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         panels: [],
         compactMode: localStorage.getItem('jdm-compact-mode') === 'true',
         nodeTypes: {},
+        globalType: {},
       })),
     [],
   );
@@ -201,30 +210,52 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
   const actions = useMemo<DecisionGraphStoreType['actions']>(
     () => ({
       handleNodesChange: (changes = []) => {
-        changes = changes.filter((c) => c.type !== 'dimensions');
-        if (changes.length === 0) {
+        const { nodesState } = referenceStore.getState();
+        const { decisionGraph } = stateStore.getState();
+        const [, , onNodesChange] = nodesState.current;
+
+        let hasChanges = false;
+
+        onNodesChange?.(changes);
+        const newDecisionGraph = produce(decisionGraph, (draft) => {
+          changes.forEach((c) =>
+            match(c)
+              .with({ type: 'position' }, (p) => {
+                const node = draft.nodes.find((n) => n.id === p.id);
+                if (node && p.position && !equal(node.position, p.position)) {
+                  hasChanges = true;
+                  node.position = p.position;
+                }
+              })
+              .with({ type: 'dimensions' }, (d) => {
+                const node = draft.nodes.find((n) => n.id === d.id);
+                if (node && !equal(node[privateSymbol]?.dimensions, d.dimensions)) {
+                  hasChanges = true;
+                  node[privateSymbol] ??= {};
+                  node[privateSymbol].dimensions = { height: d.dimensions?.height, width: d.dimensions?.width };
+                }
+              })
+              .with({ type: 'select' }, (s) => {
+                const node = draft.nodes.find((n) => n.id === s.id);
+
+                if (node && node[privateSymbol]?.selected !== s.selected) {
+                  hasChanges = true;
+                  node[privateSymbol] ??= {};
+                  node[privateSymbol].selected = s.selected;
+                }
+              })
+              .otherwise(() => {
+                // No-op
+              }),
+          );
+        });
+
+        if (!hasChanges) {
           return;
         }
 
-        const { decisionGraph } = stateStore.getState();
-        const { nodesState } = referenceStore.getState();
-
-        nodesState.current[2]?.(changes);
-        if (changes.find((c) => c.type === 'position')) {
-          const newDecisionGraph = produce(decisionGraph, (draft) => {
-            const nodes = (draft.nodes || []).map((node) => {
-              const change = changes.find((change) => 'id' in change && change.id === node.id);
-              if (change?.type === 'position' && change?.position) {
-                node.position = change.position as Position;
-              }
-              return node;
-            });
-            draft.nodes = nodes;
-          });
-
-          stateStore.setState({ decisionGraph: newDecisionGraph });
-          listenerStore.getState().onChange?.(newDecisionGraph);
-        }
+        stateStore.setState({ decisionGraph: newDecisionGraph });
+        listenerStore.getState().onChange?.(newDecisionGraph);
       },
       handleEdgesChange: (changes = []) => {
         const { decisionGraph } = stateStore.getState();
@@ -475,23 +506,37 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         const { openTabs } = stateStore.getState();
         const nodeId = openTabs.find((i) => i === id);
 
+        if (id === 'graph') {
+          return stateStore.setState({ activeTab: id });
+        }
+
         if (nodeId) {
           stateStore.setState({ activeTab: nodeId });
         } else {
           stateStore.setState({ openTabs: [...openTabs, id], activeTab: id });
         }
       },
-      closeTab: (id: string) => {
+      closeTab: (id: string, action?: string) => {
         const { openTabs, activeTab } = stateStore.getState();
         const index = openTabs?.findIndex((i) => i === id);
         const tab = openTabs?.[index];
 
+        const updatedTabs = match(action)
+          .with(undefined, () => openTabs.filter((id) => id !== tab))
+          .with('close', () => openTabs.filter((id) => id !== tab))
+          .with('close-all', () => [])
+          .with('close-other', () => openTabs.filter((id) => id === tab))
+          .with('close-right', () => openTabs.slice(0, index + 1))
+          .with('close-left', () => openTabs.slice(index))
+          .otherwise(() => openTabs);
+
         const updatedState: Partial<DecisionGraphStoreType['state']> = {
-          openTabs: openTabs.filter((id) => id !== tab),
+          openTabs: updatedTabs,
         };
 
-        if (activeTab === id) {
-          updatedState.activeTab = openTabs?.[index - 1] ?? 'graph';
+        const newActiveTabId = updatedTabs?.find((i) => i === activeTab);
+        if (!newActiveTabId) {
+          updatedState.activeTab = updatedTabs?.[index - 1] ?? 'graph';
         }
 
         stateStore.setState(updatedState);
@@ -548,6 +593,44 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         });
 
         stateStore.setState({ nodeTypes: newNodeTypes });
+      },
+      triggerNodeSelect: (id, mode) => {
+        const { decisionGraph } = stateStore.getState();
+        const { nodesState, edgesState } = referenceStore.getState();
+        const [, setNodes] = nodesState.current;
+        const [, setEdges] = edgesState.current;
+
+        const newDecisionGraph = produce(decisionGraph, (draft) => {
+          const chosenNode = draft.nodes.find((n) => n.id === id);
+          if (!chosenNode) {
+            return;
+          }
+
+          if (mode === 'only') {
+            draft.nodes.forEach((n) => {
+              if (n[privateSymbol]) {
+                n[privateSymbol].selected = false;
+              }
+            });
+          }
+
+          chosenNode[privateSymbol] ??= {};
+          chosenNode[privateSymbol].selected = match(mode)
+            .with('only', () => true)
+            .otherwise(() => !chosenNode[privateSymbol]?.selected);
+        });
+
+        setNodes(mapToGraphNodes(newDecisionGraph.nodes));
+        if (mode == 'only') {
+          setEdges((edges) =>
+            edges.map((e) => ({
+              ...e,
+              selected: false,
+            })),
+          );
+        }
+        stateStore.setState({ decisionGraph: newDecisionGraph });
+        listenerStore.getState().onChange?.(newDecisionGraph);
       },
     }),
     [],

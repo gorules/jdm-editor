@@ -5,15 +5,26 @@
   grid-template-columns: min-content 1fr min-content;
   grid-template-rows: 1fr auto;
 
+  --node-color-blue: var(--grl-color-primary);
+  --node-color-purple: #7c4dff;
+  --node-color-orange: #f76d40;
+  --node-color-green: #10ac84;
+
+  * {
+    box-sizing: border-box;
+  }
+
   .react-flow__handle {
     cursor: crosshair !important;
     transition: 0.2s all;
-    transform-origin: 50% calc(50% + 7px);
+    transform-origin: 50% calc(50% + 3.5px);
+    opacity: 0.75;
 
     &-connecting,
     &:hover {
-      transform: scale(1.75);
+      transform: scale(2);
       background-color: var(--grl-color-primary-bg-hover);
+      opacity: 1;
     }
   }
 
@@ -32,7 +43,6 @@
 
   &__simulator {
     width: 100%;
-    display: flex;
     height: 100%;
     background: var(--grl-color-primary-bg-fade);
 
@@ -206,7 +216,7 @@
         border-radius: 0 !important;
         border: 0 !important;
         background: transparent !important;
-        padding: 12px 12px !important;
+        padding: 10px 12px 12px !important;
 
         .anticon {
           margin: 0;
@@ -261,6 +271,7 @@
       flex-direction: row;
       height: 100%;
       width: 100%;
+      outline: 0 !important;
     }
 
     .react-flow {
@@ -466,8 +477,8 @@
     &__handle {
       border: 1px solid var(--grl-color-primary-border);
       background-color: var(--grl-color-primary-bg);
-      height: 9px;
-      width: 9px;
+      height: 7px;
+      width: 7px;
       border-radius: 50% !important;
 
       &::after {
@@ -483,7 +494,7 @@
     }
 
     &__handle-left {
-      left: -5px !important;
+      left: -3px !important;
 
       &::after {
         transform: translate(-80%, -50%);
@@ -493,7 +504,7 @@
     }
 
     &__handle-right {
-      right: -5px !important;
+      right: -3px !important;
 
       &::after {
         transform: translate(-20%, -50%);
@@ -533,6 +544,8 @@
     color: var(--grl-color-text);
     border-color: var(--grl-color-border);
     transition: var(--grl-transition);
+    height: 24px;
+    width: 24px;
 
     &:hover {
       background: var(--grl-color-primary-hover);
@@ -578,6 +591,8 @@
 }
 
 .grl-graph-node {
+  visibility: visible !important;
+
   &__handle-left {
     z-index: 20;
     top: 20px;
@@ -617,7 +632,7 @@
     .react-flow__handle {
       z-index: 20;
       top: calc(50% - 1px);
-      right: -16px;
+      right: -4px !important;
     }
 
     &__title {

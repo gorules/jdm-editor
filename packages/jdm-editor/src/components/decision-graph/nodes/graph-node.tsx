@@ -1,8 +1,8 @@
-import { BookOutlined, CopyOutlined, DeleteOutlined } from '@ant-design/icons';
+import { BookOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { Modal, Typography } from 'antd';
+import { Button, Modal, Typography } from 'antd';
 import clsx from 'clsx';
-import React from 'react';
+import React, { useState } from 'react';
 import type { HandleProps } from 'reactflow';
 import { Handle, Position } from 'reactflow';
 import { P, match } from 'ts-pattern';
@@ -13,6 +13,10 @@ import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-st
 import type { DecisionNodeProps } from './decision-node';
 import { DecisionNode } from './decision-node';
 import type { MinimalNodeSpecification } from './specifications/specification-types';
+
+enum Details {
+  Settings,
+}
 
 export type GraphNodeProps = {
   id: string;
@@ -32,8 +36,11 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
   name,
   displayError,
   helper,
+  actions,
   ...decisionNodeProps
 }) => {
+  const [currentDetails, setCurrentDetails] = useState<Details>(Details.Settings);
+  const [detailsOpen, setDetailsOpen] = useState<boolean>(false);
   const graphActions = useDecisionGraphActions();
   const { nodeError, nodeTrace, disabled, compactMode } = useDecisionGraphState(
     ({ simulate, disabled, compactMode }) => ({
@@ -48,25 +55,24 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
     }),
   );
 
+  const Settings = specification.renderSettings;
+
   const menuItems = [
     specification.documentationUrl
       ? {
           key: 'documentation',
-          icon: <BookOutlined />,
-          label: 'Documentation',
+          label: <SpacedText left='Documentation' right={<BookOutlined />} />,
           onClick: () => window.open(specification.documentationUrl, '_href'),
         }
       : null,
     specification.documentationUrl ? { key: 'divider-1', type: 'divider' } : null,
     !displayError && {
       key: 'copy-clipboard',
-      icon: <BookOutlined />,
       label: <SpacedText left='Copy to clipboard' right={platform.shortcut('Ctrl + C')} />,
       onClick: () => {},
     },
     !displayError && {
       key: 'duplicate',
-      icon: <CopyOutlined />,
       disabled,
       label: <SpacedText left='Duplicate' right={platform.shortcut('Ctrl + D')} />,
       onClick: () => graphActions.duplicateNodes([id]),
@@ -74,7 +80,6 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
     !displayError && { key: 'divider-2', type: 'divider' },
     {
       key: 'delete',
-      icon: <DeleteOutlined />,
       danger: true,
       label: <SpacedText left='Delete' right={platform.shortcut('Backspace')} />,
       disabled,
@@ -94,7 +99,17 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
   ].filter((i) => i !== false);
 
   return (
-    <div className={clsx('grl-graph-node', className)} style={{ minWidth: 220, maxWidth: 220 }}>
+    <div
+      className={clsx('grl-graph-node', className)}
+      style={{ minWidth: 220, maxWidth: 220 }}
+      onClick={(event) => {
+        const isToggle = match(navigator.platform.includes('Mac'))
+          .with(true, () => event.metaKey)
+          .otherwise(() => event.ctrlKey);
+
+        graphActions.triggerNodeSelect(id, isToggle ? 'toggle' : 'only');
+      }}
+    >
       {handleLeft && (
         <Handle
           className={clsx('grl-graph-node__handle-left', compactMode && 'compact')}
@@ -112,6 +127,30 @@ export const GraphNode: React.FC<GraphNodeProps> = ({
         type={specification.displayName}
         helper={helper}
         name={name}
+        details={Settings ? <Settings id={id} /> : undefined}
+        detailsOpen={detailsOpen}
+        detailsTitle={match(currentDetails)
+          .with(Details.Settings, () => 'Settings')
+          .otherwise(() => undefined)}
+        onDetailsClose={() => setDetailsOpen(false)}
+        actions={
+          !Settings
+            ? actions
+            : [
+                ...(actions ?? []),
+                <Button
+                  key='settings'
+                  type='text'
+                  style={{ marginLeft: 'auto' }}
+                  onClick={() => {
+                    setDetailsOpen(currentDetails === Details.Settings ? !detailsOpen : true);
+                    setCurrentDetails(Details.Settings);
+                  }}
+                >
+                  Settings
+                </Button>,
+              ]
+        }
         status={match([nodeTrace, nodeError, displayError])
           .with([P._, P._, true], () => 'error' as const)
           .with([P.not(P.nullish), P._, P._], () => 'success' as const)

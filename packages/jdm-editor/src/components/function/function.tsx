@@ -6,13 +6,13 @@ import { MarkerSeverity, type editor } from 'monaco-editor';
 import React, { useEffect, useRef, useState } from 'react';
 import { useDebouncedCallback, useThrottledCallback } from 'use-debounce';
 
+import '../../helpers/monaco';
 import type { SimulationTrace, SimulationTraceDataFunction } from '../decision-graph/types/simulation.types';
 import { Stack } from '../stack';
 import { FunctionDebugger } from './function-debugger';
 import './function.scss';
 import { variableTypeToTypescript } from './helpers/determine-type';
 import { functionDefinitions } from './helpers/libs';
-import './monaco';
 
 export type FunctionProps = {
   disabled?: boolean;
