@@ -124,7 +124,7 @@ export type DecisionGraphStoreType = {
     removeEdgeByHandleId: (handleId: string) => void;
     setHoveredEdgeId: (edgeId: string | null) => void;
 
-    closeTab: (id: string) => void;
+    closeTab: (id: string, action?: string) => void;
     openTab: (id: string) => void;
 
     setActivePanel: (panel?: string) => void;
@@ -506,23 +506,37 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         const { openTabs } = stateStore.getState();
         const nodeId = openTabs.find((i) => i === id);
 
+        if (id === 'graph') {
+          return stateStore.setState({ activeTab: id });
+        }
+
         if (nodeId) {
           stateStore.setState({ activeTab: nodeId });
         } else {
           stateStore.setState({ openTabs: [...openTabs, id], activeTab: id });
         }
       },
-      closeTab: (id: string) => {
+      closeTab: (id: string, action?: string) => {
         const { openTabs, activeTab } = stateStore.getState();
         const index = openTabs?.findIndex((i) => i === id);
         const tab = openTabs?.[index];
 
+        const updatedTabs = match(action)
+          .with(undefined, () => openTabs.filter((id) => id !== tab))
+          .with('close', () => openTabs.filter((id) => id !== tab))
+          .with('close-all', () => [])
+          .with('close-other', () => openTabs.filter((id) => id === tab))
+          .with('close-right', () => openTabs.slice(0, index + 1))
+          .with('close-left', () => openTabs.slice(index))
+          .otherwise(() => openTabs);
+
         const updatedState: Partial<DecisionGraphStoreType['state']> = {
-          openTabs: openTabs.filter((id) => id !== tab),
+          openTabs: updatedTabs,
         };
 
-        if (activeTab === id) {
-          updatedState.activeTab = openTabs?.[index - 1] ?? 'graph';
+        const newIndex = updatedTabs?.findIndex((i) => i === activeTab);
+        if (newIndex === -1) {
+          updatedState.activeTab = updatedTabs?.[index - 1] ?? 'graph';
         }
 
         stateStore.setState(updatedState);
@@ -582,8 +596,9 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
       },
       triggerNodeSelect: (id, mode) => {
         const { decisionGraph } = stateStore.getState();
-        const { nodesState } = referenceStore.getState();
+        const { nodesState, edgesState } = referenceStore.getState();
         const [, setNodes] = nodesState.current;
+        const [, setEdges] = edgesState.current;
 
         const newDecisionGraph = produce(decisionGraph, (draft) => {
           const chosenNode = draft.nodes.find((n) => n.id === id);
@@ -606,6 +621,14 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         });
 
         setNodes(mapToGraphNodes(newDecisionGraph.nodes));
+        if (mode == 'only') {
+          setEdges((edges) =>
+            edges.map((e) => ({
+              ...e,
+              selected: false,
+            })),
+          );
+        }
         stateStore.setState({ decisionGraph: newDecisionGraph });
         listenerStore.getState().onChange?.(newDecisionGraph);
       },
