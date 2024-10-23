@@ -22,7 +22,7 @@ export const DecisionGraphInferTypes = () => {
       return;
     }
 
-    return stateStore.subscribe(({ simulate, nodeTypes }, prevState) => {
+    return stateStore.subscribe(({ simulate, nodeTypes, decisionGraph }, prevState) => {
       if (equal(simulate, prevState?.simulate)) {
         return;
       }
@@ -49,6 +49,11 @@ export const DecisionGraphInferTypes = () => {
 
       const newNodeTypes = produce(nodeTypes, (draft) => {
         traceValues.forEach((t) => {
+          const node = decisionGraph.nodes.find((n) => n.id === t.id);
+          if (node?.type === 'inputNode') {
+            return;
+          }
+
           draft[t.id] ??= {};
 
           draft[t.id][NodeTypeKind.Output] = new VariableType(t.output ?? {});
