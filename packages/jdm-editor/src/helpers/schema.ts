@@ -43,10 +43,18 @@ export const decisionTableSchema = z
           defaultValue: z.string().nullish(),
         }),
       ),
-      passThrough: z.boolean().default(true).nullish(),
-      inputField: z.string().nullish(),
-      outputPath: z.string().nullish(),
-      executionMode: z.enum(['single', 'loop']).default('single').nullish(),
+      passThrough: z.boolean().default(false).nullish(),
+      inputField: z
+        .string()
+        .nullish()
+        .default(null)
+        .transform((val) => (val && val.trim().length > 0 ? val : null)),
+      outputPath: z
+        .string()
+        .nullish()
+        .default(null)
+        .transform((val) => (val && val.trim().length > 0 ? val : null)),
+      executionMode: z.enum(['single', 'loop']).nullish().default('single'),
     }),
   })
   .merge(nodeCommon);
@@ -58,7 +66,7 @@ export const functionNodeSchema = z
       .string()
       .or(
         z.object({
-          source: z.string(),
+          source: z.string().default(''),
         }),
       )
       .nullish(),
@@ -76,10 +84,18 @@ export const expressionNodeSchema = z
           value: z.string().default(''),
         }),
       ),
-      passThrough: z.boolean().default(true),
-      inputField: z.string().nullish(),
-      outputPath: z.string().nullish(),
-      executionMode: z.enum(['single', 'loop']).default('single').nullish(),
+      passThrough: z.boolean().default(false),
+      inputField: z
+        .string()
+        .nullish()
+        .default(null)
+        .transform((val) => (val && val.trim().length > 0 ? val : null)),
+      outputPath: z
+        .string()
+        .nullish()
+        .default(null)
+        .transform((val) => (val && val.trim().length > 0 ? val : null)),
+      executionMode: z.enum(['single', 'loop']).nullish().default('single'),
     }),
   })
   .merge(nodeCommon);
@@ -89,6 +105,18 @@ export const decisionNodeSchema = z
     type: z.literal('decisionNode'),
     content: z.object({
       key: z.string(),
+      passThrough: z.boolean().default(false),
+      inputField: z
+        .string()
+        .nullish()
+        .default(null)
+        .transform((val) => (val && val.trim().length > 0 ? val : null)),
+      outputPath: z
+        .string()
+        .nullish()
+        .default(null)
+        .transform((val) => (val && val.trim().length > 0 ? val : null)),
+      executionMode: z.enum(['single', 'loop']).nullish().default('single'),
     }),
   })
   .merge(nodeCommon);
@@ -101,7 +129,7 @@ export const switchNodeSchema = z
       statements: z.array(
         z.object({
           id,
-          condition: z.string().default(''),
+          condition: z.string().nullish().default(''),
           isDefault: z.boolean().nullish().default(false),
         }),
       ),
@@ -147,7 +175,24 @@ export const edgeSchema = z.object({
   type: z.enum(['edge']),
 });
 
+export const validationSchema = z.object({
+  inputSchema: z.any().nullish().default(null),
+  outputSchema: z.any().nullish().default(null),
+});
+
+export const settingsSchema = z
+  .object({
+    validation: validationSchema,
+  })
+  .default({
+    validation: {
+      inputSchema: null,
+      outputSchema: null,
+    },
+  });
+
 export const decisionModelSchema = z.object({
   nodes: z.array(nodeSchema).default([]),
   edges: z.array(edgeSchema).default([]),
+  settings: settingsSchema,
 });
