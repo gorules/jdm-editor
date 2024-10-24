@@ -53,18 +53,19 @@ const SwitchNode: React.FC<
   }
 > = ({ id, data, selected, specification }) => {
   const graphActions = useDecisionGraphActions();
-  const nodeType = useNodeType(id);
-  const { content, disabled, nodeTrace, compactMode } = useDecisionGraphState(
-    ({ decisionGraph, disabled, simulate, compactMode }) => ({
+  const { content, disabled, nodeTrace, compactMode, isGraphActive } = useDecisionGraphState(
+    ({ decisionGraph, disabled, simulate, compactMode, activeTab }) => ({
       nodeTrace: match(simulate)
         .with({ result: P._ }, ({ result }) => result?.trace?.[id] as SimulationTrace<SimulationTraceDataSwitch>)
         .otherwise(() => null),
       content: (decisionGraph?.nodes || []).find((n) => n?.id === id)?.content as NodeSwitchData | undefined,
       disabled,
       compactMode,
+      isGraphActive: activeTab === 'graph',
     }),
   );
 
+  const nodeType = useNodeType(id, { disabled: !isGraphActive });
   const statements: SwitchStatement[] = content?.statements || [];
   const hitPolicy = content?.hitPolicy || 'first';
 

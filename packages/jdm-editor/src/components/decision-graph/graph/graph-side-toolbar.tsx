@@ -25,14 +25,11 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
   const excelFileInput = useRef<HTMLInputElement>(null);
 
   const { setDecisionGraph, setActivePanel } = useDecisionGraphActions();
-  const { decisionGraph, disabled, panels, activePanel } = useDecisionGraphState(
-    ({ decisionGraph, disabled, panels, activePanel }) => ({
-      decisionGraph,
-      disabled,
-      panels,
-      activePanel,
-    }),
-  );
+  const { disabled, panels, activePanel } = useDecisionGraphState(({ disabled, panels, activePanel }) => ({
+    disabled,
+    panels,
+    activePanel,
+  }));
 
   const handleUploadInput = async (event: any) => {
     const fileList = event?.target?.files as FileList;
@@ -40,7 +37,9 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
     reader.onload = function (e) {
       try {
         const parsed: any = JSON.parse(e?.target?.result as string);
-        if (parsed?.contentType !== DecisionContentType) throw new Error('Invalid content type');
+        if (parsed?.contentType !== DecisionContentType) {
+          throw new Error('Invalid content type');
+        }
 
         const nodes: DecisionNode[] = Array.isArray(parsed?.nodes) ? parsed.nodes : [];
         const nodeIds = nodes.map((node) => node.id);
@@ -73,6 +72,7 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
 
         const nodesFromExcel = await readFromExcel(buffer);
 
+        const { decisionGraph } = decisionGraphRaw.stateStore.getState();
         const updatedNodes = decisionGraph.nodes.map((node) => {
           let _node = node;
           // updating existing nodes
@@ -103,6 +103,7 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
   const downloadJDM = async () => {
     try {
       const { name } = decisionGraphRaw.stateStore.getState();
+      const { decisionGraph } = decisionGraphRaw.stateStore.getState();
       // create file in browser
       const fileName = `${name.replaceAll('.json', '')}.json`;
       const json = JSON.stringify(
@@ -134,6 +135,7 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
 
   const downloadJDMExcel = async (name: string = 'decision tables') => {
     try {
+      const { decisionGraph } = decisionGraphRaw.stateStore.getState();
       const decisionTableNodes = decisionGraph.nodes
         .filter((node) => node.type === NodeKind.DecisionTable)
         .map((decisionTable) => ({

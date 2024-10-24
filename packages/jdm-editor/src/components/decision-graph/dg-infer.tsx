@@ -2,14 +2,13 @@ import { VariableType } from '@gorules/zen-engine-wasm';
 import equal from 'fast-deep-equal/es6/react';
 import { produce } from 'immer';
 import { useEffect } from 'react';
-import type { Edge, Node } from 'reactflow';
-import { getIncomers, getOutgoers } from 'reactflow';
 import { P, match } from 'ts-pattern';
 
+import type { GraphWalker } from '../../helpers/traversal';
+import { createGraphWalker } from '../../helpers/traversal';
 import { isWasmAvailable } from '../../helpers/wasm';
-import type { DecisionGraphStoreType, DecisionGraphType, DecisionNode } from './context/dg-store.context';
+import type { DecisionGraphStoreType } from './context/dg-store.context';
 import { NodeTypeKind, useDecisionGraphRaw } from './context/dg-store.context';
-import { mapToGraphEdges, mapToGraphNodes } from './dg-util';
 import type { NodeKind } from './nodes/specifications/specification-types';
 import { nodeSpecification } from './nodes/specifications/specifications';
 
@@ -71,6 +70,7 @@ export const DecisionGraphInferTypes = () => {
       return;
     }
 
+    const graphWalker = createGraphWalker();
     return stateStore.subscribe((state, prevState) => {
       const stateDigest = inferTypesStateDigest(state);
       const prevStateDigest = inferTypesStateDigest(prevState);
@@ -79,7 +79,7 @@ export const DecisionGraphInferTypes = () => {
         return;
       }
 
-      const infer = inferNodeTypes(state, prevState);
+      const infer = inferNodeTypes(state, prevState, graphWalker);
       if (infer.isModified) {
         stateStore.setState({ nodeTypes: infer.nodeTypes });
       }
@@ -121,12 +121,13 @@ type NodeTypes = DecisionGraphStoreType['state']['nodeTypes'];
 type InferNodeTypes = (
   state: DecisionGraphStoreType['state'],
   prevState: DecisionGraphStoreType['state'],
+  graphWalker: GraphWalker,
 ) => { nodeTypes: NodeTypes; isModified: boolean };
 
-const inferNodeTypes: InferNodeTypes = ({ decisionGraph, nodeTypes, customNodes }, prevState) => {
+const inferNodeTypes: InferNodeTypes = ({ decisionGraph, nodeTypes, customNodes }, prevState, graphWalker) => {
   let isModified = false;
   const newNodeTypes = produce(nodeTypes, (draft) => {
-    walkGraph(decisionGraph).forEach(({ node, incomers }) => {
+    graphWalker.walk(decisionGraph).forEach(({ node, incomers }) => {
       if (node.type === 'inputNode') {
         return;
       }
@@ -188,84 +189,6 @@ const inferNodeTypes: InferNodeTypes = ({ decisionGraph, nodeTypes, customNodes 
     isModified,
     nodeTypes: newNodeTypes,
   };
-};
-
-type WalkGraphReturn = {
-  node: DecisionNode;
-  incomers: DecisionNode[];
-};
-
-function* walkGraph(decisionGraph: DecisionGraphType): Generator<WalkGraphReturn> {
-  const nodes = mapToGraphNodes(decisionGraph.nodes);
-  const edges = mapToGraphEdges(decisionGraph.edges);
-
-  const begin = decisionGraph.nodes.find((n) => n.type === 'inputNode');
-  const beginRf = nodes.find((n) => n.id === begin?.id);
-  if (!begin || !beginRf) {
-    return;
-  }
-
-  // TODO: Perf - Skip recalculating has cycle, or find a nicer way to check (as it's blocked on graph level)
-  if (hasCycle(beginRf, nodes, edges)) {
-    return;
-  }
-
-  yield { node: begin, incomers: [] };
-  const visited = new Set<string>();
-
-  visited.add(begin.id);
-
-  const stack = getOutgoers(beginRf, nodes, edges);
-  while (stack.length > 0) {
-    const current = stack.pop()!;
-    if (visited.has(current.id)) {
-      continue;
-    }
-
-    const incomers = getIncomers(current, nodes, edges);
-    const unvisitedIncomers = incomers.filter((incomer) => !visited.has(incomer.id));
-
-    if (unvisitedIncomers.length > 0) {
-      stack.push(current, ...unvisitedIncomers);
-      continue;
-    }
-
-    visited.add(current.id);
-    const decisionNode = decisionGraph.nodes.find((n) => n.id === current.id);
-    if (decisionNode) {
-      const mappedIncomers = decisionGraph.nodes.filter((n) => incomers.some((inc) => inc.id === n.id));
-      yield { node: decisionNode, incomers: mappedIncomers };
-    }
-
-    const outgoers = getOutgoers(current, nodes, edges);
-    stack.push(...outgoers);
-  }
-}
-
-const hasCycle = (begin: Node, nodes: Node[], edges: Edge[]): boolean => {
-  const visited = new Set<string>();
-  const recursionStack = new Set<string>();
-
-  const dfs = (node: Node): boolean => {
-    visited.add(node.id);
-    recursionStack.add(node.id);
-
-    const outgoers = getOutgoers(node, nodes, edges);
-    for (const outgoer of outgoers) {
-      if (!visited.has(outgoer.id)) {
-        if (dfs(outgoer)) {
-          return true;
-        }
-      } else if (recursionStack.has(outgoer.id)) {
-        return true;
-      }
-    }
-
-    recursionStack.delete(node.id);
-    return false;
-  };
-
-  return dfs(begin);
 };
 
 const inferTypesStateDigest = ({ decisionGraph, nodeTypes, customNodes }: DecisionGraphStoreType['state']) => {

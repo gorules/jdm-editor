@@ -147,7 +147,7 @@ export type DecisionGraphStoreType = {
   };
 };
 
-type ExposedStore<T> = UseBoundStore<StoreApi<T>> & {
+export type ExposedStore<T> = UseBoundStore<StoreApi<T>> & {
   setState: (partial: Partial<T>) => void;
 };
 
