@@ -7,6 +7,7 @@ import { isWasmAvailable } from './wasm';
 
 type NodeTypeParams = {
   attachGlobals?: boolean;
+  disabled?: boolean;
 };
 
 const getNodeType = (nodeTypes: DecisionGraphStoreType['state']['nodeTypes'], id: string) =>
@@ -14,9 +15,9 @@ const getNodeType = (nodeTypes: DecisionGraphStoreType['state']['nodeTypes'], id
   nodeTypes[id]?.[NodeTypeKind.InferredInput] ??
   VariableType.fromJson({ Object: {} });
 
-export const useNodeType = (id: string, { attachGlobals = true }: NodeTypeParams = {}) => {
+export const useNodeType = (id: string, { attachGlobals = true, disabled = false }: NodeTypeParams = {}) => {
   const typeInfo = useDecisionGraphState(({ nodeTypes, globalType }) => {
-    if (!isWasmAvailable()) {
+    if (!isWasmAvailable() || disabled) {
       return undefined;
     }
 

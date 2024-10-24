@@ -11,8 +11,10 @@ import { nodeSchema } from '../../../helpers/schema';
 import {
   type DecisionGraphStoreType,
   type DecisionNode,
+  type ExposedStore,
   useDecisionGraphActions,
   useDecisionGraphListeners,
+  useDecisionGraphRaw,
   useDecisionGraphReferences,
   useDecisionGraphState,
 } from '../context/dg-store.context';
@@ -33,7 +35,9 @@ export type GraphProps = {
   reactFlowProOptions?: ProOptions;
 };
 
-export type GraphRef = DecisionGraphStoreType['actions'];
+export type GraphRef = DecisionGraphStoreType['actions'] & {
+  stateStore: ExposedStore<DecisionGraphStoreType['state']>;
+};
 
 const defaultNodeTypes = Object.entries(nodeSpecification).reduce(
   (acc, [key, value]) => ({
@@ -65,6 +69,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
 
   const [componentsOpened, setComponentsOpened] = useState(true);
 
+  const raw = useDecisionGraphRaw();
   const graphActions = useDecisionGraphActions();
   const graphReferences = useDecisionGraphReferences((s) => s);
   const { onReactFlowInit } = useDecisionGraphListeners(({ onReactFlowInit }) => ({ onReactFlowInit }));
@@ -308,7 +313,10 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
     graphActions.addEdges([mapToDecisionEdge(edge)]);
   };
 
-  useImperativeHandle(ref, () => graphActions);
+  useImperativeHandle(ref, () => ({
+    ...graphActions,
+    stateStore: raw.stateStore,
+  }));
 
   return (
     <div
