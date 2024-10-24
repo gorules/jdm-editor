@@ -43,8 +43,8 @@ export type DecisionEdge = {
   name?: string;
   sourceId: string;
   targetId: string;
-  sourceHandle?: string;
-  targetHandle?: string;
+  sourceHandle?: string | null;
+  targetHandle?: string | null;
   type?: string;
 };
 

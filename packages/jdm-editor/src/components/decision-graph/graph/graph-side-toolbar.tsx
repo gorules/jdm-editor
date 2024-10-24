@@ -4,6 +4,7 @@ import { Button, Dropdown, message } from 'antd';
 import React, { useRef } from 'react';
 
 import { exportExcelFile, readFromExcel } from '../../../helpers/excel-file-utils';
+import { decisionModelSchema } from '../../../helpers/schema';
 import {
   type DecisionEdge,
   type DecisionNode,
@@ -47,10 +48,20 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
         const edges: DecisionEdge[] = (parsed.edges as DecisionEdge[]).filter(
           (edge) => nodeIds.includes(edge?.targetId) && nodeIds.includes(edge?.sourceId),
         );
-        setDecisionGraph({
+
+        const modelParsed = decisionModelSchema.safeParse({
           nodes,
           edges,
+          settings: parsed?.settings,
         });
+
+        if (!modelParsed.success) {
+          console.log(modelParsed.error?.message);
+          message.error(modelParsed.error?.message);
+          return;
+        }
+
+        setDecisionGraph(modelParsed.data);
       } catch (e: any) {
         message.error(e.message);
       }
@@ -88,11 +99,19 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
           .filter((node) => !updatedNodes.some((existingNode) => existingNode.id === node.id))
           .map((newNode, index) => ({ ...newNode, position: { x: index * 250, y: 0 } }));
 
-        setDecisionGraph({
+        const modelParsed = decisionModelSchema.safeParse({
           nodes: [...updatedNodes, ...newNodes],
           edges: decisionGraph.edges,
+          settings: decisionGraph.settings,
         });
 
+        if (!modelParsed.success) {
+          console.log(modelParsed.error?.message);
+          message.error(modelParsed.error?.message);
+          return;
+        }
+
+        setDecisionGraph(modelParsed.data);
         message.success('Excel file has been uploaded successfully!');
       };
     } catch {
@@ -111,6 +130,7 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
           contentType: DecisionContentType,
           nodes: decisionGraph.nodes,
           edges: decisionGraph.edges,
+          settings: decisionGraph.settings,
         },
         null,
         2,
