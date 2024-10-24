@@ -10,7 +10,7 @@ import type { z } from 'zod';
 import type { StoreApi, UseBoundStore } from 'zustand';
 import { create } from 'zustand';
 
-import type { nodeSchema } from '../../../helpers/schema';
+import type { decisionModelSchema, nodeSchema } from '../../../helpers/schema';
 import type { CodeEditorProps } from '../../code-editor';
 import { mapToGraphEdge, mapToGraphEdges, mapToGraphNode, mapToGraphNodes, privateSymbol } from '../dg-util';
 import type { useGraphClipboard } from '../hooks/use-graph-clipboard';
@@ -51,6 +51,7 @@ export type DecisionEdge = {
 export type DecisionGraphType = {
   nodes: DecisionNode[];
   edges: DecisionEdge[];
+  settings?: z.infer<typeof decisionModelSchema>['settings'];
 };
 
 export type PanelType = {
@@ -104,7 +105,7 @@ export type DecisionGraphStoreType = {
   };
 
   actions: {
-    setDecisionGraph: (val: DecisionGraphType) => void;
+    setDecisionGraph: (val: Partial<DecisionGraphType>) => void;
 
     handleNodesChange: (nodesChange: NodeChange[]) => void;
     handleEdgesChange: (edgesChange: EdgeChange[]) => void;
@@ -493,13 +494,23 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         listenerStore.getState().onChange?.(newDecisionGraph);
       },
       setDecisionGraph: (graph) => {
+        const { decisionGraph } = stateStore.getState();
         const { edgesState, nodesState } = referenceStore.getState();
 
-        edgesState?.current?.[1](mapToGraphEdges(graph?.edges || []));
-        nodesState?.current?.[1](mapToGraphNodes(graph?.nodes || []));
+        const newDecisionGraph = produce(decisionGraph, (draft) => {
+          Object.assign(draft, graph);
+        });
 
-        stateStore.setState({ decisionGraph: graph });
-        listenerStore.getState().onChange?.(graph);
+        if (graph.edges) {
+          edgesState?.current?.[1](mapToGraphEdges(newDecisionGraph.edges));
+        }
+
+        if (graph.nodes) {
+          nodesState?.current?.[1](mapToGraphNodes(newDecisionGraph.nodes));
+        }
+
+        stateStore.setState({ decisionGraph: newDecisionGraph });
+        listenerStore.getState().onChange?.(newDecisionGraph);
       },
       setHoveredEdgeId: (edgeId) => stateStore.setState({ hoveredEdgeId: edgeId }),
       openTab: (id: string) => {
