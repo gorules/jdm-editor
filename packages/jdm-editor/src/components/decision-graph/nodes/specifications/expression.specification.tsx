@@ -72,6 +72,8 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
   generateNode: ({ index }) => ({
     name: `expression${index}`,
     content: {
+      inputField: null,
+      outputPath: null,
       expressions: [],
       passThrough: true,
     },
@@ -141,15 +143,17 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
             style={{ fontSize: 12, lineHeight: '20px', width: '100%' }}
             expectedVariableType={fields?.executionMode === 'loop' ? { Array: 'Any' } : undefined}
             maxRows={4}
-            value={fields?.inputField ?? ''}
-            onChange={(val) => updateNode({ inputField: val?.trim() || null })}
+            defaultValue={fields?.inputField ?? ''}
+            onChange={(val) => {
+              updateNode({ inputField: val?.trim() || null });
+            }}
           />
         </Form.Item>
         <Form.Item label='Output path'>
           <Input
             size={'small'}
             disabled={disabled}
-            value={fields?.outputPath ?? ''}
+            defaultValue={fields?.outputPath ?? ''}
             onChange={(e) => updateNode({ outputPath: e?.target?.value?.trim() || null })}
           />
         </Form.Item>

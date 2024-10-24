@@ -91,7 +91,10 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
         },
       ],
       rules: [],
+      inputField: null,
+      outputPath: null,
       passThrough: true,
+      executionMode: 'single',
     },
   }),
   renderNode: ({ id, data, selected, specification }) => {
@@ -173,7 +176,7 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
             style={{ fontSize: 12, lineHeight: '20px', width: '100%' }}
             expectedVariableType={fields?.executionMode === 'loop' ? { Array: 'Any' } : undefined}
             maxRows={4}
-            value={fields?.inputField ?? ''}
+            defaultValue={fields?.inputField ?? ''}
             onChange={(val) => updateNode({ inputField: val?.trim() || null })}
           />
         </Form.Item>
@@ -181,7 +184,7 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
           <Input
             size={'small'}
             disabled={disabled}
-            value={fields?.outputPath ?? ''}
+            defaultValue={fields?.outputPath ?? ''}
             onChange={(e) => updateNode({ outputPath: e?.target?.value?.trim() || null })}
           />
         </Form.Item>
