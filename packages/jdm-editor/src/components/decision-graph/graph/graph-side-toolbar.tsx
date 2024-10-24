@@ -47,10 +47,7 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
         const edges: DecisionEdge[] = (parsed.edges as DecisionEdge[]).filter(
           (edge) => nodeIds.includes(edge?.targetId) && nodeIds.includes(edge?.sourceId),
         );
-        setDecisionGraph({
-          nodes,
-          edges,
-        });
+        setDecisionGraph({ nodes, edges });
       } catch (e: any) {
         message.error(e.message);
       }

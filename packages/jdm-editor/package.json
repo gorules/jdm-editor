@@ -20,7 +20,8 @@
     "build:watch": "vite build --watch",
     "storybook": "storybook dev -p 9009",
     "build:storybook": "storybook build -o docs",
-    "prepublishOnly": "vite build"
+    "prepublishOnly": "vite build",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@ant-design/icons": "5.5.1",

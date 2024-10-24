@@ -240,19 +240,35 @@ const SimulatorEditor: React.FC<SimulatorEditorProps> = ({ value, onChange, read
   return (
     <Editor
       loading={<Spin size='large' />}
-      language='javascript'
+      language='json'
       value={value}
       onChange={onChange}
       theme={token.mode === 'dark' ? 'vs-dark' : 'light'}
       height='100%'
-      onMount={(editor, monaco) => {
-        monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
-          noSyntaxValidation: true,
-        });
-
-        monaco.languages.typescript.javascriptDefaults.setModeConfiguration({
-          codeActions: false,
-          inlayHints: false,
+      onMount={async (editor, monaco) => {
+        monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+          trailingCommas: 'ignore',
+          allowComments: true,
+          schemaValidation: 'error',
+          validate: true,
+          schemas: [
+            {
+              uri: 'http://myserver/foo-schema.json',
+              fileMatch: ['*'],
+              schema: {
+                type: 'object',
+                required: ['firstName'],
+                properties: {
+                  firstName: {
+                    type: 'string',
+                  },
+                  p1: {
+                    enum: ['v1', 'v2'],
+                  },
+                },
+              },
+            },
+          ],
         });
       }}
       options={{
@@ -264,6 +280,7 @@ const SimulatorEditor: React.FC<SimulatorEditorProps> = ({ value, onChange, read
         fontFamily: 'var(--mono-font-family)',
         tabSize: 2,
         lineDecorationsWidth: 2,
+        hover: { above: false },
         find: {
           addExtraSpaceOnTop: false,
           seedSearchStringFromSelection: 'never',

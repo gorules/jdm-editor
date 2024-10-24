@@ -150,4 +150,14 @@ export const edgeSchema = z.object({
 export const decisionModelSchema = z.object({
   nodes: z.array(nodeSchema).default([]),
   edges: z.array(edgeSchema).default([]),
+  settings: z
+    .object({
+      validation: z
+        .object({
+          inputSchema: z.any(),
+          outputSchema: z.any(),
+        })
+        .optional(),
+    })
+    .optional(),
 });
