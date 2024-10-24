@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.22.1](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.22.0...@gorules/jdm-editor@1.22.1) (2024-10-24)
+
+### Bug Fixes
+
+- export import schema fix ([#109](https://github.com/gorules/jdm-editor/issues/109)) ([8f03bbf](https://github.com/gorules/jdm-editor/commit/8f03bbfcd78142335cf30721797237fdf435f973))
+- node schema update ([#108](https://github.com/gorules/jdm-editor/issues/108)) ([9607572](https://github.com/gorules/jdm-editor/commit/96075729a3a5266168f388a399e244e47ac30b93))
+
 # [1.22.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.21.0...@gorules/jdm-editor@1.22.0) (2024-10-24)
 
 ### Features
