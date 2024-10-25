@@ -43,7 +43,7 @@ export const decisionTableSchema = z
           defaultValue: z.string().nullish(),
         }),
       ),
-      passThrough: z.boolean().default(false).nullish(),
+      passThrough: z.boolean().nullish().default(false),
       inputField: z
         .string()
         .nullish()
@@ -84,7 +84,7 @@ export const expressionNodeSchema = z
           value: z.string().default(''),
         }),
       ),
-      passThrough: z.boolean().default(false),
+      passThrough: z.boolean().nullish().default(false),
       inputField: z
         .string()
         .nullish()
@@ -105,7 +105,7 @@ export const decisionNodeSchema = z
     type: z.literal('decisionNode'),
     content: z.object({
       key: z.string(),
-      passThrough: z.boolean().default(false),
+      passThrough: z.boolean().nullish().default(false),
       inputField: z
         .string()
         .nullish()
