@@ -26,7 +26,6 @@ export const createGraphWalker = () => {
         yield res;
       }
 
-      yield* walkGraph(decisionGraph);
       cache = { digest, iterator };
     },
   };
