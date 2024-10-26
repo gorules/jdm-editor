@@ -76,6 +76,7 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
       outputPath: null,
       expressions: [],
       passThrough: true,
+      executionMode: 'single',
     },
   }),
   renderNode: ({ id, data, selected, specification }) => {

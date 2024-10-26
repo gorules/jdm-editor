@@ -18,10 +18,13 @@ export default defineConfig({
   },
   build: {
     target: 'esnext',
+    sourcemap: true,
     lib: {
-      entry: path.resolve(__dirname, 'src', 'index.ts'),
+      entry: {
+        index: path.resolve(__dirname, 'src', 'index.ts'),
+        schema: path.resolve(__dirname, 'src', 'helpers', 'schema.ts'),
+      },
       name: 'JDM Editor',
-      fileName: 'jdm-editor',
       formats: ['es'],
     },
     rollupOptions: {

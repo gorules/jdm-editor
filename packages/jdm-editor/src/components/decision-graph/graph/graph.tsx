@@ -411,7 +411,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
         >
           <div className={clsx(['react-flow'])} ref={reactFlowWrapper}>
             <ReactFlow
-              onlyRenderVisibleElements={true}
+              onlyRenderVisibleElements
               deleteKeyCode={null}
               elevateEdgesOnSelect={false}
               elevateNodesOnSelect={true}
