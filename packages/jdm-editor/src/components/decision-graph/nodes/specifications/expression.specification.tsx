@@ -144,7 +144,7 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
             style={{ fontSize: 12, lineHeight: '20px', width: '100%' }}
             expectedVariableType={fields?.executionMode === 'loop' ? { Array: 'Any' } : undefined}
             maxRows={4}
-            defaultValue={fields?.inputField ?? ''}
+            value={fields?.inputField ?? ''}
             onChange={(val) => {
               updateNode({ inputField: val?.trim() || null });
             }}
@@ -154,7 +154,7 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
           <Input
             size={'small'}
             disabled={disabled}
-            defaultValue={fields?.outputPath ?? ''}
+            value={fields?.outputPath ?? ''}
             onChange={(e) => updateNode({ outputPath: e?.target?.value?.trim() || null })}
           />
         </Form.Item>
