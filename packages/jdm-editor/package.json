@@ -17,14 +17,19 @@
   ],
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.js"
     },
-    "./dist/schema": {
-      "import": "./dist/schema.js",
-      "types": "./dist/schema.d.ts"
+    "./schema": {
+      "types": "./dist/schema.d.ts",
+      "require": "./dist/schema.js",
+      "import": "./dist/schema.js"
     },
-    "./dist/style.css": "./dist/style.css"
+    "./style.css": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css"
+    }
   },
   "scripts": {
     "build": "vite build",
