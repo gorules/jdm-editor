@@ -6,6 +6,7 @@ import type { StoreApi, UseBoundStore } from 'zustand';
 import { create } from 'zustand';
 
 import type { SimulationTraceDataExpression } from '../../decision-graph';
+import type { DiffMetadata } from '../../decision-graph/dg-diff-util';
 
 const ExpressionStoreContext = React.createContext<
   UseBoundStore<StoreApi<ExpressionStore>> & {
@@ -17,6 +18,7 @@ export type ExpressionEntry = {
   id: string;
   key: string;
   value: string;
+  _diff?: DiffMetadata;
 };
 
 export type ExpressionStore = {

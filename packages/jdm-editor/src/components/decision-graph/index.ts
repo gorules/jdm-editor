@@ -9,12 +9,15 @@ export type { CustomNodeSpecification } from './nodes/custom-node/index';
 export { createJdmNode } from './nodes/custom-node';
 export { GraphNode, type GraphNodeProps } from './nodes/graph-node';
 export { GraphSimulator } from './dg-simulator';
+export * from './dg-diff-util';
 export {
   useDecisionGraphState,
   useDecisionGraphActions,
   useDecisionGraphReferences,
   useDecisionGraphListeners,
   useDecisionGraphRaw,
+  useNodeDiff,
+  useEdgeDiff,
   NodeTypeKind,
   type DecisionNode,
   type DecisionEdge,
@@ -32,3 +35,5 @@ export type {
   SimulationOk,
   SimulationTraceDataSwitch,
 } from './types/simulation.types';
+
+export * from './dg-diff-util';

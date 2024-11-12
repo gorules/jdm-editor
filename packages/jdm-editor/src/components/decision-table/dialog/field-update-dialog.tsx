@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import type { SchemaSelectProps } from '../../../helpers/components';
 import { getPath, recursiveSelect } from '../../../helpers/components';
 import { AutosizeTextArea } from '../../autosize-text-area';
-import { LocalCodeEditor } from '../../code-editor/local-ce';
+import { CodeEditor } from '../../code-editor';
 import type { ColumnType, TableSchemaItem } from '../context/dt-store.context';
 import { useDecisionTableState } from '../context/dt-store.context';
 
@@ -94,7 +94,7 @@ export const FieldUpdate: React.FC<React.PropsWithChildren<FieldUpdateProps>> = 
         </Form.Item>
         <Form.Item name='field' label='Selector' rules={[{ required: props.columnType === 'outputs' }]}>
           {props.columnType === 'inputs' ? (
-            <LocalCodeEditor variableType={inputVariableType} />
+            <CodeEditor variableType={inputVariableType} />
           ) : (
             <AutosizeTextArea maxRows={3} />
           )}

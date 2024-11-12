@@ -1,6 +1,7 @@
 import { DownOutlined } from '@ant-design/icons';
 import { type VariableType } from '@gorules/zen-engine-wasm';
 import { Button, Checkbox, Form, Typography, theme } from 'antd';
+import type { DragDropManager } from 'dnd-core';
 import React, { useState } from 'react';
 import type { Position } from 'reactflow';
 import { match } from 'ts-pattern';
@@ -32,6 +33,8 @@ export type CustomNodeSpecification<Data extends object, Component extends strin
   group?: string;
   documentationUrl?: string;
   shortDescription?: string;
+  renderTab?: (props: { id: string; manager?: DragDropManager }) => React.ReactNode;
+  calculateDiff?: (current: any, previous: any) => [any, any];
   generateNode: (params: GenerateNodeParams) => Omit<DecisionNode, 'position' | 'id' | 'type' | 'content'> & {
     config?: Data;
   };

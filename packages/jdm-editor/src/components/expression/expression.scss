@@ -39,6 +39,18 @@
       bottom: -1px;
       height: 2px;
     }
+
+    &--added {
+      background-color: var(--grl-color-success-bg);
+    }
+
+    &--removed {
+      background-color: var(--grl-color-error-bg);
+    }
+
+    &--modified {
+      background-color: var(--grl-color-warning-bg);
+    }
   }
 
   &__button-wrapper {

@@ -12,6 +12,8 @@ import { create } from 'zustand';
 
 import type { decisionModelSchema, nodeSchema } from '../../../helpers/schema';
 import type { CodeEditorProps } from '../../code-editor';
+import type { DiffMetadata, DiffStatus } from '../dg-diff-util';
+import { processEdges, processNodes } from '../dg-diff-util';
 import { mapToGraphEdge, mapToGraphEdges, mapToGraphNode, mapToGraphNodes, privateSymbol } from '../dg-util';
 import type { useGraphClipboard } from '../hooks/use-graph-clipboard';
 import type { CustomNodeSpecification } from '../nodes/custom-node';
@@ -36,11 +38,20 @@ export type DecisionNode<T = any> = {
     dimensions?: { height?: number; width?: number };
     selected?: boolean;
   };
+  _diff?: {
+    status: DiffStatus;
+    fields?: {
+      [key: string]: DiffMetadata;
+    };
+  };
 };
 
 export type DecisionEdge = {
   id: string;
   name?: string;
+  _diff?: {
+    status: DiffStatus;
+  };
   sourceId: string;
   targetId: string;
   sourceHandle?: string | null;
@@ -75,6 +86,7 @@ export type DecisionGraphStoreType = {
   state: {
     id?: string;
     components: NodeSpecification[];
+    isDiff?: boolean;
     disabled?: boolean;
     configurable?: boolean;
     decisionGraph: DecisionGraphType;
@@ -106,6 +118,7 @@ export type DecisionGraphStoreType = {
 
   actions: {
     setDecisionGraph: (val: Partial<DecisionGraphType>) => void;
+    calculateDiffGraph: (currentGraph?: DecisionGraphType, previousGraph?: DecisionGraphType) => void;
 
     handleNodesChange: (nodesChange: NodeChange[]) => void;
     handleEdgesChange: (edgesChange: EdgeChange[]) => void;
@@ -212,7 +225,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
     () => ({
       handleNodesChange: (changes = []) => {
         const { nodesState } = referenceStore.getState();
-        const { decisionGraph } = stateStore.getState();
+        const { decisionGraph, isDiff } = stateStore.getState();
         const [, , onNodesChange] = nodesState.current;
 
         let hasChanges = false;
@@ -256,10 +269,11 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         }
 
         stateStore.setState({ decisionGraph: newDecisionGraph });
+        if (isDiff) return;
         listenerStore.getState().onChange?.(newDecisionGraph);
       },
       handleEdgesChange: (changes = []) => {
-        const { decisionGraph } = stateStore.getState();
+        const { decisionGraph, isDiff } = stateStore.getState();
         const { edgesState } = referenceStore.getState();
 
         edgesState?.current?.[2](changes);
@@ -278,12 +292,14 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
           });
 
           stateStore.setState({ decisionGraph: newDecisionGraph });
+          if (isDiff) return;
           listenerStore.getState().onChange?.(newDecisionGraph);
         }
       },
       setNodes: (nodes: DecisionNode[] = []) => {
         const { nodesState } = referenceStore.getState();
-        const { decisionGraph } = stateStore.getState();
+        const { decisionGraph, isDiff } = stateStore.getState();
+        if (isDiff) return;
         nodesState?.current?.[1](mapToGraphNodes(nodes));
 
         const newDecisionGraph = produce(decisionGraph, (draft) => {
@@ -295,8 +311,9 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
       },
       addNodes: (nodes: DecisionNode[]) => {
         const { nodesState } = referenceStore.getState();
-        const { decisionGraph } = stateStore.getState();
+        const { decisionGraph, isDiff } = stateStore.getState();
 
+        if (isDiff) return;
         const hasInput = nodesState.current[0]?.some((n) => n.type === NodeKind.Input);
         if (hasInput) {
           nodes = nodes.filter((n) => n.type !== NodeKind.Input);
@@ -312,7 +329,9 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
       },
       duplicateNodes: (ids) => {
         const { nodesState, edgesState } = referenceStore.getState();
-        const { decisionGraph } = stateStore.getState();
+        const { decisionGraph, isDiff } = stateStore.getState();
+
+        if (isDiff) return;
 
         let nodes = (decisionGraph?.nodes || []).filter((n) => ids.includes(n.id));
 
@@ -383,12 +402,14 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
       },
       pasteNodes: () => {
         const { graphClipboard } = referenceStore.getState();
-
+        const { isDiff } = stateStore.getState();
+        if (isDiff) return;
         graphClipboard.current?.pasteNodes?.();
       },
       removeNodes: (ids = []) => {
         const { nodesState, edgesState } = referenceStore.getState();
-        const { decisionGraph, nodeTypes } = stateStore.getState();
+        const { decisionGraph, nodeTypes, isDiff } = stateStore.getState();
+        if (isDiff) return;
 
         nodesState.current[1]?.((nodes) => nodes.filter((n) => ids.every((id) => n.id !== id)));
         edgesState.current[1]?.((edges) =>
@@ -419,7 +440,9 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
       },
       addEdges: (edges: DecisionEdge[]) => {
         const { edgesState } = referenceStore.getState();
-        const { decisionGraph } = stateStore.getState();
+        const { decisionGraph, isDiff } = stateStore.getState();
+
+        if (isDiff) return;
 
         edgesState.current?.[1]?.((els) => els.concat(edges.map(mapToGraphEdge)));
         const newDecisionGraph = produce(decisionGraph, (draft) => {
@@ -431,7 +454,8 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
       },
       setEdges: (edges = []) => {
         const { edgesState } = referenceStore.getState();
-        const { decisionGraph } = stateStore.getState();
+        const { decisionGraph, isDiff } = stateStore.getState();
+        if (isDiff) return;
 
         edgesState?.current?.[1]?.(mapToGraphEdges(edges));
         const newDecisionGraph = produce(decisionGraph, (draft) => {
@@ -443,7 +467,9 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
       },
       removeEdges: (ids) => {
         const { edgesState } = referenceStore.getState();
-        const { decisionGraph } = stateStore.getState();
+        const { decisionGraph, isDiff } = stateStore.getState();
+
+        if (isDiff) return;
 
         edgesState?.current?.[1]?.((edges) => edges.filter((e) => !ids.find((id) => e.id === id)));
         const newDecisionGraph = produce(decisionGraph, (draft) => {
@@ -456,7 +482,8 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
       removeEdgeByHandleId: (handleId: string) => {
         if (!handleId) return;
         const { edgesState } = referenceStore.getState();
-        const { decisionGraph } = stateStore.getState();
+        const { decisionGraph, isDiff } = stateStore.getState();
+        if (isDiff) return;
         edgesState?.current?.[1]?.((edges) => edges.filter((e) => e.sourceHandle !== handleId));
         const newDecisionGraph = produce(decisionGraph, (draft) => {
           draft.edges = draft.edges.filter((e) => e.sourceHandle !== handleId);
@@ -466,8 +493,9 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         listenerStore.getState().onChange?.(newDecisionGraph);
       },
       updateNode: (id, updater) => {
-        const { decisionGraph } = stateStore.getState();
+        const { decisionGraph, isDiff } = stateStore.getState();
         const { nodesState } = referenceStore.getState();
+        if (isDiff) return;
         const [nodes, setNodes] = nodesState.current;
 
         const newDecisionGraph = produce(decisionGraph, (draft) => {
@@ -493,23 +521,46 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         stateStore.setState({ decisionGraph: newDecisionGraph });
         listenerStore.getState().onChange?.(newDecisionGraph);
       },
-      setDecisionGraph: (graph) => {
-        const { decisionGraph } = stateStore.getState();
+      calculateDiffGraph: (currentGraph, previousGraph) => {
         const { edgesState, nodesState } = referenceStore.getState();
+        const { components, customNodes } = stateStore.getState();
+
+        const calculatedGraph = previousGraph
+          ? {
+              nodes: processNodes(currentGraph?.nodes ?? [], previousGraph?.nodes ?? [], {
+                components,
+                customNodes,
+              }),
+              edges: processEdges(currentGraph?.edges ?? [], previousGraph?.edges ?? []),
+            }
+          : undefined;
+
+        edgesState?.current?.[1](
+          mapToGraphEdges(calculatedGraph ? (calculatedGraph?.edges ?? []) : (currentGraph?.edges ?? [])),
+        );
+        nodesState?.current?.[1](
+          mapToGraphNodes(calculatedGraph ? (calculatedGraph?.nodes ?? []) : (currentGraph?.nodes ?? [])),
+        );
+        stateStore.setState({
+          decisionGraph: calculatedGraph ?? currentGraph,
+          disabled: !!previousGraph,
+          isDiff: !!previousGraph,
+        });
+      },
+      setDecisionGraph: (graph) => {
+        const { decisionGraph, isDiff } = stateStore.getState();
+        const { edgesState, nodesState } = referenceStore.getState();
+        if (isDiff) return;
 
         const newDecisionGraph = produce(decisionGraph, (draft) => {
           Object.assign(draft, graph);
         });
 
-        if (graph.edges) {
-          edgesState?.current?.[1](mapToGraphEdges(newDecisionGraph.edges));
-        }
-
-        if (graph.nodes) {
-          nodesState?.current?.[1](mapToGraphNodes(newDecisionGraph.nodes));
-        }
-
-        stateStore.setState({ decisionGraph: newDecisionGraph });
+        edgesState?.current?.[1](mapToGraphEdges(newDecisionGraph?.edges ?? []));
+        nodesState?.current?.[1](mapToGraphNodes(newDecisionGraph?.nodes ?? []));
+        stateStore.setState({
+          decisionGraph: newDecisionGraph,
+        });
         listenerStore.getState().onChange?.(newDecisionGraph);
       },
       setHoveredEdgeId: (edgeId) => stateStore.setState({ hoveredEdgeId: edgeId }),
@@ -606,10 +657,12 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         stateStore.setState({ nodeTypes: newNodeTypes });
       },
       triggerNodeSelect: (id, mode) => {
-        const { decisionGraph } = stateStore.getState();
+        const { decisionGraph, isDiff } = stateStore.getState();
         const { nodesState, edgesState } = referenceStore.getState();
         const [, setNodes] = nodesState.current;
         const [, setEdges] = edgesState.current;
+
+        if (isDiff) return;
 
         const newDecisionGraph = produce(decisionGraph, (draft) => {
           const chosenNode = draft.nodes.find((n) => n.id === id);
@@ -689,5 +742,33 @@ export function useDecisionGraphActions(): DecisionGraphStoreType['actions'] {
 export function useDecisionGraphRaw() {
   return React.useContext(DecisionGraphStoreContext);
 }
+
+export const useNodeDiff = (id: string) => {
+  const { diff, contentDiff } = useDecisionGraphState((s) => {
+    const node = (s?.decisionGraph?.nodes ?? []).find((node) => node.id === id);
+
+    return {
+      diff: node?._diff,
+      contentDiff: node?.content?._diff,
+    };
+  });
+  return {
+    diff,
+    contentDiff,
+  };
+};
+
+export const useEdgeDiff = (id: string) => {
+  const { diff } = useDecisionGraphState((s) => {
+    const edge = (s?.decisionGraph?.edges ?? []).find((edge) => edge.id === id);
+
+    return {
+      diff: edge?._diff,
+    };
+  });
+  return {
+    diff,
+  };
+};
 
 export default DecisionGraphProvider;

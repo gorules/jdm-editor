@@ -1,6 +1,6 @@
 import { FormatPainterOutlined } from '@ant-design/icons';
 import { createVariableType } from '@gorules/zen-engine-wasm';
-import { Editor, type Monaco, useMonaco } from '@monaco-editor/react';
+import { DiffEditor, Editor, type Monaco, useMonaco } from '@monaco-editor/react';
 import { Button, Spin, theme } from 'antd';
 import { MarkerSeverity, type editor } from 'monaco-editor';
 import React, { useEffect, useRef, useState } from 'react';
@@ -21,6 +21,7 @@ export type FunctionProps = {
   disableDebug?: boolean;
   language?: string;
   value?: string;
+  previousValue?: string;
   onChange?: (value: string) => void;
   trace?: SimulationTrace<SimulationTraceDataFunction>;
   onMonacoReady?: (monaco: Monaco) => void;
@@ -41,6 +42,7 @@ export const Function: React.FC<FunctionProps> = ({
   onMonacoReady,
   error,
   inputData,
+  previousValue,
 }) => {
   const monaco = useMonaco();
   const mountedRef = useRef(false);
@@ -53,12 +55,19 @@ export const Function: React.FC<FunctionProps> = ({
   }, 100);
 
   const [editor, setEditor] = useState<editor.IStandaloneCodeEditor>();
+  const [diffEditor, setDiffEditor] = useState<editor.IStandaloneDiffEditor>();
   const resizeEditor = useThrottledCallback(() => editor?.layout(), 100, { trailing: true });
+  const resizeDiffEditor = useThrottledCallback(() => diffEditor?.layout(), 100, { trailing: true });
 
   useEffect(() => {
     window.addEventListener('resize', resizeEditor);
     return () => window.removeEventListener('resize', resizeEditor);
   }, [resizeEditor, editor]);
+
+  useEffect(() => {
+    window.addEventListener('resize', resizeDiffEditor);
+    return () => window.removeEventListener('resize', resizeDiffEditor);
+  }, [resizeDiffEditor, diffEditor]);
 
   useEffect(() => {
     if (!monaco) return;
@@ -245,26 +254,45 @@ export const Function: React.FC<FunctionProps> = ({
         </Stack>
       </Stack>
       <div className={'grl-function__content'}>
-        <Editor
-          loading={<Spin size='large' />}
-          language={language}
-          value={innerValue}
-          onMount={(editor) => setEditor(editor)}
-          onChange={(value) => {
-            setInnerValue(value ?? '');
-            innerChange(value ?? '');
-          }}
-          theme={token.mode === 'dark' ? 'vs-dark' : 'light'}
-          height='100%'
-          options={{
-            automaticLayout: true,
-            contextmenu: false,
-            fontSize: 13,
-            fontFamily: 'var(--mono-font-family)',
-            readOnly: disabled,
-            tabSize: 2,
-          }}
-        />
+        {previousValue ? (
+          <DiffEditor
+            loading={<Spin size='large' />}
+            language={language}
+            original={previousValue}
+            modified={innerValue}
+            onMount={(editor) => setDiffEditor(editor)}
+            theme={token.mode === 'dark' ? 'vs-dark' : 'light'}
+            height='100%'
+            options={{
+              automaticLayout: true,
+              contextmenu: false,
+              fontSize: 13,
+              fontFamily: 'var(--mono-font-family)',
+              readOnly: true,
+            }}
+          />
+        ) : (
+          <Editor
+            loading={<Spin size='large' />}
+            language={language}
+            value={innerValue}
+            onMount={(editor) => setEditor(editor)}
+            onChange={(value) => {
+              setInnerValue(value ?? '');
+              innerChange(value ?? '');
+            }}
+            theme={token.mode === 'dark' ? 'vs-dark' : 'light'}
+            height='100%'
+            options={{
+              automaticLayout: true,
+              contextmenu: false,
+              fontSize: 13,
+              fontFamily: 'var(--mono-font-family)',
+              readOnly: disabled,
+              tabSize: 2,
+            }}
+          />
+        )}
         {!disableDebug && <FunctionDebugger trace={trace} />}
       </div>
     </div>

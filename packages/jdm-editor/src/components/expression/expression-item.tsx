@@ -1,12 +1,14 @@
 import { DeleteOutlined, MenuOutlined } from '@ant-design/icons';
 import type { VariableType } from '@gorules/zen-engine-wasm';
 import type { Row } from '@tanstack/react-table';
-import { Button, Input, Popconfirm, Typography } from 'antd';
+import { Button, Popconfirm, Typography } from 'antd';
 import clsx from 'clsx';
 import React, { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
-import { LocalCodeEditor } from '../code-editor/local-ce';
+import { DiffIcon } from '../diff-icon';
+import { DiffCodeEditor } from '../shared/diff-ce';
+import { DiffInput } from '../shared/diff-input';
 import type { ExpressionEntry } from './context/expression-store.context';
 import { useExpressionStore } from './context/expression-store.context';
 
@@ -66,27 +68,41 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
         'expression-list__item',
         isDropping && direction === 'down' && 'dropping-down',
         isDropping && direction === 'up' && 'dropping-up',
+        expression?._diff?.status && `expression-list__item--${expression?._diff?.status}`,
       )}
       style={{ opacity: !isDragging ? 1 : 0.5 }}
     >
       <div ref={dragRef} className='expression-list-item__drag' aria-disabled={!configurable || disabled}>
-        <MenuOutlined />
+        {expression?._diff?.status ? (
+          <DiffIcon
+            status={expression?._diff?.status}
+            style={{
+              fontSize: 16,
+            }}
+          />
+        ) : (
+          <MenuOutlined />
+        )}
       </div>
       <div>
-        <Input
+        <DiffInput
           placeholder='Key'
-          disabled={!configurable || disabled}
+          readOnly={!configurable || disabled}
+          displayDiff={expression?._diff?.fields?.key?.status === 'modified'}
+          previousValue={expression?._diff?.fields?.key?.previousValue}
           value={expression?.key}
-          onChange={(e) => onChange({ key: e.target.value.trim() })}
+          onChange={(e) => onChange({ key: e.target.value })}
           autoComplete='off'
         />
       </div>
       <div className='expression-list-item__code'>
-        <LocalCodeEditor
+        <DiffCodeEditor
           placeholder='Expression'
           maxRows={9}
           disabled={disabled}
           value={expression?.value}
+          displayDiff={expression?._diff?.fields?.value?.status === 'modified'}
+          previousValue={expression?._diff?.fields?.value?.previousValue}
           onChange={(value) => onChange({ value })}
           variableType={variableType}
         />

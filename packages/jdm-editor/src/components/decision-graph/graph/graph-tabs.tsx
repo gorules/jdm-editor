@@ -4,7 +4,9 @@ import { Dropdown } from 'antd';
 import { Avatar, Tabs } from 'antd';
 import React from 'react';
 
+import { DiffIcon } from '../../diff-icon';
 import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
+import type { DiffStatus } from '../dg-diff-util';
 import { NodeColor } from '../nodes/specifications/colors';
 import type { NodeKind } from '../nodes/specifications/specification-types';
 import { nodeSpecification } from '../nodes/specifications/specifications';
@@ -28,6 +30,7 @@ export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled }) => {
           id: node?.id,
           name: node.name,
           type: node.type,
+          diff: node?._diff,
         };
       })
       .filter((node) => !!node),
@@ -75,6 +78,7 @@ export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled }) => {
                   }}
                   icon={specification?.icon}
                   name={node?.name ?? node?.type}
+                  diffStatus={node?.diff?.status}
                   color={specification?.color}
                   index={index}
                   total={openNodes?.length}
@@ -95,8 +99,9 @@ const TabLabel: React.FC<{
   icon?: React.ReactNode;
   name?: string;
   color?: string;
+  diffStatus?: string;
   onContextClick?: (action: string) => void;
-}> = ({ total = 0, index = -1, icon, name, color = NodeColor.Blue, onContextClick }) => {
+}> = ({ total = 0, index = -1, icon, name, diffStatus, color = NodeColor.Blue, onContextClick }) => {
   const items = [
     total > 0 &&
       index !== -1 && {
@@ -133,7 +138,13 @@ const TabLabel: React.FC<{
 
   return (
     <Dropdown menu={{ items }} trigger={['contextMenu']}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+        }}
+      >
         <Avatar
           size='small'
           shape='square'
@@ -147,6 +158,12 @@ const TabLabel: React.FC<{
           icon={icon}
         />
         {name}
+        <DiffIcon
+          status={diffStatus as DiffStatus}
+          style={{
+            fontSize: 16,
+          }}
+        />
       </div>
     </Dropdown>
   );

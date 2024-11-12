@@ -3,9 +3,10 @@ import { flexRender } from '@tanstack/react-table';
 import type { VirtualItem } from '@tanstack/react-virtual';
 import { Typography } from 'antd';
 import clsx from 'clsx';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
+import type { DiffMetadata } from '../../decision-graph/dg-diff-util';
 import { useDecisionTableActions, useDecisionTableState } from '../context/dt-store.context';
 
 export const TableRow: React.FC<{
@@ -62,6 +63,15 @@ export const TableRow: React.FC<{
     };
   }, []);
 
+  const { rowValue } = useDecisionTableState(({ decisionTable }) => ({
+    rowValue: (decisionTable?.rules || [])?.find((rule) => rule._id === row?.original?._id),
+  }));
+
+  const diff = useMemo(() => {
+    return rowValue?._diff as DiffMetadata;
+  }, [rowValue]);
+  const diffStatus = diff?.status;
+
   return (
     <tr
       ref={trRef}
@@ -69,9 +79,10 @@ export const TableRow: React.FC<{
         'table-row',
         isDropping && direction === 'down' && 'dropping-down',
         isDropping && direction === 'up' && 'dropping-up',
-        isActive && 'active',
-        disabled && 'disabled',
-        cursor?.y === virtualItem.index && !disabled && 'selected',
+        !diffStatus && isActive && 'active',
+        !diffStatus && disabled && 'disabled',
+        !diffStatus && cursor?.y === virtualItem.index && !disabled && 'selected',
+        diffStatus && `diff-${diffStatus}`,
       )}
       style={{
         opacity: isDragging ? 0.5 : 1,
@@ -79,7 +90,7 @@ export const TableRow: React.FC<{
       data-virtual-index={virtualItem.index}
     >
       <td
-        className={clsx('sort-handler', !disabled && 'draggable')}
+        className={clsx('sort-handler', !disabled && 'draggable', diffStatus && 'diff')}
         ref={disabled ? undefined : dragRef}
         onContextMenuCapture={() => tableActions.setCursor({ x: 'id', y: virtualItem.index })}
       >
@@ -90,7 +101,10 @@ export const TableRow: React.FC<{
       {row.getVisibleCells().map((cell) => (
         <td
           key={cell.id}
-          className={clsx(!disabled && cursor?.x === cell.column.id && cursor?.y === virtualItem.index && 'selected')}
+          className={clsx(
+            !disabled && cursor?.x === cell.column.id && cursor?.y === virtualItem.index && 'selected',
+            diff?.fields?.[cell?.column?.id]?.status && `diff-${diff?.fields?.[cell?.column?.id]?.status}`,
+          )}
           style={{ width: cell.column.getSize() }}
         >
           {flexRender(cell.column.columnDef.cell, cell.getContext())}

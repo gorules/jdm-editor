@@ -1,10 +1,15 @@
 import type { Monaco } from '@monaco-editor/react';
 import { Spin } from 'antd';
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useMemo, useState } from 'react';
 import { P, match } from 'ts-pattern';
 
 import { useNodeType } from '../../../helpers/node-type';
-import { useDecisionGraphActions, useDecisionGraphListeners, useDecisionGraphState } from '../context/dg-store.context';
+import {
+  useDecisionGraphActions,
+  useDecisionGraphListeners,
+  useDecisionGraphState,
+  useNodeDiff,
+} from '../context/dg-store.context';
 import { FunctionKind, useFunctionKind } from '../nodes/specifications/function.specification';
 import type { SimulationTrace, SimulationTraceDataFunction } from '../types/simulation.types';
 
@@ -44,6 +49,14 @@ export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
     }),
   );
 
+  const { diff, contentDiff } = useNodeDiff(id);
+
+  const previousValue = useMemo(() => {
+    return kind === FunctionKind.Stable
+      ? contentDiff?.fields?.source?.previousValue
+      : diff?.fields?.content?.previousValue;
+  }, [diff, contentDiff]);
+
   useEffect(() => {
     if (!monaco) {
       return;
@@ -73,6 +86,7 @@ export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
       <Function
         onMonacoReady={(monaco) => setMonaco(monaco)}
         value={kind === FunctionKind.Stable ? content.source : content}
+        previousValue={typeof previousValue === 'string' ? previousValue : undefined}
         error={nodeError ?? undefined}
         inputData={nodeType}
         onChange={(val) => {

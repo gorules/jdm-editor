@@ -28,6 +28,7 @@ export const mapToGraphNode = (node: DecisionNode): Node => {
     data: {
       name: node.name,
       kind: node?.content?.kind,
+      status: node?.status,
     },
   };
 };
@@ -45,6 +46,9 @@ export const mapToGraphEdge = (edge: DecisionEdge): Edge => {
     sourceHandle: edge.sourceHandle,
     targetHandle: edge.targetHandle,
     markerEnd: { type: MarkerType.ArrowClosed, width: 20, height: 20 },
+    data: {
+      status: edge.status,
+    },
   };
 };
 

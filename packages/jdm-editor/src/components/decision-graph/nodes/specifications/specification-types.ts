@@ -1,4 +1,5 @@
 import { type VariableType } from '@gorules/zen-engine-wasm';
+import type { DragDropManager } from 'dnd-core';
 import type React from 'react';
 import type { NodeProps } from 'reactflow';
 
@@ -38,6 +39,8 @@ export type NodeSpecification<T = any> = {
   documentationUrl?: string;
   shortDescription?: string;
   helper?: string | React.ReactNode;
+  renderTab?: (props: { id: string; manager?: DragDropManager }) => React.ReactNode;
+  getDiffContent?: (current: T, previous: T) => T;
   generateNode: (params: GenerateNodeParams) => Omit<DecisionNode<T>, 'position' | 'id' | 'type'>;
   renderNode: React.FC<MinimalNodeProps & { specification: MinimalNodeSpecification }>;
   renderSettings?: React.FC<{ id: string }>;
