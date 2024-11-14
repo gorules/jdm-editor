@@ -18,11 +18,13 @@
   "exports": {
     ".": {
       "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     },
     "./dist/schema": {
       "import": "./dist/schema.js",
-      "types": "./dist/schema.d.ts"
+      "types": "./dist/schema.d.ts",
+      "default": "./dist/index.js"
     },
     "./dist/style.css": "./dist/style.css"
   },
