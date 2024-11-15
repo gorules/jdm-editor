@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.23.3](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.23.2...@gorules/jdm-editor@1.23.3) (2024-11-15)
+
+### Bug Fixes
+
+- optional wasm in function ([#115](https://github.com/gorules/jdm-editor/issues/115)) ([c51daec](https://github.com/gorules/jdm-editor/commit/c51daec2a3156465d07834d11499a57a0bb1a97b))
+
 ## [1.23.2](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.23.1...@gorules/jdm-editor@1.23.2) (2024-11-14)
 
 ### Bug Fixes
