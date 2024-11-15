@@ -7,6 +7,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useDebouncedCallback, useThrottledCallback } from 'use-debounce';
 
 import '../../helpers/monaco';
+import { isWasmAvailable } from '../../helpers/wasm';
 import type { SimulationTrace, SimulationTraceDataFunction } from '../decision-graph/types/simulation.types';
 import { Stack } from '../stack';
 import { FunctionDebugger } from './function-debugger';
@@ -105,7 +106,11 @@ export const Function: React.FC<FunctionProps> = ({
   useEffect(() => {
     if (!monaco) return;
 
-    const data = variableTypeToTypescript(createVariableType(inputData));
+    let data = 'any';
+    if (isWasmAvailable()) {
+      data = variableTypeToTypescript(createVariableType(inputData));
+    }
+
     monaco.languages.typescript.javascriptDefaults.addExtraLib(
       `
     type Input = ${data};
