@@ -1,6 +1,6 @@
 {
   "name": "@gorules/jdm-editor",
-  "version": "1.23.1",
+  "version": "1.23.3",
   "description": "",
   "author": "GoRules <hi@gorules.io> (https://gorules.io)",
   "homepage": "https://github.com/gorules/jdm-editor",
@@ -23,9 +23,15 @@
       "import": "./dist/index.js"
     },
     "./schema": {
-      "types": "./dist/schema.d.ts",
       "require": "./dist/schema.js",
-      "import": "./dist/schema.js"
+      "import": "./dist/schema.js",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./dist/schema": {
+      "import": "./dist/schema.js",
+      "types": "./dist/schema.d.ts",
+      "default": "./dist/index.js"
     },
     "./style.css": {
       "import": "./dist/style.css",
