@@ -7,8 +7,9 @@
   "license": "MIT",
   "keywords": [],
   "type": "module",
-  "main": "dist/jdm-editor.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist/",
     "package.json",
@@ -17,7 +18,13 @@
   ],
   "exports": {
     ".": {
-      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.js"
+    },
+    "./schema": {
+      "require": "./dist/schema.js",
+      "import": "./dist/schema.js",
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
@@ -26,7 +33,10 @@
       "types": "./dist/schema.d.ts",
       "default": "./dist/index.js"
     },
-    "./dist/style.css": "./dist/style.css"
+    "./style.css": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css"
+    }
   },
   "scripts": {
     "build": "vite build",
