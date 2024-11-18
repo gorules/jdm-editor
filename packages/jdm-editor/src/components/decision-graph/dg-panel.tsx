@@ -23,7 +23,7 @@ export const GraphPanel: React.FC = () => {
           <Typography.Text>{activePanel.title}</Typography.Text>
         </div>
         <div className={'grl-dg__panel__toolbar__actions'}>
-          <Tooltip placement="topLeft" title={'Close panel'}>
+          <Tooltip placement='topLeft' title={'Close panel'}>
             <Button
               size={'small'}
               type={'text'}
