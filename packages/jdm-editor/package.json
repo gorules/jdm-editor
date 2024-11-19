@@ -22,12 +22,12 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./schema": {
+    "./dist/schema": {
       "import": "./dist/schema.js",
       "types": "./dist/schema.d.ts",
       "default": "./dist/schema.js"
     },
-    "./style.css": "./dist/style.css"
+    "./dist/style.css": "./dist/style.css"
   },
   "scripts": {
     "build": "vite build",
