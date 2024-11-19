@@ -3,6 +3,18 @@ import { z } from 'zod';
 export const DECISION_GRAPH_CONTENT_TYPE = 'application/vnd.gorules.decision';
 const id = z.string().default(crypto.randomUUID);
 
+export enum NodeKind {
+  Input = 'inputNode',
+  Output = 'outputNode',
+  DecisionTable = 'decisionTableNode',
+  Function = 'functionNode',
+  Expression = 'expressionNode',
+  Switch = 'switchNode',
+  Decision = 'decisionNode',
+}
+
+export const CustomKind = 'customNode';
+
 const nodeCommon = z.object({
   id,
   name: z.string(),
@@ -11,22 +23,32 @@ const nodeCommon = z.object({
 
 export const inputNodeSchema = z
   .object({
-    type: z.literal('inputNode'),
+    type: z.literal(NodeKind.Input),
   })
   .merge(nodeCommon);
 
 export const outputNodeSchema = z
   .object({
-    type: z.literal('outputNode'),
+    type: z.literal(NodeKind.Output),
   })
   .merge(nodeCommon);
 
 export const decisionTableSchema = z
   .object({
-    type: z.literal('decisionTableNode'),
+    type: z.literal(NodeKind.DecisionTable),
     content: z.object({
       hitPolicy: z.enum(['first', 'collect']).default('first'),
-      rules: z.array(z.record(z.string(), z.string())).default([]),
+      rules: z
+        .array(
+          z.record(
+            z.string(),
+            z
+              .string()
+              .nullish()
+              .transform((val) => val ?? ''),
+          ),
+        )
+        .default([]),
       inputs: z.array(
         z.object({
           id,
@@ -61,7 +83,7 @@ export const decisionTableSchema = z
 
 export const functionNodeSchema = z
   .object({
-    type: z.literal('functionNode'),
+    type: z.literal(NodeKind.Function),
     content: z
       .string()
       .or(
@@ -75,7 +97,7 @@ export const functionNodeSchema = z
 
 export const expressionNodeSchema = z
   .object({
-    type: z.literal('expressionNode'),
+    type: z.literal(NodeKind.Expression),
     content: z.object({
       expressions: z.array(
         z.object({
@@ -102,7 +124,7 @@ export const expressionNodeSchema = z
 
 export const decisionNodeSchema = z
   .object({
-    type: z.literal('decisionNode'),
+    type: z.literal(NodeKind.Decision),
     content: z.object({
       key: z.string(),
       passThrough: z.boolean().nullish().default(false),
@@ -123,7 +145,7 @@ export const decisionNodeSchema = z
 
 export const switchNodeSchema = z
   .object({
-    type: z.literal('switchNode'),
+    type: z.literal(NodeKind.Switch),
     content: z.object({
       hitPolicy: z.enum(['first', 'collect']).default('first'),
       statements: z.array(
@@ -139,7 +161,7 @@ export const switchNodeSchema = z
 
 export const customNodeSchema = z
   .object({
-    type: z.literal('customNode'),
+    type: z.literal(CustomKind),
     content: z.object({
       kind: z.string(),
       config: z.any(),
@@ -149,7 +171,9 @@ export const customNodeSchema = z
 
 export const anyNodeSchema = z
   .object({
-    type: z.string(),
+    type: z.string().refine((val) => !(Object.values(NodeKind) as string[]).includes(val), {
+      message: 'Invalid type',
+    }),
     content: z.any().nullish(),
   })
   .merge(nodeCommon);
