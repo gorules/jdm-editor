@@ -18,25 +18,16 @@
   ],
   "exports": {
     ".": {
+      "import": "./dist/index.js",
       "types": "./dist/index.d.ts",
-      "require": "./dist/index.js",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "./schema": {
-      "require": "./dist/schema.js",
-      "import": "./dist/schema.js",
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    },
-    "./dist/schema": {
       "import": "./dist/schema.js",
       "types": "./dist/schema.d.ts",
-      "default": "./dist/index.js"
+      "default": "./dist/schema.js"
     },
-    "./style.css": {
-      "import": "./dist/style.css",
-      "require": "./dist/style.css"
-    }
+    "./style.css": "./dist/style.css"
   },
   "scripts": {
     "build": "vite build",

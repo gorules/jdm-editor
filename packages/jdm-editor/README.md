@@ -18,7 +18,7 @@ npm i @gorules/jdm-editor
 
 ```typescript
 ...
-import '@gorules/jdm-editor/dist/style.css';
+import '@gorules/jdm-editor/style.css';
 import { DecisionGraph, JdmConfigProvider } from '@gorules/jdm-editor';
 ...
 
