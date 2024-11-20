@@ -328,9 +328,9 @@ export const Diff: Story = {
     const enableDiff = (args as any)?.enableDiff;
     useEffect(() => {
       if (enableDiff) {
-        ref.current?.calculateDiffGraph(value, diffGraph);
+        ref.current?.setDecisionGraphDiff(value, diffGraph);
       } else {
-        ref.current?.calculateDiffGraph(value);
+        ref.current?.setDecisionGraphDiff(value);
       }
     }, [enableDiff]);
 

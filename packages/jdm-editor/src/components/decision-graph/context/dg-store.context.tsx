@@ -118,7 +118,7 @@ export type DecisionGraphStoreType = {
 
   actions: {
     setDecisionGraph: (val: Partial<DecisionGraphType>) => void;
-    calculateDiffGraph: (currentGraph?: DecisionGraphType, previousGraph?: DecisionGraphType) => void;
+    setDecisionGraphDiff: (currentGraph?: DecisionGraphType, previousGraph?: DecisionGraphType) => void;
 
     handleNodesChange: (nodesChange: NodeChange[]) => void;
     handleEdgesChange: (edgesChange: EdgeChange[]) => void;
@@ -521,7 +521,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         stateStore.setState({ decisionGraph: newDecisionGraph });
         listenerStore.getState().onChange?.(newDecisionGraph);
       },
-      calculateDiffGraph: (currentGraph, previousGraph) => {
+      setDecisionGraphDiff: (currentGraph, previousGraph) => {
         const { edgesState, nodesState } = referenceStore.getState();
         const { components, customNodes } = stateStore.getState();
 
