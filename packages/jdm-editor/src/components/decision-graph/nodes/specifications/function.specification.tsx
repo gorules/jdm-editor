@@ -6,7 +6,7 @@ import { P, match } from 'ts-pattern';
 
 import { defaultFunctionValue } from '../../../function/helpers/libs';
 import { useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
-import type { DiffMetadata } from '../../dg-diff-util';
+import type { DiffMetadata } from '../../dg-types';
 import { TabFunction } from '../../graph/tab-function';
 import { GraphNode } from '../graph-node';
 import { NodeColor } from './colors';

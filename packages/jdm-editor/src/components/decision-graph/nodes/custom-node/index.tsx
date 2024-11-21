@@ -7,8 +7,8 @@ import type { Position } from 'reactflow';
 import { match } from 'ts-pattern';
 
 import { CodeEditor } from '../../../code-editor';
-import type { DecisionNode } from '../../context/dg-store.context';
 import { useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
+import { type DecisionNode } from '../../dg-types';
 import { GraphNode } from '../graph-node';
 import type { InferTypeData, MinimalNodeProps, MinimalNodeSpecification } from '../specifications/specification-types';
 

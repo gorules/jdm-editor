@@ -11,12 +11,8 @@ import { P, match } from 'ts-pattern';
 import '../../helpers/monaco';
 import { copyToClipboard } from '../../helpers/utility';
 import { isWasmAvailable } from '../../helpers/wasm';
-import {
-  type DecisionGraphType,
-  NodeTypeKind,
-  useDecisionGraphRaw,
-  useDecisionGraphState,
-} from './context/dg-store.context';
+import { NodeTypeKind, useDecisionGraphRaw, useDecisionGraphState } from './context/dg-store.context';
+import { type DecisionGraphType } from './dg-types';
 import { NodeKind } from './nodes/specifications/specification-types';
 
 type GraphSimulatorProps = {

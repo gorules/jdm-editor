@@ -6,7 +6,7 @@ import clsx from 'clsx';
 import React, { useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
-import type { DiffMetadata } from '../../decision-graph/dg-diff-util';
+import type { DiffMetadata } from '../../decision-graph';
 import { useDecisionTableActions, useDecisionTableState } from '../context/dt-store.context';
 
 export const TableRow: React.FC<{

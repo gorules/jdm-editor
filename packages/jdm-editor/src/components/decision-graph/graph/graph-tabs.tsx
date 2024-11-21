@@ -6,7 +6,7 @@ import React from 'react';
 
 import { DiffIcon } from '../../diff-icon';
 import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
-import type { DiffStatus } from '../dg-diff-util';
+import type { DiffStatus } from '../dg-types';
 import { NodeColor } from '../nodes/specifications/colors';
 import type { NodeKind } from '../nodes/specifications/specification-types';
 import { nodeSpecification } from '../nodes/specifications/specifications';

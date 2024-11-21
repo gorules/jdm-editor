@@ -2,11 +2,12 @@ import { ApartmentOutlined, ApiOutlined, LeftOutlined, PlayCircleOutlined, Right
 import type { Meta, StoryObj } from '@storybook/react';
 import { Select } from 'antd';
 import json5 from 'json5';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 
 import type { PanelType } from './context/dg-store.context';
 import type { DecisionGraphRef } from './dg';
 import { DecisionGraph } from './dg';
+import { calculateDiffGraph } from './dg-diff-util';
 import { GraphSimulator } from './dg-simulator';
 import {
   defaultGraph,
@@ -326,13 +327,15 @@ export const Diff: Story = {
     const ref = useRef<DecisionGraphRef>(null);
 
     const enableDiff = (args as any)?.enableDiff;
-    useEffect(() => {
-      if (enableDiff) {
-        ref.current?.setDecisionGraphDiff(value, diffGraph);
-      } else {
-        ref.current?.setDecisionGraphDiff(value);
-      }
-    }, [enableDiff]);
+
+    const innerValue = useMemo(() => {
+      if (enableDiff)
+        return calculateDiffGraph(value, diffGraph, {
+          customNodes,
+          components,
+        });
+      return value;
+    }, [value, enableDiff, customNodes, components]);
 
     return (
       <div
@@ -342,7 +345,8 @@ export const Diff: Story = {
       >
         <DecisionGraph
           ref={ref}
-          value={value}
+          value={innerValue}
+          disabled={enableDiff}
           onChange={(val) => {
             if (!(args as any)?.enableDiff) {
               setValue(val);

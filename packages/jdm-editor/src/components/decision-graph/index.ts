@@ -9,7 +9,6 @@ export type { CustomNodeSpecification } from './nodes/custom-node/index';
 export { createJdmNode } from './nodes/custom-node';
 export { GraphNode, type GraphNodeProps } from './nodes/graph-node';
 export { GraphSimulator } from './dg-simulator';
-export * from './dg-diff-util';
 export {
   useDecisionGraphState,
   useDecisionGraphActions,
@@ -19,9 +18,6 @@ export {
   useNodeDiff,
   useEdgeDiff,
   NodeTypeKind,
-  type DecisionNode,
-  type DecisionEdge,
-  type DecisionGraphType,
 } from './context/dg-store.context';
 export { NodeColor } from './nodes/specifications/colors';
 
@@ -36,4 +32,24 @@ export type {
   SimulationTraceDataSwitch,
 } from './types/simulation.types';
 
-export * from './dg-diff-util';
+export {
+  calculateDiffGraph,
+  compareAndUnifyLists,
+  processEdges,
+  processNodes,
+  addStrikethrough,
+  buildDiffString,
+  compareStringFields,
+  type ProcessNodesOptions,
+} from './dg-diff-util';
+
+export {
+  type DecisionEdge,
+  type DecisionNode,
+  type DecisionSettings,
+  type DecisionGraphType,
+  type DiffMetadata,
+  type Diff,
+  type Position,
+  type DiffStatus,
+} from './dg-types';

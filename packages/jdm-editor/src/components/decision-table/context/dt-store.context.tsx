@@ -6,7 +6,7 @@ import type { StoreApi, UseBoundStore } from 'zustand';
 import { create } from 'zustand';
 
 import type { SchemaSelectProps } from '../../../helpers/components';
-import type { Diff, DiffMetadata } from '../../decision-graph/dg-diff-util';
+import type { Diff, DiffMetadata } from '../../decision-graph/dg-types';
 import type { TableCellProps } from '../table/table-default-cell';
 
 export type TableExportOptions = {

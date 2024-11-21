@@ -2,7 +2,7 @@ import { MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons';
 import React from 'react';
 import { match } from 'ts-pattern';
 
-import type { DiffStatus } from './decision-graph/dg-diff-util';
+import type { DiffStatus } from './decision-graph/dg-types';
 
 export const DiffIcon: React.FC<
   {

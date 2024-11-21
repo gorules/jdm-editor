@@ -3,7 +3,7 @@ import type { DragDropManager } from 'dnd-core';
 import type React from 'react';
 import type { NodeProps } from 'reactflow';
 
-import type { DecisionNode } from '../../context/dg-store.context';
+import type { DecisionNode } from '../../dg-types';
 import type { DecisionNodeProps } from '../decision-node';
 
 export enum NodeKind {

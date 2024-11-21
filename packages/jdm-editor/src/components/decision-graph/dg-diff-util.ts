@@ -1,24 +1,13 @@
 import _ from 'lodash';
 import { P, match } from 'ts-pattern';
-import type { z } from 'zod';
 
-import type { nodeSchema } from '../../helpers/schema';
-import type { privateSymbol } from './dg-util';
+import type { DecisionEdge, DecisionGraphType, DecisionNode, DiffMetadata } from './dg-types';
 import type { CustomNodeSpecification } from './nodes/custom-node';
 import { decisionTableSpecification } from './nodes/specifications/decision-table.specification';
 import { expressionSpecification } from './nodes/specifications/expression.specification';
 import { functionSpecification } from './nodes/specifications/function.specification';
 import { NodeKind, type NodeSpecification } from './nodes/specifications/specification-types';
 import { switchSpecification } from './nodes/specifications/switch.specification';
-
-export type Position = {
-  x: number;
-  y: number;
-};
-
-type NodeSchema = z.infer<typeof nodeSchema>;
-
-export type DiffStatus = 'added' | 'removed' | 'modified' | 'unchanged' | 'moved';
 
 export const compareStringFields = (field1?: string | null, field2?: string | null): boolean => {
   const value1 = (field1 || '').trim();
@@ -27,54 +16,23 @@ export const compareStringFields = (field1?: string | null, field2?: string | nu
   return value1 === value2;
 };
 
-export type Diff<T = any> = {
-  _diff?: DiffMetadata<T>;
-};
-
-export type DiffMetadata<T = any> = {
-  status?: DiffStatus;
-  previousValue?: T;
-  previousIndex?: number;
-  currentIndex?: number;
-  fields?: Record<string, DiffMetadata>;
-};
-
-export type DecisionNode<T = any> = {
-  id: string;
-  name: string;
-  description?: string;
-  type?: NodeSchema['type'] | string;
-  content?: T;
-  position: Position;
-  [privateSymbol]?: {
-    dimensions?: { height?: number; width?: number };
-    selected?: boolean;
-  };
-  _diff?: {
-    status: DiffStatus;
-    fields?: {
-      name?: DiffMetadata<string>;
-      position?: DiffMetadata<Position>;
-    };
-  };
-};
-
-export type DecisionEdge = {
-  id: string;
-  name?: string;
-  sourceId: string;
-  targetId: string;
-  sourceHandle?: string | null;
-  targetHandle?: string | null;
-  type?: string;
-  _diff?: {
-    status: DiffStatus;
-  };
-};
-
 export type ProcessNodesOptions = {
   components: NodeSpecification[];
   customNodes: CustomNodeSpecification<object, any>[];
+};
+
+export const calculateDiffGraph = (
+  currentGraph: DecisionGraphType,
+  previousGraph: DecisionGraphType,
+  options?: ProcessNodesOptions,
+): DecisionGraphType => {
+  const nodes = processNodes(currentGraph?.nodes ?? [], previousGraph?.nodes ?? [], options);
+  const edges = processEdges(currentGraph?.edges ?? [], previousGraph?.edges ?? []);
+  return {
+    nodes,
+    edges,
+    settings: currentGraph?.settings,
+  };
 };
 
 export const processNodes = (
@@ -336,6 +294,7 @@ export const compareAndUnifyLists = <T extends BaseItem>(
   oldList.forEach((item, oldIndex) => {
     if (!newMap.has(getId(item))) {
       let insertIndex = oldIndex;
+      // @ts-expect-error error should not happen here
       while (insertIndex < unifiedList.length && oldMap.get(getId(unifiedList[insertIndex]))?.index < oldIndex) {
         insertIndex++;
       }
