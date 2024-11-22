@@ -43,7 +43,7 @@ const cleanupTableRule = (
 ): Record<string, string> => {
   const schemaItems = [...decisionTable.inputs, ...decisionTable.outputs];
   const newRule: Record<string, string> = {
-    _id: rule._id || uuidv4(),
+    _id: rule._id || crypto.randomUUID() || uuidv4(),
     _description: rule._description,
   };
   schemaItems.forEach((schemaItem) => {
@@ -60,7 +60,7 @@ const cleanupTableRules = (decisionTable: DecisionTableType, defaultId?: string)
   const schemaItems = [...decisionTable.inputs, ...decisionTable.outputs];
   return rules.map((rule) => {
     const newRule: Record<string, string> = {
-      _id: rule._id || uuidv4(),
+      _id: rule._id || crypto.randomUUID() || uuidv4(),
       _description: rule._description,
     };
     schemaItems.forEach((schemaItem) => {
@@ -84,7 +84,7 @@ export const parseDecisionTable = (decisionTable?: DecisionTableType) => {
   if (dt.inputs?.length === 0) {
     dt.inputs = [
       {
-        id: uuidv4(),
+        id: crypto.randomUUID() || uuidv4(),
         name: 'Input',
       },
     ];
@@ -93,7 +93,7 @@ export const parseDecisionTable = (decisionTable?: DecisionTableType) => {
   if (dt.outputs?.length === 0) {
     dt.outputs = [
       {
-        id: uuidv4(),
+        id: crypto.randomUUID() || uuidv4(),
         field: 'output',
         name: 'Output',
       },
@@ -105,7 +105,7 @@ export const parseDecisionTable = (decisionTable?: DecisionTableType) => {
       return;
     }
 
-    r._id = uuidv4();
+    r._id = crypto.randomUUID() || uuidv4();
   });
 
   return dt;
@@ -245,7 +245,7 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
             target = 0;
           }
 
-          const _id = uuidv4();
+          const _id = crypto.randomUUID() || uuidv4();
           draft.rules.splice(target, 0, cleanupTableRule(draft, { _id }, _id));
 
           return draft;
@@ -269,7 +269,7 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
             target += 1;
           }
 
-          const _id = uuidv4();
+          const _id = crypto.randomUUID() || uuidv4();
           draft.rules.splice(target, 0, cleanupTableRule(draft, { _id }, _id));
           return draft;
         });

@@ -92,7 +92,7 @@ export const useGraphClipboard = (
       const nodeIds: Record<string, string> = clipboardData.nodes.reduce(
         (acc, curr) => ({
           ...acc,
-          [curr.id]: uuidv4(),
+          [curr.id]: crypto.randomUUID() || uuidv4(),
         }),
         {},
       );
@@ -142,7 +142,7 @@ export const useGraphClipboard = (
       });
 
       const edges = (clipboardData.edges || []).map<DecisionEdge>((e) => ({
-        id: uuidv4(),
+        id: crypto.randomUUID() || uuidv4(),
         type: e.type,
         sourceId: nodeIds[e.sourceId],
         targetId: nodeIds[e.targetId],

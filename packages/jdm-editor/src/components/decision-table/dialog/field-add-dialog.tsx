@@ -54,7 +54,7 @@ export const FieldAdd: React.FC<FieldAddProps> = (props) => {
         initialValues={{ type: 'expression' }}
         onFinish={({ field, name, defaultValue }) => {
           onSuccess?.({
-            id: uuidv4(),
+            id: crypto.randomUUID() || uuidv4(),
             field: (field || '')?.trim?.()?.length > 0 ? field : undefined,
             name,
             defaultValue,

@@ -183,7 +183,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
 
         const partialNode = specification.generateNode({ index: existingCount });
         return {
-          id: uuidv4(),
+          id: crypto.randomUUID() || uuidv4(),
           type: 'customNode',
           name: partialNode.name,
           position: position as XYPosition,
@@ -199,7 +199,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
         const partialNode = specification.generateNode({ index: existingCount });
 
         return {
-          id: uuidv4(),
+          id: crypto.randomUUID() || uuidv4(),
           type: specification.type,
           position: position as XYPosition,
           ...partialNode,
@@ -308,7 +308,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
     const edge = {
       ...params,
       type: 'edge',
-      id: uuidv4(),
+      id: crypto.randomUUID() || uuidv4(),
     };
 
     if (disabled) return;

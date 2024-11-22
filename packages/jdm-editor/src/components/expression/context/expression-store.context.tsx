@@ -44,7 +44,7 @@ type ExpressionStoreProviderProps = {
 };
 
 export const createExpression = (data: Partial<ExpressionEntry> = {}): ExpressionEntry => ({
-  id: uuidv4(),
+  id: crypto.randomUUID() || uuidv4(),
   key: '',
   value: '',
   ...data,

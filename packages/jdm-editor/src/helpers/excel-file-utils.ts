@@ -204,7 +204,7 @@ const parseSpreadsheetData = (spreadSheetData: any) => {
 
   const rules = spreadSheetData.map((data: any) => {
     const dataPoint: Record<string, string> = {
-      _id: uuidv4(),
+      _id: crypto.randomUUID() || uuidv4(),
     };
 
     columnHeaders.forEach((col, index) => {

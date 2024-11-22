@@ -81,13 +81,13 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
       hitPolicy: 'first',
       inputs: [
         {
-          id: uuidv4(),
+          id: crypto.randomUUID() || uuidv4(),
           name: 'Input',
         },
       ],
       outputs: [
         {
-          id: uuidv4(),
+          id: crypto.randomUUID() || uuidv4(),
           field: 'output',
           name: 'Output',
         },

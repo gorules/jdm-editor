@@ -81,7 +81,7 @@ enum LocalVariableKind {
 }
 
 const TableInputCell: React.FC<TableCellProps> = ({ column, value, onChange, disabled }) => {
-  const id = useMemo(() => uuidv4(), []);
+  const id = useMemo(() => crypto.randomUUID() || uuidv4(), []);
   const textareaRef = useRef<HTMLTextAreaElement | HTMLDivElement>(null);
   const raw = useDecisionTableRaw();
 

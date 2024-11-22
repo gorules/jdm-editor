@@ -330,7 +330,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         const nodeIds: Record<string, string> = nodes.reduce(
           (acc, curr) => ({
             ...acc,
-            [curr.id]: uuidv4(),
+            [curr.id]: crypto.randomUUID() || uuidv4(),
           }),
           {},
         );
@@ -351,7 +351,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
           (edgesState.current?.[0] || []).forEach((edge) => {
             if (oldNodeIds.includes(edge.source) && oldNodeIds.includes(edge.target)) {
               newEdges.push({
-                id: uuidv4(),
+                id: crypto.randomUUID() || uuidv4(),
                 type: edge.type,
                 sourceId: nodeIds[edge.source],
                 targetId: nodeIds[edge.target],

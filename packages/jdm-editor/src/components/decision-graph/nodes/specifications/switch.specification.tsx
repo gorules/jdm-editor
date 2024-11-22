@@ -43,7 +43,7 @@ export const switchSpecification: NodeSpecification<NodeSwitchData> = {
     name: `switch${index}`,
     content: {
       hitPolicy: 'first',
-      statements: [{ id: uuidv4(), condition: '', isDefault: false }],
+      statements: [{ id: crypto.randomUUID() || uuidv4(), condition: '', isDefault: false }],
     },
   }),
   renderNode: ({ specification, ...props }) => <SwitchNode specification={specification} {...props} />,
