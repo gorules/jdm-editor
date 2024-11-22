@@ -10,6 +10,8 @@ import {
   useDecisionGraphRaw,
 } from '../context/dg-store.context';
 
+import { v4 as uuidv4 } from 'uuid';
+
 type ClipboardData = {
   nodes: DecisionNode[];
   edges?: DecisionEdge[];
@@ -90,7 +92,7 @@ export const useGraphClipboard = (
       const nodeIds: Record<string, string> = clipboardData.nodes.reduce(
         (acc, curr) => ({
           ...acc,
-          [curr.id]: crypto.randomUUID(),
+          [curr.id]: uuidv4(),
         }),
         {},
       );
@@ -140,7 +142,7 @@ export const useGraphClipboard = (
       });
 
       const edges = (clipboardData.edges || []).map<DecisionEdge>((e) => ({
-        id: crypto.randomUUID(),
+        id: uuidv4(),
         type: e.type,
         sourceId: nodeIds[e.sourceId],
         targetId: nodeIds[e.targetId],

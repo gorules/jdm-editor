@@ -29,6 +29,8 @@ import { NodeKind } from '../nodes/specifications/specification-types';
 import { nodeSpecification } from '../nodes/specifications/specifications';
 import { GraphComponents } from './graph-components';
 
+import { v4 as uuidv4 } from 'uuid';
+
 export type GraphProps = {
   className?: string;
   onDisableTabs?: (val: boolean) => void;
@@ -181,7 +183,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
 
         const partialNode = specification.generateNode({ index: existingCount });
         return {
-          id: crypto.randomUUID(),
+          id: uuidv4(),
           type: 'customNode',
           name: partialNode.name,
           position: position as XYPosition,
@@ -197,7 +199,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
         const partialNode = specification.generateNode({ index: existingCount });
 
         return {
-          id: crypto.randomUUID(),
+          id: uuidv4(),
           type: specification.type,
           position: position as XYPosition,
           ...partialNode,
@@ -306,7 +308,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
     const edge = {
       ...params,
       type: 'edge',
-      id: crypto.randomUUID(),
+      id: uuidv4(),
     };
 
     if (disabled) return;

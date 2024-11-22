@@ -7,6 +7,8 @@ import { create } from 'zustand';
 
 import type { SimulationTraceDataExpression } from '../../decision-graph';
 
+import { v4 as uuidv4 } from 'uuid';
+
 const ExpressionStoreContext = React.createContext<
   UseBoundStore<StoreApi<ExpressionStore>> & {
     setState: (partial: Partial<ExpressionStore>) => void;
@@ -42,7 +44,7 @@ type ExpressionStoreProviderProps = {
 };
 
 export const createExpression = (data: Partial<ExpressionEntry> = {}): ExpressionEntry => ({
-  id: crypto.randomUUID(),
+  id: uuidv4(),
   key: '',
   value: '',
   ...data,

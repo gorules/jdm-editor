@@ -15,6 +15,8 @@ import { NodeColor } from './colors';
 import type { MinimalNodeProps, NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
 
+import { v4 as uuidv4 } from 'uuid';
+
 export type SwitchStatement = {
   id?: string;
   condition?: string;
@@ -41,7 +43,7 @@ export const switchSpecification: NodeSpecification<NodeSwitchData> = {
     name: `switch${index}`,
     content: {
       hitPolicy: 'first',
-      statements: [{ id: crypto.randomUUID(), condition: '', isDefault: false }],
+      statements: [{ id: uuidv4(), condition: '', isDefault: false }],
     },
   }),
   renderNode: ({ specification, ...props }) => <SwitchNode specification={specification} {...props} />,
@@ -102,7 +104,7 @@ const SwitchNode: React.FC<
                   }
                   return statement;
                 });
-                draft.content.statements.push({ id: crypto.randomUUID(), condition: '', isDefault: true });
+                draft.content.statements.push({ id: uuidv4(), condition: '', isDefault: true });
                 return draft;
               });
             } else {
@@ -113,7 +115,7 @@ const SwitchNode: React.FC<
                   }
                   return statement;
                 });
-                draft.content.statements.push({ id: crypto.randomUUID(), condition: '', isDefault: false });
+                draft.content.statements.push({ id: uuidv4(), condition: '', isDefault: false });
                 return draft;
               });
             }

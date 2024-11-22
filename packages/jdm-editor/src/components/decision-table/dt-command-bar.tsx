@@ -20,6 +20,8 @@ import {
   useDecisionTableState,
 } from './context/dt-store.context';
 
+import { v4 as uuidv4 } from 'uuid';
+
 export const DecisionTableCommandBar: React.FC = () => {
   const tableActions = useDecisionTableActions();
   const { disableHitPolicy, disabled, configurable, hitPolicy, cursor } = useDecisionTableState(
@@ -40,7 +42,8 @@ export const DecisionTableCommandBar: React.FC = () => {
 
     try {
       const decisionTable = stateStore.getState().decisionTable;
-      await exportExcelFile(name, [{ ...decisionTable, name: 'decision table', id: crypto.randomUUID() }]);
+      await exportExcelFile(name, [{ ...decisionTable, name: 'decision table', id: uuidv4()
+      }]);
       message.success('Excel file has been downloaded successfully!');
     } catch {
       message.error('Failed to download Excel file!');

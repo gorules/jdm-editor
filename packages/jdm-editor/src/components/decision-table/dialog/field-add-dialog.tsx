@@ -8,6 +8,8 @@ import { LocalCodeEditor } from '../../code-editor/local-ce';
 import type { ColumnType, TableSchemaItem } from '../context/dt-store.context';
 import { useDecisionTableState } from '../context/dt-store.context';
 
+import { v4 as uuidv4 } from 'uuid';
+
 export type FieldAddProps = {
   id?: string;
   onSuccess?: (column: TableSchemaItem) => void;
@@ -52,7 +54,7 @@ export const FieldAdd: React.FC<FieldAddProps> = (props) => {
         initialValues={{ type: 'expression' }}
         onFinish={({ field, name, defaultValue }) => {
           onSuccess?.({
-            id: crypto.randomUUID(),
+            id: uuidv4(),
             field: (field || '')?.trim?.()?.length > 0 ? field : undefined,
             name,
             defaultValue,

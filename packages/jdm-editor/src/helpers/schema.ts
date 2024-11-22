@@ -1,7 +1,9 @@
 import { z } from 'zod';
+import { v4 as uuidv4 } from 'uuid';
 
 export const DECISION_GRAPH_CONTENT_TYPE = 'application/vnd.gorules.decision';
-const id = z.string().default(crypto.randomUUID);
+// const id = z.string().default(crypto.randomUUID || uuidv4());
+const id = z.string().default(() => uuidv4());
 
 const nodeCommon = z.object({
   id,

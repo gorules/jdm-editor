@@ -12,6 +12,8 @@ import {
   useDecisionTableState,
 } from '../context/dt-store.context';
 
+import { v4 as uuidv4 } from 'uuid';
+
 export type TableDefaultCellProps = {
   context: CellContext<Record<string, string>, string>;
 } & React.HTMLAttributes<HTMLDivElement>;
@@ -79,7 +81,7 @@ enum LocalVariableKind {
 }
 
 const TableInputCell: React.FC<TableCellProps> = ({ column, value, onChange, disabled }) => {
-  const id = useMemo(() => crypto.randomUUID(), []);
+  const id = useMemo(() => uuidv4(), []);
   const textareaRef = useRef<HTMLTextAreaElement | HTMLDivElement>(null);
   const raw = useDecisionTableRaw();
 

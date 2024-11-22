@@ -6,6 +6,7 @@ import { NodeKind } from '../components/decision-graph/nodes/specifications/spec
 import type { TableSchemaItem } from '../components/decision-table/context/dt-store.context';
 import { parseDecisionTable } from '../components/decision-table/context/dt-store.context';
 import { saveFile } from './file-helpers';
+import { v4 as uuidv4 } from 'uuid';
 
 type DecisionTableNode = {
   id: string;
@@ -203,7 +204,7 @@ const parseSpreadsheetData = (spreadSheetData: any) => {
 
   const rules = spreadSheetData.map((data: any) => {
     const dataPoint: Record<string, string> = {
-      _id: crypto.randomUUID(),
+      _id: uuidv4(),
     };
 
     columnHeaders.forEach((col, index) => {

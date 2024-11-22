@@ -13,6 +13,8 @@ import { GraphNode } from '../graph-node';
 import type { NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
 
+import { v4 as uuidv4 } from 'uuid';
+
 export type NodeDecisionTableData = z.infer<typeof decisionTableSchema>['content'];
 
 export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData> = {
@@ -79,13 +81,13 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
       hitPolicy: 'first',
       inputs: [
         {
-          id: crypto.randomUUID(),
+          id: uuidv4(),
           name: 'Input',
         },
       ],
       outputs: [
         {
-          id: crypto.randomUUID(),
+          id: uuidv4(),
           field: 'output',
           name: 'Output',
         },

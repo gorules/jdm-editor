@@ -8,6 +8,8 @@ import { create } from 'zustand';
 import type { SchemaSelectProps } from '../../../helpers/components';
 import type { TableCellProps } from '../table/table-default-cell';
 
+import { v4 as uuidv4 } from 'uuid';
+
 export type TableExportOptions = {
   name: string;
 };
@@ -41,7 +43,7 @@ const cleanupTableRule = (
 ): Record<string, string> => {
   const schemaItems = [...decisionTable.inputs, ...decisionTable.outputs];
   const newRule: Record<string, string> = {
-    _id: rule._id || crypto.randomUUID(),
+    _id: rule._id || uuidv4(),
     _description: rule._description,
   };
   schemaItems.forEach((schemaItem) => {
@@ -58,7 +60,7 @@ const cleanupTableRules = (decisionTable: DecisionTableType, defaultId?: string)
   const schemaItems = [...decisionTable.inputs, ...decisionTable.outputs];
   return rules.map((rule) => {
     const newRule: Record<string, string> = {
-      _id: rule._id || crypto.randomUUID(),
+      _id: rule._id || uuidv4(),
       _description: rule._description,
     };
     schemaItems.forEach((schemaItem) => {
@@ -82,7 +84,7 @@ export const parseDecisionTable = (decisionTable?: DecisionTableType) => {
   if (dt.inputs?.length === 0) {
     dt.inputs = [
       {
-        id: crypto.randomUUID(),
+        id: uuidv4(),
         name: 'Input',
       },
     ];
@@ -91,7 +93,7 @@ export const parseDecisionTable = (decisionTable?: DecisionTableType) => {
   if (dt.outputs?.length === 0) {
     dt.outputs = [
       {
-        id: crypto.randomUUID(),
+        id: uuidv4(),
         field: 'output',
         name: 'Output',
       },
@@ -103,7 +105,7 @@ export const parseDecisionTable = (decisionTable?: DecisionTableType) => {
       return;
     }
 
-    r._id = crypto.randomUUID();
+    r._id = uuidv4();
   });
 
   return dt;
@@ -243,7 +245,7 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
             target = 0;
           }
 
-          const _id = crypto.randomUUID();
+          const _id = uuidv4();
           draft.rules.splice(target, 0, cleanupTableRule(draft, { _id }, _id));
 
           return draft;
@@ -267,7 +269,7 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
             target += 1;
           }
 
-          const _id = crypto.randomUUID();
+          const _id = uuidv4();
           draft.rules.splice(target, 0, cleanupTableRule(draft, { _id }, _id));
           return draft;
         });

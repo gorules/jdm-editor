@@ -18,6 +18,8 @@ import type { CustomNodeSpecification } from '../nodes/custom-node';
 import { NodeKind, type NodeSpecification } from '../nodes/specifications/specification-types';
 import type { Simulation } from '../types/simulation.types';
 
+import { v4 as uuidv4 } from 'uuid';
+
 export type Position = {
   x: number;
   y: number;
@@ -328,7 +330,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         const nodeIds: Record<string, string> = nodes.reduce(
           (acc, curr) => ({
             ...acc,
-            [curr.id]: crypto.randomUUID(),
+            [curr.id]: uuidv4(),
           }),
           {},
         );
@@ -349,7 +351,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
           (edgesState.current?.[0] || []).forEach((edge) => {
             if (oldNodeIds.includes(edge.source) && oldNodeIds.includes(edge.target)) {
               newEdges.push({
-                id: crypto.randomUUID(),
+                id: uuidv4(),
                 type: edge.type,
                 sourceId: nodeIds[edge.source],
                 targetId: nodeIds[edge.target],
