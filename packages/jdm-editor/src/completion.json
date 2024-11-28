@@ -37,6 +37,12 @@
     "info": "Converts all characters in a string to lowercase"
   },
   {
+    "label": "trim",
+    "type": "function",
+    "detail": "(str: `string`) -> `string`",
+    "info": "Returns the string with leading and trailing whitespace removed"
+  },
+  {
     "label": "startsWith",
     "type": "function",
     "detail": "(str: `string`, prefix: `string`) -> `boolean`",
