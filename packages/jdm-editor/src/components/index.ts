@@ -4,3 +4,4 @@ export * from './function';
 export * from './expression';
 export * from './code-editor';
 export * from './shared';
+export * from './diff-icon';

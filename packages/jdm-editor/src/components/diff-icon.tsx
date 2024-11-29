@@ -29,7 +29,8 @@ export const DiffIcon: React.FC<
       />
     ))
     .with('modified', () => (
-      <div
+      <span
+        {...rest}
         style={{
           width: rest?.style?.fontSize ?? 14,
           height: rest?.style?.fontSize ?? 14,
@@ -39,9 +40,10 @@ export const DiffIcon: React.FC<
           justifyContent: 'center',
           position: 'relative',
           boxSizing: 'border-box',
+          ...(rest?.style || {}),
         }}
       >
-        <div
+        <span
           style={{
             width: 3,
             height: 3,
@@ -49,7 +51,7 @@ export const DiffIcon: React.FC<
             borderRadius: '50%',
           }}
         />
-      </div>
+      </span>
     ))
     .otherwise(() => null);
 };
