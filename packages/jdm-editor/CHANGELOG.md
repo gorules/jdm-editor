@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.24.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.23.3...@gorules/jdm-editor@1.24.0) (2024-11-29)
+
+### Bug Fixes
+
+- blinking on hover and add better exports for esm ([#113](https://github.com/gorules/jdm-editor/issues/113)) ([5a65f41](https://github.com/gorules/jdm-editor/commit/5a65f4116869f781cd63a9f77d0cb5fd9fe592f3))
+- formatting ([e729347](https://github.com/gorules/jdm-editor/commit/e729347ede15e7f0c67f0cc3715e4ebb833a83b4))
+
+### Features
+
+- update completion.json for trim() ([#123](https://github.com/gorules/jdm-editor/issues/123)) ([2da863c](https://github.com/gorules/jdm-editor/commit/2da863c8e458c90418986da78274f07ce67ad24b))
+
 ## [1.23.3](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.23.2...@gorules/jdm-editor@1.23.3) (2024-11-15)
 
 ### Bug Fixes
