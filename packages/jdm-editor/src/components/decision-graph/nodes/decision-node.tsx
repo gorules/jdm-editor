@@ -76,7 +76,7 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
         compactMode && 'grl-dn--compact',
         listMode && 'grl-dn--list',
         !diffStatus && isSelected && `grl-dn--selected`,
-        !diffStatus && status && `grl-dn--${status}`,
+        status && `grl-dn--${status}`,
         diffStatus && `grl-dn--diff-${diffStatus}`,
       )}
       style={
@@ -96,7 +96,7 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
                   {h}
                 </div>
               ))}
-          {!diffStatus && status === 'error' && (
+          {status === 'error' && (
             <div className={clsx('grl-dn__status-icon', `grl-dn__status-icon--${status}`)}>
               <CloseOutlined />
             </div>
