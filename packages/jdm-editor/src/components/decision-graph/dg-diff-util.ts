@@ -61,12 +61,12 @@ export const processNodes = (
     } else {
       const fields: DiffMetadata['fields'] = {};
 
-      // if (oldNode.position.x !== newNode.position.x || oldNode.position.y !== newNode.position.y) {
-      //   _.set(fields, 'position', {
-      //     status: 'modified',
-      //     previousValue: oldNode.position,
-      //   });
-      // }
+      if (oldNode.position.x !== newNode.position.x || oldNode.position.y !== newNode.position.y) {
+        _.set(fields, 'position', {
+          status: 'moved',
+          previousValue: oldNode.position,
+        });
+      }
 
       if (oldNode.name !== newNode.name) {
         _.set(fields, 'name', {
@@ -115,12 +115,24 @@ export const processNodes = (
           return null;
         });
 
-      if (Object.keys(fields || {}).length > 0 || calculatedContent?._diff?.status === 'modified') {
+      if (
+        Object.keys(fields || {}).filter((key) => key !== 'position').length > 0 ||
+        calculatedContent?._diff?.status === 'modified'
+      ) {
         nodesMap.set(newNode.id, {
           ...newNode,
           content: calculatedContent ?? newNode.content,
           _diff: {
             status: 'modified',
+            fields,
+          },
+        });
+      } else if (Object.keys(fields || {}).length === 1 && fields?.position?.status === 'moved') {
+        nodesMap.set(newNode.id, {
+          ...newNode,
+          content: calculatedContent ?? newNode.content,
+          _diff: {
+            status: 'moved',
             fields,
           },
         });

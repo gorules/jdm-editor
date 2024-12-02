@@ -20,7 +20,7 @@ export type DecisionNodeProps = {
   children?: React.ReactNode;
   actions?: React.ReactNode[];
   status?: 'error' | 'success' | 'warning';
-  diffStatus?: 'removed' | 'added' | 'modified';
+  diffStatus?: 'removed' | 'added' | 'modified' | 'moved';
   noBodyPadding?: boolean;
   color?: 'primary' | 'secondary' | string;
   menuItems?: MenuProps['items'];

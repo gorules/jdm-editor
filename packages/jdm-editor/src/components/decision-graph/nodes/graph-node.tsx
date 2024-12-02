@@ -168,6 +168,7 @@ export const GraphNode = React.forwardRef<HTMLDivElement, GraphNodeProps>(
             .with([{ status: 'added' }], () => 'added' as const)
             .with([{ status: 'modified' }], () => 'modified' as const)
             .with([{ status: 'removed' }], () => 'removed' as const)
+            .with([{ status: 'moved' }], () => 'moved' as const)
             .otherwise(() => undefined)}
           onNameChange={(name) => {
             graphActions.updateNode(id, (draft) => {

@@ -29,6 +29,14 @@
     }
   }
 
+  &--diff-moved &__graphCard {
+    border-color: var(--grl-color-info) !important;
+
+    &:hover {
+      border-color: var(--grl-color-info) !important;
+    }
+  }
+
   &--diff-modified &__graphCard {
     border-color: var(--grl-color-warning) !important;
 

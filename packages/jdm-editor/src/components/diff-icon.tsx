@@ -1,4 +1,4 @@
-import { MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons';
+import { DragOutlined, MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons';
 import React from 'react';
 import { match } from 'ts-pattern';
 
@@ -52,6 +52,15 @@ export const DiffIcon: React.FC<
           }}
         />
       </span>
+    ))
+    .with('moved', () => (
+      <DragOutlined
+        {...rest}
+        style={{
+          color: 'var(--grl-color-info)',
+          ...(rest?.style || {}),
+        }}
+      />
     ))
     .otherwise(() => null);
 };
