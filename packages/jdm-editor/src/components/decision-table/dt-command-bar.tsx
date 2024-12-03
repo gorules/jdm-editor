@@ -6,11 +6,12 @@ import {
   ExportOutlined,
   ImportOutlined,
 } from '@ant-design/icons';
-import { Button, Divider, Popconfirm, Select, Tooltip, message } from 'antd';
+import { Button, Divider, Popconfirm, Tooltip, message } from 'antd';
 import React, { useRef } from 'react';
 
 import { exportExcelFile, readFromExcel } from '../../helpers/excel-file-utils';
 import type { DecisionNode } from '../decision-graph';
+import { DiffSelect } from '../shared';
 import { Stack } from '../stack';
 import {
   type HitPolicy,
@@ -22,13 +23,14 @@ import {
 
 export const DecisionTableCommandBar: React.FC = () => {
   const tableActions = useDecisionTableActions();
-  const { disableHitPolicy, disabled, configurable, hitPolicy, cursor } = useDecisionTableState(
+  const { disableHitPolicy, disabled, configurable, hitPolicy, diffHitPolicy, cursor } = useDecisionTableState(
     ({ disableHitPolicy, disabled, configurable, decisionTable, cursor }) => ({
       disableHitPolicy,
       disabled,
       configurable,
       cursor,
       hitPolicy: decisionTable.hitPolicy,
+      diffHitPolicy: decisionTable?._diff?.fields?.hitPolicy,
     }),
   );
 
@@ -140,8 +142,10 @@ export const DecisionTableCommandBar: React.FC = () => {
             </>
           )}
         </Stack>
-        <Select
+        <DiffSelect
+          displayDiff={diffHitPolicy?.status === 'modified'}
           style={{ width: 140 }}
+          previousValue={diffHitPolicy?.previousValue}
           size={'small'}
           disabled={disabled || !configurable || disableHitPolicy}
           value={hitPolicy}

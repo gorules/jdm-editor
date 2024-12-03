@@ -2,16 +2,19 @@ import { ApartmentOutlined, ApiOutlined, LeftOutlined, PlayCircleOutlined, Right
 import type { Meta, StoryObj } from '@storybook/react';
 import { Select } from 'antd';
 import json5 from 'json5';
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 
 import type { PanelType } from './context/dg-store.context';
+import type { DecisionGraphRef } from './dg';
 import { DecisionGraph } from './dg';
+import { calculateDiffGraph } from './dg-diff-util';
 import { GraphSimulator } from './dg-simulator';
 import {
   defaultGraph,
   defaultGraphCustomNode,
   defaultGraphInputsFormCustomNode,
   defaultGraphUnknownNode,
+  diffGraph,
 } from './dg.stories-values';
 import type { GraphRef } from './graph/graph';
 import { createJdmNode } from './nodes/custom-node';
@@ -38,6 +41,7 @@ type Story = StoryObj<typeof DecisionGraph>;
 export const Controlled: Story = {
   render: (args) => {
     const [value, setValue] = useState<any>(defaultGraph);
+
     return (
       <div
         style={{
@@ -48,6 +52,7 @@ export const Controlled: Story = {
           {...args}
           value={value}
           onChange={(val) => {
+            console.log(val);
             setValue?.(val);
           }}
         />
@@ -314,4 +319,48 @@ export const Simulator: Story = {
       </div>
     );
   },
+};
+
+export const Diff: Story = {
+  render: (args) => {
+    const [value, setValue] = useState<any>(diffGraph);
+    const ref = useRef<DecisionGraphRef>(null);
+
+    const enableDiff = (args as any)?.enableDiff;
+
+    const innerValue = useMemo(() => {
+      if (enableDiff)
+        return calculateDiffGraph(value, diffGraph, {
+          customNodes,
+          components,
+        });
+      return value;
+    }, [value, enableDiff, customNodes, components]);
+
+    return (
+      <div
+        style={{
+          height: '100%',
+        }}
+      >
+        <DecisionGraph
+          ref={ref}
+          value={innerValue}
+          disabled={enableDiff}
+          onChange={(val) => {
+            if (!(args as any)?.enableDiff) {
+              setValue(val);
+            }
+          }}
+          customNodes={customNodes}
+          components={components}
+        />
+      </div>
+    );
+  },
+  argTypes: {
+    enableDiff: {
+      control: { type: 'boolean' },
+    },
+  } as any,
 };

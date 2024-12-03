@@ -15,10 +15,9 @@ export {
   useDecisionGraphReferences,
   useDecisionGraphListeners,
   useDecisionGraphRaw,
+  useNodeDiff,
+  useEdgeDiff,
   NodeTypeKind,
-  type DecisionNode,
-  type DecisionEdge,
-  type DecisionGraphType,
 } from './context/dg-store.context';
 export { NodeColor } from './nodes/specifications/colors';
 
@@ -32,3 +31,25 @@ export type {
   SimulationOk,
   SimulationTraceDataSwitch,
 } from './types/simulation.types';
+
+export {
+  calculateDiffGraph,
+  compareAndUnifyLists,
+  processEdges,
+  processNodes,
+  addStrikethrough,
+  buildDiffString,
+  compareStringFields,
+  type ProcessNodesOptions,
+} from './dg-diff-util';
+
+export {
+  type DecisionEdge,
+  type DecisionNode,
+  type DecisionSettings,
+  type DecisionGraphType,
+  type DiffMetadata,
+  type Diff,
+  type Position,
+  type DiffStatus,
+} from './dg-types';

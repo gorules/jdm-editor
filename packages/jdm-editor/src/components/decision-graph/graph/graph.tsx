@@ -10,7 +10,6 @@ import { P, match } from 'ts-pattern';
 import { nodeSchema } from '../../../helpers/schema';
 import {
   type DecisionGraphStoreType,
-  type DecisionNode,
   type ExposedStore,
   useDecisionGraphActions,
   useDecisionGraphListeners,
@@ -19,6 +18,7 @@ import {
   useDecisionGraphState,
 } from '../context/dg-store.context';
 import { edgeFunction } from '../custom-edge';
+import { type DecisionNode } from '../dg-types';
 import { mapToDecisionEdge } from '../dg-util';
 import '../dg.scss';
 import { useGraphClipboard } from '../hooks/use-graph-clipboard';

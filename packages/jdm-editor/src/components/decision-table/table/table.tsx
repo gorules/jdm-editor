@@ -92,7 +92,11 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
       {
         id: '_description',
         accessorKey: '_description',
-        header: () => <Typography.Text className='grl-dt-text-primary'>Description</Typography.Text>,
+        header: () => (
+          <div className={'head-cell'}>
+            <Typography.Text className='grl-dt-text-primary'>Description</Typography.Text>
+          </div>
+        ),
         minSize: minColWidth,
         size: colWidth,
       },

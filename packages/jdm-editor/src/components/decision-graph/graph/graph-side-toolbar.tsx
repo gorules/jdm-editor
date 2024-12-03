@@ -5,13 +5,8 @@ import React, { useRef } from 'react';
 
 import { exportExcelFile, readFromExcel } from '../../../helpers/excel-file-utils';
 import { decisionModelSchema } from '../../../helpers/schema';
-import {
-  type DecisionEdge,
-  type DecisionNode,
-  useDecisionGraphActions,
-  useDecisionGraphRaw,
-  useDecisionGraphState,
-} from '../context/dg-store.context';
+import { useDecisionGraphActions, useDecisionGraphRaw, useDecisionGraphState } from '../context/dg-store.context';
+import { type DecisionEdge, type DecisionNode } from '../dg-types';
 import { NodeKind } from '../nodes/specifications/specification-types';
 
 const DecisionContentType = 'application/vnd.gorules.decision';

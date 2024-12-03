@@ -10,7 +10,7 @@ import { P, match } from 'ts-pattern';
 import { platform } from '../../../helpers/platform';
 import { usePersistentState } from '../../../helpers/use-persistent-state';
 import { SpacedText } from '../../spaced-text';
-import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
+import { useDecisionGraphActions, useDecisionGraphState, useNodeDiff } from '../context/dg-store.context';
 import type { DecisionNodeProps } from './decision-node';
 import { DecisionNode } from './decision-node';
 import type { MinimalNodeSpecification } from './specifications/specification-types';
@@ -59,6 +59,8 @@ export const GraphNode = React.forwardRef<HTMLDivElement, GraphNodeProps>(
         compactMode,
       }),
     );
+
+    const { diff } = useNodeDiff(id);
 
     const Settings = specification.renderSettings;
 
@@ -161,6 +163,12 @@ export const GraphNode = React.forwardRef<HTMLDivElement, GraphNodeProps>(
             .with([P._, P._, true], () => 'error' as const)
             .with([P.not(P.nullish), P._, P._], () => 'success' as const)
             .with([P._, P.not(P.nullish), P._], () => 'error' as const)
+            .otherwise(() => undefined)}
+          diffStatus={match([diff])
+            .with([{ status: 'added' }], () => 'added' as const)
+            .with([{ status: 'modified' }], () => 'modified' as const)
+            .with([{ status: 'removed' }], () => 'removed' as const)
+            .with([{ status: 'moved' }], () => 'moved' as const)
             .otherwise(() => undefined)}
           onNameChange={(name) => {
             graphActions.updateNode(id, (draft) => {

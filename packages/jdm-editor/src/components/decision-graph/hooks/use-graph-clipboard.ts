@@ -3,12 +3,8 @@ import { type RefObject, useCallback, useMemo } from 'react';
 import type { Node, ReactFlowInstance, XYPosition } from 'reactflow';
 
 import { copyToClipboard, pasteFromClipboard } from '../../../helpers/utility';
-import {
-  type DecisionEdge,
-  type DecisionNode,
-  useDecisionGraphActions,
-  useDecisionGraphRaw,
-} from '../context/dg-store.context';
+import { useDecisionGraphActions, useDecisionGraphRaw } from '../context/dg-store.context';
+import { type DecisionEdge, type DecisionNode } from '../dg-types';
 
 type ClipboardData = {
   nodes: DecisionNode[];

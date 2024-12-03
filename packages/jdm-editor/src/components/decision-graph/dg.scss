@@ -683,6 +683,18 @@
         border-bottom: 1px solid var(--grl-color-border);
       }
 
+      &.diff-added {
+        background-color: var(--grl-color-success-bg);
+      }
+
+      &.diff-modified {
+        background-color: var(--grl-color-warning-bg);
+      }
+
+      &.diff-removed {
+        background-color: var(--grl-color-error-bg);
+      }
+
       &.active {
         background-color: var(--grl-color-success-bg);
       }

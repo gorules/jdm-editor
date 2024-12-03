@@ -1,9 +1,8 @@
 import type { Edge, Node } from 'reactflow';
 import { MarkerType } from 'reactflow';
 
-import type { DecisionEdge, DecisionNode } from './context/dg-store.context';
-
-export const privateSymbol = Symbol('private');
+import type { DecisionEdge, DecisionNode } from './dg-types';
+import { privateSymbol } from './dg-types';
 
 export const mapToDecisionEdge = (edge: Edge): DecisionEdge => {
   return {

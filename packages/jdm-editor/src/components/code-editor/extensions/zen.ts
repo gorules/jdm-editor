@@ -261,19 +261,21 @@ const zenTemplateLanguage = new LanguageSupport(
 
 type extensionOptions = {
   type: 'unary' | 'standard' | 'template';
+  lint?: boolean;
 };
 
-export const zenExtensions = ({ type }: extensionOptions) => [
-  type !== 'template' ? zenLanguage : zenTemplateLanguage,
-  completionExtension(),
-  hoverExtension(),
-  closeBrackets(),
-  zenLinter(type),
-  typeField,
-  history(),
-  keymap.of([
-    ...closeBracketsKeymap,
-    ...historyKeymap,
-    { key: 'Enter', run: insertNewlineAndIndent, shift: insertNewlineAndIndent },
-  ]),
-];
+export const zenExtensions = ({ type, lint = true }: extensionOptions) =>
+  [
+    type !== 'template' ? zenLanguage : zenTemplateLanguage,
+    completionExtension(),
+    hoverExtension(),
+    closeBrackets(),
+    lint && zenLinter(type),
+    typeField,
+    history(),
+    keymap.of([
+      ...closeBracketsKeymap,
+      ...historyKeymap,
+      { key: 'Enter', run: insertNewlineAndIndent, shift: insertNewlineAndIndent },
+    ]),
+  ].filter((ext) => !!ext);

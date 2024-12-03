@@ -42,6 +42,7 @@ export type CodeEditorProps = {
   placeholder?: string;
   disabled?: boolean;
   type?: 'unary' | 'standard' | 'template';
+  lint?: boolean;
   strict?: boolean;
   fullHeight?: boolean;
   noStyle?: boolean;
@@ -67,6 +68,7 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
       extension,
       variableType,
       expectedVariableType,
+      lint = true,
       ...props
     },
     ref,
@@ -99,7 +101,7 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
           extensions: [
             EditorView.lineWrapping,
             bracketMatching(),
-            compartment.zenExtension.of(zenExtensions({ type })),
+            compartment.zenExtension.of(zenExtensions({ type, lint })),
             compartment.updateListener.of(updateListener(onChange, onStateChange)),
             compartment.theme.of(editorTheme(token.mode === 'dark')),
             compartment.placeholder.of(placeholder ? placeholderExt(placeholder) : []),
@@ -183,7 +185,7 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
 
       codeMirror.current.dispatch({
         effects: [
-          compartment.zenExtension.reconfigure(zenExtensions({ type })),
+          compartment.zenExtension.reconfigure(zenExtensions({ type, lint })),
           updateExpressionTypeEffect.of(
             match(type)
               .with('unary', () => 'unary' as const)
@@ -191,7 +193,7 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
           ),
         ],
       });
-    }, [type]);
+    }, [type, lint]);
 
     useEffect(() => {
       if (!codeMirror.current) {

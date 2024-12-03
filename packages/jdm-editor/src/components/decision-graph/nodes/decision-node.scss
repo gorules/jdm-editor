@@ -17,6 +17,42 @@
     --node-background: var(--grl-color-error-bg);
   }
 
+  &--warning {
+    --node-background: var(--grl-color-warning-bg);
+  }
+
+  &--diff-added &__graphCard {
+    border-color: var(--grl-color-success) !important;
+
+    &:hover {
+      border-color: var(--grl-color-success) !important;
+    }
+  }
+
+  &--diff-moved &__graphCard {
+    border-color: var(--grl-color-info) !important;
+
+    &:hover {
+      border-color: var(--grl-color-info) !important;
+    }
+  }
+
+  &--diff-modified &__graphCard {
+    border-color: var(--grl-color-warning) !important;
+
+    &:hover {
+      border-color: var(--grl-color-warning) !important;
+    }
+  }
+
+  &--diff-removed &__graphCard {
+    border-color: var(--grl-color-error) !important;
+
+    &:hover {
+      border-color: var(--grl-color-error) !important;
+    }
+  }
+
   &--color {
     &--primary {
       --node-color: var(--grl-color-primary);

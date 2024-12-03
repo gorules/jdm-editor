@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Transition } from 'transition-hook';
 import { match } from 'ts-pattern';
 
+import { DiffIcon } from '../../diff-icon';
 import './decision-node.scss';
 import { GraphCard } from './graph-card';
 import { NodeColor } from './specifications/colors';
@@ -18,7 +19,8 @@ export type DecisionNodeProps = {
   isSelected?: boolean;
   children?: React.ReactNode;
   actions?: React.ReactNode[];
-  status?: 'error' | 'success';
+  status?: 'error' | 'success' | 'warning';
+  diffStatus?: 'removed' | 'added' | 'modified' | 'moved';
   noBodyPadding?: boolean;
   color?: 'primary' | 'secondary' | string;
   menuItems?: MenuProps['items'];
@@ -43,6 +45,7 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
   onNameChange,
   menuItems = [],
   status,
+  diffStatus,
   compactMode,
   listMode,
   helper,
@@ -72,8 +75,9 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
         'grl-dn',
         compactMode && 'grl-dn--compact',
         listMode && 'grl-dn--list',
-        isSelected && `grl-dn--selected`,
+        !diffStatus && isSelected && `grl-dn--selected`,
         status && `grl-dn--${status}`,
+        diffStatus && `grl-dn--diff-${diffStatus}`,
       )}
       style={
         {
@@ -97,6 +101,7 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
               <CloseOutlined />
             </div>
           )}
+          <DiffIcon status={diffStatus} style={{ fontSize: 16 }} />
         </div>
         <div className={clsx('grl-dn__header', compactMode && 'compact')}>
           <div className={clsx('grl-dn__header__icon', compactMode && 'compact')}>{icon}</div>

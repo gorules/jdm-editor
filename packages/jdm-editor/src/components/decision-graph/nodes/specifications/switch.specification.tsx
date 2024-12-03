@@ -2,13 +2,17 @@ import { ArrowRightOutlined, BranchesOutlined, DeleteOutlined, DownOutlined } fr
 import type { VariableType } from '@gorules/zen-engine-wasm';
 import { Button, Dropdown, Popconfirm, Typography } from 'antd';
 import clsx from 'clsx';
+import { produce } from 'immer';
+import _ from 'lodash';
 import React, { useLayoutEffect, useMemo, useState } from 'react';
 import { Handle, Position } from 'reactflow';
 import { P, match } from 'ts-pattern';
 
 import { useNodeType } from '../../../../helpers/node-type';
-import { LocalCodeEditor } from '../../../code-editor/local-ce';
+import { DiffCodeEditor } from '../../../shared/diff-ce';
 import { useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
+import { compareAndUnifyLists } from '../../dg-diff-util';
+import type { Diff, DiffMetadata } from '../../dg-types';
 import type { SimulationTrace, SimulationTraceDataSwitch } from '../../types/simulation.types';
 import { GraphNode } from '../graph-node';
 import { NodeColor } from './colors';
@@ -16,15 +20,15 @@ import type { MinimalNodeProps, NodeSpecification } from './specification-types'
 import { NodeKind } from './specification-types';
 
 export type SwitchStatement = {
-  id?: string;
+  id: string;
   condition?: string;
   isDefault?: boolean;
-};
+} & Diff;
 
 export type NodeSwitchData = {
   hitPolicy?: 'first' | 'collect';
-  statements?: SwitchStatement[];
-};
+  statements?: (SwitchStatement & Diff)[];
+} & Diff;
 
 export const switchSpecification: NodeSpecification<NodeSwitchData> = {
   type: NodeKind.Switch,
@@ -33,6 +37,64 @@ export const switchSpecification: NodeSpecification<NodeSwitchData> = {
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/switch',
   shortDescription: 'Conditional branching',
   color: NodeColor.Purple,
+  getDiffContent: (current, previous) => {
+    return produce(current, (draft) => {
+      const fields: DiffMetadata['fields'] = {};
+      if ((current.hitPolicy ?? '') !== (previous.hitPolicy ?? '')) {
+        _.set(fields, 'hitPolicy', {
+          status: 'modified',
+          previousValue: current.hitPolicy,
+        });
+      }
+
+      const statements = compareAndUnifyLists(current?.statements || [], previous?.statements || [], {
+        compareFields: (current, previous) => {
+          const hasConditionChange = (current.condition ?? '') !== previous.condition;
+          // const hasIsDefaultChange = (current.isDefault ?? false) !== (previous.isDefault ?? false);
+
+          return {
+            hasChanges: hasConditionChange,
+            fields: {
+              ...(hasConditionChange && {
+                condition: {
+                  status: 'modified',
+                  previousValue: previous.condition,
+                },
+              }),
+              // ...(hasIsDefaultChange && {
+              //   isDefault: {
+              //     status: 'modified',
+              //     previousValue: previous.isDefault,
+              //   },
+              // }),
+            },
+          };
+        },
+      });
+
+      draft.statements = statements;
+      if (
+        statements.find(
+          (statement) =>
+            statement?._diff?.status === 'modified' ||
+            statement?._diff?.status === 'added' ||
+            statement?._diff?.status === 'removed',
+        )
+      ) {
+        _.set(fields, 'statements', {
+          status: 'modified',
+        });
+      }
+
+      if (Object.keys(fields).length > 0) {
+        draft._diff = {
+          status: 'modified',
+          fields,
+        };
+      }
+      return draft;
+    });
+  },
   inferTypes: {
     needsUpdate: () => false,
     determineOutputType: (state) => state.input,
@@ -125,17 +187,18 @@ const SwitchNode: React.FC<
           key='hitPolicy'
           trigger={['click']}
           placement='bottomRight'
-          disabled={disabled}
           menu={{
             items: [
               {
                 key: 'first',
                 label: 'First',
                 onClick: () => changeHitPolicy('first'),
+                disabled,
               },
               {
                 key: 'collect',
                 label: 'Collect',
+                disabled,
                 onClick: () => {
                   graphActions.updateNode(id, (draft) => {
                     draft.content.statements = ((draft.content.statements || []) as SwitchStatement[]).map(
@@ -172,6 +235,7 @@ const SwitchNode: React.FC<
               key={statement.id}
               index={index}
               value={statement.condition}
+              diff={statement?._diff}
               id={statement.id}
               isDefault={statement.isDefault}
               totalStatements={statements.length}
@@ -238,6 +302,7 @@ const SwitchHandle: React.FC<{
   id?: string;
   value?: string;
   isDefault?: boolean;
+  diff?: DiffMetadata;
   onChange?: (value: string) => void;
   onSetIsDefault?: (isDefault: boolean) => void;
   onDelete?: () => void;
@@ -251,6 +316,7 @@ const SwitchHandle: React.FC<{
 }> = ({
   id,
   value,
+  diff,
   onChange,
   disabled,
   configurable = true,
@@ -281,12 +347,17 @@ const SwitchHandle: React.FC<{
     isDefault && hitPolicy === 'first' && isLastIndex && index > 0 && (value || '')?.trim?.()?.length === 0;
 
   return (
-    <div className={clsx('switchNode__statement', isActive && 'active')}>
+    <div className={clsx('switchNode__statement', isActive && 'active', diff?.status && `diff-${diff?.status}`)}>
       <div
         className={clsx('switchNode__statement__heading', isElse && 'switchNode__statement__heading--without-input')}
       >
         {(index === 0 || hitPolicy === 'collect') && (
-          <Button className={clsx('switchNode__statement__heading__action')} size={'small'} type={'text'}>
+          <Button
+            disabled={disabled}
+            className={clsx('switchNode__statement__heading__action')}
+            size={'small'}
+            type={'text'}
+          >
             If
           </Button>
         )}
@@ -295,6 +366,7 @@ const SwitchHandle: React.FC<{
             className={clsx('switchNode__statement__heading__action', isElse && 'inactive')}
             size={'small'}
             type={'text'}
+            disabled={disabled}
             onClick={() => {
               if (isLastIndex && hitPolicy === 'first') {
                 onSetIsDefault?.(false);
@@ -309,6 +381,7 @@ const SwitchHandle: React.FC<{
             className={clsx('switchNode__statement__heading__action', !isElse && 'inactive')}
             size={'small'}
             type={'text'}
+            disabled={disabled}
             onClick={() => {
               if (isLastIndex && hitPolicy === 'first') {
                 onSetIsDefault?.(true);
@@ -337,12 +410,14 @@ const SwitchHandle: React.FC<{
       </div>
       {!isElse && (
         <div className='switchNode__statement__inputArea'>
-          <LocalCodeEditor
+          <DiffCodeEditor
             style={{
               fontSize: 12,
               lineHeight: '20px',
               width: '100%',
             }}
+            displayDiff={diff?.fields?.condition?.status === 'modified'}
+            previousValue={diff?.fields?.condition?.previousValue}
             value={inner}
             maxRows={4}
             disabled={disabled}
@@ -359,6 +434,7 @@ const SwitchHandleCompact: React.FC<{
   id?: string;
   value?: string;
   isDefault?: boolean;
+  diff?: DiffMetadata;
   onChange?: (value: string) => void;
   onSetIsDefault?: (isDefault: boolean) => void;
   onDelete?: () => void;
@@ -369,7 +445,7 @@ const SwitchHandleCompact: React.FC<{
   totalStatements: number;
   index: number;
   variableType?: VariableType;
-}> = ({ id, value, onChange, disabled, configurable = true, onDelete, isActive, variableType }) => {
+}> = ({ id, value, diff, onChange, disabled, configurable = true, onDelete, isActive, variableType }) => {
   const [inner, setInner] = useState(value);
   useLayoutEffect(() => {
     if (inner !== value) {
@@ -383,14 +459,18 @@ const SwitchHandleCompact: React.FC<{
   };
 
   return (
-    <div className={clsx('switchNode__statement', 'compact', isActive && 'active')}>
+    <div
+      className={clsx('switchNode__statement', 'compact', isActive && 'active', diff?.status && `diff-${diff?.status}`)}
+    >
       <div className={clsx('switchNode__statement__inputArea')}>
-        <LocalCodeEditor
+        <DiffCodeEditor
           style={{
             fontSize: 12,
             lineHeight: '20px',
             width: '100%',
           }}
+          displayDiff={diff?.fields?.condition?.status === 'modified'}
+          previousValue={diff?.fields?.condition?.previousValue}
           value={inner}
           maxRows={4}
           disabled={disabled}

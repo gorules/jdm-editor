@@ -16,7 +16,9 @@ export const outputSpecification: NodeSpecification<NodeOutputData> = {
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions',
   shortDescription: 'Outputs the context',
   generateNode: () => ({ name: 'response' }),
-  renderNode: ({ id, data, selected, specification }) => (
-    <GraphNode id={id} specification={specification} name={data.name} isSelected={selected} handleRight={false} />
-  ),
+  renderNode: ({ id, data, selected, specification }) => {
+    return (
+      <GraphNode id={id} specification={specification} name={data.name} isSelected={selected} handleRight={false} />
+    );
+  },
 };
