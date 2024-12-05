@@ -3,7 +3,15 @@ import { Button, Modal, Tooltip, Typography, message } from 'antd';
 import clsx from 'clsx';
 import React, { type MutableRefObject, forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import type { Connection, Node, ProOptions, ReactFlowInstance, XYPosition } from 'reactflow';
-import ReactFlow, { Background, ControlButton, Controls, getOutgoers, useEdgesState, useNodesState } from 'reactflow';
+import ReactFlow, {
+  Background,
+  ControlButton,
+  Controls,
+  SelectionMode,
+  getOutgoers,
+  useEdgesState,
+  useNodesState,
+} from 'reactflow';
 import 'reactflow/dist/style.css';
 import { P, match } from 'ts-pattern';
 
@@ -425,6 +433,8 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
               }}
               snapToGrid={true}
               snapGrid={[5, 5]}
+              minZoom={0.25}
+              selectionMode={SelectionMode.Partial}
               nodeTypes={nodeTypes}
               edgeTypes={edgeTypes}
               onDrop={onDrop}
