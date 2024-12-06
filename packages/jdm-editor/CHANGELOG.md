@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.27.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.26.0...@gorules/jdm-editor@1.27.0) (2024-12-06)
+
+### Features
+
+- improve simulator ([#125](https://github.com/gorules/jdm-editor/issues/125)) ([6701b0e](https://github.com/gorules/jdm-editor/commit/6701b0ee4fda2cdd614cbdf33562a2b7ed8b28cd))
+
 # [1.26.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.25.0...@gorules/jdm-editor@1.26.0) (2024-12-03)
 
 **Note:** Version bump only for package @gorules/jdm-editor
