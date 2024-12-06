@@ -33,6 +33,7 @@ export type SimulationTrace<Trace = TraceDataVariants> = {
   id: string;
   performance: string | null;
   traceData: Trace;
+  order?: number;
 };
 
 export type SimulationTraceDataFunction = {

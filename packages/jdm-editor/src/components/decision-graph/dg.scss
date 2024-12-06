@@ -46,6 +46,15 @@
     height: 100%;
     background: var(--grl-color-primary-bg-fade);
 
+    &__search {
+      height: 100%;
+      width: 100%;
+      padding-left: 12px;
+      border: none;
+      background: transparent;
+      outline: none !important;
+    }
+
     &__nodes-list {
       display: flex;
       flex-direction: column;
@@ -74,6 +83,12 @@
         &.active {
           background-color: rgba(0, 0, 0, 0.1);
         }
+      }
+    }
+
+    &__segmentButton {
+      &[data-active='true'] {
+        background-color: rgba(0, 0, 0, 0.1);
       }
     }
 
@@ -116,6 +131,7 @@
 
         &--nodes {
           justify-content: space-between;
+          padding-left: 0;
         }
 
         &--response {

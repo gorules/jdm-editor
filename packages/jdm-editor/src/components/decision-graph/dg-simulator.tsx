@@ -4,16 +4,24 @@ import { Editor } from '@monaco-editor/react';
 import { Button, Spin, Tooltip, Typography, message, notification, theme } from 'antd';
 import clsx from 'clsx';
 import json5 from 'json5';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { P, match } from 'ts-pattern';
 
 import '../../helpers/monaco';
+import { usePersistentState } from '../../helpers/use-persistent-state';
 import { copyToClipboard } from '../../helpers/utility';
 import { isWasmAvailable } from '../../helpers/wasm';
 import { NodeTypeKind, useDecisionGraphRaw, useDecisionGraphState } from './context/dg-store.context';
 import { type DecisionGraphType } from './dg-types';
 import { NodeKind } from './nodes/specifications/specification-types';
+import type { SimulationTrace } from './types/simulation.types';
+
+enum SimulationSegment {
+  Output = 'Output',
+  Input = 'Input',
+  Trace = 'Trace',
+}
 
 type GraphSimulatorProps = {
   defaultRequest?: string;
@@ -31,6 +39,8 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
   loading = false,
 }) => {
   const [requestValue, setRequestValue] = useState(defaultRequest);
+  const [search, setSearch] = usePersistentState<string>('simulation.search', '');
+  const [segment, setSegment] = usePersistentState<SimulationSegment>('simulation.segment', SimulationSegment.Output);
 
   const { stateStore, actions } = useDecisionGraphRaw();
   const { nodeTypes, simulate } = useDecisionGraphState(({ decisionGraph, simulate }) => ({
@@ -45,10 +55,6 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
   }));
 
   const [selectedNode, setSelectedNode] = useState<string>('graph');
-
-  const simulateResult = match(simulate)
-    .with({ result: P._ }, ({ result }) => result)
-    .otherwise(() => undefined);
 
   useEffect(() => {
     if (!isWasmAvailable()) {
@@ -68,6 +74,22 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
       // Skip
     }
   }, [requestValue]);
+
+  const traces = useMemo<Array<SimulationTrace & { nodeId: string }>>(() => {
+    if (!simulate) {
+      return [];
+    }
+
+    if (!('result' in simulate)) {
+      return [];
+    }
+
+    return Object.entries(simulate.result?.trace ?? {})
+      .map(([key, data]) => ({ ...data, nodeId: key }))
+      .filter((t) => ![NodeKind.Input, NodeKind.Output].includes(nodeTypes?.[t.nodeId] as NodeKind))
+      .filter((t) => t.name.toLowerCase().includes(search?.toLowerCase() ?? ''))
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  }, [simulate, search]);
 
   return (
     <PanelGroup className='grl-dg__simulator' direction='horizontal' autoSaveId='jdm-editor:simulator:layout'>
@@ -152,7 +174,12 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
       <PanelResizeHandle />
       <Panel minSize={20} maxSize={20} className={'grl-dg__simulator__section grl-dg__simulator__nodes'}>
         <div className={'grl-dg__simulator__section__bar grl-dg__simulator__section__bar--nodes'}>
-          <Typography.Text>Nodes</Typography.Text>
+          <input
+            className='grl-dg__simulator__search'
+            type='text'
+            placeholder='Search nodes...'
+            onChange={(e) => setSearch(e.target.value)}
+          />
           <div className={'grl-dg__simulator__section__bar__actions'}>
             {onClear && (
               <Tooltip title={'Clear'}>
@@ -172,29 +199,29 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
         <div className={'grl-dg__simulator__section__content'}>
           <Spin spinning={loading}>
             <div className={'grl-dg__simulator__nodes-list'}>
-              <div
-                className={clsx('grl-dg__simulator__nodes-list__node', selectedNode === 'graph' && 'active')}
-                onClick={() => setSelectedNode('graph')}
-              >
-                <Typography.Text>Graph</Typography.Text>
-                <Typography.Text type={'secondary'}>
-                  {match(simulate)
-                    .with({ result: P._ }, ({ result }) => result?.performance)
-                    .otherwise(() => undefined)}
-                </Typography.Text>
-              </div>
-              {Object.entries(simulateResult?.trace ?? {})
-                .filter(([, trace]) => ![NodeKind.Input, NodeKind.Output].includes(nodeTypes?.[trace?.id] as NodeKind))
-                .map(([nodeId, trace]) => (
-                  <div
-                    key={nodeId}
-                    className={clsx('grl-dg__simulator__nodes-list__node', nodeId === selectedNode && 'active')}
-                    onClick={() => setSelectedNode(nodeId)}
-                  >
-                    <Typography.Text>{trace.name}</Typography.Text>
-                    <Typography.Text type={'secondary'}>{trace.performance}</Typography.Text>
-                  </div>
-                ))}
+              {'graph'.includes(search?.toLowerCase() ?? '') && (
+                <div
+                  className={clsx('grl-dg__simulator__nodes-list__node', selectedNode === 'graph' && 'active')}
+                  onClick={() => setSelectedNode('graph')}
+                >
+                  <Typography.Text>Graph</Typography.Text>
+                  <Typography.Text type={'secondary'}>
+                    {match(simulate)
+                      .with({ result: P._ }, ({ result }) => result?.performance)
+                      .otherwise(() => undefined)}
+                  </Typography.Text>
+                </div>
+              )}
+              {traces.map((trace) => (
+                <div
+                  key={trace.nodeId}
+                  className={clsx('grl-dg__simulator__nodes-list__node', trace.nodeId === selectedNode && 'active')}
+                  onClick={() => setSelectedNode(trace.nodeId)}
+                >
+                  <Typography.Text>{trace.name}</Typography.Text>
+                  <Typography.Text type={'secondary'}>{trace.performance}</Typography.Text>
+                </div>
+              ))}
             </div>
           </Spin>
         </div>
@@ -202,7 +229,20 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
       <PanelResizeHandle />
       <Panel minSize={30} defaultSize={50} className={'grl-dg__simulator__section grl-dg__simulator__response'}>
         <div className={'grl-dg__simulator__section__bar grl-dg__simulator__section__bar--response'}>
-          <Typography.Text>Response</Typography.Text>
+          <div>
+            {Object.values(SimulationSegment).map((v) => (
+              <Button
+                className='grl-dg__simulator__segmentButton'
+                key={v}
+                size='small'
+                type='text'
+                data-active={segment === v}
+                onClick={() => setSegment(v)}
+              >
+                {v}
+              </Button>
+            ))}
+          </div>
         </div>
         <div className={'grl-dg__simulator__section__content'}>
           <SimulatorEditor
@@ -210,11 +250,16 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
             value={match(simulate)
               .with({ result: P._ }, ({ result }) =>
                 match(selectedNode)
-                  .with('graph', () => json5.stringify(result?.result ?? {}, undefined, 2))
-                  .otherwise(() => {
-                    const { input, output, traceData } = result?.trace[selectedNode] ?? {};
-                    return json5.stringify({ input, output, traceData }, undefined, 2);
-                  }),
+                  .with('graph', () =>
+                    displaySegment(
+                      {
+                        traceData: result?.trace,
+                        output: result?.result,
+                      },
+                      segment ?? SimulationSegment.Output,
+                    ),
+                  )
+                  .otherwise(() => displaySegment(result?.trace[selectedNode], segment ?? SimulationSegment.Output)),
               )
               .otherwise(() => '')}
           />
@@ -222,6 +267,17 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
       </Panel>
     </PanelGroup>
   );
+};
+
+const displaySegment = (data: unknown, segment: SimulationSegment) => {
+  const jsonData = match([segment, data])
+    .with([SimulationSegment.Output, { output: P._ }], ([, { output }]) => output)
+    .with([SimulationSegment.Input, { input: P._ }], ([, { input }]) => input)
+    .with([SimulationSegment.Trace, { trace: P._ }], ([, { trace }]) => trace)
+    .with([SimulationSegment.Trace, { traceData: P._ }], ([, { traceData }]) => traceData)
+    .otherwise(() => ({}));
+
+  return json5.stringify(jsonData, undefined, 2);
 };
 
 type SimulatorEditorProps = {
