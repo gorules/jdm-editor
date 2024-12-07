@@ -1,7 +1,7 @@
 type Input = unknown;
 type Output = unknown;
 
-export type Simulation = { result?: SimulationOk } | { error?: SimulationError };
+export type Simulation = { result?: SimulationOk } & { error?: SimulationError };
 
 export type SimulationError = {
   title?: string;
