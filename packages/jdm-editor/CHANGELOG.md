@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.27.1](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.27.0...@gorules/jdm-editor@1.27.1) (2024-12-07)
+
+### Bug Fixes
+
+- add union for error and result, allowing both to be displayed ([#126](https://github.com/gorules/jdm-editor/issues/126)) ([56bc11c](https://github.com/gorules/jdm-editor/commit/56bc11c2688e7e4edebd797a095e559a1e707ed1))
+
 # [1.27.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.26.0...@gorules/jdm-editor@1.27.0) (2024-12-06)
 
 ### Features
