@@ -471,9 +471,8 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
                 <div className={'grl-dg__aside__menu__heading__text'}>
                   <Typography.Text strong style={{ marginBottom: 0 }}>
                     Components
-                  </Typography.Text>
-                  {' '}
-                  <Typography.Text type="secondary" style={{ fontSize: 10, marginLeft: 5 }}>
+                  </Typography.Text>{' '}
+                  <Typography.Text type='secondary' style={{ fontSize: 10, marginLeft: 5 }}>
                     (Drag-and-drop)
                   </Typography.Text>
                 </div>

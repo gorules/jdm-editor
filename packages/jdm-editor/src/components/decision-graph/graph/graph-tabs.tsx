@@ -1,5 +1,6 @@
 import { CloseOutlined, DeploymentUnitOutlined } from '@ant-design/icons';
-import { Avatar, Button, Dropdown, Tabs, TabsProps } from 'antd';
+import type { TabsProps } from 'antd';
+import { Avatar, Button, Dropdown, Tabs } from 'antd';
 import clsx from 'clsx';
 import React from 'react';
 

@@ -143,20 +143,20 @@
 .grl-inline-tabs {
   [data-node-key] {
     margin: 0 !important;
-    transition: .1s ease;
+    transition: 0.1s ease;
     padding: 8px 0 !important;
 
     &:hover {
       background: rgba(0, 0, 0, 0.06) !important;
     }
 
-    [role="tab"] {
+    [role='tab'] {
       padding: 0 14px !important;
       font-size: 13px;
     }
   }
 
-  [role="tablist"] {
+  [role='tablist'] {
     margin: 0 !important;
   }
 }

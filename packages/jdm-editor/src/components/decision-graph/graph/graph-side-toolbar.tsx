@@ -1,5 +1,6 @@
 import { CloudDownloadOutlined, CloudUploadOutlined } from '@ant-design/icons';
-import { Button, Dropdown, MenuProps, Tooltip, message } from 'antd';
+import type { MenuProps } from 'antd';
+import { Button, Dropdown, Tooltip, message } from 'antd';
 import React, { useRef } from 'react';
 
 import { exportExcelFile, readFromExcel } from '../../../helpers/excel-file-utils';

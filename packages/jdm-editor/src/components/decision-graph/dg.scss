@@ -81,11 +81,11 @@
           font-size: 13px;
         }
 
-        [data-role="name"] {
+        [data-role='name'] {
           white-space: nowrap;
         }
 
-        [data-role="performance"] {
+        [data-role='performance'] {
           flex-shrink: 0;
         }
 
@@ -234,7 +234,7 @@
       box-sizing: content-box;
       border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 
-      [role="tablist"] {
+      [role='tablist'] {
         margin: 0;
       }
 
@@ -250,11 +250,11 @@
         align-items: center;
         gap: 6px;
         padding: 9px 12px;
-        transition: .1s ease;
+        transition: 0.1s ease;
         text-shadow: none;
         color: black;
 
-        &[data-active="false"] {
+        &[data-active='false'] {
           opacity: 0.75;
         }
 
@@ -262,7 +262,8 @@
           opacity: 1;
         }
 
-        &[data-active="true"], &:hover {
+        &[data-active='true'],
+        &:hover {
           .grl-graph-tabs__closeIcon {
             opacity: 1 !important;
           }
@@ -270,7 +271,7 @@
       }
 
       &__closeIcon {
-        transition: .1s ease;
+        transition: 0.1s ease;
         opacity: 0;
 
         > span {
