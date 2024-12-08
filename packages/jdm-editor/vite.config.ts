@@ -3,8 +3,6 @@ import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 import wasm from 'vite-plugin-wasm';
 
-import packageJson from './package.json';
-
 export default defineConfig({
   plugins: [
     wasm(),
@@ -28,12 +26,7 @@ export default defineConfig({
       formats: ['es'],
     },
     rollupOptions: {
-      external: [
-        'react/jsx-runtime',
-        'react',
-        'react-dom',
-        ...Object.keys(packageJson.dependencies).filter((s) => s !== 'antd'),
-      ],
+      external: ['react/jsx-runtime', 'react', 'react-dom'],
       output: {
         globals: {
           'react-dom': 'ReactDOM',
