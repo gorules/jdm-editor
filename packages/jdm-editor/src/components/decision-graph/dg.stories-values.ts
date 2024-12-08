@@ -28,8 +28,6 @@ export const defaultGraph = {
       name: 'decisionTableNode 1',
       content: {
         hitPolicy: 'first',
-        inputField: 'input',
-        outputPath: 'outputPath',
         inputs: [
           {
             id: 'HVo_JpALi8',
@@ -349,8 +347,6 @@ export const previousGraph = {
       name: 'decisionTableNode 1',
       content: {
         hitPolicy: 'collect',
-        inputField: 'input',
-        outputPath: 'outputPath',
         inputs: [
           { id: 'HVo_JpALi8', field: 'cart.weight', name: 'Cart Weight (Kg)' },
           { id: 'HW6mSVfLbs', field: 'customer.country', name: 'Customer Country' },
@@ -504,8 +500,6 @@ export const diffGraph = {
       name: 'decisionTableNode 1',
       content: {
         hitPolicy: 'first',
-        inputField: 'input',
-        outputPath: 'outputPath',
         inputs: [
           {
             id: 'HVo_JpALi8',
