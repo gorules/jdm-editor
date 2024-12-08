@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.28.1](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.28.0...@gorules/jdm-editor@1.28.1) (2024-12-08)
+
+### Bug Fixes
+
+- incorrect rollup externals ([#128](https://github.com/gorules/jdm-editor/issues/128)) ([e5f8b19](https://github.com/gorules/jdm-editor/commit/e5f8b19854305d93b0ac8e45603accff23aff612))
+
 # [1.28.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.27.1...@gorules/jdm-editor@1.28.0) (2024-12-08)
 
 ### Features
