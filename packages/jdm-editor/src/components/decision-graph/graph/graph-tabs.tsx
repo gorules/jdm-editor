@@ -1,7 +1,6 @@
-import { DeploymentUnitOutlined } from '@ant-design/icons';
-import type { TabsProps } from 'antd';
-import { Dropdown } from 'antd';
-import { Avatar, Tabs } from 'antd';
+import { CloseOutlined, DeploymentUnitOutlined } from '@ant-design/icons';
+import { Avatar, Button, Dropdown, Tabs, TabsProps } from 'antd';
+import clsx from 'clsx';
 import React from 'react';
 
 import { DiffIcon } from '../../diff-icon';
@@ -13,12 +12,13 @@ import { nodeSpecification } from '../nodes/specifications/specifications';
 
 export type GraphTabsProps = {
   disabled?: boolean;
+  tabBarExtraContent?: TabsProps['tabBarExtraContent'];
 };
 
 type NonUndefined<T> = T extends undefined ? never : T;
 type TabItem = NonUndefined<TabsProps['items']>[number];
 
-export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled }) => {
+export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled, tabBarExtraContent }) => {
   const graphActions = useDecisionGraphActions();
   const { openNodes, activeNodeId } = useDecisionGraphState(({ decisionGraph, activeTab, openTabs }) => ({
     activeNodeId: (decisionGraph?.nodes ?? []).find((node) => node.id === activeTab)?.id,
@@ -40,16 +40,12 @@ export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled }) => {
     <div>
       <Tabs
         hideAdd
-        type={'editable-card'}
+        type='line'
         size='small'
-        className={'tabs'}
+        className={clsx('grl-graph-tabs')}
         activeKey={activeNodeId || 'graph'}
-        onEdit={(targetKey: any, action: 'add' | 'remove') => {
-          if (action === 'remove') {
-            graphActions.closeTab(targetKey);
-          }
-        }}
         onChange={(val) => graphActions.openTab(val)}
+        tabBarExtraContent={tabBarExtraContent}
         items={[
           {
             closable: false,
@@ -59,6 +55,7 @@ export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled }) => {
                 total={openNodes?.length}
                 icon={<DeploymentUnitOutlined />}
                 name='Graph'
+                active={!activeNodeId || activeNodeId === 'graph'}
                 onContextClick={(action) => {
                   graphActions.closeTab('graph', action);
                 }}
@@ -81,7 +78,9 @@ export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled }) => {
                   diffStatus={node?.diff?.status}
                   color={specification?.color}
                   index={index}
+                  active={node.id === activeNodeId}
                   total={openNodes?.length}
+                  onClose={() => graphActions.closeTab(node.id)}
                 />
               ),
               closable: true,
@@ -100,8 +99,10 @@ const TabLabel: React.FC<{
   name?: string;
   color?: string;
   diffStatus?: string;
+  onClose?: () => void;
+  active?: boolean;
   onContextClick?: (action: string) => void;
-}> = ({ total = 0, index = -1, icon, name, diffStatus, color = NodeColor.Blue, onContextClick }) => {
+}> = ({ total = 0, index = -1, icon, name, active, diffStatus, color = NodeColor.Blue, onClose, onContextClick }) => {
   const items = [
     total > 0 &&
       index !== -1 && {
@@ -138,22 +139,18 @@ const TabLabel: React.FC<{
 
   return (
     <Dropdown menu={{ items }} trigger={['contextMenu']}>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-        }}
-      >
+      <div className='grl-graph-tabs__tab' data-active={active}>
+        {/*<span style={{ color: 'black' }}>{icon}</span>*/}
         <Avatar
           size='small'
           shape='square'
           style={{
             background: color,
-            fontSize: 14,
-            width: 20,
-            height: 20,
+            fontSize: 11,
+            width: 18,
+            height: 18,
             lineHeight: '18px',
+            borderRadius: 3,
           }}
           icon={icon}
         />
@@ -164,6 +161,19 @@ const TabLabel: React.FC<{
             fontSize: 16,
           }}
         />
+        {onClose && (
+          <Button
+            className='grl-graph-tabs__closeIcon'
+            type='text'
+            size='small'
+            style={{ height: 20, width: 20, color: 'black', borderRadius: '50%', lineHeight: 0 }}
+            icon={<CloseOutlined style={{ fontSize: 10 }} />}
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose?.();
+            }}
+          />
+        )}
       </div>
     </Dropdown>
   );

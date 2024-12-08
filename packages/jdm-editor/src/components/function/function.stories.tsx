@@ -30,6 +30,10 @@ const exampleTrace = {
         lines: ['{"deeply":{"nested":{"flat":"test","object":{"withSome":{"keys":"123"}}}}}'],
         msSinceRun: 1,
       },
+      {
+        lines: ['"Error: failed to evaluate function"'],
+        msSinceRun: 1,
+      },
     ],
   },
 } satisfies FunctionDebuggerTrace;

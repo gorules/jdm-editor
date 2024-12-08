@@ -274,6 +274,7 @@ const panels: PanelType[] = [
     id: 'simulator',
     title: 'Simulator',
     icon: <PlayCircleOutlined />,
+    hideHeader: true,
     renderPanel: () => (
       <GraphSimulator
         defaultRequest={json5.stringify(

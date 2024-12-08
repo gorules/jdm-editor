@@ -1,64 +1,54 @@
-import { DownOutlined } from '@ant-design/icons';
-import { Typography, theme } from 'antd';
-import React, { useState } from 'react';
+import { FormatPainterOutlined } from '@ant-design/icons';
+import { Button, Tabs, Tooltip } from 'antd';
+import type { editor } from 'monaco-editor';
+import React from 'react';
 
 import type { SimulationTrace, SimulationTraceDataFunction } from '../decision-graph/types/simulation.types';
 import { FunctionDebuggerLog } from './function-debugger-log';
 
 export type FunctionDebuggerProps = {
   trace?: SimulationTrace<SimulationTraceDataFunction>;
+  editor?: editor.IStandaloneCodeEditor;
 };
 
-export const FunctionDebugger: React.FC<FunctionDebuggerProps> = ({ trace }) => {
-  const { token } = theme.useToken();
-  const [open, setOpen] = useState(false);
+export const FunctionDebugger: React.FC<FunctionDebuggerProps> = ({ trace, editor }) => {
   const traceLog = trace?.traceData?.log || [];
 
   return (
     <div className='grl-function__debugger'>
       <div className='grl-function__debugger__panel'>
-        <div
-          className='function-debugger__panel-header'
-          onClick={() => setOpen(!open)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '0.75rem 1.25rem',
-            position: 'sticky',
-            top: 0,
-            background: token.colorBgLayout,
-            zIndex: 3,
-            borderBottom: open ? `1px solid ${token.colorBorder}` : 'none',
-            cursor: 'pointer',
-          }}
-        >
-          <Typography.Text
-            style={{
-              fontWeight: 'bold',
-            }}
-          >
-            Console
-          </Typography.Text>
-          <div>
-            <DownOutlined style={{ transform: !open ? 'rotate(-180deg)' : undefined, transformOrigin: '50%' }} />
-          </div>
-        </div>
-        {open && (
-          <>
-            {traceLog.length === 0 && (
-              <div style={{ textAlign: 'center', padding: '2rem' }}>
-                <Typography.Text type='secondary'>
-                  Use console.log and run simulation to debug your code.
-                </Typography.Text>
+        <div className='grl-function__debugger__header'>
+          <Tabs
+            rootClassName='grl-inline-tabs'
+            size='small'
+            style={{ width: '100%' }}
+            items={[{ key: 'console', label: 'Console' }]}
+            tabBarExtraContent={
+              <div style={{ marginRight: 8 }}>
+                <Tooltip title='Format code' placement='bottomLeft'>
+                  <Button
+                    size='small'
+                    type='text'
+                    icon={<FormatPainterOutlined />}
+                    onClick={() => editor?.getAction?.('editor.action.formatDocument')?.run?.()}
+                  />
+                </Tooltip>
               </div>
-            )}
+            }
+          />
+        </div>
+        <div className='grl-function__debugger__body'>
+          {traceLog.length === 0 && (
+            <FunctionDebuggerLog
+              lines={['"Info: Use console.log and run simulation to debug your code."']}
+              msSinceRun={null}
+            />
+          )}
 
-            {traceLog.map((log, i) => (
-              <FunctionDebuggerLog key={i} lines={log.lines} msSinceRun={log.msSinceRun} />
-            ))}
-          </>
-        )}
+          {traceLog.map((log, i) => (
+            <FunctionDebuggerLog key={i} lines={log.lines} msSinceRun={log.msSinceRun} />
+          ))}
+        </div>
       </div>
     </div>
   );

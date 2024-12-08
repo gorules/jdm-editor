@@ -355,7 +355,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
             }}
           >
             <Tooltip placement='right' title='Components'>
-              <Button icon={<LeftOutlined />} onClick={() => setComponentsOpened(true)} />
+              <Button icon={<LeftOutlined style={{ fontSize: 12 }} />} onClick={() => setComponentsOpened(true)} />
             </Tooltip>
           </div>
         )}
@@ -472,13 +472,17 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
                   <Typography.Text strong style={{ marginBottom: 0 }}>
                     Components
                   </Typography.Text>
+                  {' '}
+                  <Typography.Text type="secondary" style={{ fontSize: 10, marginLeft: 5 }}>
+                    (Drag-and-drop)
+                  </Typography.Text>
                 </div>
                 <Button
                   type={'text'}
                   size='small'
-                  icon={<CloseOutlined />}
+                  icon={<CloseOutlined style={{ fontSize: 12 }} />}
                   onClick={() => setComponentsOpened(false)}
-                ></Button>
+                />
               </div>
               <div className={'grl-dg__aside__menu__content'}>
                 <GraphComponents inputDisabled={hasInputNode} disabled={disabled} />

@@ -91,15 +91,19 @@ export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inp
     }, {});
   }, [innerGroups, search]);
 
+  const customCount = customComponents.length + customNodes.length;
+
   return (
     <div>
-      <Input
-        placeholder={'Type to search'}
-        value={search}
-        onChange={(e) => setSearch(e.target.value || '')}
-        allowClear
-        className={'grl-dg__aside__menu__components__search'}
-      />
+      {customCount > 5 && (
+        <Input
+          placeholder={'Search components...'}
+          value={search}
+          onChange={(e) => setSearch(e.target.value || '')}
+          allowClear
+          className={'grl-dg__aside__menu__components__search'}
+        />
+      )}
       <div className={'grl-dg__aside__menu__components'}>
         {Object.keys(groups).map((group) => {
           return match(group)

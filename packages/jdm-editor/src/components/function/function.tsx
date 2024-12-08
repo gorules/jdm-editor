@@ -1,15 +1,14 @@
-import { FormatPainterOutlined } from '@ant-design/icons';
 import { createVariableType } from '@gorules/zen-engine-wasm';
 import { DiffEditor, Editor, type Monaco, useMonaco } from '@monaco-editor/react';
-import { Button, Spin, theme } from 'antd';
+import { Spin, theme } from 'antd';
 import { MarkerSeverity, type editor } from 'monaco-editor';
 import React, { useEffect, useRef, useState } from 'react';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { useDebouncedCallback, useThrottledCallback } from 'use-debounce';
 
 import '../../helpers/monaco';
 import { isWasmAvailable } from '../../helpers/wasm';
 import type { SimulationTrace, SimulationTraceDataFunction } from '../decision-graph/types/simulation.types';
-import { Stack } from '../stack';
 import { FunctionDebugger } from './function-debugger';
 import './function.scss';
 import { variableTypeToTypescript } from './helpers/determine-type';
@@ -232,69 +231,64 @@ export const Function: React.FC<FunctionProps> = ({
         } as any
       }
     >
-      <Stack
-        horizontal
-        horizontalAlign={'space-between'}
-        verticalAlign={'center'}
-        className={'grl-function__command-bar'}
-      >
-        <Stack gap={8} horizontal className='full-width'>
-          <Button
-            type='text'
-            size={'small'}
-            color='default'
-            icon={<FormatPainterOutlined />}
-            disabled={disabled}
-            onClick={() => {
-              editor?.getAction?.('editor.action.formatDocument')?.run?.();
-            }}
-          >
-            Format
-          </Button>
-        </Stack>
-      </Stack>
-      <div className={'grl-function__content'}>
-        {previousValue ? (
-          <DiffEditor
-            loading={<Spin size='large' />}
-            language={language}
-            original={previousValue}
-            modified={innerValue}
-            onMount={(editor) => setDiffEditor(editor)}
-            theme={token.mode === 'dark' ? 'vs-dark' : 'light'}
-            height='100%'
-            options={{
-              automaticLayout: true,
-              contextmenu: false,
-              fontSize: 13,
-              fontFamily: 'var(--mono-font-family)',
-              readOnly: true,
-            }}
-          />
-        ) : (
-          <Editor
-            loading={<Spin size='large' />}
-            language={language}
-            value={innerValue}
-            onMount={(editor) => setEditor(editor)}
-            onChange={(value) => {
-              setInnerValue(value ?? '');
-              innerChange(value ?? '');
-            }}
-            theme={token.mode === 'dark' ? 'vs-dark' : 'light'}
-            height='100%'
-            options={{
-              automaticLayout: true,
-              contextmenu: false,
-              fontSize: 13,
-              fontFamily: 'var(--mono-font-family)',
-              readOnly: disabled,
-              tabSize: 2,
-            }}
-          />
+      <PanelGroup className='grl-function__content' direction='horizontal' autoSaveId='jdm-editor:function:layout'>
+        <Panel defaultSize={80} minSize={70}>
+          {previousValue ? (
+            <DiffEditor
+              loading={<Spin size='large' />}
+              language={language}
+              original={previousValue}
+              modified={innerValue}
+              onMount={(editor) => setDiffEditor(editor)}
+              theme={token.mode === 'dark' ? 'vs-dark' : 'light'}
+              height='100%'
+              options={{
+                ...monacoOptions,
+                readOnly: true,
+              }}
+            />
+          ) : (
+            <Editor
+              loading={<Spin size='large' />}
+              language={language}
+              value={innerValue}
+              onMount={(editor) => setEditor(editor)}
+              onChange={(value) => {
+                setInnerValue(value ?? '');
+                innerChange(value ?? '');
+              }}
+              theme={token.mode === 'dark' ? 'vs-dark' : 'light'}
+              height='100%'
+              options={{
+                ...monacoOptions,
+                readOnly: disabled,
+              }}
+            />
+          )}
+        </Panel>
+        {!disableDebug && (
+          <>
+            <PanelResizeHandle />
+            <Panel minSize={15}>{!disableDebug && <FunctionDebugger trace={trace} editor={editor} />}</Panel>
+          </>
         )}
-        {!disableDebug && <FunctionDebugger trace={trace} />}
-      </div>
+      </PanelGroup>
     </div>
   );
+};
+
+const monacoOptions: editor.IStandaloneEditorConstructionOptions = {
+  automaticLayout: true,
+  contextmenu: false,
+  fontSize: 13,
+  fontFamily: 'var(--mono-font-family)',
+  tabSize: 2,
+  minimap: { enabled: false },
+  overviewRulerBorder: false,
+  scrollbar: {
+    verticalSliderSize: 4,
+    verticalScrollbarSize: 4,
+    horizontalScrollbarSize: 4,
+    horizontalSliderSize: 4,
+  },
 };

@@ -12,7 +12,7 @@ import './dg.scss';
 import type { GraphRef } from './graph/graph';
 import { Graph } from './graph/graph';
 import { GraphSideToolbar } from './graph/graph-side-toolbar';
-import { GraphTabs } from './graph/graph-tabs';
+import { GraphTabs, GraphTabsProps } from './graph/graph-tabs';
 import { decisionTableSpecification } from './nodes/specifications/decision-table.specification';
 import { expressionSpecification } from './nodes/specifications/expression.specification';
 import { functionSpecification } from './nodes/specifications/function.specification';
@@ -20,10 +20,14 @@ import { NodeKind } from './nodes/specifications/specification-types';
 
 export type DecisionGraphWrapperProps = {
   reactFlowProOptions?: ProOptions;
+  tabBarExtraContent?: GraphTabsProps['tabBarExtraContent'];
 };
 
 export const DecisionGraphWrapper = React.memo(
-  forwardRef<GraphRef, DecisionGraphWrapperProps>(function DecisionGraphWrapperInner({ reactFlowProOptions }, ref) {
+  forwardRef<GraphRef, DecisionGraphWrapperProps>(function DecisionGraphWrapperInner(
+    { reactFlowProOptions, tabBarExtraContent },
+    ref,
+  ) {
     const [disableTabs, setDisableTabs] = useState(false);
     const hasActiveNode = useDecisionGraphState(({ decisionGraph, activeTab }) => {
       return (decisionGraph?.nodes ?? []).some((node) => node.id === activeTab);
@@ -33,7 +37,7 @@ export const DecisionGraphWrapper = React.memo(
       <>
         <GraphSideToolbar />
         <div className={'grl-dg__graph'}>
-          <GraphTabs disabled={disableTabs} />
+          <GraphTabs disabled={disableTabs} tabBarExtraContent={tabBarExtraContent} />
           <Graph
             ref={ref}
             className={clsx([!hasActiveNode && 'active'])}
