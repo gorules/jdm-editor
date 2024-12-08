@@ -1,7 +1,16 @@
-import { ClearOutlined, CopyOutlined, FormatPainterOutlined, PlayCircleOutlined } from '@ant-design/icons';
+import {
+  CheckCircleTwoTone,
+  ClearOutlined,
+  CloseCircleTwoTone,
+  CloseOutlined,
+  CopyOutlined,
+  FormatPainterOutlined,
+  InfoCircleOutlined,
+  PlayCircleOutlined,
+} from '@ant-design/icons';
 import { VariableType } from '@gorules/zen-engine-wasm';
 import { Editor } from '@monaco-editor/react';
-import { Button, Spin, Tooltip, Typography, message, notification, theme } from 'antd';
+import { Button, Spin, Tabs, Tooltip, Typography, message, notification, theme } from 'antd';
 import clsx from 'clsx';
 import json5 from 'json5';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -31,6 +40,9 @@ type GraphSimulatorProps = {
   loading?: boolean;
 };
 
+const requestTooltip =
+  'Your business context that enters through the Request node, starting the decision process. Supply JSON or JSON5 format.';
+
 export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
   defaultRequest,
   onChange,
@@ -43,8 +55,9 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
   const [segment, setSegment] = usePersistentState<SimulationSegment>('simulation.segment', SimulationSegment.Output);
 
   const { stateStore, actions } = useDecisionGraphRaw();
-  const { nodeTypes, simulate } = useDecisionGraphState(({ decisionGraph, simulate }) => ({
+  const { nodeTypes, simulate, hasInputNode } = useDecisionGraphState(({ decisionGraph, simulate }) => ({
     simulate,
+    hasInputNode: decisionGraph.nodes.some((n) => n.type === NodeKind.Input),
     nodeTypes: (decisionGraph.nodes ?? []).reduce<Record<string, string | undefined>>(
       (acc, curr) => ({
         ...acc,
@@ -95,7 +108,12 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
     <PanelGroup className='grl-dg__simulator' direction='horizontal' autoSaveId='jdm-editor:simulator:layout'>
       <Panel minSize={20} defaultSize={30} className='grl-dg__simulator__section grl-dg__simulator__request'>
         <div className={'grl-dg__simulator__section__bar grl-dg__simulator__section__bar--request'}>
-          <Typography.Text>Request (json5)</Typography.Text>
+          <Tooltip title={requestTooltip}>
+            <Typography.Text style={{ fontSize: 13, cursor: 'help' }}>
+              Request
+              <InfoCircleOutlined style={{ fontSize: 10, marginLeft: 4, opacity: 0.5, verticalAlign: 'text-top' }} />
+            </Typography.Text>
+          </Tooltip>
           <div className={'grl-dg__simulator__section__bar__actions'}>
             <Tooltip title='Copy JSON to Clipboard'>
               <Button
@@ -112,7 +130,7 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
                 }}
               />
             </Tooltip>
-            <Tooltip title={'Format json'}>
+            <Tooltip title={'Format JSON'}>
               <Button
                 size={'small'}
                 type={'text'}
@@ -123,7 +141,7 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
                   }
 
                   try {
-                    const formatted = json5.stringify(json5.parse(requestValue || ''), null, 2);
+                    const formatted = JSON.stringify(json5.parse(requestValue || ''), null, 2);
 
                     onChange?.(formatted);
                     setRequestValue(formatted);
@@ -138,26 +156,35 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
               />
             </Tooltip>
             {onRun && (
-              <Button
-                size={'small'}
-                type={'primary'}
-                loading={loading}
-                icon={<PlayCircleOutlined />}
-                onClick={() => {
-                  try {
-                    const parsed = (requestValue || '').trim().length === 0 ? null : json5.parse(requestValue || '');
-                    onRun?.({ graph: stateStore.getState().decisionGraph, context: parsed });
-                  } catch {
-                    notification.error({
-                      message: 'Invalid format',
-                      description: 'Unable to format request, invalid JSON format',
-                      placement: 'top',
-                    });
-                  }
-                }}
+              <Tooltip
+                title={
+                  !hasInputNode
+                    ? 'Request node is required to run the graph. Drag-and-drop it from the Components panel.'
+                    : undefined
+                }
               >
-                Run
-              </Button>
+                <Button
+                  size={'small'}
+                  type={'primary'}
+                  loading={loading}
+                  icon={<PlayCircleOutlined />}
+                  disabled={!hasInputNode}
+                  onClick={() => {
+                    try {
+                      const parsed = (requestValue || '').trim().length === 0 ? null : json5.parse(requestValue || '');
+                      onRun?.({ graph: stateStore.getState().decisionGraph, context: parsed });
+                    } catch {
+                      notification.error({
+                        message: 'Invalid format',
+                        description: 'Unable to format request, invalid JSON format',
+                        placement: 'top',
+                      });
+                    }
+                  }}
+                >
+                  Run
+                </Button>
+              </Tooltip>
             )}
           </div>
         </div>
@@ -178,6 +205,7 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
             className='grl-dg__simulator__search'
             type='text'
             placeholder='Search nodes...'
+            value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           <div className={'grl-dg__simulator__section__bar__actions'}>
@@ -190,6 +218,7 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
                   onClick={() => {
                     onClear?.();
                     setSelectedNode('graph');
+                    setSearch('');
                   }}
                 />
               </Tooltip>
@@ -199,13 +228,36 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
         <div className={'grl-dg__simulator__section__content'}>
           <Spin spinning={loading}>
             <div className={'grl-dg__simulator__nodes-list'}>
-              {'graph'.includes(search?.toLowerCase() ?? '') && (
+              {!simulate && (
+                <Typography.Text type='secondary' style={{ textAlign: 'center', marginTop: 60, fontSize: 13 }}>
+                  Ready to simulate!
+                  <br />
+                  Run a request to see the node trace in action.
+                  <br />
+                  <Typography.Link
+                    href='https://docs.gorules.io/docs/simulator'
+                    target='_blank'
+                    style={{ fontSize: 13, marginTop: 4, display: 'inline-block' }}
+                  >
+                    Learn more
+                  </Typography.Link>
+                </Typography.Text>
+              )}
+              {'graph'.includes(search?.toLowerCase() ?? '') && simulate && (
                 <div
                   className={clsx('grl-dg__simulator__nodes-list__node', selectedNode === 'graph' && 'active')}
                   onClick={() => setSelectedNode('graph')}
                 >
-                  <Typography.Text>Graph</Typography.Text>
-                  <Typography.Text type={'secondary'}>
+                  <Typography.Text data-role='name' ellipsis>
+                    <StatusIcon
+                      status={match(simulate)
+                        .with({ error: P.nonNullable }, () => 'error' as const)
+                        .with({ result: P.nonNullable }, () => 'success' as const)
+                        .otherwise(() => 'not-run' as const)}
+                    />
+                    Graph
+                  </Typography.Text>
+                  <Typography.Text type={'secondary'} data-role='performance'>
                     {match(simulate)
                       .with({ result: P._ }, ({ result }) => result?.performance)
                       .otherwise(() => undefined)}
@@ -218,8 +270,13 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
                   className={clsx('grl-dg__simulator__nodes-list__node', trace.nodeId === selectedNode && 'active')}
                   onClick={() => setSelectedNode(trace.nodeId)}
                 >
-                  <Typography.Text>{trace.name}</Typography.Text>
-                  <Typography.Text type={'secondary'}>{trace.performance}</Typography.Text>
+                  <Typography.Text data-role='name' ellipsis={{ tooltip: trace.name }}>
+                    <StatusIcon status={trace.nodeId === simulate?.error?.data?.nodeId ? 'error' : 'success'} />
+                    {trace.name}
+                  </Typography.Text>
+                  <Typography.Text type={'secondary'} data-role='performance'>
+                    {trace.performance}
+                  </Typography.Text>
                 </div>
               ))}
             </div>
@@ -229,20 +286,25 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
       <PanelResizeHandle />
       <Panel minSize={30} defaultSize={50} className={'grl-dg__simulator__section grl-dg__simulator__response'}>
         <div className={'grl-dg__simulator__section__bar grl-dg__simulator__section__bar--response'}>
-          <div>
-            {Object.values(SimulationSegment).map((v) => (
-              <Button
-                className='grl-dg__simulator__segmentButton'
-                key={v}
-                size='small'
-                type='text'
-                data-active={segment === v}
-                onClick={() => setSegment(v)}
-              >
-                {v}
-              </Button>
-            ))}
-          </div>
+          <Tabs
+            rootClassName='grl-inline-tabs'
+            size='small'
+            style={{ width: '100%' }}
+            onChange={(tab) => setSegment(tab as SimulationSegment)}
+            items={Object.values(SimulationSegment).map((s) => ({
+              key: s,
+              label: s,
+            }))}
+            tabBarExtraContent={
+              <Tooltip title='Close panel'>
+                <Button
+                  type='text'
+                  icon={<CloseOutlined style={{ fontSize: 12 }} />}
+                  onClick={() => actions.setActivePanel(undefined)}
+                />
+              </Tooltip>
+            }
+          />
         </div>
         <div className={'grl-dg__simulator__section__content'}>
           <SimulatorEditor
@@ -328,6 +390,28 @@ const SimulatorEditor: React.FC<SimulatorEditorProps> = ({ value, onChange, read
         },
         lineNumbersMinChars: 3,
       }}
+    />
+  );
+};
+
+export const StatusIcon: React.FC<{ status: 'success' | 'error' | 'not-run' }> = ({ status }) => {
+  if (status === 'not-run') {
+    return null;
+  }
+
+  if (status === 'success') {
+    return (
+      <CheckCircleTwoTone
+        twoToneColor={['var(--grl-color-success)', 'var(--grl-color-success-bg)']}
+        style={{ marginRight: 6, fontSize: 12, opacity: 0.5 }}
+      />
+    );
+  }
+
+  return (
+    <CloseCircleTwoTone
+      twoToneColor={['var(--grl-color-error)', 'var(--grl-color-error-bg)']}
+      style={{ marginRight: 5, fontSize: 12 }}
     />
   );
 };

@@ -73,6 +73,7 @@
     border: none;
     //color: var(--grl-color-error);
     text-decoration: line-through var(--grl-color-error);
+
     &:focus {
       box-shadow: unset;
     }
@@ -136,5 +137,26 @@
     &:focus {
       box-shadow: unset;
     }
+  }
+}
+
+.grl-inline-tabs {
+  [data-node-key] {
+    margin: 0 !important;
+    transition: 0.1s ease;
+    padding: 8px 0 !important;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.06) !important;
+    }
+
+    [role='tab'] {
+      padding: 0 14px !important;
+      font-size: 13px;
+    }
+  }
+
+  [role='tablist'] {
+    margin: 0 !important;
   }
 }

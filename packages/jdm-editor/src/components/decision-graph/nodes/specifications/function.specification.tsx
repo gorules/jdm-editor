@@ -21,7 +21,7 @@ export type NodeFunctionData =
 
 export const functionSpecification: NodeSpecification<NodeFunctionData> = {
   type: NodeKind.Function,
-  icon: <Typography.Text style={{ color: 'white' }}>JS</Typography.Text>,
+  icon: <Typography.Text style={{ color: 'white', fontSize: 'inherit' }}>JS</Typography.Text>,
   displayName: 'Function',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/functions',
   shortDescription: 'Javascript lambda',

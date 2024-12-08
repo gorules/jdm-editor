@@ -4,14 +4,7 @@
   display: flex;
   flex-direction: column;
 
-  &__command-bar {
-    padding: 7px;
-    box-sizing: border-box;
-    border-bottom: 1px solid var(--grl-color-border);
-  }
-
   &__content {
-    position: relative;
     flex: 1;
   }
 
@@ -20,6 +13,7 @@
   }
 
   $this: &;
+
   &[data-theme='dark'] {
     #{$this}__errorLineContent {
       background: #4e3534;
@@ -27,29 +21,44 @@
   }
 
   &__debugger {
+    height: 100%;
+    border-left: 1px solid var(--grl-color-border);
+
     &__panel {
-      position: absolute;
-      inset: auto 2rem 1rem 1rem;
-      border: 1px solid var(--grl-color-border);
-      border-radius: 8px;
-      max-height: 40vh;
-      overflow-y: scroll;
       background: var(--grl-color-bg-elevated);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    &__header {
+      display: flex;
+      align-items: center;
+      background: var(--grl-color-primary-bg-fade);
+      flex-shrink: 0;
+    }
+
+    &__body {
+      overflow-y: auto;
+      flex-grow: 1;
     }
 
     &__log {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      border-bottom: 1px solid var(--grl-color-border);
+      //border-bottom: 1px solid var(--grl-color-border);
+      border-bottom: 1px solid #e9e9e9;
       padding: 0 1.5rem 0 1rem;
       color: var(--grl-color-text-base);
       font-family: var(--mono-font-family);
       line-height: var(--grl-line-height);
-      font-size: 14px;
+      font-size: 12px;
 
       &__time {
         padding-top: 1ch;
+        opacity: 0.5;
       }
 
       &__values {
@@ -69,6 +78,13 @@
 
         li > div + label + span {
           display: none;
+        }
+
+        li > div > div {
+          transition: transform 0.25s ease !important;
+          font-size: 0.8em !important;
+          opacity: 0.25;
+          font-family: emoji;
         }
       }
     }

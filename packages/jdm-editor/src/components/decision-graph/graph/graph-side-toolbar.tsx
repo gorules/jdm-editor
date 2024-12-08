@@ -1,6 +1,6 @@
 import { CloudDownloadOutlined, CloudUploadOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { Button, Dropdown, message } from 'antd';
+import { Button, Dropdown, Tooltip, message } from 'antd';
 import React, { useRef } from 'react';
 
 import { exportExcelFile, readFromExcel } from '../../../helpers/excel-file-utils';
@@ -226,17 +226,27 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
           </Dropdown>
         </div>
         <div className={'grl-dg__aside__side-bar__bottom'}>
-          {(panels || []).map((panel) => (
-            <Button
-              key={panel.id}
-              type={activePanel === panel.id ? 'default' : 'text'}
-              icon={panel.icon}
-              onClick={() => {
-                if (panel?.onClick) return panel.onClick();
-                if (panel?.renderPanel) setActivePanel(activePanel === panel.id ? undefined : panel.id);
-              }}
-            />
-          ))}
+          {(panels || []).map((panel) => {
+            const isActive = activePanel === panel.id;
+            return (
+              <Tooltip
+                key={panel.id}
+                title={`${!isActive ? 'Open' : 'Close'} ${panel.title.toLowerCase()} panel`}
+                placement={'right'}
+              >
+                <Button
+                  key={panel.id}
+                  type='text'
+                  icon={panel.icon}
+                  style={{ background: isActive ? 'rgba(0, 0, 0, 0.1)' : undefined }}
+                  onClick={() => {
+                    if (panel?.onClick) return panel.onClick();
+                    if (panel?.renderPanel) setActivePanel(isActive ? undefined : panel.id);
+                  }}
+                />
+              </Tooltip>
+            );
+          })}
         </div>
       </div>
     </div>
