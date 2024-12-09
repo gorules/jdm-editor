@@ -48,6 +48,7 @@ const GlobalCssVariables: React.FC<{ mode: 'light' | 'dark' }> = ({ mode }) => {
     () => ({
       '--grl-color-border': token.colorBorder,
       '--grl-color-border-hover': mode === 'light' ? '#c3c3c3' : '#555555',
+      '--grl-color-border-fade': mode === 'light' ? '#e9e9e9' : '#333333',
       '--grl-color-primary': token.colorPrimary,
       '--grl-color-primary-bg': token.colorPrimaryBg,
       '--grl-color-primary-bg-fade': mode === 'light' ? '#f7f9fc' : '#141414',
@@ -70,7 +71,6 @@ const GlobalCssVariables: React.FC<{ mode: 'light' | 'dark' }> = ({ mode }) => {
       '--grl-color-info-border': token.colorInfoBorder,
       '--grl-color-info-text': token.colorInfoText,
       '--grl-color-bg-layout': token.colorBgLayout,
-      '--grl-color-bg-layout-fade': '#f8f8f8',
       '--grl-color-bg-mask': token.colorBgMask,
       '--grl-color-bg-elevated': token.colorBgElevated,
       '--grl-color-bg-container': token.colorBgContainer,

@@ -54,10 +54,6 @@
       background: transparent;
       outline: none !important;
       font-size: 13px;
-
-      &::placeholder {
-        color: rgba(0, 0, 0, 0.35);
-      }
     }
 
     &__nodes-list {
@@ -232,7 +228,8 @@
     .grl-graph-tabs {
       max-width: 100%;
       box-sizing: content-box;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      border-bottom: 1px solid var(--grl-color-border);
+      background: var(--grl-color-bg-container);
 
       [role='tablist'] {
         margin: 0;
@@ -252,7 +249,6 @@
         padding: 9px 12px;
         transition: 0.1s ease;
         text-shadow: none;
-        color: black;
 
         &[data-active='false'] {
           opacity: 0.75;

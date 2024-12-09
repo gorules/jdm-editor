@@ -40,7 +40,6 @@ export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled, tabBarExtraConte
   return (
     <div>
       <Tabs
-        hideAdd
         type='line'
         size='small'
         className={clsx('grl-graph-tabs')}
