@@ -12,7 +12,7 @@ import type { SimulationTrace, SimulationTraceDataFunction } from '../decision-g
 import { FunctionDebugger } from './function-debugger';
 import './function.scss';
 import { variableTypeToTypescript } from './helpers/determine-type';
-import { functionDefinitions } from './helpers/libs';
+import { type FunctionLibrary, functionDefinitions, functionLibraries } from './helpers/libs';
 
 export type FunctionProps = {
   disabled?: boolean;
@@ -24,6 +24,7 @@ export type FunctionProps = {
   onChange?: (value: string) => void;
   trace?: SimulationTrace<SimulationTraceDataFunction>;
   onMonacoReady?: (monaco: Monaco) => void;
+  libraries?: FunctionLibrary[];
   inputData?: unknown;
   error?: {
     data: { nodeId: string; source?: string };
@@ -42,6 +43,7 @@ export const Function: React.FC<FunctionProps> = ({
   error,
   inputData,
   previousValue,
+  libraries = functionLibraries,
 }) => {
   const monaco = useMonaco();
   const mountedRef = useRef(false);
@@ -89,16 +91,19 @@ export const Function: React.FC<FunctionProps> = ({
       onlyVisible: false,
     });
 
-    Object.entries(functionDefinitions.libs).forEach(([pkg, types]) => {
-      monaco.languages.typescript.javascriptDefaults.addExtraLib(`declare module '${pkg}' { ${types} }`, pkg);
-    });
+    monaco.languages.typescript.javascriptDefaults.setExtraLibs(
+      functionLibraries.map((lib) => ({
+        content: `declare module '${lib.name}' { ${lib.typeDef} }`,
+        filePath: lib.name,
+      })),
+    );
 
     Object.entries(functionDefinitions.globals).forEach(([pkg, types]) => {
       monaco.languages.typescript.javascriptDefaults.addExtraLib(types, `ts:${pkg}`);
     });
 
     onMonacoReady?.(monaco);
-  }, [monaco]);
+  }, [monaco, libraries]);
 
   useEffect(() => {
     if (mountedRef.current && value !== undefined && value !== innerValue) {
@@ -232,7 +237,7 @@ export const Function: React.FC<FunctionProps> = ({
       }
     >
       <PanelGroup className='grl-function__content' direction='horizontal' autoSaveId='jdm-editor:function:layout'>
-        <Panel defaultSize={80} minSize={70}>
+        <Panel defaultSize={70} minSize={50}>
           {previousValue ? (
             <DiffEditor
               loading={<Spin size='large' />}
@@ -269,7 +274,11 @@ export const Function: React.FC<FunctionProps> = ({
         {!disableDebug && (
           <>
             <PanelResizeHandle />
-            <Panel minSize={15}>{!disableDebug && <FunctionDebugger trace={trace} editor={editor} />}</Panel>
+            <Panel minSize={25}>
+              {!disableDebug && (
+                <FunctionDebugger libraries={functionLibraries} trace={trace} editor={editor} editorValue={value} />
+              )}
+            </Panel>
           </>
         )}
       </PanelGroup>

@@ -102,6 +102,7 @@
           width: 100%;
           min-height: 0;
           padding: 4px 8px;
+          box-sizing: border-box;
 
           &.diff-added {
             box-shadow: 0 0 0 2px var(--grl-color-success);
