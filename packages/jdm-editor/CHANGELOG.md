@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.29.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.28.1...@gorules/jdm-editor@1.29.0) (2024-12-09)
+
+### Features
+
+- add libraries tab to functions ([#129](https://github.com/gorules/jdm-editor/issues/129)) ([5339014](https://github.com/gorules/jdm-editor/commit/5339014784670d8bbcdf3bb417d5079c017fd625))
+
 ## [1.28.1](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.28.0...@gorules/jdm-editor@1.28.1) (2024-12-08)
 
 ### Bug Fixes
