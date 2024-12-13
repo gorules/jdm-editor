@@ -119,6 +119,7 @@
 
         .text-wrapper {
           overflow: hidden;
+
           .span-overflow {
             overflow: hidden;
             white-space: nowrap;
@@ -162,6 +163,7 @@
 
         &.disabled {
           background-color: rgba(0, 0, 0, 0.02);
+
           textarea {
             background-color: transparent;
             color: var(--grl-color-text-secondary);
@@ -227,6 +229,20 @@
       cursor: col-resize;
       user-select: none;
       touch-action: none;
+
+      &::after {
+        content: '';
+        display: block;
+        width: 3px;
+        height: 100%;
+        margin: 0 auto;
+        transition: 0.1s ease;
+        border-radius: 3px;
+      }
+
+      &:hover::after {
+        background: var(--grl-color-primary-hover);
+      }
     }
 
     th {

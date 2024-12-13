@@ -5,7 +5,8 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { Button, Typography, theme } from 'antd';
 import clsx from 'clsx';
 import equal from 'fast-deep-equal/es6/react';
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { z } from 'zod';
 
 import { useDecisionTableActions, useDecisionTableListeners, useDecisionTableState } from '../context/dt-store.context';
 import { TableContextMenu } from './table-context-menu';
@@ -20,14 +21,34 @@ import { TableHeadRow } from './table-head-row';
 import { TableRow } from './table-row';
 
 export type TableProps = {
+  id?: string;
   maxHeight: string | number;
 };
 
-export const Table: React.FC<TableProps> = ({ maxHeight }) => {
+type ColumnSizing = Record<string, number>;
+
+const columnSizeKey = (id: string) => `jdm-editor:decisionTable:columns:${id}`;
+
+const loadColumnSizing = (id?: string) => {
+  if (!id) {
+    return {};
+  }
+
+  try {
+    const sizeData = localStorage.getItem(columnSizeKey(id));
+    const jsonData = JSON.parse(sizeData ?? '{}');
+    return z.record(z.string(), z.number()).parse(jsonData);
+  } catch {
+    return {};
+  }
+};
+
+export const Table: React.FC<TableProps> = ({ id, maxHeight }) => {
   const { token } = theme.useToken();
 
   const tableActions = useDecisionTableActions();
   const { cellRenderer } = useDecisionTableListeners(({ cellRenderer }) => ({ cellRenderer }));
+  const [columnSizing, setColumnSizing] = useState<ColumnSizing>(() => loadColumnSizing(id));
 
   const { configurable, disabled, inputs, outputs, colWidth, minColWidth } = useDecisionTableState(
     ({ configurable, disabled, minColWidth, colWidth, decisionTable }) => ({
@@ -116,6 +137,12 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
     meta: {
       getCell: cellRenderer,
     },
+    ...(!id
+      ? {}
+      : {
+          state: { columnSizing },
+          onColumnSizingChange: setColumnSizing,
+        }),
   });
 
   const tableContainerRef = useRef<HTMLDivElement>(null);
@@ -139,6 +166,22 @@ export const Table: React.FC<TableProps> = ({ maxHeight }) => {
       resizeObserver.disconnect();
     };
   }, []);
+
+  useEffect(() => {
+    if (!id) {
+      return;
+    }
+
+    setColumnSizing(loadColumnSizing(id));
+  }, [id]);
+
+  useEffect(() => {
+    if (!id) {
+      return;
+    }
+
+    localStorage.setItem(columnSizeKey(id), JSON.stringify(columnSizing));
+  }, [columnSizing]);
 
   return (
     <div
