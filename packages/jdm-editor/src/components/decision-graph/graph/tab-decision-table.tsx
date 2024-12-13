@@ -52,19 +52,20 @@ export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager 
 
   return (
     <DecisionTable
+      id={id}
       tableHeight={'100%'}
       value={content as any}
+      manager={manager}
+      disabled={disabled}
+      configurable={configurable}
+      inputData={computedType}
+      activeRules={(activeRules || []).filter((id) => !!id)}
       onChange={(val) => {
         graphActions.updateNode(id, (draft) => {
           Object.assign(draft.content, val);
           return draft;
         });
       }}
-      manager={manager}
-      disabled={disabled}
-      configurable={configurable}
-      inputData={computedType}
-      activeRules={(activeRules || []).filter((id) => !!id)}
     />
   );
 };
