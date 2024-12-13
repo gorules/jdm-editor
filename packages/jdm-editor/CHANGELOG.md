@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.30.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.29.0...@gorules/jdm-editor@1.30.0) (2024-12-13)
+
+### Features
+
+- store decision table size ([#130](https://github.com/gorules/jdm-editor/issues/130)) ([7ffa470](https://github.com/gorules/jdm-editor/commit/7ffa4702c195e3c0c63471759be7bc5e77ac3104))
+
 # [1.29.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.28.1...@gorules/jdm-editor@1.29.0) (2024-12-09)
 
 ### Features
