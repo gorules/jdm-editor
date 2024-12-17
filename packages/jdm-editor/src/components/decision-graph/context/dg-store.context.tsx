@@ -17,7 +17,7 @@ import { mapToGraphEdge, mapToGraphEdges, mapToGraphNode, mapToGraphNodes } from
 import type { useGraphClipboard } from '../hooks/use-graph-clipboard';
 import type { CustomNodeSpecification } from '../nodes/custom-node';
 import { NodeKind, type NodeSpecification } from '../nodes/specifications/specification-types';
-import type { Simulation } from '../types/simulation.types';
+import type { Simulation } from '../simulator/simulation.types';
 
 export type PanelType = {
   id: string;

@@ -8,7 +8,8 @@ export type {
 export type { CustomNodeSpecification } from './nodes/custom-node/index';
 export { createJdmNode } from './nodes/custom-node';
 export { GraphNode, type GraphNodeProps } from './nodes/graph-node';
-export { GraphSimulator } from './dg-simulator';
+export { GraphSimulator, type GraphSimulatorProps } from './simulator/dg-simulator';
+export { SimulatorEditor } from './simulator/simulator-editor';
 export {
   useDecisionGraphState,
   useDecisionGraphActions,
@@ -30,7 +31,7 @@ export type {
   SimulationError,
   SimulationOk,
   SimulationTraceDataSwitch,
-} from './types/simulation.types';
+} from './simulator/simulation.types';
 
 export {
   calculateDiffGraph,

@@ -1,30 +1,18 @@
-import {
-  CheckCircleTwoTone,
-  ClearOutlined,
-  CloseCircleTwoTone,
-  CloseOutlined,
-  CopyOutlined,
-  FormatPainterOutlined,
-  InfoCircleOutlined,
-  PlayCircleOutlined,
-} from '@ant-design/icons';
-import { VariableType } from '@gorules/zen-engine-wasm';
-import { Editor } from '@monaco-editor/react';
-import { Button, Spin, Tabs, Tooltip, Typography, message, notification, theme } from 'antd';
+import { CheckCircleTwoTone, ClearOutlined, CloseCircleTwoTone, CloseOutlined } from '@ant-design/icons';
+import { Button, Spin, Tabs, Tooltip, Typography } from 'antd';
 import clsx from 'clsx';
 import json5 from 'json5';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { P, match } from 'ts-pattern';
 
-import '../../helpers/monaco';
-import { usePersistentState } from '../../helpers/use-persistent-state';
-import { copyToClipboard } from '../../helpers/utility';
-import { isWasmAvailable } from '../../helpers/wasm';
-import { NodeTypeKind, useDecisionGraphRaw, useDecisionGraphState } from './context/dg-store.context';
-import { type DecisionGraphType } from './dg-types';
-import { NodeKind } from './nodes/specifications/specification-types';
-import type { SimulationTrace } from './types/simulation.types';
+import '../../../helpers/monaco';
+import { usePersistentState } from '../../../helpers/use-persistent-state';
+import { useDecisionGraphRaw, useDecisionGraphState } from '../context/dg-store.context';
+import { NodeKind } from '../nodes/specifications/specification-types';
+import type { SimulationTrace } from './simulation.types';
+import { SimulatorEditor } from './simulator-editor';
+import { SimulatorRequestPanel, type SimulatorRequestPanelProps } from './simulator-request-panel';
 
 enum SimulationSegment {
   Output = 'Output',
@@ -32,16 +20,14 @@ enum SimulationSegment {
   Trace = 'Trace',
 }
 
-type GraphSimulatorProps = {
-  defaultRequest?: string;
-  onChange?: (val: string) => void;
-  onRun?: (payload: { graph: DecisionGraphType; context: unknown }) => void;
+export type GraphSimulatorProps = {
   onClear?: () => void;
   loading?: boolean;
+  defaultRequest?: SimulatorRequestPanelProps['defaultRequest'];
+  onChange?: SimulatorRequestPanelProps['onChange'];
+  onRun?: SimulatorRequestPanelProps['onRun'];
+  leftPanel?: React.FC<SimulatorRequestPanelProps>;
 };
-
-const requestTooltip =
-  'Your business context that enters through the Request node, starting the decision process. Supply JSON or JSON5 format.';
 
 export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
   defaultRequest,
@@ -49,12 +35,12 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
   onRun,
   onClear,
   loading = false,
+  leftPanel: LeftPanel = SimulatorRequestPanel,
 }) => {
-  const [requestValue, setRequestValue] = useState(defaultRequest);
   const [search, setSearch] = usePersistentState<string>('simulation.search', '');
   const [segment, setSegment] = usePersistentState<SimulationSegment>('simulation.segment', SimulationSegment.Output);
 
-  const { stateStore, actions } = useDecisionGraphRaw();
+  const { actions } = useDecisionGraphRaw();
   const { nodeTypes, simulate, hasInputNode } = useDecisionGraphState(({ decisionGraph, simulate }) => ({
     simulate,
     hasInputNode: decisionGraph.nodes.some((n) => n.type === NodeKind.Input),
@@ -68,25 +54,6 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
   }));
 
   const [selectedNode, setSelectedNode] = useState<string>('graph');
-
-  useEffect(() => {
-    if (!isWasmAvailable()) {
-      return;
-    }
-
-    const { decisionGraph } = stateStore.getState();
-    const requestNode = decisionGraph.nodes.find((n) => n.type === 'inputNode');
-    if (!requestNode) {
-      return;
-    }
-
-    try {
-      const value = requestValue ? json5.parse(requestValue) : 'Any';
-      actions.setNodeType(requestNode.id, NodeTypeKind.InferredOutput, new VariableType(value));
-    } catch {
-      // Skip
-    }
-  }, [requestValue]);
 
   const traces = useMemo<Array<SimulationTrace & { nodeId: string }>>(() => {
     if (!simulate) {
@@ -107,96 +74,13 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
   return (
     <PanelGroup className='grl-dg__simulator' direction='horizontal' autoSaveId='jdm-editor:simulator:layout'>
       <Panel minSize={20} defaultSize={30} className='grl-dg__simulator__section grl-dg__simulator__request'>
-        <div className={'grl-dg__simulator__section__bar grl-dg__simulator__section__bar--request'}>
-          <Tooltip title={requestTooltip}>
-            <Typography.Text style={{ fontSize: 13, cursor: 'help' }}>
-              Request
-              <InfoCircleOutlined style={{ fontSize: 10, marginLeft: 4, opacity: 0.5, verticalAlign: 'text-top' }} />
-            </Typography.Text>
-          </Tooltip>
-          <div className={'grl-dg__simulator__section__bar__actions'}>
-            <Tooltip title='Copy JSON to Clipboard'>
-              <Button
-                type={'text'}
-                size={'small'}
-                icon={<CopyOutlined />}
-                onClick={async () => {
-                  try {
-                    await copyToClipboard(JSON.stringify(json5.parse(requestValue ?? '')));
-                    message.success('Copied to clipboard!');
-                  } catch {
-                    message.error('Failed to copy to clipboard.');
-                  }
-                }}
-              />
-            </Tooltip>
-            <Tooltip title={'Format JSON'}>
-              <Button
-                size={'small'}
-                type={'text'}
-                icon={<FormatPainterOutlined />}
-                onClick={() => {
-                  if ((requestValue || '').trim().length === 0) {
-                    return;
-                  }
-
-                  try {
-                    const formatted = JSON.stringify(json5.parse(requestValue || ''), null, 2);
-
-                    onChange?.(formatted);
-                    setRequestValue(formatted);
-                  } catch {
-                    notification.error({
-                      message: 'Invalid format',
-                      description: 'Unable to format request, invalid JSON format',
-                      placement: 'top',
-                    });
-                  }
-                }}
-              />
-            </Tooltip>
-            {onRun && (
-              <Tooltip
-                title={
-                  !hasInputNode
-                    ? 'Request node is required to run the graph. Drag-and-drop it from the Components panel.'
-                    : undefined
-                }
-              >
-                <Button
-                  size={'small'}
-                  type={'primary'}
-                  loading={loading}
-                  icon={<PlayCircleOutlined />}
-                  disabled={!hasInputNode}
-                  onClick={() => {
-                    try {
-                      const parsed = (requestValue || '').trim().length === 0 ? null : json5.parse(requestValue || '');
-                      onRun?.({ graph: stateStore.getState().decisionGraph, context: parsed });
-                    } catch {
-                      notification.error({
-                        message: 'Invalid format',
-                        description: 'Unable to format request, invalid JSON format',
-                        placement: 'top',
-                      });
-                    }
-                  }}
-                >
-                  Run
-                </Button>
-              </Tooltip>
-            )}
-          </div>
-        </div>
-        <div className={'grl-dg__simulator__section__content'}>
-          <SimulatorEditor
-            value={requestValue}
-            onChange={(text) => {
-              setRequestValue(text);
-              onChange?.(text ?? '');
-            }}
-          />
-        </div>
+        <LeftPanel
+          defaultRequest={defaultRequest}
+          loading={loading}
+          hasInputNode={hasInputNode}
+          onRun={onRun}
+          onChange={onChange}
+        />
       </Panel>
       <PanelResizeHandle />
       <Panel minSize={20} maxSize={20} className={'grl-dg__simulator__section grl-dg__simulator__nodes'}>
@@ -342,59 +226,7 @@ const displaySegment = (data: unknown, segment: SimulationSegment) => {
   return json5.stringify(jsonData, undefined, 2);
 };
 
-type SimulatorEditorProps = {
-  value?: string;
-  onChange?: (value: string | undefined) => void;
-  readOnly?: boolean;
-};
-
-const SimulatorEditor: React.FC<SimulatorEditorProps> = ({ value, onChange, readOnly }) => {
-  const { token } = theme.useToken();
-
-  return (
-    <Editor
-      loading={<Spin size='large' />}
-      language='javascript'
-      value={value}
-      onChange={onChange}
-      theme={token.mode === 'dark' ? 'vs-dark' : 'light'}
-      height='100%'
-      onMount={(editor, monaco) => {
-        monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
-          noSyntaxValidation: true,
-        });
-
-        monaco.languages.typescript.javascriptDefaults.setModeConfiguration({
-          codeActions: false,
-          inlayHints: false,
-        });
-      }}
-      options={{
-        readOnly: readOnly,
-        automaticLayout: true,
-        contextmenu: false,
-        minimap: { enabled: false },
-        fontSize: 12,
-        fontFamily: 'var(--mono-font-family)',
-        tabSize: 2,
-        lineDecorationsWidth: 2,
-        find: {
-          addExtraSpaceOnTop: false,
-          seedSearchStringFromSelection: 'never',
-        },
-        scrollbar: {
-          verticalSliderSize: 4,
-          verticalScrollbarSize: 4,
-          horizontalScrollbarSize: 4,
-          horizontalSliderSize: 4,
-        },
-        lineNumbersMinChars: 3,
-      }}
-    />
-  );
-};
-
-export const StatusIcon: React.FC<{ status: 'success' | 'error' | 'not-run' }> = ({ status }) => {
+const StatusIcon: React.FC<{ status: 'success' | 'error' | 'not-run' }> = ({ status }) => {
   if (status === 'not-run') {
     return null;
   }

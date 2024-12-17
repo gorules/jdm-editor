@@ -11,7 +11,7 @@ import {
   useNodeDiff,
 } from '../context/dg-store.context';
 import { FunctionKind, useFunctionKind } from '../nodes/specifications/function.specification';
-import type { SimulationTrace, SimulationTraceDataFunction } from '../types/simulation.types';
+import type { SimulationTrace, SimulationTraceDataFunction } from '../simulator/simulation.types';
 
 const Function = React.lazy(async () => {
   const functionImport = await import('../../function');

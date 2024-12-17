@@ -5,7 +5,7 @@ import React, { useMemo, useState } from 'react';
 import { match } from 'ts-pattern';
 
 import typeScriptIcon from '../../assets/typescript.svg?inline';
-import type { SimulationTrace, SimulationTraceDataFunction } from '../decision-graph/types/simulation.types';
+import type { SimulationTrace, SimulationTraceDataFunction } from '../decision-graph/simulator/simulation.types';
 import { FunctionDebuggerLog } from './function-debugger-log';
 import { type FunctionLibrary } from './helpers/libs';
 

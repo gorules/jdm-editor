@@ -13,7 +13,7 @@ import { DiffCodeEditor } from '../../../shared/diff-ce';
 import { useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
 import { compareAndUnifyLists } from '../../dg-diff-util';
 import type { Diff, DiffMetadata } from '../../dg-types';
-import type { SimulationTrace, SimulationTraceDataSwitch } from '../../types/simulation.types';
+import type { SimulationTrace, SimulationTraceDataSwitch } from '../../simulator/simulation.types';
 import { GraphNode } from '../graph-node';
 import { NodeColor } from './colors';
 import type { MinimalNodeProps, NodeSpecification } from './specification-types';

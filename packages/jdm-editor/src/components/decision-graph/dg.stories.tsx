@@ -8,7 +8,7 @@ import type { PanelType } from './context/dg-store.context';
 import type { DecisionGraphRef } from './dg';
 import { DecisionGraph } from './dg';
 import { calculateDiffGraph } from './dg-diff-util';
-import { GraphSimulator } from './dg-simulator';
+import { GraphSimulator } from './simulator/dg-simulator';
 import {
   defaultGraph,
   defaultGraphCustomNode,
