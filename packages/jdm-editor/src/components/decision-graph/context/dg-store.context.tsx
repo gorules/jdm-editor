@@ -493,6 +493,10 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
       },
       setHoveredEdgeId: (edgeId) => stateStore.setState({ hoveredEdgeId: edgeId }),
       goToNode: (id: string) => {
+        if (stateStore.getState().activeTab !== 'graph') {
+          return;
+        }
+
         const { reactFlowInstance } = referenceStore.getState();
         if (!reactFlowInstance.current) {
           return;
