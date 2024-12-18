@@ -1,6 +1,7 @@
 import { CloseOutlined, CompressOutlined, LeftOutlined, WarningOutlined } from '@ant-design/icons';
 import { Button, Modal, Tooltip, Typography, message } from 'antd';
 import clsx from 'clsx';
+import equal from 'fast-deep-equal';
 import React, { type MutableRefObject, forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import type { Connection, Node, ProOptions, ReactFlowInstance, XYPosition } from 'reactflow';
 import ReactFlow, {
@@ -56,7 +57,7 @@ const defaultNodeTypes = Object.entries(nodeSpecification).reduce(
         return (
           prevProps.id === nextProps.id &&
           prevProps.selected === nextProps.selected &&
-          prevProps.data === nextProps.data
+          equal(prevProps.data, nextProps.data)
         );
       },
     ),
@@ -93,6 +94,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
   graphReferences.nodesState.current = nodesState;
   graphReferences.edgesState.current = edgesState;
   graphReferences.graphClipboard.current = useGraphClipboard(reactFlowInstance, reactFlowWrapper);
+  graphReferences.reactFlowInstance.current = reactFlowInstance.current;
 
   const customNodeRenderer = useMemo(() => {
     return React.memo(
@@ -131,7 +133,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
         return (
           prevProps.id === nextProps.id &&
           prevProps.selected === nextProps.selected &&
-          prevProps.data === nextProps.data
+          equal(prevProps.data, nextProps.data)
         );
       },
     );
@@ -147,7 +149,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
             return (
               prevProps.id === nextProps.id &&
               prevProps.selected === nextProps.selected &&
-              prevProps.data === nextProps.data
+              equal(prevProps.data, nextProps.data)
             );
           },
         ),
@@ -419,7 +421,6 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
         >
           <div className={clsx(['react-flow'])} ref={reactFlowWrapper}>
             <ReactFlow
-              onlyRenderVisibleElements
               deleteKeyCode={null}
               elevateEdgesOnSelect={false}
               elevateNodesOnSelect={true}

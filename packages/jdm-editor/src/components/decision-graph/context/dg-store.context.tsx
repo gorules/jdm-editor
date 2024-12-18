@@ -17,7 +17,7 @@ import { mapToGraphEdge, mapToGraphEdges, mapToGraphNode, mapToGraphNodes } from
 import type { useGraphClipboard } from '../hooks/use-graph-clipboard';
 import type { CustomNodeSpecification } from '../nodes/custom-node';
 import { NodeKind, type NodeSpecification } from '../nodes/specifications/specification-types';
-import type { Simulation } from '../types/simulation.types';
+import type { Simulation } from '../simulator/simulation.types';
 
 export type PanelType = {
   id: string;
@@ -71,6 +71,7 @@ export type DecisionGraphStoreType = {
   references: {
     nodesState: MutableRefObject<ReturnType<typeof useNodesState>>;
     edgesState: MutableRefObject<ReturnType<typeof useEdgesState>>;
+    reactFlowInstance: MutableRefObject<ReactFlowInstance | null>;
     graphClipboard: MutableRefObject<ReturnType<typeof useGraphClipboard>>;
   };
 
@@ -98,6 +99,7 @@ export type DecisionGraphStoreType = {
 
     closeTab: (id: string, action?: string) => void;
     openTab: (id: string) => void;
+    goToNode: (id: string) => void;
 
     setActivePanel: (panel?: string) => void;
 
@@ -175,6 +177,7 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         nodesState: createRef() as MutableRefObject<ReturnType<typeof useNodesState>>,
         edgesState: createRef() as MutableRefObject<ReturnType<typeof useEdgesState>>,
         graphClipboard: createRef() as MutableRefObject<ReturnType<typeof useGraphClipboard>>,
+        reactFlowInstance: createRef() as MutableRefObject<ReactFlowInstance | null>,
       })),
     [],
   );
@@ -489,6 +492,23 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         });
       },
       setHoveredEdgeId: (edgeId) => stateStore.setState({ hoveredEdgeId: edgeId }),
+      goToNode: (id: string) => {
+        if (stateStore.getState().activeTab !== 'graph') {
+          return;
+        }
+
+        const { reactFlowInstance } = referenceStore.getState();
+        if (!reactFlowInstance.current) {
+          return;
+        }
+
+        const node = reactFlowInstance.current.getNode(id);
+        if (!node) {
+          return;
+        }
+
+        reactFlowInstance.current.fitView({ nodes: [node], duration: 1_000, maxZoom: 1.25 });
+      },
       openTab: (id: string) => {
         const { openTabs } = stateStore.getState();
         const nodeId = openTabs.find((i) => i === id);

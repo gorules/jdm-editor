@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { produce } from 'immer';
 import _ from 'lodash';
 import React, { useLayoutEffect, useMemo, useState } from 'react';
+import { useInView } from 'react-intersection-observer';
 import { Handle, Position } from 'reactflow';
 import { P, match } from 'ts-pattern';
 
@@ -13,7 +14,7 @@ import { DiffCodeEditor } from '../../../shared/diff-ce';
 import { useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
 import { compareAndUnifyLists } from '../../dg-diff-util';
 import type { Diff, DiffMetadata } from '../../dg-types';
-import type { SimulationTrace, SimulationTraceDataSwitch } from '../../types/simulation.types';
+import type { SimulationTrace, SimulationTraceDataSwitch } from '../../simulator/simulation.types';
 import { GraphNode } from '../graph-node';
 import { NodeColor } from './colors';
 import type { MinimalNodeProps, NodeSpecification } from './specification-types';
@@ -115,6 +116,7 @@ const SwitchNode: React.FC<
   }
 > = ({ id, data, selected, specification }) => {
   const graphActions = useDecisionGraphActions();
+  const { ref: inViewRef, inView } = useInView({ delay: 1_000 });
   const { content, disabled, nodeTrace, compactMode, isGraphActive } = useDecisionGraphState(
     ({ decisionGraph, disabled, simulate, compactMode, activeTab }) => ({
       nodeTrace: match(simulate)
@@ -127,7 +129,7 @@ const SwitchNode: React.FC<
     }),
   );
 
-  const nodeType = useNodeType(id, { disabled: !isGraphActive });
+  const nodeType = useNodeType(id, { disabled: !isGraphActive || !inView });
   const statements: SwitchStatement[] = content?.statements || [];
   const hitPolicy = content?.hitPolicy || 'first';
 
@@ -143,6 +145,7 @@ const SwitchNode: React.FC<
   return (
     <GraphNode
       id={id}
+      ref={inViewRef}
       className={clsx(['switch'])}
       specification={specification}
       name={data.name}

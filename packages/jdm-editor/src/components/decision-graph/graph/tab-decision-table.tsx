@@ -6,7 +6,7 @@ import { useNodeType } from '../../../helpers/node-type';
 import { DecisionTable } from '../../decision-table';
 import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
 import type { NodeDecisionTableData } from '../nodes/specifications/decision-table.specification';
-import type { SimulationTrace, SimulationTraceDataTable } from '../types/simulation.types';
+import type { SimulationTrace, SimulationTraceDataTable } from '../simulator/simulation.types';
 
 export type TabDecisionTableProps = {
   id: string;
