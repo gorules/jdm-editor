@@ -153,6 +153,7 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
                   key={trace.nodeId}
                   className={clsx('grl-dg__simulator__nodes-list__node', trace.nodeId === selectedNode && 'active')}
                   onClick={() => setSelectedNode(trace.nodeId)}
+                  onDoubleClick={() => actions.goToNode(trace.nodeId)}
                 >
                   <Typography.Text data-role='name' ellipsis={{ tooltip: trace.name }}>
                     <StatusIcon status={trace.nodeId === simulate?.error?.data?.nodeId ? 'error' : 'success'} />

@@ -72,6 +72,7 @@
         justify-content: space-between;
         align-items: center;
         gap: 16px;
+        user-select: none;
 
         & > span {
           font-size: 13px;
