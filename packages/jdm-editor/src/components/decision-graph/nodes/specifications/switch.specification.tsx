@@ -116,7 +116,7 @@ const SwitchNode: React.FC<
   }
 > = ({ id, data, selected, specification }) => {
   const graphActions = useDecisionGraphActions();
-  const { ref: inViewRef, inView } = useInView({ delay: 500 });
+  const { ref: inViewRef, inView } = useInView({ delay: 1_000 });
   const { content, disabled, nodeTrace, compactMode, isGraphActive } = useDecisionGraphState(
     ({ decisionGraph, disabled, simulate, compactMode, activeTab }) => ({
       nodeTrace: match(simulate)
