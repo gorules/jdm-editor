@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.31.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.30.0...@gorules/jdm-editor@1.31.0) (2024-12-19)
+
+### Features
+
+- customizable left panel ([#132](https://github.com/gorules/jdm-editor/issues/132)) ([3cf3a3b](https://github.com/gorules/jdm-editor/commit/3cf3a3b1ec8441cd945b27bfc963d5d550bdd617))
+
 # [1.30.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.29.0...@gorules/jdm-editor@1.30.0) (2024-12-13)
 
 ### Features
