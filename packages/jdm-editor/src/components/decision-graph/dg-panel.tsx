@@ -37,7 +37,7 @@ export const GraphPanel: React.FC = () => {
         bottomLeft: { display: 'none' },
         bottomRight: { display: 'none' },
       }}
-      maxHeight={400}
+      maxHeight={500}
       minHeight={150}
       onResize={(event, direction, elementRef) => {
         localStorage.setItem(heightKey, elementRef.clientHeight.toString());

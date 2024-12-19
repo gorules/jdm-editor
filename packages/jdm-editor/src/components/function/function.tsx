@@ -8,7 +8,7 @@ import { useDebouncedCallback, useThrottledCallback } from 'use-debounce';
 
 import '../../helpers/monaco';
 import { isWasmAvailable } from '../../helpers/wasm';
-import type { SimulationTrace, SimulationTraceDataFunction } from '../decision-graph/types/simulation.types';
+import type { SimulationTrace, SimulationTraceDataFunction } from '../decision-graph/simulator/simulation.types';
 import { FunctionDebugger } from './function-debugger';
 import './function.scss';
 import { variableTypeToTypescript } from './helpers/determine-type';

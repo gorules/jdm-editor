@@ -6,7 +6,7 @@ import { useNodeType } from '../../../helpers/node-type';
 import { Expression } from '../../expression';
 import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
 import type { NodeExpressionData } from '../nodes/specifications/expression.specification';
-import type { SimulationTrace, SimulationTraceDataExpression } from '../types/simulation.types';
+import type { SimulationTrace, SimulationTraceDataExpression } from '../simulator/simulation.types';
 
 export type TabExpressionProps = {
   id: string;

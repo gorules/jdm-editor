@@ -8,7 +8,6 @@ import type { PanelType } from './context/dg-store.context';
 import type { DecisionGraphRef } from './dg';
 import { DecisionGraph } from './dg';
 import { calculateDiffGraph } from './dg-diff-util';
-import { GraphSimulator } from './dg-simulator';
 import {
   defaultGraph,
   defaultGraphCustomNode,
@@ -20,6 +19,7 @@ import type { GraphRef } from './graph/graph';
 import { createJdmNode } from './nodes/custom-node';
 import { GraphNode } from './nodes/graph-node';
 import type { NodeSpecification } from './nodes/specifications/specification-types';
+import { GraphSimulator } from './simulator/dg-simulator';
 
 const meta: Meta<typeof DecisionGraph> = {
   /* 👇 The title prop is optional.
