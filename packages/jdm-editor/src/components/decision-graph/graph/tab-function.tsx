@@ -28,7 +28,7 @@ export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
   const onFunctionReady = useDecisionGraphListeners((s) => s.onFunctionReady);
   const [monaco, setMonaco] = useState<Monaco>();
   const nodeType = useNodeType(id);
-  const { nodeTrace, disabled, content, additionalModules, nodeError } = useDecisionGraphState(
+  const { nodeTrace, disabled, content, nodeError } = useDecisionGraphState(
     ({ simulate, disabled, configurable, decisionGraph }) => ({
       nodeTrace: match(simulate)
         .with({ result: P._ }, ({ result }) => result?.trace?.[id])
@@ -39,13 +39,6 @@ export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
       disabled,
       configurable,
       content: (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content,
-      additionalModules: (decisionGraph?.nodes ?? [])
-        .filter((node) => node.type === 'functionNode')
-        .map((node) => ({
-          id: node.id,
-          name: node.name,
-          content: node.content,
-        })),
     }),
   );
 
@@ -63,23 +56,14 @@ export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
     }
 
     const extraLibs = monaco.languages.typescript.javascriptDefaults.getExtraLibs();
-    const newExtraLibs = Object.entries(extraLibs)
-      .map(([key, value]) => ({
-        filePath: key,
-        content: value.content,
-      }))
-      .filter((i) => !i.filePath.startsWith('node:'));
-
-    additionalModules.forEach((module) => {
-      newExtraLibs.push({
-        filePath: `node:${module.name}`,
-        content: `declare module 'node:${module.name}' { ${module.content} }`,
-      });
-    });
+    const newExtraLibs = Object.entries(extraLibs).map(([key, value]) => ({
+      filePath: key,
+      content: value.content,
+    }));
 
     monaco.languages.typescript.javascriptDefaults.setExtraLibs(newExtraLibs);
     onFunctionReady?.(monaco);
-  }, [JSON.stringify(additionalModules), monaco, onFunctionReady]);
+  }, [monaco, onFunctionReady]);
 
   return (
     <Suspense fallback={<Spin />}>
