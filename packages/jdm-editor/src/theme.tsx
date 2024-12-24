@@ -36,6 +36,7 @@ export const JdmConfigProvider: React.FC<JdmConfigProviderProps> = ({
   return (
     <ConfigProvider prefixCls={prefixCls} theme={{ ...restTheme, algorithm, token: { ...token, mode } }}>
       <GlobalCssVariables mode={mode} />
+      <GlobalStoplightCssVariables mode={mode} />
       {children}
     </ConfigProvider>
   );
@@ -92,6 +93,50 @@ const GlobalCssVariables: React.FC<{ mode: 'light' | 'dark' }> = ({ mode }) => {
 
       '--grl-decision-table-output': mode === 'light' ? '#eaeaea' : '#091422',
       '--grl-decision-table-selected-row': mode === 'light' ? '#f4faff' : '#121720',
+    }),
+    [token, mode],
+  );
+
+  const cssBlock = Object.entries(exposedTokens)
+    .map(([key, value]) => `  ${key}: ${value};`)
+    .join('\n');
+
+  return <style dangerouslySetInnerHTML={{ __html: `:root {\n${cssBlock}\n}` }} />;
+};
+
+const GlobalStoplightCssVariables: React.FC<{ mode: 'light' | 'dark' }> = ({ mode }) => {
+  const { token } = theme.useToken();
+
+  const exposedTokens = useMemo(
+    () => ({
+      'color': token.colorText,
+
+      '--color-text-heading': token.colorTextHeading,
+      '--color-text': token.colorText,
+      '--color-text-paragraph': token.colorText,
+      '--color-text-muted': token.colorTextSecondary,
+
+      '--color-canvas': token.colorBgBase,
+      '--color-canvas-dark': token.colorBgBase,
+      '--color-canvas-pure': token.colorBgBase,
+      '--color-canvas-tint': token.colorBgLayout,
+      '--color-canvas-200': token.colorBgLayout,
+
+      '--color-canvas-dialog': token.colorBgBase,
+      '--color-border-dark': token.colorBorder,
+      '--color-border': token.colorBorder,
+      '--color-border-light': token.colorBorder,
+      '--color-border-input': token.colorBorder,
+      '--color-border-button': token.colorBorder,
+
+      '--color-text-primary': token.colorPrimaryText,
+      '--color-primary': token.colorPrimary,
+      '--color-text-success': token.colorSuccessText,
+      '--color-success': token.colorSuccess,
+      '--color-text-warning': token.colorWarningText,
+      '--color-warning': token.colorWarningActive,
+      '--color-text-danger': token.colorErrorText,
+      '--color-danger': token.colorError,
     }),
     [token, mode],
   );

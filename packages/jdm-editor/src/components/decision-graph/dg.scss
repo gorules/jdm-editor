@@ -1,4 +1,5 @@
 .grl-dg {
+  font-family: var(--grl-font-family);
   height: 100%;
   display: grid;
   grid-template-areas: 'sidebar graph component' 'bottom bottom component';
@@ -216,7 +217,7 @@
     justify-content: flex-start;
     gap: 0.5rem;
     width: 100%;
-    padding: 0.5rem;
+    padding: 7px;
     border-bottom: 1px solid var(--grl-color-border);
   }
 
@@ -818,4 +819,41 @@
 .single-line * {
   display: inline;
   white-space: nowrap;
+}
+
+.grl-node-content {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.grl-node-content-main {
+  flex: 1;
+}
+
+.grl-node-content-side {
+  height: 100%;
+  border-left: 1px solid var(--grl-color-border);
+
+  &__panel {
+    background: var(--grl-color-bg-elevated);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    background: var(--grl-color-primary-bg-fade);
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--grl-color-border);
+  }
+
+  &__body {
+    overflow-y: auto;
+    flex-grow: 1;
+  }
 }

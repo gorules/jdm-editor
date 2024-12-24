@@ -37,6 +37,7 @@
       align-items: center;
       background: var(--grl-color-primary-bg-fade);
       flex-shrink: 0;
+      border-bottom: 1px solid var(--grl-color-border);
     }
 
     &__body {

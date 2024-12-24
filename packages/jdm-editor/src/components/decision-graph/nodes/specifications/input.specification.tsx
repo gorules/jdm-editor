@@ -1,16 +1,24 @@
 import { BookOutlined, DeleteOutlined, LoginOutlined } from '@ant-design/icons';
-import { Modal, Typography } from 'antd';
+import { Button, Modal, Typography } from 'antd';
+import { produce } from 'immer';
+import _ from 'lodash';
 import React from 'react';
+import type { z } from 'zod';
 
 import { platform } from '../../../../helpers/platform';
+import { type inputNodeSchema } from '../../../../helpers/schema';
 import { SpacedText } from '../../../spaced-text';
 import { useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
+import type { Diff, DiffMetadata } from '../../dg-types';
+import { TabJsonSchema } from '../../graph/tab-json-schema';
 import { GraphNode } from '../graph-node';
 import { NodeColor } from './colors';
 import type { NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
 
-export type NodeInputData = never;
+type InferredContent = z.infer<typeof inputNodeSchema>['content'];
+
+export type NodeInputData = InferredContent & Diff;
 
 export const inputSpecification: NodeSpecification<NodeInputData> = {
   type: NodeKind.Input,
@@ -19,7 +27,13 @@ export const inputSpecification: NodeSpecification<NodeInputData> = {
   color: NodeColor.Green,
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions',
   shortDescription: 'Provides input context',
-  generateNode: () => ({ name: 'request' }),
+  generateNode: () => ({
+    name: 'request',
+    content: {
+      schema: '',
+    },
+  }),
+  renderTab: ({ id, manager }) => <TabJsonSchema id={id} manager={manager} type={'input'} />,
   renderNode: ({ id, data, selected, specification }) => {
     const graphActions = useDecisionGraphActions();
     const { disabled } = useDecisionGraphState(({ disabled }) => ({
@@ -33,6 +47,11 @@ export const inputSpecification: NodeSpecification<NodeInputData> = {
         name={data.name}
         isSelected={selected}
         handleLeft={false}
+        actions={[
+          <Button key='edit-table' type='text' onClick={() => graphActions.openTab(id)}>
+            Configure
+          </Button>,
+        ]}
         menuItems={[
           {
             key: 'documentation',
@@ -62,5 +81,26 @@ export const inputSpecification: NodeSpecification<NodeInputData> = {
         ]}
       />
     );
+  },
+  getDiffContent: (current, previous): any => {
+    const fields: DiffMetadata['fields'] = {};
+    return produce(current, (draft) => {
+      if (current?.schema !== previous?.schema) {
+        _.set(fields, 'schema', {
+          previousValue: previous?.schema || '',
+          status: 'modified',
+        });
+      }
+
+      const hasModifications = Object.keys(fields).length > 0;
+
+      if (hasModifications) {
+        draft._diff = {
+          status: 'modified',
+          fields,
+        };
+      }
+      return draft;
+    });
   },
 };

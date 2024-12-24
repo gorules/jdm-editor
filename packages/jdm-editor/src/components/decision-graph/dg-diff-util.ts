@@ -6,6 +6,8 @@ import type { CustomNodeSpecification } from './nodes/custom-node';
 import { decisionTableSpecification } from './nodes/specifications/decision-table.specification';
 import { expressionSpecification } from './nodes/specifications/expression.specification';
 import { functionSpecification } from './nodes/specifications/function.specification';
+import { inputSpecification } from './nodes/specifications/input.specification';
+import { outputSpecification } from './nodes/specifications/output.specification';
 import { NodeKind, type NodeSpecification } from './nodes/specifications/specification-types';
 import { switchSpecification } from './nodes/specifications/switch.specification';
 
@@ -31,7 +33,6 @@ export const calculateDiffGraph = (
   return {
     nodes,
     edges,
-    settings: currentGraph?.settings,
   };
 };
 
@@ -76,6 +77,12 @@ export const processNodes = (
       }
 
       const calculatedContent = match([newNode.type, oldNode.type])
+        .with([NodeKind.Output, NodeKind.Output], () =>
+          outputSpecification?.getDiffContent?.(newNode?.content, oldNode?.content),
+        )
+        .with([NodeKind.Input, NodeKind.Input], () =>
+          inputSpecification?.getDiffContent?.(newNode?.content, oldNode?.content),
+        )
         .with([NodeKind.Expression, NodeKind.Expression], () =>
           expressionSpecification?.getDiffContent?.(newNode?.content, oldNode?.content),
         )
