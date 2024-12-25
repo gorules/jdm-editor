@@ -1,4 +1,4 @@
-import { FormatPainterOutlined, ImportOutlined } from '@ant-design/icons';
+import { FormatPainterOutlined, ImportOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { DiffEditor, Editor } from '@monaco-editor/react';
 import { JsonSchemaViewer } from '@stoplight/json-schema-viewer';
 import { Button, Space, Spin, Tabs, Tooltip, Typography, theme } from 'antd';
@@ -12,6 +12,8 @@ import { useDebouncedCallback, useThrottledCallback } from 'use-debounce';
 
 import { useDecisionGraphActions, useDecisionGraphState, useNodeDiff } from '../context/dg-store.context';
 import { JsonToJsonSchemaDialog } from './json-to-json-schema-dialog';
+
+const schemaTooltip = 'Provide JSON Schema format. If no JSON Schema is provided, validation will be skipped.';
 
 const monacoOptions: editor.IStandaloneEditorConstructionOptions = {
   automaticLayout: true,
@@ -145,7 +147,11 @@ export const TabJsonSchema: React.FC<TabJsonSchemaProps> = ({ id, type = 'input'
                   <JsonSchemaViewer
                     schema={result || {}}
                     emptyText={
-                      (<Typography.Text type={'secondary'}>No schema defined</Typography.Text>) as unknown as string
+                      (
+                        <Typography.Text type={'secondary'}>
+                          No JSON Schema defined. Validation will be skipped.
+                        </Typography.Text>
+                      ) as unknown as string
                     }
                     defaultExpandedDepth={5}
                   />
@@ -170,7 +176,19 @@ export const TabJsonSchema: React.FC<TabJsonSchemaProps> = ({ id, type = 'input'
                   rootClassName='grl-inline-tabs'
                   size='small'
                   style={{ width: '100%' }}
-                  items={Object.values(TabKey).map((t) => ({ key: t, label: t }))}
+                  items={Object.values(TabKey).map((t) => ({
+                    key: t,
+                    label: (
+                      <span>
+                        {t}{' '}
+                        <Tooltip title={schemaTooltip}>
+                          <InfoCircleOutlined
+                            style={{ fontSize: 10, marginLeft: 4, opacity: 0.5, verticalAlign: 'text-top' }}
+                          />
+                        </Tooltip>
+                      </span>
+                    ),
+                  }))}
                   activeKey={activeTab}
                   onChange={(t) => setActiveTab(t as TabKey)}
                   tabBarExtraContent={

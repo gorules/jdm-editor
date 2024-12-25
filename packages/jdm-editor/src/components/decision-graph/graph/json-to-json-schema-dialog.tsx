@@ -46,7 +46,7 @@ export const JsonToJsonSchemaDialog: React.FC<JsonToJsonSchemaDialogProps> = (pr
         }
       }}
     >
-      <Typography.Text>Type or paste json model here and covert to schema</Typography.Text>
+      <Typography.Text>Type or paste JSON or JSON5 model here and covert it to JSON Schema</Typography.Text>
       <Editor
         loading={<Spin size='large' />}
         language='javascript'
