@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.32.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.31.1...@gorules/jdm-editor@1.32.0) (2024-12-25)
+
+### Features
+
+- json schema validation ([#136](https://github.com/gorules/jdm-editor/issues/136)) ([4419202](https://github.com/gorules/jdm-editor/commit/4419202b173065934ba221bc15e7d7a5047b2e79))
+
 ## [1.31.1](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.31.0...@gorules/jdm-editor@1.31.1) (2024-12-20)
 
 ### Bug Fixes
