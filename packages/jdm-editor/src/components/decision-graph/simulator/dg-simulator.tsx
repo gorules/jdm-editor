@@ -66,7 +66,7 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
 
     return Object.entries(simulate.result?.trace ?? {})
       .map(([key, data]) => ({ ...data, nodeId: key }))
-      .filter((t) => ![NodeKind.Input, NodeKind.Output].includes(nodeTypes?.[t.nodeId] as NodeKind))
+      .filter((t) => ![NodeKind.Input].includes(nodeTypes?.[t.nodeId] as NodeKind))
       .filter((t) => t.name.toLowerCase().includes(search?.toLowerCase() ?? ''))
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   }, [simulate, search]);

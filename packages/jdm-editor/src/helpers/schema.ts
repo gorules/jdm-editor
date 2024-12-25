@@ -24,12 +24,32 @@ const nodeCommon = z.object({
 export const inputNodeSchema = z
   .object({
     type: z.literal(NodeKind.Input),
+    content: z
+      .object({
+        schema: z
+          .string()
+          .nullish()
+          .transform((val) => val ?? ''),
+      })
+      .default({
+        schema: '',
+      }),
   })
   .merge(nodeCommon);
 
 export const outputNodeSchema = z
   .object({
     type: z.literal(NodeKind.Output),
+    content: z
+      .object({
+        schema: z
+          .string()
+          .nullish()
+          .transform((val) => val ?? ''),
+      })
+      .default({
+        schema: '',
+      }),
   })
   .merge(nodeCommon);
 
@@ -234,19 +254,7 @@ export const validationSchema = z.object({
   outputSchema: z.any().nullish().default(null),
 });
 
-export const settingsSchema = z
-  .object({
-    validation: validationSchema,
-  })
-  .default({
-    validation: {
-      inputSchema: null,
-      outputSchema: null,
-    },
-  });
-
 export const decisionModelSchema = z.object({
   nodes: z.array(nodeSchema).default([]),
   edges: z.array(edgeSchema).default([]),
-  settings: settingsSchema,
 });
