@@ -1,14 +1,12 @@
 import { FormatPainterOutlined, ImportOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { DiffEditor, Editor } from '@monaco-editor/react';
-import { JsonSchemaViewer } from '@stoplight/json-schema-viewer';
-import { Button, Space, Spin, Tabs, Tooltip, Typography, theme } from 'antd';
+import { Button, Space, Spin, Tabs, Tooltip, theme } from 'antd';
 import type { DragDropManager } from 'dnd-core';
-import json5 from 'json5';
 import { type editor } from 'monaco-editor';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import { PanelGroup } from 'react-resizable-panels';
 import { match } from 'ts-pattern';
-import { useDebouncedCallback, useThrottledCallback } from 'use-debounce';
+import { useThrottledCallback } from 'use-debounce';
 
 import { useDecisionGraphActions, useDecisionGraphState, useNodeDiff } from '../context/dg-store.context';
 import { JsonToJsonSchemaDialog } from './json-to-json-schema-dialog';
@@ -82,36 +80,6 @@ export const TabJsonSchema: React.FC<TabJsonSchemaProps> = ({ id, type = 'input'
     return () => window.removeEventListener('resize', resizeDiffEditor);
   }, [resizeDiffEditor, diffEditor]);
 
-  const calculateState = (val: string = ''): { result: any | null; error?: null | string; loaded?: boolean } => {
-    try {
-      if (!(val?.trim?.()?.length > 0)) {
-        return { result: {}, error: null, loaded: true };
-      } else {
-        const parsed = json5.parse(val || '');
-        return { result: parsed, error: null, loaded: true };
-      }
-    } catch (e: any) {
-      return { result: null, error: e?.message, loaded: true };
-    }
-  };
-
-  const [{ result, error, loaded }, setViewer] = useState<{
-    result: any | null;
-    error?: string | null;
-    loaded?: boolean;
-  }>({
-    result: null,
-    error: null,
-    loaded: false,
-  });
-  const setViewerStateDebounced = useDebouncedCallback((val?: string) => setViewer(calculateState(val)), 500, {
-    trailing: true,
-  });
-
-  useEffect(() => {
-    setViewerStateDebounced(content?.schema);
-  }, [content?.schema]);
-
   return (
     <div
       className='grl-node-content'
@@ -131,148 +99,109 @@ export const TabJsonSchema: React.FC<TabJsonSchemaProps> = ({ id, type = 'input'
         direction='horizontal'
         autoSaveId={`jdm-editor:${type}:schema:layout`}
       >
-        <Panel
-          defaultSize={70}
-          minSize={30}
-          style={{
-            overflowY: 'auto',
-          }}
-        >
-          <div className={'json-schema-viewer'} style={{ maxWidth: 600, padding: '3rem 2rem', margin: '0 auto' }}>
-            {loaded ? (
-              <>
-                {error ? (
-                  <Typography.Text>{error}</Typography.Text>
-                ) : (
-                  <JsonSchemaViewer
-                    schema={result || {}}
-                    emptyText={
-                      (
-                        <Typography.Text type={'secondary'}>
-                          No JSON Schema defined. Validation will be skipped.
-                        </Typography.Text>
-                      ) as unknown as string
-                    }
-                    defaultExpandedDepth={5}
-                  />
-                )}
-              </>
-            ) : (
-              <Spin
-                spinning
-                style={{
-                  width: '100%',
-                }}
-              />
-            )}
-          </div>
-        </Panel>
-        <PanelResizeHandle />
-        <Panel minSize={25}>
-          <div className='grl-node-content-side'>
-            <div className='grl-node-content-side__panel'>
-              <div className='grl-node-content-side__header'>
-                <Tabs
-                  rootClassName='grl-inline-tabs'
-                  size='small'
-                  style={{ width: '100%' }}
-                  items={Object.values(TabKey).map((t) => ({
-                    key: t,
-                    label: (
-                      <span>
-                        {t}{' '}
-                        <Tooltip title={schemaTooltip}>
-                          <InfoCircleOutlined
-                            style={{ fontSize: 10, marginLeft: 4, opacity: 0.5, verticalAlign: 'text-top' }}
-                          />
-                        </Tooltip>
-                      </span>
-                    ),
-                  }))}
-                  activeKey={activeTab}
-                  onChange={(t) => setActiveTab(t as TabKey)}
-                  tabBarExtraContent={
-                    <Space style={{ marginRight: 8 }} size={'small'}>
-                      <Tooltip title='Format code' placement='bottomRight'>
-                        <Button
-                          size='small'
-                          type='text'
-                          disabled={disabled}
-                          icon={<FormatPainterOutlined />}
-                          onClick={() => editor?.getAction?.('editor.action.formatDocument')?.run?.()}
+        <div className='grl-node-content-side'>
+          <div className='grl-node-content-side__panel'>
+            <div className='grl-node-content-side__header'>
+              <Tabs
+                rootClassName='grl-inline-tabs'
+                size='small'
+                style={{ width: '100%' }}
+                items={Object.values(TabKey).map((t) => ({
+                  key: t,
+                  label: (
+                    <span>
+                      {t}{' '}
+                      <Tooltip title={schemaTooltip}>
+                        <InfoCircleOutlined
+                          style={{ fontSize: 10, marginLeft: 4, opacity: 0.5, verticalAlign: 'text-top' }}
                         />
                       </Tooltip>
-                      <Tooltip title='Import from JSON' placement='bottomRight'>
-                        <Button
-                          type='text'
-                          size={'small'}
-                          disabled={disabled}
-                          icon={<ImportOutlined />}
-                          onClick={() => {
-                            setJsonToJsonSchemaOpen(true);
-                          }}
-                        />
-                      </Tooltip>
-                    </Space>
-                  }
-                />
-              </div>
-              <div className='grl-node-content-side__body'>
-                {match(activeTab)
-                  .with(TabKey.Schema, () =>
-                    previousValue !== undefined ? (
-                      <DiffEditor
-                        loading={<Spin size='large' />}
-                        language={language}
-                        original={previousValue}
-                        modified={content?.schema}
-                        onMount={(editor) => setDiffEditor(editor)}
-                        theme={token.mode === 'dark' ? 'vs-dark' : 'light'}
-                        height='100%'
-                        options={{
-                          ...monacoOptions,
-                          readOnly: true,
+                    </span>
+                  ),
+                }))}
+                activeKey={activeTab}
+                onChange={(t) => setActiveTab(t as TabKey)}
+                tabBarExtraContent={
+                  <Space style={{ marginRight: 8 }} size={'small'}>
+                    <Tooltip title='Format code' placement='bottomRight'>
+                      <Button
+                        size='small'
+                        type='text'
+                        disabled={disabled}
+                        icon={<FormatPainterOutlined />}
+                        onClick={() => editor?.getAction?.('editor.action.formatDocument')?.run?.()}
+                      />
+                    </Tooltip>
+                    <Tooltip title='Import from JSON' placement='bottomRight'>
+                      <Button
+                        type='text'
+                        size={'small'}
+                        disabled={disabled}
+                        icon={<ImportOutlined />}
+                        onClick={() => {
+                          setJsonToJsonSchemaOpen(true);
                         }}
                       />
-                    ) : (
-                      <Editor
-                        loading={<Spin size='large' />}
-                        language={language}
-                        value={content?.schema || ''}
-                        onMount={(editor) => setEditor(editor)}
-                        onChange={(value) => {
-                          graphActions.updateNode(id, (draft) => {
-                            draft.content = { schema: value };
-                            return draft;
-                          });
-                        }}
-                        theme={token.mode === 'dark' ? 'vs-dark' : 'light'}
-                        height='100%'
-                        options={{
-                          ...monacoOptions,
-                          readOnly: disabled,
-                        }}
-                      />
-                    ),
-                  )
-                  .exhaustive()}
-              </div>
-              <JsonToJsonSchemaDialog
-                isOpen={jsonToJsonSchemaOpen}
-                onDismiss={() => setJsonToJsonSchemaOpen(false)}
-                onSuccess={({ schema, model }) => {
-                  localStorage.setItem(`${id}-model`, model);
-                  graphActions.updateNode(id, (draft) => {
-                    draft.content = { schema };
-                    return draft;
-                  });
-                  setJsonToJsonSchemaOpen(false);
-                }}
-                model={localStorage.getItem(`${id}-model`) || undefined}
+                    </Tooltip>
+                  </Space>
+                }
               />
             </div>
+            <div className='grl-node-content-side__body'>
+              {match(activeTab)
+                .with(TabKey.Schema, () =>
+                  previousValue !== undefined ? (
+                    <DiffEditor
+                      loading={<Spin size='large' />}
+                      language={language}
+                      original={previousValue}
+                      modified={content?.schema}
+                      onMount={(editor) => setDiffEditor(editor)}
+                      theme={token.mode === 'dark' ? 'vs-dark' : 'light'}
+                      height='100%'
+                      options={{
+                        ...monacoOptions,
+                        readOnly: true,
+                      }}
+                    />
+                  ) : (
+                    <Editor
+                      loading={<Spin size='large' />}
+                      language={language}
+                      value={content?.schema || ''}
+                      onMount={(editor) => setEditor(editor)}
+                      onChange={(value) => {
+                        graphActions.updateNode(id, (draft) => {
+                          draft.content = { schema: value };
+                          return draft;
+                        });
+                      }}
+                      theme={token.mode === 'dark' ? 'vs-dark' : 'light'}
+                      height='100%'
+                      options={{
+                        ...monacoOptions,
+                        readOnly: disabled,
+                      }}
+                    />
+                  ),
+                )
+                .exhaustive()}
+            </div>
+            <JsonToJsonSchemaDialog
+              isOpen={jsonToJsonSchemaOpen}
+              onDismiss={() => setJsonToJsonSchemaOpen(false)}
+              onSuccess={({ schema, model }) => {
+                localStorage.setItem(`${id}-model`, model);
+                graphActions.updateNode(id, (draft) => {
+                  draft.content = { schema };
+                  return draft;
+                });
+                setJsonToJsonSchemaOpen(false);
+              }}
+              model={localStorage.getItem(`${id}-model`) || undefined}
+            />
           </div>
-        </Panel>
+        </div>
       </PanelGroup>
     </div>
   );
