@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.32.1](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.32.0...@gorules/jdm-editor@1.32.1) (2024-12-26)
+
+### Bug Fixes
+
+- remove stoplight ([#137](https://github.com/gorules/jdm-editor/issues/137)) ([a5ece23](https://github.com/gorules/jdm-editor/commit/a5ece238abea5ac7425560780c83592402b01103))
+
 # [1.32.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.31.1...@gorules/jdm-editor@1.32.0) (2024-12-25)
 
 ### Features
