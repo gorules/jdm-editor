@@ -834,7 +834,8 @@
 
 .grl-node-content-side {
   height: 100%;
-  border-left: 1px solid var(--grl-color-border);
+  width: 100%;
+  //border-left: 1px solid var(--grl-color-border);
 
   &__panel {
     background: var(--grl-color-bg-elevated);

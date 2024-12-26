@@ -1,13 +1,7 @@
-@import 'stoplight-mosaic.css';
-
 :root {
   --mono-font-family: 'SF Mono', SFMono-Regular, ui-monospace, 'DejaVu Sans Mono', Menlo, Consolas, monospace;
   --grl-transition: 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
   --grl-transition-quick: 0.1s cubic-bezier(0.645, 0.045, 0.355, 1);
-}
-
-.sl-text-base {
-  font-size: 13px !important;
 }
 
 .full-width {
