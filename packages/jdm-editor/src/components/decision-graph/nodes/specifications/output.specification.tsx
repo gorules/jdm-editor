@@ -46,7 +46,7 @@ export const outputSpecification: NodeSpecification<NodeOutputData> = {
   },
   getDiffContent: (current, previous): any => {
     const fields: DiffMetadata['fields'] = {};
-    return produce(current, (draft) => {
+    return produce(current || {}, (draft) => {
       if (current?.schema !== previous?.schema) {
         _.set(fields, 'schema', {
           previousValue: previous?.schema || '',
