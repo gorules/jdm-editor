@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.32.3](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.32.2...@gorules/jdm-editor@1.32.3) (2025-01-10)
+
+### Bug Fixes
+
+- input output schema diff logic ([#140](https://github.com/gorules/jdm-editor/issues/140)) ([605c610](https://github.com/gorules/jdm-editor/commit/605c610bbb4360e1856174d674c9a1dde3b9f760))
+
 ## [1.32.2](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.32.1...@gorules/jdm-editor@1.32.2) (2025-01-08)
 
 ### Bug Fixes
