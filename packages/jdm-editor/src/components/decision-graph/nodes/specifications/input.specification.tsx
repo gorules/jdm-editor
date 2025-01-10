@@ -85,7 +85,7 @@ export const inputSpecification: NodeSpecification<NodeInputData> = {
   getDiffContent: (current, previous): any => {
     const fields: DiffMetadata['fields'] = {};
     return produce(current || {}, (draft) => {
-      if (current?.schema !== previous?.schema) {
+      if ((current?.schema || '')?.trim?.() !== (previous?.schema || '')?.trim?.()) {
         _.set(fields, 'schema', {
           previousValue: previous?.schema || '',
           status: 'modified',
