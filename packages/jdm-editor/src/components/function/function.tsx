@@ -289,6 +289,7 @@ export const Function: React.FC<FunctionProps> = ({
 const monacoOptions: editor.IStandaloneEditorConstructionOptions = {
   automaticLayout: true,
   contextmenu: false,
+  fixedOverflowWidgets: true,
   fontSize: 13,
   fontFamily: 'var(--mono-font-family)',
   tabSize: 2,

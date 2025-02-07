@@ -30,7 +30,12 @@ export default defineConfig({
       formats: ['es'],
     },
     rollupOptions: {
-      external: ['react/jsx-runtime', 'react', 'react-dom', ...Object.keys(packageJson.dependencies)],
+      external: [
+        'react/jsx-runtime',
+        'react',
+        'react-dom',
+        ...Object.keys(packageJson.dependencies).filter((s) => s !== 'antd`'),
+      ],
       output: {
         globals: {
           'react-dom': 'ReactDOM',

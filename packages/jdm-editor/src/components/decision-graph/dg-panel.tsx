@@ -28,6 +28,7 @@ export const GraphPanel: React.FC = () => {
     <Resizable
       className={'grl-dg__panel'}
       defaultSize={{ height: defaultHeight }}
+      handleClasses={{ top: 'grl-dg__resizeHandle grl-dg__resizeHandle__vertical' }}
       handleStyles={{
         bottom: { display: 'none' },
         left: { display: 'none' },

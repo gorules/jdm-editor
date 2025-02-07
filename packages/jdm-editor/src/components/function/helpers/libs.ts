@@ -28,8 +28,8 @@ export const functionLibraries: FunctionLibrary[] = [
     name: 'big.js',
     tagline: 'Arbitrary-precision decimal arithmetic',
     importName: 'Big',
-    typeDef: bigJs,
     documentationUrl: 'https://mikemcl.github.io/big.js/',
+    typeDef: bigJs,
   },
   {
     name: 'dayjs',
@@ -52,7 +52,7 @@ export const functionLibraries: FunctionLibrary[] = [
   {
     name: 'zod',
     tagline: 'Schema validation',
-    importName: 'z',
+    importName: '{ z }',
     typeDef: zod,
     documentationUrl: 'https://zod.dev/',
   },
