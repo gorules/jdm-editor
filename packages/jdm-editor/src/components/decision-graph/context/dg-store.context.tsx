@@ -2,7 +2,7 @@ import { type VariableType } from '@gorules/zen-engine-wasm';
 import type { Monaco } from '@monaco-editor/react';
 import equal from 'fast-deep-equal/es6/react';
 import { produce } from 'immer';
-import type { WritableDraft } from 'immer/src/types/types-external';
+import type { WritableDraft } from 'immer';
 import React, { type MutableRefObject, createRef, useMemo } from 'react';
 import type { EdgeChange, NodeChange, ReactFlowInstance, useEdgesState, useNodesState } from 'reactflow';
 import { match } from 'ts-pattern';
