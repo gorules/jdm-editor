@@ -24,6 +24,7 @@ export type TableSchemaItem = {
   field?: string;
   defaultValue?: string;
   _diff?: DiffMetadata;
+  children?: TableSchemaItem[];
 };
 
 export type HitPolicy = 'first' | 'collect';
@@ -55,6 +56,11 @@ const cleanupTableRule = (
       return (newRule[schemaItem.id] = rule?.[schemaItem.id] || schemaItem?.defaultValue || '');
     }
     newRule[schemaItem.id] = rule?.[schemaItem.id] || '';
+    if (schemaItem.children) {
+      schemaItem.children.forEach((child) => {
+        newRule[child.id] = rule?.[child.id] || '';
+      });
+    }
   });
   return newRule;
 };
@@ -72,6 +78,11 @@ const cleanupTableRules = (decisionTable: DecisionTableType, defaultId?: string)
         return (newRule[schemaItem.id] = rule?.[schemaItem.id] || schemaItem?.defaultValue || '');
       }
       newRule[schemaItem.id] = rule?.[schemaItem.id] || '';
+      if (schemaItem.children) {
+        schemaItem.children.forEach((child) => {
+          newRule[child.id] = rule?.[child.id] || '';
+        });
+      }
     });
     return newRule;
   });
@@ -156,6 +167,7 @@ export type DecisionTableStoreType = {
     removeColumn: (type: ColumnType, id: string) => void;
     reorderColumns: (type: ColumnType, columns: TableSchemaItem[]) => void;
     updateHitPolicy: (hitPolicy: HitPolicy) => void;
+    addChildColumn: (type: ColumnType, parentId: string, column: TableSchemaItem) => void;
   };
 
   listeners: {
@@ -371,6 +383,22 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
 
         const updatedDecisionTable = produce(decisionTable, (draft) => {
           draft.hitPolicy = hitPolicy;
+          return draft;
+        });
+
+        stateStore.setState({ decisionTable: updatedDecisionTable });
+        listenerStore.getState().onChange?.(updatedDecisionTable);
+      },
+      addChildColumn: (type: ColumnType, parentId: string, column: TableSchemaItem) => {
+        const { decisionTable } = stateStore.getState();
+
+        const updatedDecisionTable = produce(decisionTable, (draft) => {
+          const parentColumn = draft[type].find((item) => item.id === parentId);
+          if (parentColumn) {
+            parentColumn.children = parentColumn.children || [];
+            parentColumn.children.push(column);
+          }
+          draft.rules = cleanupTableRules(draft);
           return draft;
         });
 
