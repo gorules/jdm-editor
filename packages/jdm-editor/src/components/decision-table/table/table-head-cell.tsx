@@ -208,6 +208,17 @@ export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({ con
                         });
                       },
                     },
+                    {
+                      key: 'addChild',
+                      label: 'Add child column',
+                      onClick: () => {
+                        setDialog({
+                          type: 'add',
+                          columnType: 'inputs',
+                          item: schema,
+                        });
+                      },
+                    },
                   ],
                 }}
               >
@@ -301,6 +312,17 @@ export const TableHeadCellOutputField: React.FC<TableHeadCellFieldProps> = ({ co
                             danger: true,
                           },
                           onOk: () => tableActions.removeColumn('outputs', schema.id),
+                        });
+                      },
+                    },
+                    {
+                      key: 'addChild',
+                      label: 'Add child column',
+                      onClick: () => {
+                        setDialog({
+                          type: 'add',
+                          columnType: 'outputs',
+                          item: schema,
                         });
                       },
                     },

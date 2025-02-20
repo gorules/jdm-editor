@@ -88,6 +88,15 @@ export const Table: React.FC<TableProps> = ({ id, maxHeight }) => {
               minSize: minColWidth,
               size: colWidth,
               header: () => <TableHeadCellInputField schema={input} configurable={configurable} disabled={disabled} />,
+              columns: input.children?.map((child: any) => ({
+                accessorKey: child.id,
+                id: child.id,
+                minSize: minColWidth,
+                size: colWidth,
+                header: () => (
+                  <TableHeadCellInputField schema={child} configurable={configurable} disabled={disabled} />
+                ),
+              })),
             };
           }),
         ],
@@ -106,6 +115,15 @@ export const Table: React.FC<TableProps> = ({ id, maxHeight }) => {
               header: () => (
                 <TableHeadCellOutputField schema={output} configurable={configurable} disabled={disabled} />
               ),
+              columns: output.children?.map((child: any) => ({
+                accessorKey: child.id,
+                id: child.id,
+                minSize: minColWidth,
+                size: colWidth,
+                header: () => (
+                  <TableHeadCellOutputField schema={child} configurable={configurable} disabled={disabled} />
+                ),
+              })),
             };
           }),
         ],
