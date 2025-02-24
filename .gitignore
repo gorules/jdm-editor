@@ -4,6 +4,7 @@ dist
 /node_modules
 node_modules
 /target
+/.pnpm-store
 
 # Ignore
 *.log*

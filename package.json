@@ -10,10 +10,11 @@
     "prettier": "prettier --check .",
     "prettier:fix": "pnpm prettier --write",
     "format": "run-s lint prettier",
-    "format:fix": "run-s lint:fix prettier:fix"
+    "format:fix": "run-s lint:fix prettier:fix",
+    "storybook": "lerna run storybook"
   },
   "engines": {
-    "pnpm": "~9"
+    "pnpm": "~10"
   },
   "devDependencies": {
     "@swc/core": "^1.7.26",
