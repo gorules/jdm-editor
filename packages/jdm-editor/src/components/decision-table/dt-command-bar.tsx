@@ -44,7 +44,8 @@ export const DecisionTableCommandBar: React.FC = () => {
       const decisionTable = stateStore.getState().decisionTable;
       await exportExcelFile(name, [{ ...decisionTable, name: 'decision table', id: crypto.randomUUID() }]);
       message.success('Excel file has been downloaded successfully!');
-    } catch {
+    } catch (e) {
+      console.error('Failed to download Excel file!', e);
       message.error('Failed to download Excel file!');
     }
   };

@@ -1,4 +1,5 @@
 import { message } from 'antd';
+import exceljs from 'exceljs';
 import { P, match } from 'ts-pattern';
 
 import type { DecisionNode, DecisionTableType } from '../components';
@@ -13,8 +14,8 @@ type DecisionTableNode = {
 } & DecisionTableType;
 
 export const exportExcelFile = async (fileName: string, decisionTableNodes: DecisionTableNode[]) => {
-  const ExcelJS = await import('exceljs');
-  const workbook = new ExcelJS.Workbook();
+  const { Workbook } = exceljs;
+  const workbook = new Workbook();
 
   decisionTableNodes.forEach((decisionTableNode) => {
     let worksheetName: string = decisionTableNode.name;
