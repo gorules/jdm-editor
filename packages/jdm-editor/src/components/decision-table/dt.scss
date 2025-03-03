@@ -53,6 +53,7 @@
     width: fit-content;
     background-color: var(--grl-color-bg-container);
     height: 1px;
+    min-width: 100%;
 
     .cell-wrapper {
       display: block;
@@ -229,6 +230,10 @@
       cursor: col-resize;
       user-select: none;
       touch-action: none;
+
+      &--last {
+        right: 0;
+      }
 
       &::after {
         content: '';
