@@ -65,7 +65,8 @@ export const DecisionTableCommandBar: React.FC = () => {
 
         if (!buffer) return;
 
-        const nodes: DecisionNode[] = await readFromExcel(buffer);
+        const table = stateStore.getState().decisionTable;
+        const nodes: DecisionNode[] = await readFromExcel(buffer, table);
         const newTable = nodes[0].content;
 
         tableActions.setDecisionTable(newTable);
