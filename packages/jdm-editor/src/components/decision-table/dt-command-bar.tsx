@@ -129,7 +129,7 @@ export const DecisionTableCommandBar: React.FC = () => {
               </Tooltip>
               <Tooltip>
                 <Popconfirm title='Remove row?' okText='Remove' onConfirm={() => tableActions.removeRow(cursor?.y)}>
-                  <Button type='text' size={'small'} icon={<DeleteOutlined />} />
+                  <Button type='text' danger size={'small'} icon={<DeleteOutlined />} />
                 </Popconfirm>
               </Tooltip>
               <Button
