@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.33.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.32.3...@gorules/jdm-editor@1.33.0) (2025-03-04)
+
+### Bug Fixes
+
+- dt full width and excel fix ([#150](https://github.com/gorules/jdm-editor/issues/150)) ([e310f3f](https://github.com/gorules/jdm-editor/commit/e310f3f0d63a0d90a65de592cf3942dd03de2d99))
+
 ## [1.32.3](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.32.2...@gorules/jdm-editor@1.32.3) (2025-01-10)
 
 ### Bug Fixes
