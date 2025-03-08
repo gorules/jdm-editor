@@ -28,14 +28,25 @@ export const TableHeadRow: React.FC<{ headerGroup: HeaderGroup<any> }> = ({ head
           colSpan={header.colSpan}
           data-self={selfKind}
           data-parent={parentKind}
-          style={{
-            width: header.getSize(),
-          }}
+          style={
+            selfKind !== 'description'
+              ? {
+                  width: header.getSize(),
+                }
+              : {
+                  minWidth: header.getSize(),
+                  width: '100%',
+                }
+          }
         >
           {!header.isPlaceholder && flexRender(header.column.columnDef.header, context)}
           {header.column.getCanResize() && (
             <div
-              className={clsx('resizer', header.column.getIsResizing() && 'isResizing')}
+              className={clsx(
+                'resizer',
+                selfKind === 'description' && 'resizer--last',
+                header.column.getIsResizing() && 'isResizing',
+              )}
               onMouseDown={header.getResizeHandler()}
               onTouchStart={header.getResizeHandler()}
             />

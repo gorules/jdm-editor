@@ -75,10 +75,10 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
         const buffer = fileReader.result as ArrayBuffer;
 
         if (!buffer) return;
-
-        const nodesFromExcel = await readFromExcel(buffer);
-
         const { decisionGraph } = decisionGraphRaw.stateStore.getState();
+
+        const nodesFromExcel = await readFromExcel(buffer, decisionGraph);
+
         const updatedNodes = decisionGraph.nodes.map((node) => {
           let _node = node;
           // updating existing nodes

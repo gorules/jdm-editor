@@ -44,7 +44,8 @@ export const DecisionTableCommandBar: React.FC = () => {
       const decisionTable = stateStore.getState().decisionTable;
       await exportExcelFile(name, [{ ...decisionTable, name: 'decision table', id: crypto.randomUUID() }]);
       message.success('Excel file has been downloaded successfully!');
-    } catch {
+    } catch (e) {
+      console.error('Failed to download Excel file!', e);
       message.error('Failed to download Excel file!');
     }
   };
@@ -64,7 +65,8 @@ export const DecisionTableCommandBar: React.FC = () => {
 
         if (!buffer) return;
 
-        const nodes: DecisionNode[] = await readFromExcel(buffer);
+        const table = stateStore.getState().decisionTable;
+        const nodes: DecisionNode[] = await readFromExcel(buffer, table);
         const newTable = nodes[0].content;
 
         tableActions.setDecisionTable(newTable);
@@ -127,7 +129,7 @@ export const DecisionTableCommandBar: React.FC = () => {
               </Tooltip>
               <Tooltip>
                 <Popconfirm title='Remove row?' okText='Remove' onConfirm={() => tableActions.removeRow(cursor?.y)}>
-                  <Button type='text' size={'small'} icon={<DeleteOutlined />} />
+                  <Button type='text' danger size={'small'} icon={<DeleteOutlined />} />
                 </Popconfirm>
               </Tooltip>
               <Button

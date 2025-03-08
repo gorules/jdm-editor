@@ -1,7 +1,8 @@
 import { message } from 'antd';
+import exceljs from 'exceljs';
 import { P, match } from 'ts-pattern';
 
-import type { DecisionNode, DecisionTableType } from '../components';
+import type { DecisionGraphType, DecisionNode, DecisionTableType } from '../components';
 import { NodeKind } from '../components/decision-graph/nodes/specifications/specification-types';
 import type { TableSchemaItem } from '../components/decision-table/context/dt-store.context';
 import { parseDecisionTable } from '../components/decision-table/context/dt-store.context';
@@ -13,8 +14,8 @@ type DecisionTableNode = {
 } & DecisionTableType;
 
 export const exportExcelFile = async (fileName: string, decisionTableNodes: DecisionTableNode[]) => {
-  const ExcelJS = await import('exceljs');
-  const workbook = new ExcelJS.Workbook();
+  const { Workbook } = exceljs;
+  const workbook = new Workbook();
 
   decisionTableNodes.forEach((decisionTableNode) => {
     let worksheetName: string = decisionTableNode.name;
@@ -145,7 +146,7 @@ export const exportExcelFile = async (fileName: string, decisionTableNodes: Deci
   saveFile(`${fileName}.xlsx`, blob);
 };
 
-const parseSpreadsheetData = (spreadSheetData: any) => {
+const parseSpreadsheetData = (spreadSheetData: any, defaultTable?: DecisionTableType) => {
   const headers: any[] = spreadSheetData.splice(0, 3)[2];
   const columnHeaders = headers.map((header) => {
     if (header.value.toLowerCase() === 'description') {
@@ -220,13 +221,16 @@ const parseSpreadsheetData = (spreadSheetData: any) => {
     inputs,
     outputs,
     rules,
-    hitPolicy: 'first',
+    hitPolicy: defaultTable?.hitPolicy || 'first',
+    inputField: defaultTable?.inputField,
+    outputPath: defaultTable?.outputPath,
+    passThorough: defaultTable?.passThorough,
   });
 };
 
-export const readFromExcel = async (buffer: ArrayBuffer) => {
-  const ExcelJS = await import('exceljs');
-  const excelWorkbook = new ExcelJS.Workbook();
+export const readFromExcel = async (buffer: ArrayBuffer, defaultValues?: DecisionTableType | DecisionGraphType) => {
+  const { Workbook } = exceljs;
+  const excelWorkbook = new Workbook();
   const workbook = await excelWorkbook.xlsx.load(buffer);
   const nodes: DecisionNode[] = [];
 
@@ -253,11 +257,18 @@ export const readFromExcel = async (buffer: ArrayBuffer) => {
     });
     const nodeId: string = spreadsheetData[0][0].value;
 
+    let defaultTableValues;
+    if (defaultValues && typeof defaultValues === 'object' && 'nodes' in defaultValues) {
+      defaultTableValues = defaultValues.nodes?.find((node) => node.id === nodeId)?.content;
+    } else if (defaultValues && typeof defaultValues === 'object') {
+      defaultTableValues = defaultValues as DecisionTableType;
+    }
+
     nodes.push({
       id: nodeId,
       name: spreadsheetName,
       type: NodeKind.DecisionTable,
-      content: parseSpreadsheetData(spreadsheetData),
+      content: parseSpreadsheetData(spreadsheetData, defaultTableValues),
       position: { x: 0, y: 0 },
     });
   });
