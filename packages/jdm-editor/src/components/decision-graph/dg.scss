@@ -6,11 +6,6 @@
   grid-template-columns: min-content 1fr min-content;
   grid-template-rows: 1fr auto;
 
-  --node-color-blue: var(--grl-color-primary);
-  --node-color-purple: #7c4dff;
-  --node-color-orange: #f76d40;
-  --node-color-green: #10ac84;
-
   * {
     box-sizing: border-box;
   }

@@ -36,7 +36,7 @@ export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inp
     };
 
     event.dataTransfer.effectAllowed = 'move';
-    event.dataTransfer.setData('application/reactflow', nodeType);
+    event.dataTransfer.setData('nodeType', nodeType);
     event.dataTransfer.setData('relativePosition', JSON.stringify(positionData));
     if (component) {
       event.dataTransfer.setData('customNodeComponent', component);
