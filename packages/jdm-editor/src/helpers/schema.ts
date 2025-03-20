@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const DECISION_GRAPH_CONTENT_TYPE = 'application/vnd.gorules.decision';
-const id = z.string().default(crypto.randomUUID);
+const id = z.string().default(() => crypto.randomUUID());
 
 export enum NodeKind {
   Input = 'inputNode',

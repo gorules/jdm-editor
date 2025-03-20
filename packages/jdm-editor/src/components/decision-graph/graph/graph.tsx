@@ -1,5 +1,5 @@
 import { CloseOutlined, CompressOutlined, LeftOutlined, WarningOutlined } from '@ant-design/icons';
-import { Button, Modal, Tooltip, Typography, message } from 'antd';
+import { Button, Modal, Tooltip, Typography, message, notification } from 'antd';
 import clsx from 'clsx';
 import equal from 'fast-deep-equal';
 import React, { type MutableRefObject, forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
@@ -284,7 +284,6 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
     }
 
     const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
-    const type = event.dataTransfer.getData('application/reactflow');
     let elementPosition: XYPosition;
 
     try {
@@ -292,6 +291,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
     } catch {
       return;
     }
+
     const position = reactFlowInstance.current.project({
       x: event.clientX - reactFlowBounds.left,
       y: event.clientY - reactFlowBounds.top,
@@ -300,11 +300,25 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
     position.x -= Math.round((elementPosition.x * 226) / 10) * 10;
     position.y -= Math.round((elementPosition.y * 60) / 10) * 10;
 
+    const nodeData = event.dataTransfer.getData('nodeData');
+    if (nodeData) {
+      try {
+        const jsonData = JSON.parse(nodeData);
+        graphActions.addNodes([nodeSchema.parse({ ...jsonData, position })]);
+      } catch (err) {
+        notification.error({ message: 'Failed to create a node' });
+        console.error(err);
+      }
+
+      return;
+    }
+
+    const type = event.dataTransfer.getData('nodeType');
     const component = match(event.dataTransfer.getData('customNodeComponent'))
       .with(P.string, (c) => c)
       .otherwise(() => undefined);
 
-    addNodeInner(type, position, component);
+    void addNodeInner(type, position, component);
   };
 
   const onDragOver = (event: any) => {

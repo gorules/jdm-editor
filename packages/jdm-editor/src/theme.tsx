@@ -92,6 +92,11 @@ const GlobalCssVariables: React.FC<{ mode: 'light' | 'dark' }> = ({ mode }) => {
 
       '--grl-decision-table-output': mode === 'light' ? '#eaeaea' : '#091422',
       '--grl-decision-table-selected-row': mode === 'light' ? '#f4faff' : '#121720',
+
+      '--node-color-blue': 'var(--grl-color-primary)',
+      '--node-color-purple': '#7c4dff',
+      '--node-color-orange': '#f76d40',
+      '--node-color-green': '#10ac84',
     }),
     [token, mode],
   );

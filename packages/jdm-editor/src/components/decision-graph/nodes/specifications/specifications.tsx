@@ -12,11 +12,7 @@ function makeNodeSpecification<T extends Record<NodeKind, V>, V extends NodeSpec
 }
 
 export const nodeSpecification = makeNodeSpecification({
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
   [NodeKind.Input]: inputSpecification,
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
   [NodeKind.Output]: outputSpecification,
   [NodeKind.DecisionTable]: decisionTableSpecification,
   [NodeKind.Expression]: expressionSpecification,
