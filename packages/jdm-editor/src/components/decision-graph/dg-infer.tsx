@@ -22,45 +22,49 @@ export const DecisionGraphInferTypes = () => {
     }
 
     return stateStore.subscribe(({ simulate, nodeTypes, decisionGraph }, prevState) => {
-      if (equal(simulate, prevState?.simulate)) {
-        return;
-      }
+      try {
+        if (equal(simulate, prevState?.simulate)) {
+          return;
+        }
 
-      const trace = match(simulate)
-        .with({ result: P.nonNullable }, ({ result }) => result.trace)
-        .otherwise(() => null);
-      if (trace === null) {
+        const trace = match(simulate)
+          .with({ result: P.nonNullable }, ({ result }) => result.trace)
+          .otherwise(() => null);
+        if (trace === null) {
+          const newNodeTypes = produce(nodeTypes, (draft) => {
+            Object.values(draft).forEach((nt) => {
+              delete nt[NodeTypeKind.Input];
+              delete nt[NodeTypeKind.Output];
+            });
+          });
+
+          stateStore.setState({ nodeTypes: newNodeTypes });
+          return;
+        }
+
+        const traceValues = Object.values(trace);
+        if (traceValues.length === 0) {
+          return;
+        }
+
         const newNodeTypes = produce(nodeTypes, (draft) => {
-          Object.values(draft).forEach((nt) => {
-            delete nt[NodeTypeKind.Input];
-            delete nt[NodeTypeKind.Output];
+          traceValues.forEach((t) => {
+            const node = decisionGraph.nodes.find((n) => n.id === t.id);
+            if (node?.type === 'inputNode') {
+              return;
+            }
+
+            draft[t.id] ??= {};
+
+            draft[t.id][NodeTypeKind.Output] = new VariableType(t.output ?? {});
+            draft[t.id][NodeTypeKind.Input] = new VariableType(t.input ?? {});
           });
         });
 
         stateStore.setState({ nodeTypes: newNodeTypes });
-        return;
+      } catch (err) {
+        console.error('error occurred while setting up variable types from trace', err);
       }
-
-      const traceValues = Object.values(trace);
-      if (traceValues.length === 0) {
-        return;
-      }
-
-      const newNodeTypes = produce(nodeTypes, (draft) => {
-        traceValues.forEach((t) => {
-          const node = decisionGraph.nodes.find((n) => n.id === t.id);
-          if (node?.type === 'inputNode') {
-            return;
-          }
-
-          draft[t.id] ??= {};
-
-          draft[t.id][NodeTypeKind.Output] = new VariableType(t.output ?? {});
-          draft[t.id][NodeTypeKind.Input] = new VariableType(t.input ?? {});
-        });
-      });
-
-      stateStore.setState({ nodeTypes: newNodeTypes });
     });
   }, []);
 
@@ -72,16 +76,20 @@ export const DecisionGraphInferTypes = () => {
 
     const graphWalker = createGraphWalker();
     return stateStore.subscribe((state, prevState) => {
-      const stateDigest = inferTypesStateDigest(state);
-      const prevStateDigest = inferTypesStateDigest(prevState);
-      const needUpdate = inferTypesNeedsUpdate(state, prevState);
-      if (equal(stateDigest, prevStateDigest) && !needUpdate) {
-        return;
-      }
+      try {
+        const stateDigest = inferTypesStateDigest(state);
+        const prevStateDigest = inferTypesStateDigest(prevState);
+        const needUpdate = inferTypesNeedsUpdate(state, prevState);
+        if (equal(stateDigest, prevStateDigest) && !needUpdate) {
+          return;
+        }
 
-      const infer = inferNodeTypes(state, prevState, graphWalker);
-      if (infer.isModified) {
-        stateStore.setState({ nodeTypes: infer.nodeTypes });
+        const infer = inferNodeTypes(state, prevState, graphWalker);
+        if (infer.isModified) {
+          stateStore.setState({ nodeTypes: infer.nodeTypes });
+        }
+      } catch (err) {
+        console.error('error occurred during node type inference', err);
       }
     });
   }, []);
@@ -92,24 +100,28 @@ export const DecisionGraphInferTypes = () => {
     }
 
     return stateStore.subscribe((state, prevState) => {
-      const stateDigest = globalTypesStateDigest(state);
-      const prevStateDigest = globalTypesStateDigest(prevState);
-      if (equal(stateDigest, prevStateDigest)) {
-        return;
+      try {
+        const stateDigest = globalTypesStateDigest(state);
+        const prevStateDigest = globalTypesStateDigest(prevState);
+        if (equal(stateDigest, prevStateDigest)) {
+          return;
+        }
+
+        const $nodesType = VariableType.fromJson({ Object: {} });
+        state.decisionGraph.nodes.forEach((node) => {
+          const nodeType = state.nodeTypes[node.id];
+          const nodeOutput =
+            nodeType?.[NodeTypeKind.Output] ??
+            nodeType?.[NodeTypeKind.InferredOutput] ??
+            VariableType.fromJson({ Object: {} });
+
+          $nodesType.set(node.name, nodeOutput);
+        });
+
+        stateStore.setState({ globalType: { $nodes: $nodesType } });
+      } catch (err) {
+        console.error('error occurred while global node types', err);
       }
-
-      const $nodesType = VariableType.fromJson({ Object: {} });
-      state.decisionGraph.nodes.forEach((node) => {
-        const nodeType = state.nodeTypes[node.id];
-        const nodeOutput =
-          nodeType?.[NodeTypeKind.Output] ??
-          nodeType?.[NodeTypeKind.InferredOutput] ??
-          VariableType.fromJson({ Object: {} });
-
-        $nodesType.set(node.name, nodeOutput);
-      });
-
-      stateStore.setState({ globalType: { $nodes: $nodesType } });
     });
   }, []);
 
