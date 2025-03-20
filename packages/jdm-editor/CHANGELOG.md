@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.33.1](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.33.0...@gorules/jdm-editor@1.33.1) (2025-03-20)
+
+### Bug Fixes
+
+- add safety for type inference ([#153](https://github.com/gorules/jdm-editor/issues/153)) ([65b811c](https://github.com/gorules/jdm-editor/commit/65b811cc450e86bce61d90fabc39d542324b1767))
+
 # [1.33.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.32.3...@gorules/jdm-editor@1.33.0) (2025-03-04)
 
 ### Bug Fixes
