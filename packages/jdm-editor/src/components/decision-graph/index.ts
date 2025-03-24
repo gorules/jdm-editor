@@ -8,6 +8,10 @@ export type {
 export type { CustomNodeSpecification } from './nodes/custom-node/index';
 export { createJdmNode } from './nodes/custom-node';
 export { GraphNode, type GraphNodeProps } from './nodes/graph-node';
+export {
+  DecisionNode as GraphDecisionNode,
+  type DecisionNodeProps as GraphDecisionNodeProps,
+} from './nodes/decision-node';
 export { GraphSimulator, type GraphSimulatorProps } from './simulator/dg-simulator';
 export { SimulatorEditor } from './simulator/simulator-editor';
 export {
@@ -54,3 +58,5 @@ export {
   type Position,
   type DiffStatus,
 } from './dg-types';
+
+export { nodeSpecification } from './nodes/specifications/specifications';
