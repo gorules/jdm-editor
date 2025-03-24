@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.34.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.33.1...@gorules/jdm-editor@1.34.0) (2025-03-24)
+
+### Features
+
+- better dnd handling ([#152](https://github.com/gorules/jdm-editor/issues/152)) ([7ce9a73](https://github.com/gorules/jdm-editor/commit/7ce9a73b0e09909d9a8c66d802869d55b26a3f2f))
+
 ## [1.33.1](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.33.0...@gorules/jdm-editor@1.33.1) (2025-03-20)
 
 ### Bug Fixes
