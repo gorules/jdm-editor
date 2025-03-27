@@ -193,6 +193,10 @@ const valueRenderer =
 const lens = (obj: any, path: (string | number)[]) => path.reduce((o, key) => (o && o[key] ? o[key] : null), obj);
 
 const safeParseJson = (data: string): unknown => {
+  if (typeof data !== 'string') {
+    return undefined;
+  }
+
   data = data.trim();
   if (!data) {
     return undefined;
