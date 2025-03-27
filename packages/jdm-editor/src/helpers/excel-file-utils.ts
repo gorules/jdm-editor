@@ -103,16 +103,16 @@ export const exportExcelFile = async (fileName: string, decisionTableNodes: Deci
     };
 
     const headerRow = worksheet.addRow(schemaMeta.map((data) => data.title));
-    headerRow.eachCell((cell) => {
-      const note = schemaMeta.find((data) => data.title === cell.value)?.meta;
-      const cellColor = note?.type.toLowerCase() === 'input' ? '5e6476' : '63546c';
+    headerRow.eachCell((cell, colNumber) => {
+      const meta = schemaMeta[colNumber - 1]?.meta;
+      const cellColor = meta?.type.toLowerCase() === 'input' ? '5e6476' : '63546c';
 
       cell.font = { bold: true, color: { argb: 'FFFFFF' } };
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: cellColor } };
 
-      if (note) {
+      if (meta) {
         cell.note = {
-          texts: [{ text: JSON.stringify(note, undefined, 2) }],
+          texts: [{ text: JSON.stringify(meta, undefined, 2) }],
         };
       }
     });
