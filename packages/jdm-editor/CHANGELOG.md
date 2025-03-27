@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.34.1](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.34.0...@gorules/jdm-editor@1.34.1) (2025-03-27)
+
+### Bug Fixes
+
+- **jdm-editor:** excel header cell note ([#155](https://github.com/gorules/jdm-editor/issues/155)) ([91b6be5](https://github.com/gorules/jdm-editor/commit/91b6be5fcf1cb0281c896b85223af4bcf4ea90a9))
+- update immer import ([#145](https://github.com/gorules/jdm-editor/issues/145)) ([762886d](https://github.com/gorules/jdm-editor/commit/762886da59140f452c9514ba9a2903578a4b04c4))
+
 # [1.34.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.33.1...@gorules/jdm-editor@1.34.0) (2025-03-24)
 
 ### Features
