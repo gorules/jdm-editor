@@ -60,7 +60,7 @@ export const FunctionDebuggerLog: React.FC<FunctionDebuggerLogProps> = ({ lines,
       >
         <div className='grl-function__debugger__log__values'>
           {lines.map((line, i) => {
-            const data = JSON.parse(line);
+            const data = safeParseJson(line);
 
             return (
               <JSONTree
@@ -191,3 +191,20 @@ const valueRenderer =
   };
 
 const lens = (obj: any, path: (string | number)[]) => path.reduce((o, key) => (o && o[key] ? o[key] : null), obj);
+
+const safeParseJson = (data: string): unknown => {
+  if (typeof data !== 'string') {
+    return undefined;
+  }
+
+  data = data.trim();
+  if (!data) {
+    return undefined;
+  }
+
+  try {
+    return JSON.parse(data);
+  } catch {
+    return `[UNSERIALIZED]: ${data}`;
+  }
+};
