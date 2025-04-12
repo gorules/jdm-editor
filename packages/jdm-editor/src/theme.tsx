@@ -34,7 +34,7 @@ export const JdmConfigProvider: React.FC<JdmConfigProviderProps> = ({
   }, [mode]);
 
   return (
-    <ConfigProvider prefixCls={prefixCls} theme={{ ...restTheme, algorithm, token: { ...token, mode } }}>
+    <ConfigProvider prefixCls={prefixCls} theme={{ ...restTheme, algorithm, token: { ...token, mode, motion: false } }}>
       <GlobalCssVariables mode={mode} />
       {children}
     </ConfigProvider>
@@ -48,10 +48,10 @@ const GlobalCssVariables: React.FC<{ mode: 'light' | 'dark' }> = ({ mode }) => {
     () => ({
       '--grl-color-border': token.colorBorder,
       '--grl-color-border-hover': mode === 'light' ? '#c3c3c3' : '#555555',
-      '--grl-color-border-fade': mode === 'light' ? '#e9e9e9' : '#333333',
+      '--grl-color-border-fade': mode === 'light' ? '#eef0f5' : '#333333',
       '--grl-color-primary': token.colorPrimary,
       '--grl-color-primary-bg': token.colorPrimaryBg,
-      '--grl-color-primary-bg-fade': mode === 'light' ? '#f7f9fc' : '#141414',
+      '--grl-color-primary-bg-fade': mode === 'light' ? '#f8fafc' : '#141414',
       '--grl-color-primary-bg-hover': token.colorPrimaryBgHover,
       '--grl-color-primary-border': token.colorPrimaryBorder,
       '--grl-color-primary-border-hover': token.colorPrimaryBorderHover,

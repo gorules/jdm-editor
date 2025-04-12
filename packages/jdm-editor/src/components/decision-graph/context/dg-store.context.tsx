@@ -1,8 +1,8 @@
 import { type VariableType } from '@gorules/zen-engine-wasm';
 import type { Monaco } from '@monaco-editor/react';
 import equal from 'fast-deep-equal/es6/react';
-import { produce } from 'immer';
 import type { WritableDraft } from 'immer';
+import { produce } from 'immer';
 import React, { type MutableRefObject, createRef, useMemo } from 'react';
 import type { EdgeChange, NodeChange, ReactFlowInstance, useEdgesState, useNodesState } from 'reactflow';
 import { match } from 'ts-pattern';
@@ -643,18 +643,17 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
     [],
   );
 
-  return (
-    <DecisionGraphStoreContext.Provider
-      value={{
-        stateStore,
-        referenceStore,
-        listenerStore,
-        actions,
-      }}
-    >
-      {children}
-    </DecisionGraphStoreContext.Provider>
+  const value = useMemo(
+    () => ({
+      stateStore,
+      referenceStore,
+      listenerStore,
+      actions,
+    }),
+    [stateStore, referenceStore, listenerStore, actions],
   );
+
+  return <DecisionGraphStoreContext.Provider value={value}>{children}</DecisionGraphStoreContext.Provider>;
 };
 
 export function useDecisionGraphState<T>(

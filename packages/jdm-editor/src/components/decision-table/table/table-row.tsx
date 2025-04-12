@@ -17,9 +17,9 @@ export const TableRow: React.FC<{
 }> = ({ row, disabled, virtualItem, onResize }) => {
   const trRef = useRef<HTMLTableRowElement>(null);
   const tableActions = useDecisionTableActions();
-  const { cursor, isActive } = useDecisionTableState(({ cursor, activeRules }) => ({
+  const { cursor, isActive } = useDecisionTableState(({ cursor, debug }) => ({
     cursor,
-    isActive: Array.isArray(activeRules) && activeRules.includes(row.id),
+    isActive: !!debug?.activeRules.includes(row.id),
   }));
 
   const [{ isDropping, direction }, dropRef] = useDrop({

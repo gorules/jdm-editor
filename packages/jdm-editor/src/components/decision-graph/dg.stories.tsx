@@ -3,8 +3,8 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { Select } from 'antd';
 import json5 from 'json5';
 import React, { useMemo, useRef, useState } from 'react';
+import { P, match } from 'ts-pattern';
 
-import type { PanelType } from './context/dg-store.context';
 import type { DecisionGraphRef } from './dg';
 import { DecisionGraph } from './dg';
 import { calculateDiffGraph } from './dg-diff-util';
@@ -20,6 +20,7 @@ import { createJdmNode } from './nodes/custom-node';
 import { GraphNode } from './nodes/graph-node';
 import type { NodeSpecification } from './nodes/specifications/specification-types';
 import { GraphSimulator } from './simulator/dg-simulator';
+import type { Simulation } from './simulator/simulation.types';
 
 const meta: Meta<typeof DecisionGraph> = {
   /* 👇 The title prop is optional.
@@ -269,57 +270,8 @@ export const UnknownCustomNode: Story = {
   },
 };
 
-const panels: PanelType[] = [
-  {
-    id: 'simulator',
-    title: 'Simulator',
-    icon: <PlayCircleOutlined />,
-    hideHeader: true,
-    renderPanel: () => (
-      <GraphSimulator
-        defaultRequest={json5.stringify(
-          {
-            age: 20,
-          },
-          null,
-          2,
-        )}
-        onChange={(val) => {
-          console.log(val);
-        }}
-        onRun={(payload) => {
-          console.log(payload);
-        }}
-        onClear={() => {}}
-      />
-    ),
-  },
-];
-
 export const Simulator: Story = {
-  render: (args) => {
-    const [value, setValue] = useState<any>(defaultGraph);
-    return (
-      <div
-        style={{
-          height: '100%',
-        }}
-      >
-        <DecisionGraph
-          {...args}
-          value={value}
-          onPanelsChange={(val) => {
-            console.log(val);
-          }}
-          defaultActivePanel={'simulator'}
-          panels={panels}
-          onChange={(val) => {
-            setValue?.(val);
-          }}
-        />
-      </div>
-    );
-  },
+  render: () => <DecisionGraphWithSimulator />,
 };
 
 export const Diff: Story = {
@@ -364,4 +316,107 @@ export const Diff: Story = {
       control: { type: 'boolean' },
     },
   } as any,
+};
+
+const safeParse = (val?: string) => {
+  try {
+    return JSON.parse(val ?? '');
+  } catch {
+    return val;
+  }
+};
+
+const mapSimulateError = (error: unknown) =>
+  match(error)
+    .with(
+      {
+        data: {
+          type: P.optional(P.string),
+          source: P.optional(P.string),
+          nodeId: P.optional(P.string),
+          trace: P.optional(P._),
+        },
+      },
+      ({ data }) => {
+        const error = {
+          title: data.type,
+          message: safeParse(data.source),
+          data: { nodeId: data.nodeId },
+        };
+
+        return {
+          error,
+          result: {
+            trace: data.trace as any,
+            result: { error },
+            performance: '',
+          },
+        } satisfies Simulation;
+      },
+    )
+    .otherwise(() => undefined);
+
+const DecisionGraphWithSimulator: React.FC = () => {
+  const [value, setValue] = useState<any>(defaultGraph);
+  const [simulate, setSimulate] = useState<Simulation>();
+
+  const panels = useMemo(
+    () => [
+      {
+        id: 'simulator',
+        title: 'Simulator',
+        icon: <PlayCircleOutlined />,
+        hideHeader: true,
+        renderPanel: () => (
+          <GraphSimulator
+            defaultRequest={json5.stringify(
+              {
+                customer: { country: 'US' },
+                cart: { weight: 50 },
+              },
+              null,
+              2,
+            )}
+            onRun={async ({ graph, context }) => {
+              try {
+                const response = await fetch('https://editor.gorules.io/api/simulate', {
+                  method: 'POST',
+                  body: JSON.stringify({ content: graph, context }),
+                  headers: { 'content-type': 'application/json' },
+                });
+
+                const responseJson = await response.json();
+                setSimulate({ result: responseJson });
+              } catch (err) {
+                setSimulate(mapSimulateError(err));
+              }
+            }}
+            onClear={() => {}}
+          />
+        ),
+      },
+    ],
+    [],
+  );
+
+  return (
+    <div
+      style={{
+        height: '100%',
+      }}
+    >
+      <DecisionGraph
+        value={value}
+        onPanelsChange={(val) => {
+          console.log(val);
+        }}
+        simulate={simulate}
+        defaultActivePanel={'simulator'}
+        panels={panels}
+        onChange={(val) => {
+          setValue?.(val);
+        }}
+      />
+    </div>
+  );
 };

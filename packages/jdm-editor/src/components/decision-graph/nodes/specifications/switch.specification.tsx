@@ -1,9 +1,10 @@
-import { ArrowRightOutlined, BranchesOutlined, DeleteOutlined, DownOutlined } from '@ant-design/icons';
+import { ArrowRightOutlined, DeleteOutlined, DownOutlined } from '@ant-design/icons';
 import type { VariableType } from '@gorules/zen-engine-wasm';
 import { Button, Dropdown, Popconfirm, Typography } from 'antd';
 import clsx from 'clsx';
 import { produce } from 'immer';
 import _ from 'lodash';
+import { SplitIcon } from 'lucide-react';
 import React, { useLayoutEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Handle, Position } from 'reactflow';
@@ -33,7 +34,7 @@ export type NodeSwitchData = {
 
 export const switchSpecification: NodeSpecification<NodeSwitchData> = {
   type: NodeKind.Switch,
-  icon: <BranchesOutlined />,
+  icon: <SplitIcon size='1em' />,
   displayName: 'Switch',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/switch',
   shortDescription: 'Conditional branching',

@@ -1,9 +1,10 @@
-import { ArrowRightOutlined, SyncOutlined, TableOutlined } from '@ant-design/icons';
+import { ArrowRightOutlined, SyncOutlined } from '@ant-design/icons';
 import { VariableType } from '@gorules/zen-engine-wasm';
 import { Button, Form, Space } from 'antd';
 import equal from 'fast-deep-equal/es6/react';
 import { produce } from 'immer';
 import _ from 'lodash';
+import { Grid3x3Icon } from 'lucide-react';
 import React from 'react';
 import type { z } from 'zod';
 
@@ -30,7 +31,7 @@ export type NodeDecisionTableData = Omit<InferredContent, 'inputs' | 'outputs' |
 
 export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData> = {
   type: NodeKind.DecisionTable,
-  icon: <TableOutlined />,
+  icon: <Grid3x3Icon size='1em' />,
   displayName: 'Decision table',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/decision-tables',
   shortDescription: 'Rules spreadsheet',

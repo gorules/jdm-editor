@@ -1,11 +1,12 @@
-import { DeleteOutlined, MenuOutlined } from '@ant-design/icons';
 import type { VariableType } from '@gorules/zen-engine-wasm';
 import type { Row } from '@tanstack/react-table';
-import { Button, Popconfirm, Typography } from 'antd';
+import { Typography } from 'antd';
 import clsx from 'clsx';
+import { GripVerticalIcon } from 'lucide-react';
 import React, { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
+import { ConfirmAction } from '../confirm-action';
 import { DiffIcon } from '../diff-icon';
 import { DiffCodeEditor } from '../shared/diff-ce';
 import { DiffInput } from '../shared/diff-input';
@@ -81,7 +82,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
             }}
           />
         ) : (
-          <MenuOutlined />
+          <GripVerticalIcon size={14} />
         )}
       </div>
       <div>
@@ -109,14 +110,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
         <ResultOverlay expression={expression} />
       </div>
       <div>
-        <Popconfirm
-          title='Remove selected row?'
-          okText='Remove'
-          onConfirm={onRemove}
-          disabled={!configurable || disabled}
-        >
-          <Button type='text' icon={<DeleteOutlined />} danger disabled={!configurable || disabled} />
-        </Popconfirm>
+        <ConfirmAction iconOnly disabled={!configurable || disabled} onConfirm={onRemove} />
       </div>
     </div>
   );
