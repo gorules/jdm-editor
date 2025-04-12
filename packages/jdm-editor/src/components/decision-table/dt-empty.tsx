@@ -28,7 +28,7 @@ export type DecisionTableEmptyType = {
   inputsSchema?: SchemaSelectProps[];
   outputsSchema?: SchemaSelectProps[];
   inputData?: unknown;
-  debug?: { trace: SimulationTrace<SimulationTraceDataTable>; inputData: Variable };
+  debug?: { trace: SimulationTrace<SimulationTraceDataTable>; inputData?: Variable };
   minColWidth?: number;
   colWidth?: number;
   onChange?: (val: DecisionTableType) => void;

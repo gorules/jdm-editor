@@ -129,7 +129,7 @@ export const TableHeadCellOutput: React.FC<TableHeadCellProps> = ({ configurable
 export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({ configurable, disabled, schema }) => {
   const tableActions = useDecisionTableActions();
   const { inputData, inputVariableType } = useDecisionTableState(({ debug, inputVariableType }) => ({
-    inputData: (debug?.trace as any)?.input,
+    inputData: debug?.inputData,
     inputVariableType,
   }));
 

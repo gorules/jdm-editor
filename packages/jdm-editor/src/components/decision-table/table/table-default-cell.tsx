@@ -230,7 +230,7 @@ const TableInputCellStatus: React.FC<{ columnId: string; index: number }> = Reac
   });
 
   const status = useMemo<'hit' | 'no-hit' | 'skip' | null>(() => {
-    if (Array.isArray(inputData) || typeof inputData !== 'object' || !expressionContext) {
+    if (!inputData || !expressionContext) {
       return null;
     }
 

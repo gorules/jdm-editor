@@ -140,7 +140,7 @@ export type DecisionTableStoreType = {
     debug?: {
       snapshot: DecisionTableType;
       trace: SimulationTrace<SimulationTraceDataTable>;
-      inputData: Variable;
+      inputData?: Variable;
       activeRules: string[];
     };
 

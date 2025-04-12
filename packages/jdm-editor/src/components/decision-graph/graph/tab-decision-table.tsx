@@ -1,9 +1,11 @@
+import { Variable } from '@gorules/zen-engine-wasm';
 import type { DragDropManager } from 'dnd-core';
 import React, { useMemo } from 'react';
 import { P, match } from 'ts-pattern';
 
 import { getNodeData } from '../../../helpers/node-data';
 import { useNodeType } from '../../../helpers/node-type';
+import { isWasmAvailable } from '../../../helpers/wasm';
 import { DecisionTable } from '../../decision-table';
 import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
 import type { NodeDecisionTableData } from '../nodes/specifications/decision-table.specification';
@@ -55,7 +57,11 @@ export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager 
       return undefined;
     }
 
-    return { trace: nodeTrace, inputData };
+    if (!isWasmAvailable()) {
+      return { trace: nodeTrace };
+    }
+
+    return { trace: nodeTrace, inputData: new Variable(inputData) };
   }, [nodeTrace, inputData]);
 
   return (
