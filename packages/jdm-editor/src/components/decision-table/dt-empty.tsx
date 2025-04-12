@@ -1,4 +1,4 @@
-import { createVariableType } from '@gorules/zen-engine-wasm';
+import { type Variable, createVariableType } from '@gorules/zen-engine-wasm';
 import equal from 'fast-deep-equal/es6/react';
 import type React from 'react';
 import { useEffect, useRef } from 'react';
@@ -28,7 +28,7 @@ export type DecisionTableEmptyType = {
   inputsSchema?: SchemaSelectProps[];
   outputsSchema?: SchemaSelectProps[];
   inputData?: unknown;
-  debug?: { trace: SimulationTrace<SimulationTraceDataTable>; inputData: unknown };
+  debug?: { trace: SimulationTrace<SimulationTraceDataTable>; inputData: Variable };
   minColWidth?: number;
   colWidth?: number;
   onChange?: (val: DecisionTableType) => void;

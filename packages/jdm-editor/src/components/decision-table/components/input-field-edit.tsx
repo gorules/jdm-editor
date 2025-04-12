@@ -1,4 +1,4 @@
-import { evaluateExpression } from '@gorules/zen-engine-wasm';
+import { type Variable } from '@gorules/zen-engine-wasm';
 import { Button, Popover, Typography } from 'antd';
 import clsx from 'clsx';
 import stringifyPretty from 'json-stringify-pretty-compact';
@@ -17,7 +17,7 @@ type InputFieldEditProps = {
   onChange?: (value: string) => void;
   onRemove?: () => void;
   variableType?: unknown;
-  inputData?: unknown;
+  inputData?: Variable;
   referenceData?: { field: string; value: unknown };
 } & Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'>;
 
@@ -50,7 +50,7 @@ export const InputFieldEdit: React.FC<InputFieldEditProps> = ({
     }
 
     try {
-      const value = evaluateExpression(innerValue, inputData);
+      const value = inputData.evaluateExpression(innerValue);
       return { type: 'success' as const, value: stringifyPretty(value, { maxLength: 30 }) };
     } catch (err) {
       return { type: 'error' as const, value: (err as any).toString() };

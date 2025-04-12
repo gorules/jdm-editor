@@ -1,4 +1,4 @@
-import type { VariableType } from '@gorules/zen-engine-wasm';
+import type { Variable, VariableType } from '@gorules/zen-engine-wasm';
 import equal from 'fast-deep-equal/es6/react';
 import { produce } from 'immer';
 import React, { useMemo } from 'react';
@@ -140,7 +140,7 @@ export type DecisionTableStoreType = {
     debug?: {
       snapshot: DecisionTableType;
       trace: SimulationTrace<SimulationTraceDataTable>;
-      inputData: unknown;
+      inputData: Variable;
       activeRules: string[];
     };
 

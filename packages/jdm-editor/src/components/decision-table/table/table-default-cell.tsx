@@ -1,4 +1,3 @@
-import { evaluateExpression, evaluateUnaryExpression } from '@gorules/zen-engine-wasm';
 import type { CellContext } from '@tanstack/react-table';
 import React, { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { P, match } from 'ts-pattern';
@@ -247,9 +246,10 @@ const TableInputCellStatus: React.FC<{ columnId: string; index: number }> = Reac
     try {
       let isOk: boolean;
       if (type === 'unary') {
-        isOk = evaluateUnaryExpression(expression, { $, ...inputData });
+        const newInputData = inputData.cloneWithReference($);
+        isOk = newInputData.evaluateUnaryExpression(expression);
       } else {
-        isOk = evaluateExpression(expression, inputData) === true;
+        isOk = inputData.evaluateExpression(expression) === true;
       }
 
       return isOk ? 'hit' : 'no-hit';
