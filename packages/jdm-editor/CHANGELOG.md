@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.35.1](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.35.0...@gorules/jdm-editor@1.35.1) (2025-04-14)
+
+### Bug Fixes
+
+- active rules without wasm ([#158](https://github.com/gorules/jdm-editor/issues/158)) ([13475e6](https://github.com/gorules/jdm-editor/commit/13475e630c159b0e59fef879d02b74b3827b8c7a))
+
 # [1.35.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.34.2...@gorules/jdm-editor@1.35.0) (2025-04-14)
 
 ### Features
