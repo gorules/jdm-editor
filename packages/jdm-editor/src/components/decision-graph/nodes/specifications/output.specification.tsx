@@ -1,7 +1,7 @@
-import { LogoutOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import { produce } from 'immer';
 import _ from 'lodash';
+import { ArrowRightFromLineIcon } from 'lucide-react';
 import React from 'react';
 import type { z } from 'zod';
 
@@ -20,7 +20,7 @@ export type NodeOutputData = InferredContent & Diff;
 
 export const outputSpecification: NodeSpecification<NodeOutputData> = {
   type: NodeKind.Output,
-  icon: <LogoutOutlined />,
+  icon: <ArrowRightFromLineIcon size='1em' />,
   color: NodeColor.Green,
   displayName: 'Response',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions',

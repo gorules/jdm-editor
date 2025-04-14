@@ -1,11 +1,12 @@
 import { CloseOutlined, MoreOutlined } from '@ant-design/icons';
 import { Button, Dropdown, type MenuProps, Typography } from 'antd';
 import clsx from 'clsx';
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { Transition } from 'transition-hook';
 import { match } from 'ts-pattern';
 
 import { DiffIcon } from '../../diff-icon';
+import { TextEdit } from '../../text-edit';
 import './decision-node.scss';
 import { GraphCard } from './graph-card';
 import { NodeColor } from './specifications/colors';
@@ -54,17 +55,6 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
   detailsTitle = 'Details',
   onDetailsClose,
 }) => {
-  const [contentEditing, setContentEditing] = useState(false);
-  const nameRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (nameRef.current && contentEditing) {
-      nameRef.current.value = name as string;
-      nameRef.current.focus();
-      nameRef.current.select();
-    }
-  }, [contentEditing]);
-
   const nodeColor = match(color)
     .with('primary', () => NodeColor.Blue)
     .otherwise((c) => c);
@@ -105,45 +95,7 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
         </div>
         <div className={clsx('grl-dn__header', compactMode && 'compact')}>
           <div className={clsx('grl-dn__header__icon', compactMode && 'compact')}>{icon}</div>
-          <div className='grl-dn__header__text'>
-            {!contentEditing && (
-              <Typography.Text
-                className={clsx('grl-dn__header__text__name')}
-                onClick={() => {
-                  if (!disabled) {
-                    setContentEditing(true);
-                  }
-                }}
-              >
-                {name}
-              </Typography.Text>
-            )}
-            {contentEditing && (
-              <input
-                ref={nameRef}
-                className={clsx('grl-dn__header__text__name-input', 'nodrag')}
-                onBlur={(e) => {
-                  if (e.target.value?.trim?.()?.length > 0) {
-                    onNameChange?.(nameRef?.current?.value as string);
-                  }
-                  e.preventDefault();
-                  setContentEditing(false);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.currentTarget.blur();
-                    e.preventDefault();
-                  } else if (e.key === 'Escape') {
-                    if (nameRef.current) {
-                      nameRef.current.value = name as string;
-                    }
-                    setContentEditing(false);
-                    e.preventDefault();
-                  }
-                }}
-              />
-            )}
-          </div>
+          <TextEdit onChange={onNameChange} disabled={disabled} value={name} />
           {menuItems.length > 0 && (
             <div className={clsx('grl-dn__header__actions', 'nodrag')}>
               <Dropdown trigger={['click']} overlayStyle={{ minWidth: 250 }} menu={{ items: menuItems }}>

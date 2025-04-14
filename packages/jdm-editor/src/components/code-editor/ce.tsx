@@ -51,7 +51,11 @@ export type CodeEditorProps = {
   expectedVariableType?: any;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, 'disabled' | 'onChange'>;
 
-export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
+export type CodeEditorRef = HTMLDivElement & {
+  codeMirror: EditorView | null;
+};
+
+export const CodeEditor = React.forwardRef<CodeEditorRef, CodeEditorProps>(
   (
     {
       noStyle = false,
@@ -112,6 +116,9 @@ export const CodeEditor = React.forwardRef<HTMLDivElement, CodeEditorProps>(
       });
 
       (codeMirror as any).current = editorView;
+      if (container.current) {
+        (container.current as CodeEditorRef).codeMirror = editorView;
+      }
 
       return () => {
         editorView.destroy();

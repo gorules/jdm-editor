@@ -294,7 +294,7 @@ const TableBody = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(
               virtualItem={item}
               row={row}
               disabled={disabled}
-              onResize={(node) => virtualizer.measureElement(node)}
+              onResize={virtualizer.measureElement}
             />
           );
         })}

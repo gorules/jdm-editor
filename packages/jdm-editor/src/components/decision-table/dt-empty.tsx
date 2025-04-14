@@ -1,11 +1,13 @@
-import { createVariableType } from '@gorules/zen-engine-wasm';
+import { type Variable, createVariableType } from '@gorules/zen-engine-wasm';
 import equal from 'fast-deep-equal/es6/react';
 import type React from 'react';
 import { useEffect, useRef } from 'react';
+import { P, match } from 'ts-pattern';
 import { useDebouncedCallback } from 'use-debounce';
 
 import type { SchemaSelectProps } from '../../helpers/components';
 import { isWasmAvailable } from '../../helpers/wasm';
+import type { SimulationTrace, SimulationTraceDataTable } from '../decision-graph';
 import {
   type DecisionTableType,
   parseDecisionTable,
@@ -22,11 +24,11 @@ export type DecisionTableEmptyType = {
   disabled?: boolean;
   configurable?: boolean;
   disableHitPolicy?: boolean;
-  activeRules?: string[];
   cellRenderer?: (props: TableCellProps) => JSX.Element | null | undefined;
   inputsSchema?: SchemaSelectProps[];
   outputsSchema?: SchemaSelectProps[];
   inputData?: unknown;
+  debug?: { trace: SimulationTrace<SimulationTraceDataTable>; inputData?: Variable };
   minColWidth?: number;
   colWidth?: number;
   onChange?: (val: DecisionTableType) => void;
@@ -38,10 +40,10 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
   disabled = false,
   configurable = true,
   disableHitPolicy = false,
-  activeRules,
   inputsSchema,
   outputsSchema,
   inputData,
+  debug,
   colWidth,
   minColWidth,
   cellRenderer,
@@ -64,13 +66,12 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
       disabled,
       configurable,
       disableHitPolicy,
-      activeRules,
       inputsSchema,
       outputsSchema,
       colWidth: colWidth || 200,
       minColWidth: minColWidth || 150,
     });
-  }, [id, disabled, configurable, disableHitPolicy, activeRules, inputsSchema, minColWidth, colWidth, outputsSchema]);
+  }, [id, disabled, configurable, disableHitPolicy, inputsSchema, minColWidth, colWidth, outputsSchema]);
 
   useEffect(() => {
     listenerStore.setState({
@@ -105,6 +106,31 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
 
     stateStore.setState({ inputVariableType: createVariableType(inputData) });
   }, [inputData]);
+
+  useEffect(() => {
+    if (!isWasmAvailable()) {
+      return;
+    }
+
+    if (!debug) {
+      stateStore.setState({ debug: undefined });
+      return;
+    }
+
+    const { decisionTable } = stateStore.getState();
+    const activeRules = match(debug.trace.traceData)
+      .with(P.array(), (t) => t.map((d) => d?.rule?._id))
+      .otherwise((t) => [t?.rule?._id]);
+
+    stateStore.setState({
+      debug: {
+        trace: debug.trace,
+        snapshot: decisionTable,
+        inputData: debug.inputData,
+        activeRules,
+      },
+    });
+  }, [debug]);
 
   return null;
 };

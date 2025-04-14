@@ -66,7 +66,7 @@
   &--list &__graphCard {
     border-radius: 0;
     border: none;
-    border-bottom: 1px solid var(--grl-color-border);
+    border-bottom: 1px solid var(--grl-color-border-fade);
   }
 
   &--selected &__graphCard {
@@ -205,7 +205,7 @@
   &__footer {
     background: var(--grl-color-primary-bg-fade);
     border-radius: 0 0 var(--node-border-radius) var(--node-border-radius);
-    border-top: 1px solid var(--grl-color-border);
+    border-top: 1px solid var(--grl-color-border-fade);
     overflow: hidden;
 
     &__actions {

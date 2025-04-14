@@ -1,4 +1,4 @@
-import type { VariableType } from '@gorules/zen-engine-wasm';
+import type { Variable, VariableType } from '@gorules/zen-engine-wasm';
 import equal from 'fast-deep-equal/es6/react';
 import { produce } from 'immer';
 import React, { useMemo } from 'react';
@@ -6,6 +6,7 @@ import type { StoreApi, UseBoundStore } from 'zustand';
 import { create } from 'zustand';
 
 import type { SchemaSelectProps } from '../../../helpers/components';
+import type { SimulationTrace, SimulationTraceDataTable } from '../../decision-graph';
 import type { Diff, DiffMetadata } from '../../decision-graph/dg-types';
 import type { TableCellProps } from '../table/table-default-cell';
 
@@ -126,7 +127,6 @@ export type DecisionTableStoreType = {
     name?: string;
     decisionTable: DecisionTableType;
     cursor: TableCursor | null;
-    activeRules: string[];
 
     disabled: boolean;
     configurable: boolean;
@@ -135,9 +135,14 @@ export type DecisionTableStoreType = {
     minColWidth: number;
     colWidth: number;
 
-    inputData?: unknown;
     inputVariableType?: VariableType;
     derivedVariableTypes: Record<string, VariableType>;
+    debug?: {
+      snapshot: DecisionTableType;
+      trace: SimulationTrace<SimulationTraceDataTable>;
+      inputData?: Variable;
+      activeRules: string[];
+    };
 
     inputsSchema?: SchemaSelectProps[];
     outputsSchema?: SchemaSelectProps[];
@@ -189,7 +194,6 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
         name: undefined,
         decisionTable: parseDecisionTable(),
         cursor: null,
-        activeRules: [],
 
         disabled: false,
         configurable: true,
@@ -203,7 +207,7 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
 
         derivedVariableTypes: {},
         inputVariableType: undefined,
-        inputData: undefined,
+        debug: undefined,
       })),
     [],
   );
@@ -381,17 +385,16 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
     [],
   );
 
-  return (
-    <DecisionTableStoreContext.Provider
-      value={{
-        stateStore,
-        listenerStore,
-        actions,
-      }}
-    >
-      {children}
-    </DecisionTableStoreContext.Provider>
+  const value = useMemo(
+    () => ({
+      stateStore,
+      listenerStore,
+      actions,
+    }),
+    [stateStore, listenerStore, actions],
   );
+
+  return <DecisionTableStoreContext.Provider value={value}>{children}</DecisionTableStoreContext.Provider>;
 };
 
 export function useDecisionTableState<T>(

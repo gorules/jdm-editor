@@ -1,12 +1,16 @@
-import { MoreOutlined, PlusOutlined, SwapOutlined } from '@ant-design/icons';
-import { Button, Dropdown, Modal, Tooltip, Typography } from 'antd';
+import { PlusOutlined, SwapOutlined } from '@ant-design/icons';
+import { Button, Tooltip, Typography } from 'antd';
 import clsx from 'clsx';
 import React from 'react';
 
 import { DiffIcon } from '../../diff-icon';
 import { Stack } from '../../stack';
+import { TextEdit } from '../../text-edit';
+import { InputFieldEdit } from '../components/input-field-edit';
+import { OutputFieldEdit } from '../components/output-field-edit';
 import { useDecisionTableDialog } from '../context/dt-dialog.context';
 import { type TableSchemaItem, useDecisionTableActions, useDecisionTableState } from '../context/dt-store.context';
+import { getReferenceMap } from '../util';
 
 export type TableHeadCellProps = {
   configurable?: boolean;
@@ -21,6 +25,7 @@ export type TableHeadCellFieldProps = {
 
 export const TableHeadCellInput: React.FC<TableHeadCellProps> = ({ configurable, disabled }) => {
   const inputs = useDecisionTableState((store) => store.decisionTable?.inputs);
+  const tableActions = useDecisionTableActions();
   const { setDialog } = useDecisionTableDialog();
 
   return (
@@ -57,10 +62,9 @@ export const TableHeadCellInput: React.FC<TableHeadCellProps> = ({ configurable,
                 icon={<PlusOutlined />}
                 disabled={disabled}
                 onClick={() => {
-                  setDialog({
-                    type: 'add',
-                    columnType: 'inputs',
-                    item: null,
+                  tableActions.addColumn('inputs', {
+                    id: crypto.randomUUID(),
+                    name: 'New field',
                   });
                 }}
               />
@@ -74,6 +78,7 @@ export const TableHeadCellInput: React.FC<TableHeadCellProps> = ({ configurable,
 
 export const TableHeadCellOutput: React.FC<TableHeadCellProps> = ({ configurable, disabled }) => {
   const outputs = useDecisionTableState((store) => store.decisionTable?.outputs);
+  const tableActions = useDecisionTableActions();
   const { setDialog } = useDecisionTableDialog();
 
   return (
@@ -110,11 +115,7 @@ export const TableHeadCellOutput: React.FC<TableHeadCellProps> = ({ configurable
                 icon={<PlusOutlined />}
                 disabled={disabled}
                 onClick={() => {
-                  setDialog({
-                    type: 'add',
-                    columnType: 'outputs',
-                    item: null,
-                  });
+                  tableActions.addColumn('outputs', { id: crypto.randomUUID(), name: 'Output', field: 'output' });
                 }}
               />
             </Tooltip>
@@ -126,8 +127,29 @@ export const TableHeadCellOutput: React.FC<TableHeadCellProps> = ({ configurable
 };
 
 export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({ configurable, disabled, schema }) => {
-  const { setDialog, getContainer } = useDecisionTableDialog();
   const tableActions = useDecisionTableActions();
+  const { inputData, inputVariableType } = useDecisionTableState(({ debug, inputVariableType }) => ({
+    inputData: debug?.inputData,
+    inputVariableType,
+  }));
+
+  const referenceData = useDecisionTableState(({ debug }) => {
+    if (!debug) {
+      return undefined;
+    }
+
+    const { trace, snapshot } = debug;
+    const snapshotField = snapshot.inputs.find((i) => i.id === schema.id);
+    if (!snapshotField?.field) {
+      return undefined;
+    }
+
+    const referenceMap = getReferenceMap(trace);
+    return {
+      field: snapshotField.field,
+      value: referenceMap?.[snapshotField.field],
+    };
+  });
 
   return (
     <div className={clsx(['head-cell'])}>
@@ -138,7 +160,13 @@ export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({ con
               {schema?._diff?.fields?.name?.previousValue}
             </Typography.Text>
           )}
-          <Typography.Text className={clsx(['span-overflow', 'grl-dt-text-primary'])}>{schema.name}</Typography.Text>
+          <TextEdit
+            className={clsx(['span-overflow', 'grl-dt-text-primary'])}
+            value={schema.name}
+            onChange={(name) => {
+              tableActions.updateColumn('inputs', schema.id, { ...schema, name });
+            }}
+          />
           {schema?._diff?.fields?.field?.status && (
             <Typography.Text
               className={clsx(['span-overflow', 'grl-dt-text-secondary', 'text-removed'])}
@@ -148,75 +176,22 @@ export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({ con
               {schema?._diff?.fields?.field?.previousValue}
             </Typography.Text>
           )}
-          <Typography.Text
-            className={clsx(['span-overflow', 'grl-dt-text-secondary'])}
-            type='secondary'
-            style={{ fontSize: 12 }}
-          >
-            {schema.field}
-          </Typography.Text>
-        </Stack>
-        <Stack
-          horizontal
-          gap={2}
-          verticalAlign={'center'}
-          style={{
-            width: 'auto',
-          }}
-        >
-          <DiffIcon
-            status={schema?._diff?.status}
-            style={{
-              fontSize: 16,
+          <InputFieldEdit
+            value={schema.field}
+            variableType={inputVariableType}
+            inputData={inputData}
+            referenceData={referenceData}
+            disabled={disabled || !configurable}
+            onRemove={() => {
+              tableActions.removeColumn('inputs', schema.id);
+            }}
+            onChange={(field) => {
+              tableActions.updateColumn('inputs', schema.id, { ...schema, field });
             }}
           />
-          {configurable && (
-            <div>
-              <Dropdown
-                trigger={['click']}
-                overlayStyle={{ minWidth: 140 }}
-                disabled={disabled}
-                menu={{
-                  items: [
-                    {
-                      key: 'edit',
-                      label: 'Edit column',
-                      onClick: () => {
-                        setDialog({
-                          type: 'edit',
-                          columnType: 'inputs',
-                          item: schema,
-                        });
-                      },
-                    },
-                    {
-                      key: 'remove',
-                      label: 'Remove column',
-                      onClick: () => {
-                        Modal.confirm({
-                          title: 'Remove column',
-                          icon: false,
-                          getContainer,
-                          content: (
-                            <Typography.Paragraph>
-                              You are about to delete <strong>{schema.name}</strong> column.
-                            </Typography.Paragraph>
-                          ),
-                          okText: 'Remove',
-                          okButtonProps: { danger: true },
-                          onOk: () => tableActions.removeColumn('inputs', schema.id),
-                        });
-                      },
-                    },
-                  ],
-                }}
-              >
-                <Tooltip title='Settings'>
-                  <Button className='grl-dt-text-secondary' type='text' size={'small'} icon={<MoreOutlined />} />
-                </Tooltip>
-              </Dropdown>
-            </div>
-          )}
+        </Stack>
+        <Stack horizontal gap={2} verticalAlign={'center'} style={{ width: 'auto' }}>
+          <DiffIcon status={schema?._diff?.status} style={{ fontSize: 16 }} />
         </Stack>
       </Stack>
     </div>
@@ -224,7 +199,6 @@ export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({ con
 };
 
 export const TableHeadCellOutputField: React.FC<TableHeadCellFieldProps> = ({ configurable, disabled, schema }) => {
-  const { setDialog, getContainer } = useDecisionTableDialog();
   const tableActions = useDecisionTableActions();
 
   return (
@@ -236,7 +210,13 @@ export const TableHeadCellOutputField: React.FC<TableHeadCellFieldProps> = ({ co
               {schema?._diff?.fields?.name?.previousValue}
             </Typography.Text>
           )}
-          <Typography.Text className={'span-overflow grl-dt-text-primary'}>{schema.name}</Typography.Text>
+          <TextEdit
+            className={clsx(['span-overflow', 'grl-dt-text-primary'])}
+            value={schema.name}
+            onChange={(name) => {
+              tableActions.updateColumn('outputs', schema.id, { ...schema, name });
+            }}
+          />
           {schema?._diff?.fields?.field?.status === 'modified' && (
             <Typography.Text
               className={clsx(['span-overflow', 'grl-dt-text-secondary', 'text-removed'])}
@@ -246,9 +226,16 @@ export const TableHeadCellOutputField: React.FC<TableHeadCellFieldProps> = ({ co
               {schema?._diff?.fields?.field?.previousValue}
             </Typography.Text>
           )}
-          <Typography.Text className={'span-overflow grl-dt-text-secondary'} type='secondary' style={{ fontSize: 12 }}>
-            {schema.field}
-          </Typography.Text>
+          <OutputFieldEdit
+            value={schema.field}
+            disabled={disabled || !configurable}
+            onRemove={() => {
+              tableActions.removeColumn('outputs', schema.id);
+            }}
+            onChange={(field) => {
+              tableActions.updateColumn('outputs', schema.id, { ...schema, field });
+            }}
+          />
         </Stack>
         <Stack
           horizontal
@@ -264,55 +251,6 @@ export const TableHeadCellOutputField: React.FC<TableHeadCellFieldProps> = ({ co
               fontSize: 16,
             }}
           />
-          {configurable && (
-            <div>
-              <Dropdown
-                trigger={['click']}
-                overlayStyle={{ minWidth: 140 }}
-                disabled={disabled}
-                menu={{
-                  items: [
-                    {
-                      key: 'edit',
-                      label: 'Edit column',
-                      onClick: () => {
-                        setDialog({
-                          type: 'edit',
-                          columnType: 'outputs',
-                          item: schema,
-                        });
-                      },
-                    },
-                    {
-                      key: 'remove',
-                      label: 'Remove column',
-                      onClick: () => {
-                        Modal.confirm({
-                          title: 'Remove column',
-                          content: (
-                            <Typography.Paragraph>
-                              You are about to delete <strong>{schema.name}</strong> column.
-                            </Typography.Paragraph>
-                          ),
-                          getContainer,
-                          icon: false,
-                          okText: 'Remove',
-                          okButtonProps: {
-                            danger: true,
-                          },
-                          onOk: () => tableActions.removeColumn('outputs', schema.id),
-                        });
-                      },
-                    },
-                  ],
-                }}
-              >
-                <Tooltip title='Settings'>
-                  <Button className='grl-dt-text-secondary' type='text' size={'small'} icon={<MoreOutlined />} />
-                </Tooltip>
-              </Dropdown>
-            </div>
-          )}
         </Stack>
       </Stack>
     </div>

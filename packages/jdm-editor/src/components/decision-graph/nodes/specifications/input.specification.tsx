@@ -1,7 +1,8 @@
-import { BookOutlined, DeleteOutlined, LoginOutlined } from '@ant-design/icons';
+import { BookOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Button, Modal, Typography } from 'antd';
 import { produce } from 'immer';
 import _ from 'lodash';
+import { ArrowRightToLineIcon } from 'lucide-react';
 import React from 'react';
 import type { z } from 'zod';
 
@@ -22,7 +23,7 @@ export type NodeInputData = InferredContent & Diff;
 
 export const inputSpecification: NodeSpecification<NodeInputData> = {
   type: NodeKind.Input,
-  icon: <LoginOutlined />,
+  icon: <ArrowRightToLineIcon size='1em' />,
   displayName: 'Request',
   color: NodeColor.Green,
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions',

@@ -19,7 +19,6 @@ export type DecisionTableProps = {
   tableHeight: string | number;
   mountDialogsOnBody?: boolean;
   manager?: DragDropManager;
-  inputData?: unknown;
 } & DecisionTableContextProps &
   DecisionTableEmptyType;
 

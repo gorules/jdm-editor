@@ -1,9 +1,10 @@
-import { ArrowRightOutlined, NumberOutlined, SyncOutlined } from '@ant-design/icons';
+import { ArrowRightOutlined, SyncOutlined } from '@ant-design/icons';
 import { VariableType } from '@gorules/zen-engine-wasm';
 import { Button, Form } from 'antd';
 import equal from 'fast-deep-equal/es6/react';
 import { produce } from 'immer';
 import _ from 'lodash';
+import { HashIcon } from 'lucide-react';
 import React from 'react';
 import type { z } from 'zod';
 
@@ -35,7 +36,7 @@ export type NodeExpressionData = Omit<InferredContent, 'expressions'> &
 
 export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
   type: NodeKind.Expression,
-  icon: <NumberOutlined />,
+  icon: <HashIcon size='1em' />,
   displayName: 'Expression',
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/expression',
   shortDescription: 'Mapping utility',

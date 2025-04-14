@@ -42,12 +42,14 @@ export type SimulationTraceDataFunction = {
 
 export type SimulationTraceDataExpression = Record<string, { result: unknown }>;
 
-export type SimulationTraceDataTable = {
+type SimulationTraceDataTableSingle = {
   index: number;
   reference_map: Record<string, unknown>;
   /** List of expressions */
   rule: Record<string, string>;
 };
+
+export type SimulationTraceDataTable = SimulationTraceDataTableSingle | SimulationTraceDataTableSingle[];
 
 export type SimulationTraceDataSwitch = {
   statements: {

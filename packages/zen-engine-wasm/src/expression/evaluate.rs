@@ -19,13 +19,6 @@ pub fn evaluate_expression(expression: &str, context: JsValue) -> Result<JsValue
 #[wasm_bindgen(js_name = "evaluateUnaryExpression")]
 pub fn evaluate_unary_expression(expression: &str, context: JsValue) -> Result<bool, JsError> {
     let context_value: Value = context.into_serde()?;
-    if !context_value
-        .as_object()
-        .map(|o| o.contains_key("$"))
-        .unwrap_or(false)
-    {
-        return Err(JsError::new("Missing $ reference for unary evaluation."));
-    }
 
     let result = zen_expression::evaluate_unary_expression(expression, context_value.into())
         .map_err(|e| {

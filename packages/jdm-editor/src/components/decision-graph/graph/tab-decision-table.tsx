@@ -1,8 +1,11 @@
+import { Variable } from '@gorules/zen-engine-wasm';
 import type { DragDropManager } from 'dnd-core';
 import React, { useMemo } from 'react';
 import { P, match } from 'ts-pattern';
 
+import { getNodeData } from '../../../helpers/node-data';
 import { useNodeType } from '../../../helpers/node-type';
+import { isWasmAvailable } from '../../../helpers/wasm';
 import { DecisionTable } from '../../decision-table';
 import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
 import type { NodeDecisionTableData } from '../nodes/specifications/decision-table.specification';
@@ -16,24 +19,23 @@ export type TabDecisionTableProps = {
 export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager }) => {
   const graphActions = useDecisionGraphActions();
   const nodeType = useNodeType(id, { attachGlobals: false });
-  const { nodeTrace, disabled, configurable, content, globalType } = useDecisionGraphState(
-    ({ simulate, disabled, configurable, decisionGraph, globalType }) => ({
-      nodeTrace: match(simulate)
-        .with({ result: P._ }, ({ result }) => result?.trace?.[id] as SimulationTrace<SimulationTraceDataTable>)
-        .otherwise(() => null),
+  const { nodeTrace, inputData } = useDecisionGraphState(({ simulate, decisionGraph }) => ({
+    nodeTrace: match(simulate)
+      .with({ result: P.nonNullable }, ({ result }) => result.trace[id] as SimulationTrace<SimulationTraceDataTable>)
+      .otherwise(() => null),
+    inputData: match(simulate)
+      .with({ result: P.nonNullable }, ({ result }) => getNodeData(id, { trace: result.trace, decisionGraph }))
+      .otherwise(() => null),
+  }));
+
+  const { disabled, configurable, content, globalType } = useDecisionGraphState(
+    ({ disabled, configurable, decisionGraph, globalType }) => ({
       disabled,
       configurable,
       content: (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content as NodeDecisionTableData,
       globalType,
     }),
   );
-
-  const activeRules: string[] =
-    nodeTrace?.traceData !== undefined
-      ? Array.isArray(nodeTrace?.traceData)
-        ? nodeTrace?.traceData?.map((d: any) => d?.rule?._id)
-        : [nodeTrace?.traceData?.rule?._id]
-      : [];
 
   const computedType = useMemo(() => {
     if (!nodeType) {
@@ -50,6 +52,18 @@ export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager 
     return newType;
   }, [nodeType, globalType, content?.inputField, content?.executionMode]);
 
+  const debug = useMemo(() => {
+    if (!nodeTrace || !inputData) {
+      return undefined;
+    }
+
+    if (!isWasmAvailable()) {
+      return { trace: nodeTrace };
+    }
+
+    return { trace: nodeTrace, inputData: new Variable(inputData) };
+  }, [nodeTrace, inputData]);
+
   return (
     <DecisionTable
       id={id}
@@ -59,7 +73,7 @@ export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager 
       disabled={disabled}
       configurable={configurable}
       inputData={computedType}
-      activeRules={(activeRules || []).filter((id) => !!id)}
+      debug={debug}
       onChange={(val) => {
         graphActions.updateNode(id, (draft) => {
           Object.assign(draft.content, val);

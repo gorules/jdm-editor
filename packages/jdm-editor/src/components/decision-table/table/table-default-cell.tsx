@@ -3,6 +3,7 @@ import React, { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, 
 import { P, match } from 'ts-pattern';
 
 import { columnIdSelector } from '../../../helpers/components';
+import { isWasmAvailable } from '../../../helpers/wasm';
 import type { DiffMetadata } from '../../decision-graph';
 import { DiffAutosizeTextArea } from '../../shared';
 import { DiffCodeEditor } from '../../shared/diff-ce';
@@ -12,6 +13,7 @@ import {
   useDecisionTableRaw,
   useDecisionTableState,
 } from '../context/dt-store.context';
+import { getReferenceMap } from '../util';
 
 export type TableDefaultCellProps = {
   context: CellContext<Record<string, string>, string>;
@@ -64,7 +66,9 @@ export const TableDefaultCell = memo<TableDefaultCellProps>(({ context, ...props
         value: inner,
         diff,
         onChange: commit,
-      }) || <TableInputCell disabled={disabled} column={column} value={inner} onChange={commit} diff={diff} />}
+      }) || (
+        <TableInputCell disabled={disabled} column={column} value={inner} onChange={commit} diff={diff} index={index} />
+      )}
     </div>
   );
 });
@@ -75,6 +79,7 @@ export type TableCellProps = {
   diff?: DiffMetadata;
   onChange: (value: string) => void;
   disabled?: boolean;
+  index: number;
 };
 
 enum LocalVariableKind {
@@ -82,7 +87,7 @@ enum LocalVariableKind {
   Derived,
 }
 
-const TableInputCell: React.FC<TableCellProps> = ({ column, value, onChange, disabled, diff }) => {
+const TableInputCell: React.FC<TableCellProps> = ({ column, value, onChange, disabled, diff, index }) => {
   const id = useMemo(() => crypto.randomUUID(), []);
   const textareaRef = useRef<HTMLTextAreaElement | HTMLDivElement>(null);
   const raw = useDecisionTableRaw();
@@ -168,21 +173,100 @@ const TableInputCell: React.FC<TableCellProps> = ({ column, value, onChange, dis
   }
 
   return (
-    <DiffCodeEditor
-      ref={textareaRef as any}
-      id={id}
-      type={match(column)
-        .with({ colType: 'input', field: P.string }, () => 'unary' as const)
-        .otherwise(() => 'standard' as const)}
-      className='grl-dt__cell__input'
-      noStyle
-      displayDiff={diff?.status === 'modified'}
-      previousValue={diff?.previousValue}
-      variableType={localVariableType.value}
-      maxRows={3}
-      value={value}
-      disabled={disabled}
-      onChange={onChange}
-    />
+    <div className='grl-dt__cell__input__container'>
+      {column.colType === 'input' && <TableInputCellStatus index={index} columnId={column.id} />}
+      <DiffCodeEditor
+        ref={textareaRef as any}
+        id={id}
+        type={match(column)
+          .with({ colType: 'input', field: P.string }, () => 'unary' as const)
+          .otherwise(() => 'standard' as const)}
+        className='grl-dt__cell__input'
+        noStyle
+        displayDiff={diff?.status === 'modified'}
+        previousValue={diff?.previousValue}
+        variableType={localVariableType.value}
+        maxRows={3}
+        value={value}
+        disabled={disabled}
+        onChange={onChange}
+      />
+    </div>
   );
 };
+
+const TableInputCellStatus: React.FC<{ columnId: string; index: number }> = React.memo(({ columnId, index }) => {
+  const inputData = useDecisionTableState(({ debug }) => debug?.inputData);
+  const expressionContext = useDecisionTableState(({ debug }) => {
+    if (!isWasmAvailable() || !debug) {
+      return;
+    }
+
+    const { trace, snapshot } = debug;
+    const referenceMap = getReferenceMap(trace);
+    if (!referenceMap) {
+      return null;
+    }
+
+    const columnDef = snapshot.inputs.find((i) => i.id === columnId);
+    if (!columnDef) {
+      return null;
+    }
+
+    if (!(index in snapshot.rules)) {
+      return null;
+    }
+
+    const expression = snapshot.rules[index]?.[columnId]?.trim();
+    if (!columnDef.field) {
+      return { type: 'standard' as const, expression };
+    }
+
+    if (!(columnDef.field in referenceMap)) {
+      return { type: 'skip' as const };
+    }
+
+    return { type: 'unary' as const, expression, $: referenceMap[columnDef.field] };
+  });
+
+  const status = useMemo<'hit' | 'no-hit' | 'skip' | null>(() => {
+    if (!inputData || !expressionContext) {
+      return null;
+    }
+
+    const { type, expression, $ } = expressionContext;
+    if (type === 'skip') {
+      return 'skip';
+    }
+
+    if (!expression) {
+      return 'hit';
+    }
+
+    try {
+      let isOk: boolean;
+      if (type === 'unary') {
+        const newInputData = inputData.cloneWithReference($);
+        isOk = newInputData.evaluateUnaryExpression(expression);
+      } else {
+        isOk = inputData.evaluateExpression(expression) === true;
+      }
+
+      return isOk ? 'hit' : 'no-hit';
+    } catch {
+      return 'no-hit';
+    }
+  }, [inputData, expressionContext]);
+
+  if (!status) {
+    return null;
+  }
+
+  switch (status) {
+    case 'hit':
+    case 'no-hit':
+      return <div className='grl-dt__cell__input__status' color='var(--grl-color-success)' data-status={status} />;
+    case 'skip':
+      return null;
+  }
+});
