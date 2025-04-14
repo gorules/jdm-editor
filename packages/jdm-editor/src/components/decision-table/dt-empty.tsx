@@ -119,8 +119,8 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
 
     const { decisionTable } = stateStore.getState();
     const activeRules = match(debug.trace.traceData)
-      .with(P.array(), (t) => t.map((d) => d.rule._id))
-      .otherwise((t) => [t.rule._id]);
+      .with(P.array(), (t) => t.map((d) => d?.rule?._id))
+      .otherwise((t) => [t?.rule?._id]);
 
     stateStore.setState({
       debug: {

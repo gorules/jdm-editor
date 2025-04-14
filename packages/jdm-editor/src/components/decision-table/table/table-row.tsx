@@ -6,15 +6,17 @@ import clsx from 'clsx';
 import React, { useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
+import { composeRefs } from '../../../helpers/compose-refs';
 import type { DiffMetadata } from '../../decision-graph';
 import { useDecisionTableActions, useDecisionTableState } from '../context/dt-store.context';
 
 export const TableRow: React.FC<{
+  ref?: React.Ref<HTMLTableRowElement>;
   row: Row<Record<string, string>>;
   disabled?: boolean;
   virtualItem: VirtualItem;
   onResize?: (node: HTMLElement) => void;
-}> = ({ row, disabled, virtualItem, onResize }) => {
+}> = ({ ref, row, disabled, virtualItem, onResize }) => {
   const trRef = useRef<HTMLTableRowElement>(null);
   const tableActions = useDecisionTableActions();
   const { cursor, isActive } = useDecisionTableState(({ cursor, debug }) => ({
@@ -74,7 +76,7 @@ export const TableRow: React.FC<{
 
   return (
     <tr
-      ref={trRef}
+      ref={composeRefs(trRef, ref)}
       className={clsx(
         'table-row',
         isDropping && direction === 'down' && 'dropping-down',
