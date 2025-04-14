@@ -19,10 +19,6 @@ export const getNodeData = (nodeId: string, { trace, decisionGraph }: NodeDataPa
           return null;
         }
 
-        if (node.type === 'inputNode') {
-          return [t.name, t.output];
-        }
-
         return [t.name, t.output];
       })
       .filter((s) => !!s),

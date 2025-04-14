@@ -108,10 +108,6 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
   }, [inputData]);
 
   useEffect(() => {
-    if (!isWasmAvailable()) {
-      return;
-    }
-
     if (!debug) {
       stateStore.setState({ debug: undefined });
       return;
