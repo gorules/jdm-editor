@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.14.0](https://github.com/gorules/jdm-editor/compare/@gorules/zen-engine-wasm@0.13.0...@gorules/zen-engine-wasm@0.14.0) (2025-04-14)
+
+### Features
+
+- decision table design ([#157](https://github.com/gorules/jdm-editor/issues/157)) ([aa363cc](https://github.com/gorules/jdm-editor/commit/aa363cc2987b745c360a9c6fd4603a6f2b9d7a4d))
+
 # [0.13.0](https://github.com/gorules/jdm-editor/compare/@gorules/zen-engine-wasm@0.12.0...@gorules/zen-engine-wasm@0.13.0) (2024-12-03)
 
 ### Features
