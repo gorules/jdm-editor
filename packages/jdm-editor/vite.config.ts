@@ -21,6 +21,7 @@ export default defineConfig({
       },
       name: 'JDM Editor',
       formats: ['es'],
+      cssFileName: 'style',
     },
     rollupOptions: {
       external: ['react/jsx-runtime', 'react', 'react-dom', ...Object.keys(packageJson.dependencies)],
