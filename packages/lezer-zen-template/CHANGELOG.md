@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/lezer-parser/json/compare/@gorules/lezer-zen-template@0.3.1...@gorules/lezer-zen-template@0.4.0) (2025-04-15)
+
+**Note:** Version bump only for package @gorules/lezer-zen-template
+
 ## [0.3.1](https://github.com/lezer-parser/json/compare/@gorules/lezer-zen-template@0.3.0...@gorules/lezer-zen-template@0.3.1) (2024-10-04)
 
 ### Bug Fixes

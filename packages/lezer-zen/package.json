@@ -1,6 +1,6 @@
 {
   "name": "@gorules/lezer-zen",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "lezer-based ZEN grammar",
   "main": "dist/index.cjs",
   "type": "module",
