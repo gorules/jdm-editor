@@ -7,14 +7,7 @@ import wasm from 'vite-plugin-wasm';
 import packageJson from './package.json';
 
 export default defineConfig({
-  plugins: [
-    react(),
-    wasm(),
-    dts({
-      insertTypesEntry: true,
-      rollupTypes: true,
-    }),
-  ],
+  plugins: [react(), wasm(), dts({ insertTypesEntry: true, rollupTypes: true })],
   resolve: {
     dedupe: ['@lezer/common', '@lezer/lr', '@lezer/highlight'],
   },

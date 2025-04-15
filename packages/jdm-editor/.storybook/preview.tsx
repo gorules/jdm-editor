@@ -6,6 +6,7 @@ import { useDarkMode } from 'storybook-dark-mode';
 
 import { JdmConfigProvider } from '../src';
 
+// @ts-ignore
 await ZenEngineWasm.default();
 
 export const parameters = {

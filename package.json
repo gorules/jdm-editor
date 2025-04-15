@@ -5,6 +5,7 @@
     "lerna": "lerna",
     "build": "lerna run build",
     "test": "lerna run test",
+    "typecheck": "lerna run typecheck",
     "lint": "eslint --ext js,ts,jsx,tsx .",
     "lint:fix": "pnpm lint --fix",
     "prettier": "prettier --check .",

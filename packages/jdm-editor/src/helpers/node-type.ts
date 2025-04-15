@@ -1,8 +1,11 @@
 import { VariableType } from '@gorules/zen-engine-wasm';
 import { useMemo } from 'react';
 
-import { NodeTypeKind, useDecisionGraphState } from '../components';
-import type { DecisionGraphStoreType } from '../components/decision-graph/context/dg-store.context';
+import {
+  type DecisionGraphStoreType,
+  NodeTypeKind,
+  useDecisionGraphState,
+} from '../components/decision-graph/context/dg-store.context';
 import { isWasmAvailable } from './wasm';
 
 type NodeTypeParams = {

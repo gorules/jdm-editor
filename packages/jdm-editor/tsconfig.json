@@ -1,9 +1,8 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "rootDir": "src",
-    "baseUrl": "..",
-    "allowJs": true
+    "allowJs": true,
+    "types": ["vite/client"]
   },
-  "include": ["src", ".storybook"]
+  "include": ["src", ".storybook", "vite.config.ts"]
 }

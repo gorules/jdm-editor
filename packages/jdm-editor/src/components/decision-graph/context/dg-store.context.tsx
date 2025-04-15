@@ -10,7 +10,6 @@ import type { StoreApi, UseBoundStore } from 'zustand';
 import { create } from 'zustand';
 
 import type { CodeEditorProps } from '../../code-editor';
-import { calculateDiffGraph } from '../dg-diff-util';
 import type { DecisionEdge, DecisionGraphType, DecisionNode } from '../dg-types';
 import { privateSymbol } from '../dg-types';
 import { mapToGraphEdge, mapToGraphEdges, mapToGraphNode, mapToGraphNodes } from '../dg-util';
@@ -77,7 +76,6 @@ export type DecisionGraphStoreType = {
 
   actions: {
     setDecisionGraph: (val: Partial<DecisionGraphType>, options?: SetDecisionGraphOptions) => void;
-    calculateDiffGraph: (currentGraph: DecisionGraphType, previousGraph: DecisionGraphType) => DecisionGraphType;
 
     handleNodesChange: (nodesChange: NodeChange[]) => void;
     handleEdgesChange: (edgesChange: EdgeChange[]) => void;
@@ -483,13 +481,6 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         if (!skipOnChangeEvent) {
           listenerStore.getState().onChange?.(newDecisionGraph);
         }
-      },
-      calculateDiffGraph: (currentGraph, previousGraph) => {
-        const { components, customNodes } = stateStore.getState();
-        return calculateDiffGraph(currentGraph, previousGraph, {
-          components,
-          customNodes,
-        });
       },
       setHoveredEdgeId: (edgeId) => stateStore.setState({ hoveredEdgeId: edgeId }),
       goToNode: (id: string) => {

@@ -82,19 +82,12 @@ export const DecisionTableCommandBar: React.FC = () => {
     <>
       <Stack horizontal horizontalAlign={'space-between'} verticalAlign={'center'} className={'grl-dt__command-bar'}>
         <Stack gap={8} horizontal className='full-width'>
-          <Button
-            type='text'
-            size={'small'}
-            color='secondary'
-            icon={<ExportOutlined />}
-            onClick={() => exportExcel({ name: 'table' })}
-          >
+          <Button type='text' size={'small'} icon={<ExportOutlined />} onClick={() => exportExcel({ name: 'table' })}>
             Export Excel
           </Button>
           <Button
             type='text'
             size={'small'}
-            color='secondary'
             disabled={disabled}
             icon={<ImportOutlined />}
             onClick={() => importExcel()}
@@ -113,7 +106,6 @@ export const DecisionTableCommandBar: React.FC = () => {
                 <Button
                   type='text'
                   size={'small'}
-                  color='secondary'
                   icon={<ArrowDownOutlined />}
                   onClick={() => tableActions.addRowBelow(cursor?.y)}
                 />
@@ -122,7 +114,6 @@ export const DecisionTableCommandBar: React.FC = () => {
                 <Button
                   type='text'
                   size={'small'}
-                  color='secondary'
                   icon={<ArrowUpOutlined />}
                   onClick={() => tableActions.addRowAbove(cursor?.y)}
                 />
@@ -132,13 +123,7 @@ export const DecisionTableCommandBar: React.FC = () => {
                   <Button type='text' danger size={'small'} icon={<DeleteOutlined />} />
                 </Popconfirm>
               </Tooltip>
-              <Button
-                type='text'
-                size={'small'}
-                color='secondary'
-                icon={<CloseOutlined />}
-                onClick={() => tableActions.setCursor(null)}
-              >
+              <Button type='text' size={'small'} icon={<CloseOutlined />} onClick={() => tableActions.setCursor(null)}>
                 Deselect
               </Button>
             </>

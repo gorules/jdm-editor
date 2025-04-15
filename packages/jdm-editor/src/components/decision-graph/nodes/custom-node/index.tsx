@@ -3,7 +3,7 @@ import { type VariableType } from '@gorules/zen-engine-wasm';
 import { Button, Checkbox, Form, Typography, theme } from 'antd';
 import type { DragDropManager } from 'dnd-core';
 import React, { useState } from 'react';
-import type { Position } from 'reactflow';
+import type { XYPosition } from 'reactflow';
 import { match } from 'ts-pattern';
 
 import { CodeEditor } from '../../../code-editor';
@@ -18,7 +18,7 @@ type CustomDecisionNode<T> = {
   description?: string;
   type?: string;
   content?: T;
-  position: Position;
+  position: XYPosition;
 };
 
 type GenerateNodeParams = {

@@ -97,7 +97,6 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
         const modelParsed = decisionModelSchema.safeParse({
           nodes: [...updatedNodes, ...newNodes],
           edges: decisionGraph.edges,
-          settings: decisionGraph.settings,
         });
 
         if (!modelParsed.success) {
@@ -125,7 +124,6 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
           contentType: DecisionContentType,
           nodes: decisionGraph.nodes,
           edges: decisionGraph.edges,
-          settings: decisionGraph.settings,
         },
         null,
         2,
