@@ -20,5 +20,8 @@ jobs:
       - name: Lint and prettier
         run: pnpm format
 
+      - name: Type check
+        run: pnpm typecheck
+
       - name: Build
         run: pnpm build
