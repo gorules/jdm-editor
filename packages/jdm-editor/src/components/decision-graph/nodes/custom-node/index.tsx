@@ -78,7 +78,6 @@ type SplitPath<Path extends string, Obj> = Path extends `${infer Prefix}.${infer
   ? { [K in Prefix]: SplitPath<Rest, Obj> }
   : { [K in Path]: Obj };
 
-// eslint-disable-next-line
 type CreateDynamicType<T extends ReadonlyArray<unknown>, Result = {}> = T extends readonly [infer First, ...infer Rest]
   ? First extends { control: infer Control extends string; name: infer Name extends string }
     ? CreateDynamicType<Rest, Result & SplitPath<Name, ControlToType<Control>>>
