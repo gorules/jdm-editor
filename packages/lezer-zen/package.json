@@ -17,10 +17,10 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "@lezer/generator": "^1.7.1",
-    "@rollup/plugin-node-resolve": "^15.3.0",
-    "mocha": "^10.7.3",
-    "rollup": "^4.24.0"
+    "@lezer/generator": "^1.7.3",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "mocha": "^11.1.0",
+    "rollup": "^4.40.0"
   },
   "repository": {
     "type": "git",
@@ -33,7 +33,7 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "@lezer/common": "^1.2.2",
+    "@lezer/common": "^1.2.3",
     "@lezer/highlight": "^1.2.1",
     "@lezer/lr": "^1.4.2"
   }

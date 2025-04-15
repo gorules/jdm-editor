@@ -49,14 +49,7 @@ export const Controlled: Story = {
           height: '100%',
         }}
       >
-        <DecisionGraph
-          {...args}
-          value={value}
-          onChange={(val) => {
-            console.log(val);
-            setValue?.(val);
-          }}
-        />
+        <DecisionGraph {...args} value={value} onChange={(val) => setValue?.(val)} />
       </div>
     );
   },
@@ -407,9 +400,6 @@ const DecisionGraphWithSimulator: React.FC = () => {
     >
       <DecisionGraph
         value={value}
-        onPanelsChange={(val) => {
-          console.log(val);
-        }}
         simulate={simulate}
         defaultActivePanel={'simulator'}
         panels={panels}

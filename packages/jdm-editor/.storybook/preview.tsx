@@ -1,12 +1,10 @@
-// @ts-ignore
 import * as ZenEngineWasm from '@gorules/zen-engine-wasm';
-import { Preview } from '@storybook/react';
+import type { Preview } from '@storybook/react';
 import * as React from 'react';
 import { useDarkMode } from 'storybook-dark-mode';
 
 import { JdmConfigProvider } from '../src';
 
-// @ts-ignore
 await ZenEngineWasm.default();
 
 export const parameters = {
