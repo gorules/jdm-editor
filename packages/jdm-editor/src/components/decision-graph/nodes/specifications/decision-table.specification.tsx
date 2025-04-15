@@ -10,15 +10,14 @@ import type { z } from 'zod';
 
 import { useNodeType } from '../../../../helpers/node-type';
 import type { decisionTableSchema } from '../../../../helpers/schema';
-import { DiffInput, DiffRadio, DiffSwitch } from '../../../shared';
-import { DiffCodeEditor } from '../../../shared/diff-ce';
+import { DiffCodeEditor, DiffInput, DiffRadio, DiffSwitch } from '../../../shared';
 import { useDecisionGraphActions, useDecisionGraphState, useNodeDiff } from '../../context/dg-store.context';
-import { compareAndUnifyLists } from '../../dg-diff-util';
 import type { Diff, DiffMetadata } from '../../dg-types';
+import { compareAndUnifyLists } from '../../diff/comparison';
 import { TabDecisionTable } from '../../graph/tab-decision-table';
 import { GraphNode } from '../graph-node';
-import type { NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
+import type { NodeSpecification } from './specification-types';
 
 type InferredContent = z.infer<typeof decisionTableSchema>['content'];
 

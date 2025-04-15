@@ -7,7 +7,6 @@ import { P, match } from 'ts-pattern';
 
 import type { DecisionGraphRef } from './dg';
 import { DecisionGraph } from './dg';
-import { calculateDiffGraph } from './dg-diff-util';
 import {
   defaultGraph,
   defaultGraphCustomNode,
@@ -15,6 +14,7 @@ import {
   defaultGraphUnknownNode,
   diffGraph,
 } from './dg.stories-values';
+import { calculateDiffGraph } from './diff/utility';
 import type { GraphRef } from './graph/graph';
 import { createJdmNode } from './nodes/custom-node';
 import { GraphNode } from './nodes/graph-node';

@@ -1,6 +1,6 @@
 import type { z } from 'zod';
 
-import type { decisionModelSchema, nodeSchema } from '../../helpers/schema';
+import type { nodeSchema } from '../../helpers/schema';
 
 export const privateSymbol = Symbol('private');
 
@@ -55,10 +55,7 @@ export type DecisionEdge = {
   };
 };
 
-export type DecisionSettings = z.infer<typeof decisionModelSchema>['settings'] & Diff;
-
 export type DecisionGraphType = {
   nodes: DecisionNode[];
   edges: DecisionEdge[];
-  settings?: DecisionSettings;
 };

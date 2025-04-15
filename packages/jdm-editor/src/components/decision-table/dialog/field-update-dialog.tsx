@@ -24,7 +24,7 @@ export const FieldUpdate: React.FC<React.PropsWithChildren<FieldUpdateProps>> = 
   const { inputVariableType } = useDecisionTableState(({ inputVariableType }) => ({ inputVariableType }));
   const [form] = Form.useForm();
 
-  const [selectorValue, setSelectorValue] = useState<(string | number)[]>();
+  const [selectorValue, setSelectorValue] = useState<string[]>();
 
   useEffect(() => {
     if (isOpen) {

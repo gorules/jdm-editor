@@ -19,7 +19,7 @@ export type JdmConfigProviderProps = {
 };
 
 export const JdmConfigProvider: React.FC<JdmConfigProviderProps> = ({
-  theme: { mode = 'light', token = {}, ...restTheme } = {},
+  theme: { mode = 'light' as const, token = {}, ...restTheme } = {},
   prefixCls,
   children,
 }) => {

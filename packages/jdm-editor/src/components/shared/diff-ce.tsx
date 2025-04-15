@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import React from 'react';
 
-import type { CodeEditorProps } from '../code-editor';
+import type { CodeEditorProps, CodeEditorRef } from '../code-editor';
 import { CodeEditor } from '../code-editor';
 
 export type DiffCodeEditorProps = CodeEditorProps & {
@@ -10,7 +10,7 @@ export type DiffCodeEditorProps = CodeEditorProps & {
   noStyle?: boolean;
 };
 
-export const DiffCodeEditor = React.forwardRef<HTMLDivElement, DiffCodeEditorProps>(
+export const DiffCodeEditor = React.forwardRef<CodeEditorRef, DiffCodeEditorProps>(
   ({ displayDiff, previousValue, noStyle, ...rest }, ref) => {
     if (displayDiff) {
       return (
@@ -38,6 +38,7 @@ export const DiffCodeEditor = React.forwardRef<HTMLDivElement, DiffCodeEditorPro
         </div>
       );
     }
+
     return <CodeEditor ref={ref} {...rest} />;
   },
 );

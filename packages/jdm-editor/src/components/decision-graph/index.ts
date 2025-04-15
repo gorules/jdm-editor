@@ -37,26 +37,17 @@ export type {
   SimulationTraceDataSwitch,
 } from './simulator/simulation.types';
 
-export {
-  calculateDiffGraph,
-  compareAndUnifyLists,
-  processEdges,
-  processNodes,
-  addStrikethrough,
-  buildDiffString,
-  compareStringFields,
-  type ProcessNodesOptions,
-} from './dg-diff-util';
+export { nodeSpecification } from './nodes/specifications/specifications';
+
+export { addStrikethrough, buildDiffString, compareAndUnifyLists, compareStringFields } from './diff/comparison';
+export { calculateDiffGraph, processEdges, processNodes, type ProcessNodesOptions } from './diff/utility';
 
 export {
   type DecisionEdge,
   type DecisionNode,
-  type DecisionSettings,
   type DecisionGraphType,
   type DiffMetadata,
   type Diff,
   type Position,
   type DiffStatus,
 } from './dg-types';
-
-export { nodeSpecification } from './nodes/specifications/specifications';
