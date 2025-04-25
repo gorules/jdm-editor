@@ -140,7 +140,7 @@ export type DecisionTableStoreType = {
 
     inputsSchema?: SchemaSelectProps[];
     outputsSchema?: SchemaSelectProps[];
-    
+
     debug?: {
       snapshot: DecisionTableType;
       trace: SimulationTrace<SimulationTraceDataTable>;

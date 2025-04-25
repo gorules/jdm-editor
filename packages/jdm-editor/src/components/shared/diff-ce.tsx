@@ -39,6 +39,6 @@ export const DiffCodeEditor = React.forwardRef<CodeEditorRef, DiffCodeEditorProp
       );
     }
 
-    return <CodeEditor ref={ref} {...rest} />;
+    return <CodeEditor ref={ref} noStyle={noStyle} {...rest} />;
   },
 );

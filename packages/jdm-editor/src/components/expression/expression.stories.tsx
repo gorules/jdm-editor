@@ -70,20 +70,3 @@ export const Controlled: Story = {
     );
   },
 };
-
-export const WithTrace: Story = {
-  args: {
-    traceData: {
-      'customer.fullName': { result: '"John Doe"' },
-      'customer.isPremium': { result: 'true' },
-      'customer.purchaseTotals': { result: '[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]' },
-    },
-  },
-  render: (args) => {
-    return (
-      <StoryWrapper>
-        <Expression {...args} />
-      </StoryWrapper>
-    );
-  },
-};

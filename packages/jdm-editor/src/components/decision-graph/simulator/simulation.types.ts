@@ -1,4 +1,4 @@
-import { DecisionGraphType } from '../dg-types';
+import type { DecisionGraphType } from '../dg-types';
 
 type Input = unknown;
 type Output = unknown;

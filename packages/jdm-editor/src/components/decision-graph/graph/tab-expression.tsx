@@ -1,3 +1,4 @@
+import { Variable } from '@gorules/zen-engine-wasm';
 import type { DragDropManager } from 'dnd-core';
 import React, { useMemo } from 'react';
 import { P, match } from 'ts-pattern';
@@ -6,12 +7,11 @@ import type { z } from 'zod';
 import { getNodeData } from '../../../helpers/node-data';
 import { useNodeType } from '../../../helpers/node-type';
 import type { expressionNodeSchema } from '../../../helpers/schema';
+import { isWasmAvailable } from '../../../helpers/wasm';
 import { Expression } from '../../expression';
 import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
 import type { NodeExpressionData } from '../nodes/specifications/expression.specification';
 import type { SimulationTrace, SimulationTraceDataExpression } from '../simulator/simulation.types';
-import { isWasmAvailable } from '../../../helpers/wasm';
-import { Variable } from '@gorules/zen-engine-wasm';
 
 export type TabExpressionProps = {
   id: string;

@@ -2,8 +2,7 @@ import type { VariableType } from '@gorules/zen-engine-wasm';
 import type { Row } from '@tanstack/react-table';
 import { Typography } from 'antd';
 import clsx from 'clsx';
-import { GripVerticalIcon } from 'lucide-react';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { CodeEditorPreview } from '../code-editor/ce-preview';
@@ -21,6 +20,7 @@ export type ExpressionItemProps = {
 };
 
 export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, index, variableType }) => {
+  const [isFocused, setIsFocused] = useState(false);
   const expressionRef = useRef<HTMLDivElement>(null);
   const { updateRow, removeRow, swapRows, disabled, configurable } = useExpressionStore(
     ({ updateRow, removeRow, swapRows, disabled, configurable }) => ({
@@ -74,24 +74,20 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
       )}
       style={{ opacity: !isDragging ? 1 : 0.5 }}
     >
-      <div style={{ paddingTop: 4 }}>
-        <Typography.Text type='secondary' style={{ fontSize: 12 }}>
-          {index + 1}
-        </Typography.Text>
-      </div>
       <div ref={dragRef} className='expression-list-item__drag' aria-disabled={!configurable || disabled}>
-        {expression?._diff?.status ? (
-          <DiffIcon
-            status={expression?._diff?.status}
-            style={{
-              fontSize: 16,
-            }}
-          />
-        ) : (
-          <GripVerticalIcon size={14} />
-        )}
+        <div className='expression-list-item__drag__inner'>
+          <Typography.Text style={{ fontSize: 10 }}>{index + 1}</Typography.Text>
+          {expression?._diff?.status && (
+            <DiffIcon
+              status={expression?._diff?.status}
+              style={{
+                fontSize: 16,
+              }}
+            />
+          )}
+        </div>
       </div>
-      <div>
+      <div className='expression-list-item__key'>
         <DiffInput
           placeholder='Key'
           readOnly={!configurable || disabled}
@@ -100,10 +96,12 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
           value={expression?.key}
           onChange={(e) => onChange({ key: e.target.value })}
           autoComplete='off'
+          bordered={false}
         />
       </div>
       <div className='expression-list-item__code'>
         <DiffCodeEditor
+          className='expression-list-item__value'
           placeholder='Expression'
           maxRows={9}
           disabled={disabled}
@@ -112,17 +110,21 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
           previousValue={expression?._diff?.fields?.value?.previousValue}
           onChange={(value) => onChange({ value })}
           variableType={variableType}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          noStyle={true}
         />
-        <ResultOverlay id={expression.id} value={expression.value} />
+        <ResultOverlay expression={expression} />
       </div>
-      <div>
+      <div className='expression-list-item__action'>
         <ConfirmAction iconOnly disabled={!configurable || disabled} onConfirm={onRemove} />
+        {isFocused && <LivePreview id={expression.id} value={expression.value} />}
       </div>
     </div>
   );
 };
 
-const ResultOverlay = React.memo<{ id: string; value: string }>(({ id, value }) => {
+const LivePreview = React.memo<{ id: string; value: string }>(({ id, value }) => {
   const { inputData, initial } = useExpressionStore(({ debug }) => {
     const snapshot = (debug?.snapshot?.expressions ?? []).find((e) => e.id === id);
     const trace = debug?.trace.traceData[id];
@@ -134,8 +136,25 @@ const ResultOverlay = React.memo<{ id: string; value: string }>(({ id, value }) 
   });
 
   return (
-    <div className='expression-list-item__resultOverlay'>
+    <div className='expression-list-item__livePreview'>
       <CodeEditorPreview expression={value} inputData={inputData} initial={initial} />
     </div>
   );
 });
+
+const ResultOverlay: React.FC<{ expression: ExpressionEntry }> = ({ expression }) => {
+  const { trace } = useExpressionStore(({ debug }) => ({
+    trace: debug?.trace?.traceData?.[expression.key]?.result,
+  }));
+  if (!trace) {
+    return null;
+  }
+
+  return (
+    <div className='expression-list-item__resultOverlay'>
+      <Typography.Text ellipsis={{ tooltip: trace }} style={{ maxWidth: 60, overflow: 'hidden' }}>
+        = {trace as string}
+      </Typography.Text>
+    </div>
+  );
+};

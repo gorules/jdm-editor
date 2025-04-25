@@ -46,10 +46,13 @@ export const ExpressionList: React.FC<ExpressionListProps> = ({}) => {
   return (
     <div className={'expression-list'}>
       <div className={clsx('expression-list__item', 'expression-list__item--heading')}>
-        <div />
-        <div />
-        <Typography.Text type='secondary'>Key</Typography.Text>
-        <Typography.Text type='secondary'>Expression</Typography.Text>
+        <div className={'expression-list__item__th expression-list__item__th--order'} />
+        <Typography.Text type='secondary' className={'expression-list__item__th expression-list__item__th--key'}>
+          Key
+        </Typography.Text>
+        <Typography.Text type='secondary' className={'expression-list__item__th'}>
+          Expression
+        </Typography.Text>
         <div />
       </div>
       {(expressions || []).map((expression, index) => (

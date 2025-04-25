@@ -53,9 +53,21 @@ export const CodeEditorPreview: React.FC<CodeEditorPreviewProps> = ({
         {(preview?.type === 'success' || preview?.type === 'initial') && (
           <CodeEditor value={preview.value} disabled noStyle maxRows={3} />
         )}
-        {preview?.type === 'none' && <Typography.Text type='secondary'>{preview.value}</Typography.Text>}
-        {preview?.type === 'error' && <Typography.Text type='danger'>{preview.value}</Typography.Text>}
-        {!preview && <Typography.Text type='secondary'>{noPreviewText}</Typography.Text>}
+        {preview?.type === 'none' && (
+          <Typography.Text type='secondary' ellipsis>
+            {preview.value}
+          </Typography.Text>
+        )}
+        {preview?.type === 'error' && (
+          <Typography.Text type='danger' ellipsis>
+            {preview.value}
+          </Typography.Text>
+        )}
+        {!preview && (
+          <Typography.Text type='secondary' ellipsis>
+            {noPreviewText}
+          </Typography.Text>
+        )}
       </div>
     </div>
   );
