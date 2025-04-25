@@ -1,3 +1,5 @@
+import { DecisionGraphType } from '../dg-types';
+
 type Input = unknown;
 type Output = unknown;
 
@@ -14,6 +16,8 @@ export type SimulationError = {
 export type SimulationOk = {
   performance: string;
   result: Output;
+  // Graph that was used
+  snapshot: DecisionGraphType;
 
   /** List of traces by nodeId */
   trace: Record<string, SimulationTrace>;

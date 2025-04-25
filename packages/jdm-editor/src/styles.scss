@@ -227,32 +227,11 @@
     cursor: not-allowed;
   }
 
-  &__preview {
-    border-radius: 8px;
-    padding: 8px;
-    background: var(--grl-color-bg-container-disabled);
-
-    > .ant-typography {
-      font-family: var(--mono-font-family);
-      font-size: 12px;
-    }
-  }
-
   &__footer {
     display: flex;
     justify-content: space-between;
     gap: 8px;
     margin-top: 16px;
     width: 100%;
-  }
-
-  &__preview .grl-ce.no-style {
-    .cm-editor {
-      background: transparent;
-    }
-
-    .cm-content {
-      padding: 0;
-    }
   }
 }

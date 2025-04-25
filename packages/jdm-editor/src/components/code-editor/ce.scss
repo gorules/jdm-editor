@@ -304,3 +304,24 @@
   color: var(--grl-color-text);
   padding: 2px 8px !important;
 }
+
+.grl-ce-preview {
+  border-radius: 8px;
+  padding: 8px;
+  background: var(--grl-color-bg-container-disabled);
+
+  > .ant-typography {
+    font-family: var(--mono-font-family);
+    font-size: 12px;
+  }
+
+  .grl-ce.no-style {
+    .cm-editor {
+      background: transparent;
+    }
+
+    .cm-content {
+      padding: 0;
+    }
+  }
+}

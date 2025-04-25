@@ -47,6 +47,7 @@ export const ExpressionList: React.FC<ExpressionListProps> = ({}) => {
     <div className={'expression-list'}>
       <div className={clsx('expression-list__item', 'expression-list__item--heading')}>
         <div />
+        <div />
         <Typography.Text type='secondary'>Key</Typography.Text>
         <Typography.Text type='secondary'>Expression</Typography.Text>
         <div />

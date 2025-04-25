@@ -6,6 +6,7 @@ import { P, match } from 'ts-pattern';
 import { getNodeData } from '../../../helpers/node-data';
 import { useNodeType } from '../../../helpers/node-type';
 import { isWasmAvailable } from '../../../helpers/wasm';
+import type { DecisionTableType } from '../../decision-table';
 import { DecisionTable } from '../../decision-table';
 import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
 import type { NodeDecisionTableData } from '../nodes/specifications/decision-table.specification';
@@ -19,12 +20,18 @@ export type TabDecisionTableProps = {
 export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager }) => {
   const graphActions = useDecisionGraphActions();
   const nodeType = useNodeType(id, { attachGlobals: false });
-  const { nodeTrace, inputData } = useDecisionGraphState(({ simulate, decisionGraph }) => ({
+  const { nodeTrace, inputData, nodeSnapshot } = useDecisionGraphState(({ simulate, decisionGraph }) => ({
     nodeTrace: match(simulate)
       .with({ result: P.nonNullable }, ({ result }) => result.trace[id] as SimulationTrace<SimulationTraceDataTable>)
       .otherwise(() => null),
     inputData: match(simulate)
       .with({ result: P.nonNullable }, ({ result }) => getNodeData(id, { trace: result.trace, decisionGraph }))
+      .otherwise(() => null),
+    nodeSnapshot: match(simulate)
+      .with(
+        { result: P.nonNullable },
+        ({ result }) => result.snapshot.nodes.find((n) => n.id === id)?.content as DecisionTableType,
+      )
       .otherwise(() => null),
   }));
 
@@ -53,16 +60,16 @@ export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager 
   }, [nodeType, globalType, content?.inputField, content?.executionMode]);
 
   const debug = useMemo(() => {
-    if (!nodeTrace || !inputData) {
+    if (!nodeTrace || !inputData || !nodeSnapshot) {
       return undefined;
     }
 
     if (!isWasmAvailable()) {
-      return { trace: nodeTrace };
+      return { trace: nodeTrace, snapshot: nodeSnapshot };
     }
 
-    return { trace: nodeTrace, inputData: new Variable(inputData) };
-  }, [nodeTrace, inputData]);
+    return { trace: nodeTrace, inputData: new Variable(inputData), snapshot: nodeSnapshot };
+  }, [nodeTrace, nodeSnapshot, inputData]);
 
   return (
     <DecisionTable

@@ -1,13 +1,12 @@
 import { type Variable } from '@gorules/zen-engine-wasm';
 import { Button, Popover, Typography } from 'antd';
 import clsx from 'clsx';
-import stringifyPretty from 'json-stringify-pretty-compact';
-import { BugIcon, ChevronDownIcon } from 'lucide-react';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { ChevronDownIcon } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
 
-import { isWasmAvailable } from '../../../helpers/wasm';
 import type { CodeEditorRef } from '../../code-editor';
 import { CodeEditor } from '../../code-editor';
+import { CodeEditorPreview } from '../../code-editor/ce-preview';
 import { ConfirmAction } from '../../confirm-action';
 import { Stack } from '../../stack';
 
@@ -36,27 +35,6 @@ export const InputFieldEdit: React.FC<InputFieldEditProps> = ({
   const [innerValue, setInnerValue] = useState(value);
   const codeEditor = useRef<CodeEditorRef>(null);
 
-  const preview = useMemo(() => {
-    if (!inputData) {
-      return undefined;
-    }
-
-    if (!isWasmAvailable() || !inputData || innerValue === referenceData?.field) {
-      return { type: 'initial' as const, value: stringifyPretty(referenceData?.value, { maxLength: 30 }) };
-    }
-
-    if (!innerValue) {
-      return { type: 'none' as const, value: '-' };
-    }
-
-    try {
-      const value = inputData.evaluateExpression(innerValue);
-      return { type: 'success' as const, value: stringifyPretty(value, { maxLength: 30 }) };
-    } catch (err) {
-      return { type: 'error' as const, value: (err as any).toString() };
-    }
-  }, [inputData, innerValue, referenceData]);
-
   useEffect(() => {
     if (open) {
       setInnerValue(value);
@@ -65,7 +43,6 @@ export const InputFieldEdit: React.FC<InputFieldEditProps> = ({
       }
 
       setTimeout(() => {
-        console.log(codeEditor.current);
         codeEditor.current!.codeMirror?.focus();
         const content = codeEditor.current!.querySelector('.cm-content');
         const selection = window.getSelection();
@@ -112,20 +89,11 @@ export const InputFieldEdit: React.FC<InputFieldEditProps> = ({
             disabled={disabled}
           />
           <div style={{ marginTop: 16 }}>
-            <Typography.Text style={{ fontSize: 12 }}>
-              Live Preview <BugIcon size='1em' opacity={0.5} color='#077D16' />
-            </Typography.Text>
-            <Typography.Text style={{ fontSize: 12, display: 'block' }} type='secondary'>
-              {preview?.type === 'initial' ? 'Based on simulation data' : 'Based on live calculation'}
-            </Typography.Text>
-            <div className='grl-field-edit__preview'>
-              {(preview?.type === 'success' || preview?.type === 'initial') && (
-                <CodeEditor value={preview.value} disabled noStyle maxRows={3} />
-              )}
-              {preview?.type === 'none' && <Typography.Text type='secondary'>{preview.value}</Typography.Text>}
-              {preview?.type === 'error' && <Typography.Text type='danger'>{preview.value}</Typography.Text>}
-              {!preview && <Typography.Text type='secondary'>Run simulation to see the results</Typography.Text>}
-            </div>
+            <CodeEditorPreview
+              expression={innerValue ?? ''}
+              inputData={inputData}
+              initial={referenceData ? { expression: referenceData.field, result: referenceData.value } : undefined}
+            />
             <div className='grl-field-edit__footer'>
               <ConfirmAction iconOnly onConfirm={onRemove} disabled={disabled} />
               <Stack horizontal width='auto' verticalAlign='end'>

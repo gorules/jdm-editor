@@ -6,6 +6,7 @@ import { GripVerticalIcon } from 'lucide-react';
 import React, { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
+import { CodeEditorPreview } from '../code-editor/ce-preview';
 import { ConfirmAction } from '../confirm-action';
 import { DiffIcon } from '../diff-icon';
 import { DiffCodeEditor } from '../shared/diff-ce';
@@ -73,6 +74,11 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
       )}
       style={{ opacity: !isDragging ? 1 : 0.5 }}
     >
+      <div style={{ paddingTop: 4 }}>
+        <Typography.Text type='secondary' style={{ fontSize: 12 }}>
+          {index + 1}
+        </Typography.Text>
+      </div>
       <div ref={dragRef} className='expression-list-item__drag' aria-disabled={!configurable || disabled}>
         {expression?._diff?.status ? (
           <DiffIcon
@@ -107,7 +113,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
           onChange={(value) => onChange({ value })}
           variableType={variableType}
         />
-        <ResultOverlay expression={expression} />
+        <ResultOverlay id={expression.id} value={expression.value} />
       </div>
       <div>
         <ConfirmAction iconOnly disabled={!configurable || disabled} onConfirm={onRemove} />
@@ -116,19 +122,20 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
   );
 };
 
-const ResultOverlay: React.FC<{ expression: ExpressionEntry }> = ({ expression }) => {
-  const { trace } = useExpressionStore(({ traceData }) => ({
-    trace: traceData?.[expression.key]?.result,
-  }));
-  if (!trace) {
-    return null;
-  }
+const ResultOverlay = React.memo<{ id: string; value: string }>(({ id, value }) => {
+  const { inputData, initial } = useExpressionStore(({ debug }) => {
+    const snapshot = (debug?.snapshot?.expressions ?? []).find((e) => e.id === id);
+    const trace = debug?.trace.traceData[id];
+
+    return {
+      inputData: debug?.inputData,
+      initial: snapshot && trace ? { expression: snapshot.value, result: trace.result } : undefined,
+    };
+  });
 
   return (
     <div className='expression-list-item__resultOverlay'>
-      <Typography.Text ellipsis={{ tooltip: trace }} style={{ maxWidth: 120 }}>
-        = {trace as string}
-      </Typography.Text>
+      <CodeEditorPreview expression={value} inputData={inputData} initial={initial} />
     </div>
   );
-};
+});

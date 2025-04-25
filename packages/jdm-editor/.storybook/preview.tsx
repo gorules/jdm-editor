@@ -5,6 +5,8 @@ import { useDarkMode } from 'storybook-dark-mode';
 
 import { JdmConfigProvider } from '../src';
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
 await ZenEngineWasm.default();
 
 export const parameters = {
@@ -21,6 +23,9 @@ export const parameters = {
 };
 
 const preview: Preview = {
+  parameters: {
+    layout: 'fullscreen',
+  },
   decorators: [
     (Story) => {
       const isDark = useDarkMode();
@@ -32,7 +37,6 @@ const preview: Preview = {
               __html: `html { background-color: ${isDark ? '#1f1f1f' : 'white'} }
               body {
                 height: 100vh;
-                padding: 0 !important;
               }
               #storybook-root {
                 height: 100%;
