@@ -16,7 +16,7 @@ import { NodeProp, type SyntaxNode, parseMixed } from '@lezer/common';
 import { tags as t } from '@lezer/highlight';
 import { match } from 'ts-pattern';
 
-import completion from '../../../completion.json';
+import { getCompletions } from './completion';
 import { renderDiagnosticMessage } from './diagnostic';
 import { zenLinter } from './linter';
 import { buildTypeCompletion, typeField, zenKindToString } from './types';
@@ -41,14 +41,15 @@ export const applyCompletion = (view: EditorView, completion: Completion, from: 
   view.dispatch(transaction);
 };
 
-const extendedCompletion = completion.map(
-  (c) =>
-    ({
-      ...c,
-      detail: c.detail.replaceAll('`', ''),
-      apply: applyCompletion,
-    }) satisfies Completion,
-);
+const makeExtendedCompletions = () =>
+  getCompletions().map(
+    (c) =>
+      ({
+        ...c,
+        detail: c.detail.replaceAll('`', ''),
+        apply: applyCompletion,
+      }) satisfies Completion,
+  );
 
 const hasAutoComplete = (n: SyntaxNode | null): boolean => {
   if (!n) {
@@ -59,9 +60,10 @@ const hasAutoComplete = (n: SyntaxNode | null): boolean => {
   return isAutoComplete || hasAutoComplete(n?.parent);
 };
 
-const makeExpressionCompletion =
-  () =>
-  (context: CompletionContext): CompletionResult | null => {
+const makeExpressionCompletion = () => {
+  const extendedCompletions = makeExtendedCompletions();
+
+  return (context: CompletionContext): CompletionResult | null => {
     const tree = syntaxTree(context.state);
 
     const word = context.state.wordAt(context.pos);
@@ -82,7 +84,7 @@ const makeExpressionCompletion =
 
         return {
           from,
-          options: [...buildTypeCompletion({ type: 'variable', kind: tField.rootKind }), ...extendedCompletion],
+          options: [...buildTypeCompletion({ type: 'variable', kind: tField.rootKind }), ...extendedCompletions],
           validFor: /\w*/,
         };
       }
@@ -119,6 +121,7 @@ const makeExpressionCompletion =
         return null;
     }
   };
+};
 
 const autoCompleteSpan = (node: SyntaxNode): [number, number] | null => {
   let lastNode = node;
@@ -153,15 +156,17 @@ export const completionExtension = () =>
     override: [makeExpressionCompletion()],
   });
 
-export const hoverExtension = () =>
-  hoverTooltip((view, pos) => {
+export const hoverExtension = () => {
+  const completions = getCompletions();
+
+  return hoverTooltip((view, pos) => {
     const word = view.state.wordAt(pos);
     if (!word) {
       return null;
     }
 
     const data = view.state.doc.sliceString(word.from, word.to);
-    const details = completion.find((cmp) => cmp.label === data);
+    const details = completions.find((cmp) => cmp.label === data);
     if (details) {
       return {
         pos: word.from,
@@ -208,6 +213,7 @@ export const hoverExtension = () =>
 
     return null;
   });
+};
 
 export const zenHighlightLight = syntaxHighlighting(
   HighlightStyle.define([

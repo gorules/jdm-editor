@@ -99,7 +99,7 @@ export const buildTypeCompletion = ({ kind, type = 'property' }: BuildTypeComple
       Object.entries(t.Object as object).map(([k, v]) => ({
         label: k,
         type,
-        boost: 10,
+        boost: 50,
         detail: zenKindToString(v),
         apply: applyCompletion,
       })),

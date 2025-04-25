@@ -1,6 +1,10 @@
 use serde::Serialize;
 use std::ops::Deref;
 use wasm_bindgen::JsError;
+use zen_expression::compiler::CompilerError;
+use zen_expression::lexer::LexerError;
+use zen_expression::parser::ParserError;
+use zen_expression::vm::VMError;
 use zen_expression::IsolateError;
 
 #[derive(Debug, Serialize)]
@@ -17,6 +21,30 @@ impl Deref for JsIsolateError {
 impl From<IsolateError> for JsIsolateError {
     fn from(value: IsolateError) -> Self {
         Self(value)
+    }
+}
+
+impl From<LexerError> for JsIsolateError {
+    fn from(source: LexerError) -> Self {
+        Self(IsolateError::LexerError { source })
+    }
+}
+
+impl From<ParserError> for JsIsolateError {
+    fn from(source: ParserError) -> Self {
+        Self(IsolateError::ParserError { source })
+    }
+}
+
+impl From<CompilerError> for JsIsolateError {
+    fn from(source: CompilerError) -> Self {
+        Self(IsolateError::CompilerError { source })
+    }
+}
+
+impl From<VMError> for JsIsolateError {
+    fn from(source: VMError) -> Self {
+        Self(IsolateError::VMError { source })
     }
 }
 

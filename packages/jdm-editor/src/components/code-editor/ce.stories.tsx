@@ -1,11 +1,13 @@
 import { syntaxTree } from '@codemirror/language';
+import { generateAst, generateAstUnary } from '@gorules/zen-engine-wasm';
 import type { SyntaxNodeRef } from '@lezer/common';
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 import { Typography, theme } from 'antd';
 import React, { useState } from 'react';
+import { match } from 'ts-pattern';
 
-import { CodeEditor } from './ce';
+import { CodeEditor, type CodeEditorProps } from './ce';
 
 const meta: Meta<typeof CodeEditor> = {
   title: 'CodeEditor',
@@ -113,15 +115,38 @@ export const NoStyle: Story = {
   },
 };
 
-export const Debug: Story = {
+export const Debug: StoryObj<CodeEditorProps & { showEditorState: boolean; showParserState: boolean }> = {
+  args: {
+    showParserState: true,
+    showEditorState: false,
+  },
+  argTypes: {
+    showParserState: {
+      control: 'boolean',
+      description: 'Toggle parser state visibility',
+    },
+    showEditorState: {
+      control: 'boolean',
+      description: 'Toggle editor state visibility',
+    },
+  },
   render: (args) => {
     const { token } = theme.useToken();
     const [editorState, setEditorState] = useState('');
+    const [parserState, setParserState] = useState('');
 
     return (
       <StoryWrapper>
         <CodeEditor
           {...args}
+          onChange={(expression) => {
+            const ast = match(args.type)
+              .with('standard', () => generateAst(expression))
+              .with('unary', () => generateAstUnary(expression))
+              .otherwise(() => null);
+
+            setParserState(ast ?? '');
+          }}
           onStateChange={(state) => {
             const nodes: string[] = [];
             syntaxTree(state).iterate({
@@ -135,17 +160,37 @@ export const Debug: Story = {
             setEditorState(JSON.stringify(nodes, undefined, 2));
           }}
         />
-        <div
-          style={{
-            background: token.colorBgLayout,
-            border: `1px solid ${token.colorBorder}`,
-            borderRadius: token.borderRadiusOuter,
-            marginTop: token.marginMD,
-            padding: token.paddingSM,
-          }}
-        >
-          <Typography.Text style={{ whiteSpace: 'pre', fontFamily: 'monospace' }}>{editorState}</Typography.Text>
-        </div>
+        {args.showParserState && (
+          <div style={{ marginTop: token.marginMD }}>
+            <Typography.Text>Parser state (ZEN)</Typography.Text>
+            <div
+              style={{
+                background: token.colorBgLayout,
+                border: `1px solid ${token.colorBorder}`,
+                borderRadius: token.borderRadiusOuter,
+                padding: token.paddingSM,
+              }}
+            >
+              <Typography.Text style={{ whiteSpace: 'pre', fontFamily: 'monospace' }}>{parserState}</Typography.Text>
+            </div>
+          </div>
+        )}
+
+        {args.showEditorState && (
+          <div style={{ marginTop: token.marginMD }}>
+            <Typography.Text>Editor state (CodeMirror)</Typography.Text>
+            <div
+              style={{
+                background: token.colorBgLayout,
+                border: `1px solid ${token.colorBorder}`,
+                borderRadius: token.borderRadiusOuter,
+                padding: token.paddingSM,
+              }}
+            >
+              <Typography.Text style={{ whiteSpace: 'pre', fontFamily: 'monospace' }}>{editorState}</Typography.Text>
+            </div>
+          </div>
+        )}
       </StoryWrapper>
     );
   },

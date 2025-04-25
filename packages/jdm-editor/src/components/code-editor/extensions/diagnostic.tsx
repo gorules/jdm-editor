@@ -13,6 +13,15 @@ export const renderDiagnosticMessage = ({ text, className }: RenderDiagnosticMes
     } else {
       color = '#CE8E6D'; // Everything else
     }
-    return `<span class="${className}" style="color: ${color};">${content}</span>`;
+    return `<span class="${className}" style="color: ${color};">${escapeHtml(content)}</span>`;
   });
+};
+
+const escapeHtml = (str: string) => {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 };
