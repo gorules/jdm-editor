@@ -2,6 +2,7 @@ import type { VariableType } from '@gorules/zen-engine-wasm';
 import type { Row } from '@tanstack/react-table';
 import { Typography } from 'antd';
 import clsx from 'clsx';
+import { GripVerticalIcon } from 'lucide-react';
 import React, { useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
@@ -76,27 +77,40 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
     >
       <div ref={dragRef} className='expression-list-item__drag' aria-disabled={!configurable || disabled}>
         <div className='expression-list-item__drag__inner'>
-          <Typography.Text style={{ fontSize: 10 }}>{index + 1}</Typography.Text>
-          {expression?._diff?.status && (
+          {expression?._diff?.status ? (
             <DiffIcon
               status={expression?._diff?.status}
               style={{
                 fontSize: 16,
               }}
             />
+          ) : (
+            <GripVerticalIcon size={10} />
           )}
         </div>
       </div>
-      <div className='expression-list-item__key'>
+      <div
+        className='expression-list-item__key'
+        onClick={(e) => {
+          const inputElement = e.currentTarget.querySelector<HTMLInputElement>('input');
+          if (!inputElement) {
+            return;
+          }
+
+          inputElement.focus();
+          const inputLength = inputElement.value.length;
+          inputElement.setSelectionRange(inputLength, inputLength);
+        }}
+      >
         <DiffInput
           placeholder='Key'
+          variant='borderless'
           readOnly={!configurable || disabled}
           displayDiff={expression?._diff?.fields?.key?.status === 'modified'}
           previousValue={expression?._diff?.fields?.key?.previousValue}
           value={expression?.key}
           onChange={(e) => onChange({ key: e.target.value })}
           autoComplete='off'
-          bordered={false}
         />
       </div>
       <div className='expression-list-item__code'>
