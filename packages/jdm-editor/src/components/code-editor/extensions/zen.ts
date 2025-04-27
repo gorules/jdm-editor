@@ -79,7 +79,8 @@ const makeExpressionCompletion = () => {
     const from = word?.from ?? context.pos;
     switch (node.name) {
       case 'Standard':
-      case 'VariableName': {
+      case 'VariableName':
+      case '[': {
         const tField = context.state.field(typeField);
 
         return {

@@ -141,11 +141,11 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
 const LivePreview = React.memo<{ id: string; value: string }>(({ id, value }) => {
   const { inputData, initial } = useExpressionStore(({ debug }) => {
     const snapshot = (debug?.snapshot?.expressions ?? []).find((e) => e.id === id);
-    const trace = debug?.trace.traceData[id];
+    const trace = snapshot?.key ? debug?.trace.traceData[snapshot.key] : undefined;
 
     return {
       inputData: debug?.inputData,
-      initial: snapshot && trace ? { expression: snapshot.value, result: trace.result } : undefined,
+      initial: snapshot && trace ? { expression: snapshot.value, result: safeJson(trace.result) } : undefined,
     };
   });
 
@@ -171,4 +171,12 @@ const ResultOverlay: React.FC<{ expression: ExpressionEntry }> = ({ expression }
       </Typography.Text>
     </div>
   );
+};
+
+const safeJson = (data: string) => {
+  try {
+    return JSON.parse(data);
+  } catch (err: any) {
+    return err.toString();
+  }
 };

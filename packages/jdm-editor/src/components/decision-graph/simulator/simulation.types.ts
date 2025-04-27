@@ -44,7 +44,7 @@ export type SimulationTraceDataFunction = {
   log?: TraceFunctionLog[];
 };
 
-export type SimulationTraceDataExpression = Record<string, { result: unknown }>;
+export type SimulationTraceDataExpression = Record<string, { result: string }>;
 
 type SimulationTraceDataTableSingle = {
   index: number;
