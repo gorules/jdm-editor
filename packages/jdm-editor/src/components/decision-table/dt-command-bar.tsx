@@ -9,17 +9,16 @@ import {
 import { Button, Divider, Popconfirm, Tooltip, message } from 'antd';
 import React, { useRef } from 'react';
 
-import { exportExcelFile, readFromExcel } from '../../helpers/excel-file-utils';
 import type { DecisionNode } from '../decision-graph';
 import { DiffSelect } from '../shared';
 import { Stack } from '../stack';
 import {
   type HitPolicy,
-  type TableExportOptions,
   useDecisionTableActions,
   useDecisionTableRaw,
   useDecisionTableState,
 } from './context/dt-store.context';
+import { exportDecisionTable, readDecisionTableFile } from './excel';
 
 export const DecisionTableCommandBar: React.FC = () => {
   const tableActions = useDecisionTableActions();
@@ -37,12 +36,12 @@ export const DecisionTableCommandBar: React.FC = () => {
   const { listenerStore, stateStore } = useDecisionTableRaw();
   const fileInput = useRef<HTMLInputElement>(null);
 
-  const exportExcel = async (options: TableExportOptions) => {
-    const { name } = options;
-
+  const exportExcel = async () => {
     try {
-      const decisionTable = stateStore.getState().decisionTable;
-      await exportExcelFile(name, [{ ...decisionTable, name: 'decision table', id: crypto.randomUUID() }]);
+      const { decisionTable, name } = stateStore.getState();
+      await exportDecisionTable(name ?? 'table', [
+        { ...decisionTable, name: 'decision table', id: crypto.randomUUID() },
+      ]);
       message.success('Excel file has been downloaded successfully!');
     } catch (e) {
       console.error('Failed to download Excel file!', e);
@@ -66,7 +65,7 @@ export const DecisionTableCommandBar: React.FC = () => {
         if (!buffer) return;
 
         const table = stateStore.getState().decisionTable;
-        const nodes: DecisionNode[] = await readFromExcel(buffer, table);
+        const nodes: DecisionNode[] = await readDecisionTableFile(buffer, table);
         const newTable = nodes[0].content;
 
         tableActions.setDecisionTable(newTable);
@@ -82,7 +81,7 @@ export const DecisionTableCommandBar: React.FC = () => {
     <>
       <Stack horizontal horizontalAlign={'space-between'} verticalAlign={'center'} className={'grl-dt__command-bar'}>
         <Stack gap={8} horizontal className='full-width'>
-          <Button type='text' size={'small'} icon={<ExportOutlined />} onClick={() => exportExcel({ name: 'table' })}>
+          <Button type='text' size={'small'} icon={<ExportOutlined />} onClick={exportExcel}>
             Export Excel
           </Button>
           <Button

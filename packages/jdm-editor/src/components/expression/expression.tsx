@@ -6,7 +6,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import { isWasmAvailable } from '../../helpers/wasm';
-import type { SimulationTraceDataExpression } from '../decision-graph';
+import type { ExpressionStore } from './context/expression-store.context';
 import { ExpressionStoreProvider, useExpressionStoreRaw } from './context/expression-store.context';
 import type { ExpressionControllerProps } from './expression-controller';
 import { ExpressionController } from './expression-controller';
@@ -15,11 +15,11 @@ import './expression.scss';
 
 export type ExpressionProps = {
   manager?: DragDropManager;
-  traceData?: SimulationTraceDataExpression;
+  debug?: ExpressionStore['debug'];
   inputData?: unknown;
 } & ExpressionControllerProps;
 
-export const Expression: React.FC<ExpressionProps> = ({ manager, traceData, inputData, ...props }) => {
+export const Expression: React.FC<ExpressionProps> = ({ manager, debug, inputData, ...props }) => {
   const [_, setMounted] = useState(false);
   const container = useRef<HTMLDivElement>(null);
 
@@ -49,7 +49,7 @@ export const Expression: React.FC<ExpressionProps> = ({ manager, traceData, inpu
           <ExpressionStoreProvider>
             <ExpressionController {...props} />
             <ExpressionList />
-            <SimulateDataSync traceData={traceData} inputData={inputData} />
+            <SimulateDataSync debug={debug} inputData={inputData} />
           </ExpressionStoreProvider>
         </DndProvider>
       )}
@@ -57,18 +57,17 @@ export const Expression: React.FC<ExpressionProps> = ({ manager, traceData, inpu
   );
 };
 
-const SimulateDataSync: React.FC<Pick<ExpressionProps, 'traceData' | 'inputData'>> = ({ traceData, inputData }) => {
+const SimulateDataSync: React.FC<Pick<ExpressionProps, 'debug' | 'inputData'>> = ({ debug, inputData }) => {
   const expressionStoreRaw = useExpressionStoreRaw();
 
   useEffect(() => {
     const currentState = expressionStoreRaw.getState();
-
-    if (equal(currentState, traceData)) {
+    if (equal(currentState, debug)) {
       return;
     }
 
-    expressionStoreRaw.setState({ traceData });
-  }, [traceData]);
+    expressionStoreRaw.setState({ debug });
+  }, [debug]);
 
   useEffect(() => {
     if (!isWasmAvailable()) {

@@ -19,6 +19,7 @@ import type { TableCellProps } from './table/table-default-cell';
 
 export type DecisionTableEmptyType = {
   id?: string;
+  name?: string;
   defaultValue?: DecisionTableType;
   value?: DecisionTableType;
   disabled?: boolean;
@@ -28,13 +29,16 @@ export type DecisionTableEmptyType = {
   inputsSchema?: SchemaSelectProps[];
   outputsSchema?: SchemaSelectProps[];
   inputData?: unknown;
-  debug?: { trace: SimulationTrace<SimulationTraceDataTable>; inputData?: Variable };
+  debug?: { trace: SimulationTrace<SimulationTraceDataTable>; inputData?: Variable; snapshot: DecisionTableType };
   minColWidth?: number;
   colWidth?: number;
   onChange?: (val: DecisionTableType) => void;
+  snapshot?: DecisionTableType;
 };
+
 export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
   id,
+  name,
   defaultValue,
   value,
   disabled = false,
@@ -48,6 +52,7 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
   minColWidth,
   cellRenderer,
   onChange,
+  snapshot,
 }) => {
   const mountedRef = useRef(false);
   const { stateStore, listenerStore } = useDecisionTableRaw();
@@ -63,6 +68,7 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
   useEffect(() => {
     stateStore.setState({
       id,
+      name,
       disabled,
       configurable,
       disableHitPolicy,
@@ -71,7 +77,7 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
       colWidth: colWidth || 200,
       minColWidth: minColWidth || 150,
     });
-  }, [id, disabled, configurable, disableHitPolicy, inputsSchema, minColWidth, colWidth, outputsSchema]);
+  }, [id, name, disabled, configurable, disableHitPolicy, inputsSchema, minColWidth, colWidth, outputsSchema]);
 
   useEffect(() => {
     listenerStore.setState({
@@ -113,7 +119,6 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
       return;
     }
 
-    const { decisionTable } = stateStore.getState();
     const activeRules = match(debug.trace.traceData)
       .with(P.array(), (t) => t.map((d) => d?.rule?._id))
       .otherwise((t) => [t?.rule?._id]);
@@ -121,12 +126,12 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
     stateStore.setState({
       debug: {
         trace: debug.trace,
-        snapshot: decisionTable,
+        snapshot: debug.snapshot,
         inputData: debug.inputData,
         activeRules,
       },
     });
-  }, [debug]);
+  }, [debug, snapshot]);
 
   return null;
 };

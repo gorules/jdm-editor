@@ -47,6 +47,7 @@ export type CodeEditorProps = {
   fullHeight?: boolean;
   noStyle?: boolean;
   extension?: (params: ExtensionParams) => Extension;
+  livePreview?: { input: unknown; fromSimulation: boolean; result?: unknown };
   variableType?: any;
   expectedVariableType?: any;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, 'disabled' | 'onChange'>;

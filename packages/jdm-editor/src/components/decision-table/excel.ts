@@ -2,18 +2,18 @@ import { message } from 'antd';
 import exceljs from 'exceljs';
 import { P, match } from 'ts-pattern';
 
-import type { DecisionGraphType, DecisionNode, DecisionTableType } from '../components';
-import { NodeKind } from '../components/decision-graph/nodes/specifications/specification-types';
-import type { TableSchemaItem } from '../components/decision-table/context/dt-store.context';
-import { parseDecisionTable } from '../components/decision-table/context/dt-store.context';
-import { saveFile } from './file-helpers';
+import { saveFile } from '../../helpers/file-helpers';
+import { NodeKind } from '../decision-graph/nodes/specifications/specification-types';
+import type { DecisionGraphType, DecisionNode, DecisionTableType } from '../index';
+import type { TableSchemaItem } from './context/dt-store.context';
+import { parseDecisionTable } from './context/dt-store.context';
 
 type DecisionTableNode = {
   id: string;
   name: string;
 } & DecisionTableType;
 
-export const exportExcelFile = async (fileName: string, decisionTableNodes: DecisionTableNode[]) => {
+export const exportDecisionTable = async (fileName: string, decisionTableNodes: DecisionTableNode[]) => {
   const { Workbook } = exceljs;
   const workbook = new Workbook();
 
@@ -228,7 +228,10 @@ const parseSpreadsheetData = (spreadSheetData: any, defaultTable?: DecisionTable
   });
 };
 
-export const readFromExcel = async (buffer: ArrayBuffer, defaultValues?: DecisionTableType | DecisionGraphType) => {
+export const readDecisionTableFile = async (
+  buffer: ArrayBuffer,
+  defaultValues?: DecisionTableType | DecisionGraphType,
+) => {
   const { Workbook } = exceljs;
   const excelWorkbook = new Workbook();
   const workbook = await excelWorkbook.xlsx.load(buffer);

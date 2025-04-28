@@ -3,9 +3,10 @@ import type { Row } from '@tanstack/react-table';
 import { Typography } from 'antd';
 import clsx from 'clsx';
 import { GripVerticalIcon } from 'lucide-react';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
+import { CodeEditorPreview } from '../code-editor/ce-preview';
 import { ConfirmAction } from '../confirm-action';
 import { DiffIcon } from '../diff-icon';
 import { DiffCodeEditor } from '../shared/diff-ce';
@@ -20,6 +21,7 @@ export type ExpressionItemProps = {
 };
 
 export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, index, variableType }) => {
+  const [isFocused, setIsFocused] = useState(false);
   const expressionRef = useRef<HTMLDivElement>(null);
   const { updateRow, removeRow, swapRows, disabled, configurable } = useExpressionStore(
     ({ updateRow, removeRow, swapRows, disabled, configurable }) => ({
@@ -74,20 +76,35 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
       style={{ opacity: !isDragging ? 1 : 0.5 }}
     >
       <div ref={dragRef} className='expression-list-item__drag' aria-disabled={!configurable || disabled}>
-        {expression?._diff?.status ? (
-          <DiffIcon
-            status={expression?._diff?.status}
-            style={{
-              fontSize: 16,
-            }}
-          />
-        ) : (
-          <GripVerticalIcon size={14} />
-        )}
+        <div className='expression-list-item__drag__inner'>
+          {expression?._diff?.status ? (
+            <DiffIcon
+              status={expression?._diff?.status}
+              style={{
+                fontSize: 16,
+              }}
+            />
+          ) : (
+            <GripVerticalIcon size={10} />
+          )}
+        </div>
       </div>
-      <div>
+      <div
+        className='expression-list-item__key'
+        onClick={(e) => {
+          const inputElement = e.currentTarget.querySelector<HTMLInputElement>('input');
+          if (!inputElement) {
+            return;
+          }
+
+          inputElement.focus();
+          const inputLength = inputElement.value.length;
+          inputElement.setSelectionRange(inputLength, inputLength);
+        }}
+      >
         <DiffInput
           placeholder='Key'
+          variant='borderless'
           readOnly={!configurable || disabled}
           displayDiff={expression?._diff?.fields?.key?.status === 'modified'}
           previousValue={expression?._diff?.fields?.key?.previousValue}
@@ -98,6 +115,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
       </div>
       <div className='expression-list-item__code'>
         <DiffCodeEditor
+          className='expression-list-item__value'
           placeholder='Expression'
           maxRows={9}
           disabled={disabled}
@@ -106,19 +124,41 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
           previousValue={expression?._diff?.fields?.value?.previousValue}
           onChange={(value) => onChange({ value })}
           variableType={variableType}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          noStyle={true}
         />
         <ResultOverlay expression={expression} />
       </div>
-      <div>
+      <div className='expression-list-item__action'>
         <ConfirmAction iconOnly disabled={!configurable || disabled} onConfirm={onRemove} />
+        {isFocused && <LivePreview id={expression.id} value={expression.value} />}
       </div>
     </div>
   );
 };
 
+const LivePreview = React.memo<{ id: string; value: string }>(({ id, value }) => {
+  const { inputData, initial } = useExpressionStore(({ debug }) => {
+    const snapshot = (debug?.snapshot?.expressions ?? []).find((e) => e.id === id);
+    const trace = snapshot?.key ? debug?.trace.traceData[snapshot.key] : undefined;
+
+    return {
+      inputData: debug?.inputData,
+      initial: snapshot && trace ? { expression: snapshot.value, result: safeJson(trace.result) } : undefined,
+    };
+  });
+
+  return (
+    <div className='expression-list-item__livePreview'>
+      <CodeEditorPreview expression={value} inputData={inputData} initial={initial} />
+    </div>
+  );
+});
+
 const ResultOverlay: React.FC<{ expression: ExpressionEntry }> = ({ expression }) => {
-  const { trace } = useExpressionStore(({ traceData }) => ({
-    trace: traceData?.[expression.key]?.result,
+  const { trace } = useExpressionStore(({ debug }) => ({
+    trace: debug?.trace?.traceData?.[expression.key]?.result,
   }));
   if (!trace) {
     return null;
@@ -126,9 +166,17 @@ const ResultOverlay: React.FC<{ expression: ExpressionEntry }> = ({ expression }
 
   return (
     <div className='expression-list-item__resultOverlay'>
-      <Typography.Text ellipsis={{ tooltip: trace }} style={{ maxWidth: 120 }}>
+      <Typography.Text ellipsis={{ tooltip: trace }} style={{ maxWidth: 60, overflow: 'hidden' }}>
         = {trace as string}
       </Typography.Text>
     </div>
   );
+};
+
+const safeJson = (data: string) => {
+  try {
+    return JSON.parse(data);
+  } catch (err: any) {
+    return err.toString();
+  }
 };

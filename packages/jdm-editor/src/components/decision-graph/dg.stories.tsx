@@ -7,6 +7,7 @@ import { P, match } from 'ts-pattern';
 
 import type { DecisionGraphRef } from './dg';
 import { DecisionGraph } from './dg';
+import type { DecisionGraphType } from './dg-types';
 import {
   defaultGraph,
   defaultGraphCustomNode,
@@ -319,7 +320,7 @@ const safeParse = (val?: string) => {
   }
 };
 
-const mapSimulateError = (error: unknown) =>
+const mapSimulateError = (graph: DecisionGraphType, error: unknown) =>
   match(error)
     .with(
       {
@@ -343,6 +344,7 @@ const mapSimulateError = (error: unknown) =>
             trace: data.trace as any,
             result: { error },
             performance: '',
+            snapshot: graph,
           },
         } satisfies Simulation;
       },
@@ -379,9 +381,9 @@ const DecisionGraphWithSimulator: React.FC = () => {
                 });
 
                 const responseJson = await response.json();
-                setSimulate({ result: responseJson });
+                setSimulate({ result: { ...responseJson, snapshot: graph } });
               } catch (err) {
-                setSimulate(mapSimulateError(err));
+                setSimulate(mapSimulateError(graph, err));
               }
             }}
             onClear={() => {}}

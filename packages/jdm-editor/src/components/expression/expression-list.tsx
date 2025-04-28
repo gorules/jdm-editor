@@ -44,16 +44,22 @@ export const ExpressionList: React.FC<ExpressionListProps> = ({}) => {
   }, [expressions, inputVariableType]);
 
   return (
-    <div className={'expression-list'}>
-      <div className={clsx('expression-list__item', 'expression-list__item--heading')}>
-        <div />
-        <Typography.Text type='secondary'>Key</Typography.Text>
-        <Typography.Text type='secondary'>Expression</Typography.Text>
-        <div />
+    <>
+      <div className={'expression-list'}>
+        <div className={clsx('expression-list__item', 'expression-list__item--heading')}>
+          <div className={'expression-list__item__th expression-list__item__th--order'} />
+          <Typography.Text type='secondary' className={'expression-list__item__th expression-list__item__th--key'}>
+            Key
+          </Typography.Text>
+          <Typography.Text type='secondary' className={'expression-list__item__th'}>
+            Expression
+          </Typography.Text>
+          <div />
+        </div>
+        {(expressions || []).map((expression, index) => (
+          <ExpressionItem key={expression.id} expression={expression} index={index} variableType={variableType} />
+        ))}
       </div>
-      {(expressions || []).map((expression, index) => (
-        <ExpressionItem key={expression.id} expression={expression} index={index} variableType={variableType} />
-      ))}
       {configurable && !disabled && (
         <div className={'expression-list__button-wrapper'}>
           <Button
@@ -66,6 +72,6 @@ export const ExpressionList: React.FC<ExpressionListProps> = ({}) => {
           </Button>
         </div>
       )}
-    </div>
+    </>
   );
 };

@@ -137,15 +137,16 @@ export type DecisionTableStoreType = {
 
     inputVariableType?: VariableType;
     derivedVariableTypes: Record<string, VariableType>;
+
+    inputsSchema?: SchemaSelectProps[];
+    outputsSchema?: SchemaSelectProps[];
+
     debug?: {
       snapshot: DecisionTableType;
       trace: SimulationTrace<SimulationTraceDataTable>;
       inputData?: Variable;
       activeRules: string[];
     };
-
-    inputsSchema?: SchemaSelectProps[];
-    outputsSchema?: SchemaSelectProps[];
   };
 
   actions: {

@@ -1,11 +1,13 @@
-import type { VariableType } from '@gorules/zen-engine-wasm';
+import type { Variable, VariableType } from '@gorules/zen-engine-wasm';
 import equal from 'fast-deep-equal/es6/react';
 import { produce } from 'immer';
 import React, { useMemo } from 'react';
+import type { z } from 'zod';
 import type { StoreApi, UseBoundStore } from 'zustand';
 import { create } from 'zustand';
 
-import type { SimulationTraceDataExpression } from '../../decision-graph';
+import type { expressionNodeSchema } from '../../../helpers/schema';
+import type { SimulationTrace, SimulationTraceDataExpression } from '../../decision-graph';
 import type { DiffMetadata } from '../../decision-graph/dg-types';
 
 const ExpressionStoreContext = React.createContext<
@@ -24,7 +26,6 @@ export type ExpressionEntry = {
 export type ExpressionStore = {
   configurable: boolean;
   disabled: boolean;
-  traceData?: SimulationTraceDataExpression;
 
   addRowAbove: (index?: number, data?: Partial<ExpressionEntry>) => void;
   addRowBelow: (index?: number, data?: Partial<ExpressionEntry>) => void;
@@ -37,6 +38,12 @@ export type ExpressionStore = {
   removeRow: (index: number) => void;
 
   inputVariableType?: VariableType;
+
+  debug?: {
+    snapshot: z.infer<typeof expressionNodeSchema>['content'];
+    trace: SimulationTrace<SimulationTraceDataExpression>;
+    inputData?: Variable;
+  };
 };
 
 type ExpressionStoreProviderProps = {
