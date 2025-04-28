@@ -3,8 +3,8 @@ import type { MenuProps } from 'antd';
 import { Button, Dropdown, Tooltip, message } from 'antd';
 import React, { useRef } from 'react';
 
-import { exportExcelFile, readFromExcel } from '../../../helpers/excel-file-utils';
 import { decisionModelSchema } from '../../../helpers/schema';
+import { exportDecisionTable, readDecisionTableFile } from '../../decision-table/excel';
 import { useDecisionGraphActions, useDecisionGraphRaw, useDecisionGraphState } from '../context/dg-store.context';
 import { type DecisionEdge, type DecisionNode } from '../dg-types';
 import { NodeKind } from '../nodes/specifications/specification-types';
@@ -77,7 +77,7 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
         if (!buffer) return;
         const { decisionGraph } = decisionGraphRaw.stateStore.getState();
 
-        const nodesFromExcel = await readFromExcel(buffer, decisionGraph);
+        const nodesFromExcel = await readDecisionTableFile(buffer, decisionGraph);
 
         const updatedNodes = decisionGraph.nodes.map((node) => {
           let _node = node;
@@ -115,8 +115,7 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
 
   const downloadJDM = async () => {
     try {
-      const { name } = decisionGraphRaw.stateStore.getState();
-      const { decisionGraph } = decisionGraphRaw.stateStore.getState();
+      const { name, decisionGraph } = decisionGraphRaw.stateStore.getState();
       // create file in browser
       const fileName = `${name.replaceAll('.json', '')}.json`;
       const json = JSON.stringify(
@@ -146,9 +145,11 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
     }
   };
 
-  const downloadJDMExcel = async (name: string = 'decision tables') => {
+  const downloadJDMExcel = async () => {
     try {
-      const { decisionGraph } = decisionGraphRaw.stateStore.getState();
+      const { name, decisionGraph } = decisionGraphRaw.stateStore.getState();
+      const fileName = name.replaceAll('.json', '');
+
       const decisionTableNodes = decisionGraph.nodes
         .filter((node) => node.type === NodeKind.DecisionTable)
         .map((decisionTable) => ({
@@ -157,7 +158,7 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
           name: decisionTable.name,
         }));
 
-      await exportExcelFile(name, decisionTableNodes);
+      await exportDecisionTable(fileName, decisionTableNodes);
       message.success('Excel file has been downloaded successfully!');
     } catch {
       message.error('Failed to download Excel file!');

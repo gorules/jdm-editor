@@ -20,7 +20,8 @@ export type TabDecisionTableProps = {
 export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager }) => {
   const graphActions = useDecisionGraphActions();
   const nodeType = useNodeType(id, { attachGlobals: false });
-  const { nodeTrace, inputData, nodeSnapshot } = useDecisionGraphState(({ simulate, decisionGraph }) => ({
+  const { nodeName, nodeTrace, inputData, nodeSnapshot } = useDecisionGraphState(({ simulate, decisionGraph }) => ({
+    nodeName: decisionGraph.nodes.find((n) => n.id === id)?.name,
     nodeTrace: match(simulate)
       .with({ result: P.nonNullable }, ({ result }) => result.trace[id] as SimulationTrace<SimulationTraceDataTable>)
       .otherwise(() => null),
@@ -74,6 +75,7 @@ export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager 
   return (
     <DecisionTable
       id={id}
+      name={nodeName}
       tableHeight={'100%'}
       value={content as any}
       manager={manager}

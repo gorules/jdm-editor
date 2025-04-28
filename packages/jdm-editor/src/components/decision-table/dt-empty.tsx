@@ -19,6 +19,7 @@ import type { TableCellProps } from './table/table-default-cell';
 
 export type DecisionTableEmptyType = {
   id?: string;
+  name?: string;
   defaultValue?: DecisionTableType;
   value?: DecisionTableType;
   disabled?: boolean;
@@ -34,8 +35,10 @@ export type DecisionTableEmptyType = {
   onChange?: (val: DecisionTableType) => void;
   snapshot?: DecisionTableType;
 };
+
 export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
   id,
+  name,
   defaultValue,
   value,
   disabled = false,
@@ -65,6 +68,7 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
   useEffect(() => {
     stateStore.setState({
       id,
+      name,
       disabled,
       configurable,
       disableHitPolicy,
@@ -73,7 +77,7 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
       colWidth: colWidth || 200,
       minColWidth: minColWidth || 150,
     });
-  }, [id, disabled, configurable, disableHitPolicy, inputsSchema, minColWidth, colWidth, outputsSchema]);
+  }, [id, name, disabled, configurable, disableHitPolicy, inputsSchema, minColWidth, colWidth, outputsSchema]);
 
   useEffect(() => {
     listenerStore.setState({
