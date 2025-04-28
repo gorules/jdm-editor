@@ -11,6 +11,7 @@ export enum NodeKind {
   Expression = 'expressionNode',
   Switch = 'switchNode',
   Decision = 'decisionNode',
+  Markdown = 'markdown',
 }
 
 export const CustomKind = 'customNode';
@@ -18,7 +19,7 @@ export const CustomKind = 'customNode';
 const nodeCommon = z.object({
   id,
   name: z.string(),
-  position: z.object({ x: z.number(), y: z.number() }).default({ x: 0, y: 0 }),
+  position: z.object({ x: z.number(), y: z.number() }).default({ x: 0, y: 0 }).nullish(),
 });
 
 export const inputNodeSchema = z
@@ -219,6 +220,15 @@ export const customNodeSchema = z
   })
   .merge(nodeCommon);
 
+export const markdownSchema = z
+  .object({
+    type: z.literal(NodeKind.Markdown),
+    content: z.object({
+      source: z.string().nullish(),
+    }),
+  })
+  .merge(nodeCommon);
+
 export const anyNodeSchema = z
   .object({
     type: z.string().refine((val) => !(Object.values(NodeKind) as string[]).includes(val), {
@@ -238,6 +248,7 @@ export const nodeSchema = z
     customNodeSchema,
     inputNodeSchema,
     outputNodeSchema,
+    markdownSchema,
   ])
   .or(anyNodeSchema);
 
@@ -257,4 +268,19 @@ export const validationSchema = z.object({
 export const decisionModelSchema = z.object({
   nodes: z.array(nodeSchema).default([]),
   edges: z.array(edgeSchema).default([]),
+});
+
+export const blockSchema = z
+  .discriminatedUnion('type', [
+    decisionNodeSchema,
+    expressionNodeSchema,
+    functionNodeSchema,
+    decisionTableSchema,
+    customNodeSchema,
+    markdownSchema,
+  ])
+  .or(anyNodeSchema);
+
+export const rulebookSchema = z.object({
+  blocks: z.array(blockSchema).default([]),
 });

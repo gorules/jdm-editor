@@ -1,3 +1,11 @@
+.expression-wrapper {
+  flex: 1;
+  min-height: 0; /* Again, critical for nested flex */
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
 .expression-list {
   display: flex;
   flex-direction: column;
@@ -9,6 +17,8 @@
 
   $pv: 9px;
   $ph: 12px;
+  height: 100%;
+  position: relative;
 
   &__item {
     position: relative;
@@ -72,8 +82,11 @@
   }
 
   &__button-wrapper {
-    padding: 8px 0;
-    margin-bottom: 60px;
+    padding: 12px 0;
+    position: sticky;
+    bottom: 0;
+    background-color: var(--grl-color-background);
+    z-index: 1;
   }
 
   &__button {

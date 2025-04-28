@@ -14,8 +14,6 @@
 
   &__add-row-wrapper {
     padding: 8px;
-    position: sticky;
-    bottom: 0;
   }
 
   &__add-row {
@@ -207,6 +205,8 @@
 
     tfoot {
       background-color: var(--grl-color-bg-elevated);
+      position: sticky;
+      bottom: 0;
     }
 
     .add-row {

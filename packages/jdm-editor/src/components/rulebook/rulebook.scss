@@ -1,0 +1,211 @@
+// Rulebook Component Styles
+// Prefix: grl-rb (GoRule Rulebook)
+
+.grl-rb {
+  width: 100%;
+  font-family: var(--grl-font-family);
+  overflow-x: auto;
+  --node-color: var(--grl-color-primary);
+
+  &-empty {
+    text-align: center;
+  }
+
+  // Container for the entire rulebook
+  &-container {
+    max-width: 1024px;
+    margin: 0 auto 24px auto;
+    background-color: var(--grl-color-bg-container);
+    border-radius: 4px;
+    //box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  // Header area for the rulebook
+  &-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    &-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    &-actions {
+      display: flex;
+      gap: 8px;
+    }
+  }
+
+  &-content {
+    position: relative;
+    padding: 1rem;
+  }
+
+  &-block {
+    position: relative;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s;
+    min-height: 56px;
+
+    &:hover {
+      //background-color: rgba(0, 0, 0, 0.02);
+    }
+
+    &-header {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 16px 0;
+      margin-left: 40px;
+
+      .grl-text-edit__input {
+        max-width: 300px;
+      }
+
+      .grl-text-edit {
+        max-width: 300px;
+      }
+
+      &-icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 24px;
+        width: 24px;
+        font-size: 16px;
+        border-radius: 4px;
+        color: white;
+        background-color: var(--node-color);
+        margin-right: 2px;
+      }
+    }
+
+    &--selected {
+      background-color: rgba(24, 144, 255, 0.05);
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background-color: #1890ff;
+      }
+    }
+
+    // Block type specific styles
+    &--markdown {
+      // Specific styles for markdown blocks
+    }
+
+    &--decision-table {
+      // Specific styles for decision table blocks
+    }
+
+    // Block content area
+    &-content {
+      margin-left: 40px;
+      padding: 0 24px 16px 0;
+      max-height: 400px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+
+      &--function {
+        min-height: 400px;
+        height: 400px;
+      }
+
+      &--markdown {
+        padding-top: 8px;
+      }
+
+      &--hide {
+        display: none;
+      }
+    }
+
+    // Left gutter for block controls
+    &-gutter {
+      position: absolute;
+      left: 8px;
+      top: 20px;
+      width: 24px;
+      gap: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.2s;
+
+      .grl-rb-block:hover &,
+      .grl-rb-block--selected & {
+        opacity: 1;
+      }
+    }
+
+    // Block execution button
+    &-execute {
+      padding: 4px;
+      border-radius: 4px;
+      color: #52c41a;
+
+      &:hover {
+        background-color: rgba(82, 196, 26, 0.1);
+      }
+    }
+
+    // Block actions menu (right side)
+    &-actions {
+      position: absolute;
+      right: 24px;
+      top: 14px;
+      display: flex;
+      gap: 4px;
+      background-color: white;
+      border: 1px solid #f0f0f0;
+      border-radius: 4px;
+      padding: 2px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    // Add new block button
+    &-add {
+      position: absolute;
+      bottom: -12px;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 0.2s;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #fff;
+
+      .grl-rb-block:hover & {
+        opacity: 1;
+      }
+
+      button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 1px solid #1890ff;
+        background-color: white;
+        color: #1890ff;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+        &:hover {
+          background-color: rgba(24, 144, 255, 0.05);
+        }
+      }
+    }
+  }
+}

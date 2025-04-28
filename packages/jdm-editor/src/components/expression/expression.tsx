@@ -43,7 +43,7 @@ export const Expression: React.FC<ExpressionProps> = ({ manager, debug, inputDat
   }, [container.current, manager]);
 
   return (
-    <div ref={container}>
+    <div ref={container} className={'expression-wrapper'}>
       {container.current && (
         <DndProvider {...dndProps}>
           <ExpressionStoreProvider>

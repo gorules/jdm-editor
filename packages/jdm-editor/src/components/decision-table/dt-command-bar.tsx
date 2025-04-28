@@ -1,14 +1,8 @@
-import {
-  ArrowDownOutlined,
-  ArrowUpOutlined,
-  CloseOutlined,
-  DeleteOutlined,
-  ExportOutlined,
-  ImportOutlined,
-} from '@ant-design/icons';
-import { Button, Divider, Popconfirm, Tooltip, message } from 'antd';
+import { ArrowDownOutlined, ArrowUpOutlined, CloseOutlined, ExportOutlined, ImportOutlined } from '@ant-design/icons';
+import { Button, Divider, Tooltip, message } from 'antd';
 import React, { useRef } from 'react';
 
+import { ConfirmAction } from '../confirm-action';
 import type { DecisionNode } from '../decision-graph';
 import { DiffSelect } from '../shared';
 import { Stack } from '../stack';
@@ -117,10 +111,8 @@ export const DecisionTableCommandBar: React.FC = () => {
                   onClick={() => tableActions.addRowAbove(cursor?.y)}
                 />
               </Tooltip>
-              <Tooltip>
-                <Popconfirm title='Remove row?' okText='Remove' onConfirm={() => tableActions.removeRow(cursor?.y)}>
-                  <Button type='text' danger size={'small'} icon={<DeleteOutlined />} />
-                </Popconfirm>
+              <Tooltip title='Delete'>
+                <ConfirmAction iconOnly onConfirm={() => tableActions.removeRow(cursor?.y)} size={'small'} />
               </Tooltip>
               <Button type='text' size={'small'} icon={<CloseOutlined />} onClick={() => tableActions.setCursor(null)}>
                 Deselect
