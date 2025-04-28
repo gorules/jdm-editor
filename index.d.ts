@@ -119,6 +119,11 @@ export declare const CodeEditor: default_2.ForwardRefExoticComponent<{
     fullHeight?: boolean;
     noStyle?: boolean;
     extension?: (params: ExtensionParams) => Extension;
+    livePreview?: {
+        input: unknown;
+        fromSimulation: boolean;
+        result?: unknown;
+    };
     variableType?: any;
     expectedVariableType?: any;
 } & Omit<default_2.HTMLAttributes<HTMLDivElement>, "disabled" | "onChange"> & default_2.RefAttributes<CodeEditorRef>>;
@@ -136,6 +141,11 @@ export declare type CodeEditorProps = {
     fullHeight?: boolean;
     noStyle?: boolean;
     extension?: (params: ExtensionParams) => Extension;
+    livePreview?: {
+        input: unknown;
+        fromSimulation: boolean;
+        result?: unknown;
+    };
     variableType?: any;
     expectedVariableType?: any;
 } & Omit<default_2.HTMLAttributes<HTMLDivElement>, 'disabled' | 'onChange'>;
@@ -1366,6 +1376,7 @@ declare type DecisionTableContextProps = {};
 
 declare type DecisionTableEmptyType = {
     id?: string;
+    name?: string;
     defaultValue?: DecisionTableType;
     value?: DecisionTableType;
     disabled?: boolean;
@@ -1378,10 +1389,12 @@ declare type DecisionTableEmptyType = {
     debug?: {
         trace: SimulationTrace<SimulationTraceDataTable>;
         inputData?: Variable;
+        snapshot: DecisionTableType;
     };
     minColWidth?: number;
     colWidth?: number;
     onChange?: (val: DecisionTableType) => void;
+    snapshot?: DecisionTableType;
 };
 
 export declare type DecisionTableProps = {
@@ -1580,6 +1593,11 @@ export declare const DiffCodeEditor: default_2.ForwardRefExoticComponent<{
     extension?: (params: {
         type?: "standard" | "unary" | "template";
     }) => Extension;
+    livePreview?: {
+        input: unknown;
+        fromSimulation: boolean;
+        result?: unknown;
+    };
     variableType?: any;
     expectedVariableType?: any;
 } & Omit<default_2.HTMLAttributes<HTMLDivElement>, "disabled" | "onChange"> & {
@@ -1784,9 +1802,27 @@ export declare const expressionNodeSchema: z.ZodObject<z.objectUtil.extendShape<
 
 export declare type ExpressionProps = {
     manager?: DragDropManager;
-    traceData?: SimulationTraceDataExpression;
+    debug?: ExpressionStore['debug'];
     inputData?: unknown;
 } & ExpressionControllerProps;
+
+declare type ExpressionStore = {
+    configurable: boolean;
+    disabled: boolean;
+    addRowAbove: (index?: number, data?: Partial<ExpressionEntry>) => void;
+    addRowBelow: (index?: number, data?: Partial<ExpressionEntry>) => void;
+    expressions: ExpressionEntry[];
+    setExpressions: (expressions: ExpressionEntry[]) => void;
+    swapRows: (sourceIndex: number, targetIndex: number) => void;
+    updateRow: (index: number, update: Partial<Omit<ExpressionEntry, 'id'>>) => void;
+    removeRow: (index: number) => void;
+    inputVariableType?: VariableType;
+    debug?: {
+        snapshot: z.infer<typeof expressionNodeSchema>['content'];
+        trace: SimulationTrace<SimulationTraceDataExpression>;
+        inputData?: Variable;
+    };
+};
 
 declare type ExtensionParams = {
     type?: 'standard' | 'unary' | 'template';
@@ -2814,6 +2850,7 @@ export declare type SimulationError = {
 export declare type SimulationOk = {
     performance: string;
     result: Output;
+    snapshot: DecisionGraphType;
     trace: Record<string, SimulationTrace>;
 };
 
@@ -2828,7 +2865,7 @@ export declare type SimulationTrace<Trace = TraceDataVariants> = {
 };
 
 export declare type SimulationTraceDataExpression = Record<string, {
-    result: unknown;
+    result: string;
 }>;
 
 export declare type SimulationTraceDataFunction = {
