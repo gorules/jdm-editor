@@ -73,7 +73,9 @@ export const TabExpression: React.FC<TabExpressionProps> = ({ id, manager }) => 
       return { trace: nodeTrace, snapshot: nodeSnapshot };
     }
 
-    return { trace: nodeTrace, inputData: new Variable(inputData), snapshot: nodeSnapshot };
+    const $data = Object.fromEntries(Object.entries(nodeTrace.traceData).map(([k, v]) => [k, safeJson(v.result)]));
+
+    return { trace: nodeTrace, inputData: new Variable({ ...inputData, $: $data }), snapshot: nodeSnapshot };
   }, [nodeTrace, nodeSnapshot, inputData]);
 
   return (
@@ -94,4 +96,12 @@ export const TabExpression: React.FC<TabExpressionProps> = ({ id, manager }) => 
       />
     </div>
   );
+};
+
+const safeJson = (data: string): unknown => {
+  try {
+    return JSON.parse(data);
+  } catch {
+    return null;
+  }
 };
