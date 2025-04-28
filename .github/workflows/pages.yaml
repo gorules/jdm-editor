@@ -27,8 +27,8 @@ jobs:
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: gh-pages
-          FOLDER: packages/jdm-editor/docs
-          CLEAN: true
-          FORCE: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          folder: packages/jdm-editor/docs
+          branch: gh-pages
+          clean: true
+          force: true
