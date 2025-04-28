@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.15.0](https://github.com/gorules/jdm-editor/compare/@gorules/zen-engine-wasm@0.14.0...@gorules/zen-engine-wasm@0.15.0) (2025-04-28)
+
+### Features
+
+- expression function system ([#163](https://github.com/gorules/jdm-editor/issues/163)) ([8b069aa](https://github.com/gorules/jdm-editor/commit/8b069aa114b95517b927769d1d6bb217ff4c9ca7))
+
 # [0.14.0](https://github.com/gorules/jdm-editor/compare/@gorules/zen-engine-wasm@0.13.0...@gorules/zen-engine-wasm@0.14.0) (2025-04-14)
 
 ### Features

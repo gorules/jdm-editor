@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.38.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.37.1...@gorules/jdm-editor@1.38.0) (2025-04-28)
+
+### Features
+
+- expression function system ([#163](https://github.com/gorules/jdm-editor/issues/163)) ([8b069aa](https://github.com/gorules/jdm-editor/commit/8b069aa114b95517b927769d1d6bb217ff4c9ca7))
+
 ## [1.37.1](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.37.0...@gorules/jdm-editor@1.37.1) (2025-04-15)
 
 ### Bug Fixes
