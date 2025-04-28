@@ -1,6 +1,7 @@
 name: Storybook
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
@@ -27,7 +28,7 @@ jobs:
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT }}
           folder: packages/jdm-editor/docs
           branch: gh-pages
           clean: true
