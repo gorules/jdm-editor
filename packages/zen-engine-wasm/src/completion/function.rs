@@ -1,13 +1,7 @@
-use gloo_utils::format::JsValueSerdeExt;
-use serde::Serialize;
-use strum::IntoEnumIterator;
-use wasm_bindgen::prelude::wasm_bindgen;
-use wasm_bindgen::JsValue;
+use crate::completion::{CompletionDefinition, CompletionInfo, CompletionParamNames};
 use zen_expression::functions::{
     ClosureFunction, DeprecatedFunction, FunctionKind, FunctionRegistry, InternalFunction,
 };
-
-struct CompletionInfo(String);
 
 impl From<FunctionKind> for CompletionInfo {
     fn from(value: FunctionKind) -> Self {
@@ -45,6 +39,7 @@ impl From<FunctionKind> for CompletionInfo {
                 InternalFunction::Type => m("Returns a string representing the data type of the value."),
                 InternalFunction::Keys => m("Returns an array of a given object's own enumerable property names."),
                 InternalFunction::Values => m("Returns an array of a given object's own enumerable property values."),
+                InternalFunction::Date => m("Returns a new date time instance.")
             },
             FunctionKind::Deprecated(d) => match d {
                 DeprecatedFunction::Date => m("Converts a numeric timestamp to a unix timestamp."),
@@ -75,8 +70,6 @@ impl From<FunctionKind> for CompletionInfo {
         }
     }
 }
-
-struct CompletionParamNames(Vec<String>);
 
 impl From<FunctionKind> for CompletionParamNames {
     fn from(value: FunctionKind) -> Self {
@@ -114,6 +107,7 @@ impl From<FunctionKind> for CompletionParamNames {
                 InternalFunction::Type => m(&["value"]),
                 InternalFunction::Keys => m(&["obj"]),
                 InternalFunction::Values => m(&["obj"]),
+                InternalFunction::Date => m(&["dateOrTimezone", "timezone"]),
             },
             FunctionKind::Deprecated(d) => match d {
                 DeprecatedFunction::Date => m(&["timestamp"]),
@@ -136,21 +130,18 @@ impl From<FunctionKind> for CompletionParamNames {
     }
 }
 
-struct CompletionSignature(String);
-
-impl CompletionSignature {
-    pub fn new(sig: &str) -> Self {
-        CompletionSignature(sig.to_owned())
-    }
-}
-
-impl From<FunctionKind> for CompletionSignature {
+impl From<FunctionKind> for CompletionDefinition {
     fn from(value: FunctionKind) -> Self {
+        let cd = |s: &str| CompletionDefinition {
+            signature: s.to_owned(),
+            method_for: None,
+        };
+
         match value {
             FunctionKind::Internal(_) | FunctionKind::Deprecated(_) => {
                 let param_names: CompletionParamNames = value.clone().into();
                 let Some(definition) = FunctionRegistry::get_definition(&value) else {
-                    return CompletionSignature::new("");
+                    return cd("");
                 };
 
                 let optional_params = definition.optional_parameters();
@@ -165,89 +156,40 @@ impl From<FunctionKind> for CompletionSignature {
                             false => "",
                         };
 
-                        let param_type = definition.param_type(i);
-
+                        let param_type = definition.param_type_str(i);
                         format!("{param_name}{osym}: `{param_type}`")
                     })
                     .collect::<Vec<_>>()
                     .join(", ");
 
-                CompletionSignature(format!("({s}) -> {}", definition.return_type()))
+                cd(format!("({s}) -> {}", definition.return_type_str()).as_str())
             }
             FunctionKind::Closure(c) => match c {
-                ClosureFunction::All => CompletionSignature::new(
-                    "`<T>`(array: `T[]`, callback: `Callback<T, boolean>`) -> `boolean`",
-                ),
-                ClosureFunction::None => CompletionSignature::new(
-                    "`<T>`(array: `T[]`, callback: `Callback<T, boolean>`) -> `boolean`",
-                ),
-                ClosureFunction::Some => CompletionSignature::new(
-                    "`<T>`(array: `T[]`, callback: `Callback<T, boolean>`) -> `boolean`",
-                ),
-                ClosureFunction::One => CompletionSignature::new(
-                    "`<T>`(array: `T[]`, callback: `Callback<T, boolean>`) -> `boolean`",
-                ),
-                ClosureFunction::Filter => CompletionSignature::new(
-                    "`<T>`(array: `T[]`, callback: `Callback<T, boolean>`) -> `T[]`",
-                ),
-                ClosureFunction::Map => CompletionSignature::new(
-                    "`<T, U>`(array: `T[]`, callback: `Callback<T, U>`) -> `U[]`",
-                ),
-                ClosureFunction::FlatMap => CompletionSignature::new(
-                    "`<T, U>`(array: `T[]`, callback: `Callback<T, U[]>`) -> `U[]`",
-                ),
-                ClosureFunction::Count => CompletionSignature::new(
-                    "`<T>`(array: `T[]`, callback: `Callback<T, boolean>`) -> `number`",
-                ),
+                ClosureFunction::All => {
+                    cd("`<T>`(array: `T[]`, callback: `Callback<T, boolean>`) -> `boolean`")
+                }
+                ClosureFunction::None => {
+                    cd("`<T>`(array: `T[]`, callback: `Callback<T, boolean>`) -> `boolean`")
+                }
+                ClosureFunction::Some => {
+                    cd("`<T>`(array: `T[]`, callback: `Callback<T, boolean>`) -> `boolean`")
+                }
+                ClosureFunction::One => {
+                    cd("`<T>`(array: `T[]`, callback: `Callback<T, boolean>`) -> `boolean`")
+                }
+                ClosureFunction::Filter => {
+                    cd("`<T>`(array: `T[]`, callback: `Callback<T, boolean>`) -> `T[]`")
+                }
+                ClosureFunction::Map => {
+                    cd("`<T, U>`(array: `T[]`, callback: `Callback<T, U>`) -> `U[]`")
+                }
+                ClosureFunction::FlatMap => {
+                    cd("`<T, U>`(array: `T[]`, callback: `Callback<T, U[]>`) -> `U[]`")
+                }
+                ClosureFunction::Count => {
+                    cd("`<T>`(array: `T[]`, callback: `Callback<T, boolean>`) -> `number`")
+                }
             },
         }
     }
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub enum CompletionKind {
-    Variable,
-    Function,
-}
-
-#[derive(Serialize)]
-pub struct Completion {
-    #[serde(rename = "type")]
-    kind: CompletionKind,
-    label: String,
-    #[serde(rename = "detail")]
-    signature: String,
-    info: String,
-    boost: Option<i32>,
-}
-
-#[wasm_bindgen(js_name = "getCompletions")]
-pub fn get_completions() -> JsValue {
-    let mut completions = InternalFunction::iter()
-        .map(FunctionKind::Internal)
-        .chain(DeprecatedFunction::iter().map(FunctionKind::Deprecated))
-        .chain(ClosureFunction::iter().map(FunctionKind::Closure))
-        .map(|fk| Completion {
-            kind: CompletionKind::Function,
-            label: fk.to_string(),
-            signature: CompletionSignature::from(fk.clone()).0,
-            info: CompletionInfo::from(fk.clone()).0,
-            boost: match fk {
-                FunctionKind::Internal(_) => Some(10),
-                FunctionKind::Deprecated(_) => Some(-20),
-                FunctionKind::Closure(_) => None,
-            },
-        })
-        .collect::<Vec<_>>();
-
-    completions.push(Completion {
-        kind: CompletionKind::Variable,
-        label: "$root".to_owned(),
-        signature: "Root variable".to_owned(),
-        boost: Some(-10),
-        info: "".to_owned(),
-    });
-
-    JsValue::from_serde(completions.as_slice()).unwrap()
 }
