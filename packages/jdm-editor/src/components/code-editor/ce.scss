@@ -235,7 +235,7 @@
 
   .cm-completionIcon-function::after,
   .cm-completionIcon-method::after {
-    content: 'f';
+    content: 'm';
     --icon-primary: var(--grl-color-error);
     --icon-secondary: var(--grl-color-error-bg);
   }

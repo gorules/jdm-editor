@@ -112,4 +112,6 @@ export const zenKindToString = (type: unknown): string =>
     .with(P.string, (s) => s.toLowerCase())
     .with({ Object: P._ }, () => 'object')
     .with({ Array: P._ }, (t) => `${zenKindToString(t.Array)}[]`)
+    .with({ Const: P.string }, (c) => `"${c}"`)
+    .with({ Enum: P.array(P.string) }, (t) => t.Enum.map((s) => `"${s}"`).join(' | '))
     .otherwise(() => 'unknown');

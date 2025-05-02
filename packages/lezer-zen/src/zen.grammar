@@ -72,6 +72,10 @@ BinaryExpression {
   expressionNoComma !nullCoalesce LogicOp<"??"> expressionNoComma
 }
 
+MethodExpression {
+ "." PropertyName !call ArgList
+}
+
 PropertyExpression {
   "[" expression? "]"
 }
@@ -81,7 +85,7 @@ PropertyAccess {
 }
 
 MemberExpression {
-  expressionNoComma !member (PropertyAccess | PropertyExpression)
+  expressionNoComma !member (MethodExpression | PropertyAccess | PropertyExpression)
 }
 
 ArgList {
