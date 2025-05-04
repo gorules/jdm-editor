@@ -71,9 +71,8 @@
     border: 1px solid var(--grl-color-border);
     border-color: var(--grl-color-border);
     border-radius: 6px;
-    transition:
-      border-color,
-      box-shadow 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+    transition: border-color,
+    box-shadow 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
     line-height: var(--ce-lineHeight);
 
     &.cm-focused {
@@ -233,7 +232,12 @@
     opacity: 1;
   }
 
-  .cm-completionIcon-function::after,
+  .cm-completionIcon-function::after {
+    content: 'f';
+    --icon-primary: var(--grl-color-error);
+    --icon-secondary: var(--grl-color-error-bg);
+  }
+
   .cm-completionIcon-method::after {
     content: 'm';
     --icon-primary: var(--grl-color-error);
