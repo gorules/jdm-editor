@@ -92,6 +92,10 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
       <div
         className='expression-list-item__key'
         onClick={(e) => {
+          if (e.target instanceof HTMLInputElement) {
+            return;
+          }
+
           const inputElement = e.currentTarget.querySelector<HTMLInputElement>('input');
           if (!inputElement) {
             return;

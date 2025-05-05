@@ -16,7 +16,7 @@
     background: var(--grl-color-bg-container);
     grid-auto-flow: column;
     align-items: flex-start;
-    grid-template-columns: 40px minmax(240px, 1fr) 3fr 40px;
+    grid-template-columns: 40px minmax(240px, 1.1fr) 3fr 40px;
 
     &:focus-within {
       box-shadow: 0 0 0 1px var(--grl-color-border);
@@ -124,6 +124,7 @@
         border-radius: 0;
         font-family: var(--mono-font-family);
         line-height: 24px;
+        font-size: 13px;
       }
     }
 
