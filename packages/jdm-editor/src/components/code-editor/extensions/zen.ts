@@ -14,16 +14,17 @@ import { parser as zenParser } from '@gorules/lezer-zen';
 import { parser as zenTemplateParser } from '@gorules/lezer-zen-template';
 import { NodeProp, type SyntaxNode, parseMixed } from '@lezer/common';
 import { tags as t } from '@lezer/highlight';
-import { match } from 'ts-pattern';
+import { P, match } from 'ts-pattern';
 
 import { getCompletions } from './completion';
 import { renderDiagnosticMessage } from './diagnostic';
 import { zenLinter } from './linter';
+import type { ZenType } from './types';
 import { buildTypeCompletion, typeField, zenKindToString } from './types';
 
 export const applyCompletion = (view: EditorView, completion: Completion, from: number, to: number) => {
   const transaction = match(completion.type)
-    .with('function', () => {
+    .with(P.union('function', 'method'), () => {
       const insert = `${completion.label}()`;
 
       return view.state.update({
@@ -41,7 +42,7 @@ export const applyCompletion = (view: EditorView, completion: Completion, from: 
   view.dispatch(transaction);
 };
 
-const makeExtendedCompletions = () =>
+const makeExtendedCompletions = (): Completion[] =>
   getCompletions().map(
     (c) =>
       ({
@@ -62,6 +63,16 @@ const hasAutoComplete = (n: SyntaxNode | null): boolean => {
 
 const makeExpressionCompletion = () => {
   const extendedCompletions = makeExtendedCompletions();
+  const topLevelCompletions = extendedCompletions.filter((c) => c.type && ['variable', 'function'].includes(c.type));
+  const methodCompletions = (type: ZenType) => {
+    return extendedCompletions.filter(
+      (s) =>
+        s.type === 'method' &&
+        match(s as unknown)
+          .with({ methodFor: P._ }, ({ methodFor }) => methodFor === type.kind)
+          .otherwise(() => false),
+    );
+  };
 
   return (context: CompletionContext): CompletionResult | null => {
     const tree = syntaxTree(context.state);
@@ -85,7 +96,7 @@ const makeExpressionCompletion = () => {
 
         return {
           from,
-          options: [...buildTypeCompletion({ type: 'variable', kind: tField.rootKind }), ...extendedCompletions],
+          options: [...buildTypeCompletion({ type: 'variable', kind: tField.rootKind }), ...topLevelCompletions],
           validFor: /\w*/,
         };
       }
@@ -114,7 +125,7 @@ const makeExpressionCompletion = () => {
 
         return {
           from,
-          options: buildTypeCompletion({ kind: targetType.kind }),
+          options: [...buildTypeCompletion({ kind: targetType.kind }), ...methodCompletions(targetType)],
           validFor: /\w*/,
         };
       }

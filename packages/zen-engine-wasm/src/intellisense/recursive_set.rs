@@ -28,7 +28,7 @@ impl RecursiveGetSet for VariableType {
                     vt = variable_type;
                 }
 
-                map.insert(first.to_string(), Rc::new(vt));
+                map.insert(Rc::from(first), Rc::new(vt));
                 VariableType::Object(map.clone())
             }
             _ => VariableType::Any,
