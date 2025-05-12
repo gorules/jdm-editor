@@ -1,6 +1,6 @@
 {
   "name": "@gorules/zen-engine-wasm",
-  "version": "0.15.0",
+  "version": "0.16.0",
   "description": "ZEN Engine WASM",
   "type": "module",
   "main": "index.js",

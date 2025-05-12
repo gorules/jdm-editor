@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.7.0](https://github.com/lezer-parser/json/compare/@gorules/lezer-zen@0.6.0...@gorules/lezer-zen@0.7.0) (2025-05-12)
+
+### Features
+
+- date v2 ([#168](https://github.com/lezer-parser/json/issues/168)) ([8c0d3a6](https://github.com/lezer-parser/json/commit/8c0d3a6f9b4fe7f55ddd17096d5d32843d6fe9e4))
+
 # [0.6.0](https://github.com/lezer-parser/json/compare/@gorules/lezer-zen@0.5.1...@gorules/lezer-zen@0.6.0) (2025-04-15)
 
 **Note:** Version bump only for package @gorules/lezer-zen
