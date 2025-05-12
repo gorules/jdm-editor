@@ -9,6 +9,9 @@ import { JdmConfigProvider } from '../src';
 // @ts-expect-error
 await ZenEngineWasm.default();
 
+(window as any).VariableType = ZenEngineWasm.VariableType;
+(window as any).Variable = ZenEngineWasm.Variable;
+
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },
   parameters: {

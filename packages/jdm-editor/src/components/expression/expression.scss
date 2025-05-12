@@ -7,7 +7,7 @@
   --border-color: var(--grl-color-border-fade);
   background: var(--border-color);
 
-  $pv: 9px;
+  $pv: 12px;
   $ph: 12px;
 
   &__item {
@@ -123,13 +123,14 @@
         padding: $pv $ph;
         border-radius: 0;
         font-family: var(--mono-font-family);
-        line-height: 24px;
+        line-height: 1.5em;
         font-size: 13px;
       }
     }
 
     &__code {
       position: relative;
+      font-size: 13px;
     }
 
     &__value {

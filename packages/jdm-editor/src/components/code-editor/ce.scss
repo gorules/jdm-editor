@@ -233,9 +233,14 @@
     opacity: 1;
   }
 
-  .cm-completionIcon-function::after,
-  .cm-completionIcon-method::after {
+  .cm-completionIcon-function::after {
     content: 'f';
+    --icon-primary: var(--grl-color-error);
+    --icon-secondary: var(--grl-color-error-bg);
+  }
+
+  .cm-completionIcon-method::after {
+    content: 'm';
     --icon-primary: var(--grl-color-error);
     --icon-secondary: var(--grl-color-error-bg);
   }

@@ -7,9 +7,9 @@ export const renderDiagnosticMessage = ({ text, className }: RenderDiagnosticMes
   return text.replace(/`([^`]+)`/g, (match, content) => {
     let color;
     if (/^["'].*["']$/.test(content)) {
-      color = '#077d16'; // Strings
+      color = '#6aab73'; // Strings
     } else if (/^\d+$/.test(content)) {
-      color = '#015cc5'; // Numbers
+      color = '#57a8f5'; // Numbers
     } else {
       color = '#CE8E6D'; // Everything else
     }
