@@ -9,11 +9,10 @@ import { useDrag, useDrop } from 'react-dnd';
 import { CodeEditorPreview } from '../code-editor/ce-preview';
 import { ConfirmAction } from '../confirm-action';
 import { DiffIcon } from '../diff-icon';
+import { DiffAutosizeTextArea } from '../shared';
 import { DiffCodeEditor } from '../shared/diff-ce';
-import { DiffInput } from '../shared/diff-input';
 import type { ExpressionEntry } from './context/expression-store.context';
 import { useExpressionStore } from './context/expression-store.context';
-import { DiffAutosizeTextArea } from '../shared';
 
 export type ExpressionItemProps = {
   expression: ExpressionEntry;
