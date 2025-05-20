@@ -119,12 +119,19 @@
     &__key {
       border-right: 1px solid var(--border-color);
 
-      input {
+      textarea {
+        border: 0;
+        width: 100%;
+        background-color: transparent;
         padding: $pv $ph;
         border-radius: 0;
         font-family: var(--mono-font-family);
         line-height: 1.5em;
         font-size: 13px;
+
+        &:focus {
+          box-shadow: none !important;
+        }
       }
     }
 

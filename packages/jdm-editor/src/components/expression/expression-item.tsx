@@ -9,8 +9,8 @@ import { useDrag, useDrop } from 'react-dnd';
 import { CodeEditorPreview } from '../code-editor/ce-preview';
 import { ConfirmAction } from '../confirm-action';
 import { DiffIcon } from '../diff-icon';
+import { DiffAutosizeTextArea } from '../shared';
 import { DiffCodeEditor } from '../shared/diff-ce';
-import { DiffInput } from '../shared/diff-input';
 import type { ExpressionEntry } from './context/expression-store.context';
 import { useExpressionStore } from './context/expression-store.context';
 
@@ -92,11 +92,11 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
       <div
         className='expression-list-item__key'
         onClick={(e) => {
-          if (e.target instanceof HTMLInputElement) {
+          if (e.target instanceof HTMLTextAreaElement) {
             return;
           }
 
-          const inputElement = e.currentTarget.querySelector<HTMLInputElement>('input');
+          const inputElement = e.currentTarget.querySelector<HTMLTextAreaElement>('textarea');
           if (!inputElement) {
             return;
           }
@@ -106,9 +106,10 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
           inputElement.setSelectionRange(inputLength, inputLength);
         }}
       >
-        <DiffInput
+        <DiffAutosizeTextArea
+          noStyle
           placeholder='Key'
-          variant='borderless'
+          maxRows={10}
           readOnly={!configurable || disabled}
           displayDiff={expression?._diff?.fields?.key?.status === 'modified'}
           previousValue={expression?._diff?.fields?.key?.previousValue}
