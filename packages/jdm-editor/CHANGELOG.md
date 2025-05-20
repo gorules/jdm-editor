@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.40.1](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.40.0...@gorules/jdm-editor@1.40.1) (2025-05-20)
+
+### Bug Fixes
+
+- expression key autosize ([#173](https://github.com/gorules/jdm-editor/issues/173)) ([f24a1f8](https://github.com/gorules/jdm-editor/commit/f24a1f86a3ed5291d32669b4825310725a0222a4))
+
 # [1.40.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.39.0...@gorules/jdm-editor@1.40.0) (2025-05-14)
 
 **Note:** Version bump only for package @gorules/jdm-editor
