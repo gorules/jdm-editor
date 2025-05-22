@@ -21,11 +21,6 @@ const vtJsonToTypescript = (vtj: VariableTypeJson): string =>
       return `{${innerObject}}`;
     })
     .with({ Array: P.select() }, (arr) => `${vtJsonToTypescript(arr)}[]`)
-    .with({ Constant: P.select() }, (c) => {
-      try {
-        return JSON.stringify(c);
-      } catch {
-        return 'any';
-      }
-    })
+    .with({ Const: P.select() }, (c) => `"${c}"`)
+    .with({ Enum: [P._, P.select()] }, (en) => en.map((e) => `"${e}"`).join(' | '))
     .exhaustive();

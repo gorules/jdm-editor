@@ -4,6 +4,7 @@ export type VariableTypeJson =
   | 'Bool'
   | 'String'
   | 'Number'
-  | { Constant: any }
+  | { Const: string }
+  | { Enum: [string | undefined, string[]] }
   | { Array: VariableTypeJson }
   | { Object: Record<string, VariableTypeJson> };
