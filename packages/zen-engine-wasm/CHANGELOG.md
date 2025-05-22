@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.17.3](https://github.com/gorules/jdm-editor/compare/@gorules/zen-engine-wasm@0.17.2...@gorules/zen-engine-wasm@0.17.3) (2025-05-22)
+
+### Bug Fixes
+
+- incorrect vt types ([#176](https://github.com/gorules/jdm-editor/issues/176)) ([cb83a7c](https://github.com/gorules/jdm-editor/commit/cb83a7c127e2a84bb6443770a045ad0b1db9e85e))
+
 ## [0.17.2](https://github.com/gorules/jdm-editor/compare/@gorules/zen-engine-wasm@0.17.1...@gorules/zen-engine-wasm@0.17.2) (2025-05-21)
 
 ### Bug Fixes
