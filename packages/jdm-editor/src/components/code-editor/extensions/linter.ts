@@ -178,8 +178,8 @@ export const validateZenExpression = ({
   } else if (expectedVariableType && types.length > 0) {
     const expressionResultKind = types[0].kind;
     const expressionResultVt = VariableType.fromJson(expressionResultKind);
-    const typesEqual = match(strict)
-      .with(true, () => expressionResultVt.equal(expectedVariableType))
+    const typesEqual = match([strict, expressionResultKind])
+      .with([true, 'Any'], () => false)
       .otherwise(() => expressionResultVt.satisfies(expectedVariableType));
 
     if (!typesEqual) {
