@@ -1,0 +1,5 @@
+[target.wasm32-unknown-unknown]
+rustflags = [
+    "-C", "link-args=-z stack-size=2097152",
+    "--cfg", "getrandom_backend=\"wasm_js\""
+]
