@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.41.1](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.41.0...@gorules/jdm-editor@1.41.1) (2025-05-23)
+
+**Note:** Version bump only for package @gorules/jdm-editor
+
 # [1.41.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.40.4...@gorules/jdm-editor@1.41.0) (2025-05-23)
 
 **Note:** Version bump only for package @gorules/jdm-editor
