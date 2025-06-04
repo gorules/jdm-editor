@@ -34,48 +34,52 @@ export const typeField = StateField.define<TypeField>({
     return defaultTypeField;
   },
   update(value, transaction) {
-    const updateExpressionType = transaction.effects.find((e) => e.is(updateExpressionTypeEffect));
-    const expressionType: TypeField['expressionType'] = match(updateExpressionType)
-      .with({ value: P.string }, (e) => e.value)
-      .otherwise(() => value.expressionType);
+    try {
+      const updateExpressionType = transaction.effects.find((e) => e.is(updateExpressionTypeEffect));
+      const expressionType: TypeField['expressionType'] = match(updateExpressionType)
+        .with({ value: P.string }, (e) => e.value)
+        .otherwise(() => value.expressionType);
 
-    const updateExpectedVariableType = transaction.effects.find((e) => e.is(updateExpectedVariableTypeEffect));
-    const expectedVariableType = match(updateExpectedVariableType)
-      .with({ value: P.nonNullable }, ({ value }) => value)
-      .with({ value: P.nullish }, () => undefined)
-      .otherwise(() => value.expectedVariableType);
+      const updateExpectedVariableType = transaction.effects.find((e) => e.is(updateExpectedVariableTypeEffect));
+      const expectedVariableType = match(updateExpectedVariableType)
+        .with({ value: P.nonNullable }, ({ value }) => value)
+        .with({ value: P.nullish }, () => undefined)
+        .otherwise(() => value.expectedVariableType);
 
-    const updateVariableType = transaction.effects.find((e) => e.is(updateVariableTypeEffect));
-    const variableType: VariableType | null = match(updateVariableType)
-      .with({ value: P._ }, (e) => e.value)
-      .otherwise(() => value.root || null);
+      const updateVariableType = transaction.effects.find((e) => e.is(updateVariableTypeEffect));
+      const variableType: VariableType | null = match(updateVariableType)
+        .with({ value: P._ }, (e) => e.value)
+        .otherwise(() => value.root || null);
 
-    const updateStrictMode = transaction.effects.find((e) => e.is(updateStrictModeEffect));
-    const strict: boolean = match(updateStrictMode)
-      .with({ value: P.boolean }, ({ value }) => value)
-      .otherwise(() => value.strict);
+      const updateStrictMode = transaction.effects.find((e) => e.is(updateStrictModeEffect));
+      const strict: boolean = match(updateStrictMode)
+        .with({ value: P.boolean }, ({ value }) => value)
+        .otherwise(() => value.strict);
 
-    if (!variableType) {
-      return { ...value, expressionType, expectedVariableType, strict };
+      if (!variableType) {
+        return { ...value, expressionType, expectedVariableType, strict };
+      }
+
+      // Triggered without effect and no changes, bail
+      if (!transaction.docChanged && !updateExpressionType && !updateVariableType) {
+        return { ...value, expressionType, expectedVariableType, strict };
+      }
+
+      const source = transaction.newDoc.toString();
+      return {
+        source,
+        expressionType,
+        expectedVariableType,
+        strict,
+        root: variableType,
+        rootKind: variableType.toJson(),
+        types: match(expressionType)
+          .with('unary', () => variableType.typeCheckUnary(source))
+          .otherwise(() => variableType.typeCheck(source)),
+      } satisfies TypeField;
+    } catch {
+      return value;
     }
-
-    // Triggered without effect and no changes, bail
-    if (!transaction.docChanged && !updateExpressionType && !updateVariableType) {
-      return { ...value, expressionType, expectedVariableType, strict };
-    }
-
-    const source = transaction.newDoc.toString();
-    return {
-      source,
-      expressionType,
-      expectedVariableType,
-      strict,
-      root: variableType,
-      rootKind: variableType.toJson(),
-      types: match(expressionType)
-        .with('unary', () => variableType.typeCheckUnary(source))
-        .otherwise(() => variableType.typeCheck(source)),
-    } satisfies TypeField;
   },
   compare(a, b) {
     return (

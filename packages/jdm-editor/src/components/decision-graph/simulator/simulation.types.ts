@@ -44,7 +44,9 @@ export type SimulationTraceDataFunction = {
   log?: TraceFunctionLog[];
 };
 
-export type SimulationTraceDataExpression = Record<string, { result: string }>;
+type Arrayable<T> = T | T[];
+
+export type SimulationTraceDataExpression = Arrayable<Record<string, { result: string }>>;
 
 type SimulationTraceDataTableSingle = {
   index: number;

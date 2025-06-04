@@ -6,6 +6,7 @@ import type { z } from 'zod';
 import type { StoreApi, UseBoundStore } from 'zustand';
 import { create } from 'zustand';
 
+import { type GetNodeDataResult } from '../../../helpers/node-data';
 import type { expressionNodeSchema } from '../../../helpers/schema';
 import type { SimulationTrace, SimulationTraceDataExpression } from '../../decision-graph';
 import type { DiffMetadata } from '../../decision-graph/dg-types';
@@ -39,10 +40,12 @@ export type ExpressionStore = {
 
   inputVariableType?: VariableType;
 
+  debugIndex: number;
+  calculatedInputData?: Variable;
   debug?: {
     snapshot: z.infer<typeof expressionNodeSchema>['content'];
     trace: SimulationTrace<SimulationTraceDataExpression>;
-    inputData?: Variable;
+    inputData?: GetNodeDataResult;
   };
 };
 
@@ -65,6 +68,7 @@ export const ExpressionStoreProvider: React.FC<React.PropsWithChildren<Expressio
       create<ExpressionStore>((set) => ({
         configurable: true,
         disabled: false,
+        debugIndex: 0,
         addRowAbove: (index = 0) => {
           set(
             produce<ExpressionStore>((draft) => {

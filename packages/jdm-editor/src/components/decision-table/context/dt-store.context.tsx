@@ -6,6 +6,7 @@ import type { StoreApi, UseBoundStore } from 'zustand';
 import { create } from 'zustand';
 
 import type { SchemaSelectProps } from '../../../helpers/components';
+import { type GetNodeDataResult } from '../../../helpers/node-data';
 import type { SimulationTrace, SimulationTraceDataTable } from '../../decision-graph';
 import type { Diff, DiffMetadata } from '../../decision-graph/dg-types';
 import type { TableCellProps } from '../table/table-default-cell';
@@ -141,11 +142,13 @@ export type DecisionTableStoreType = {
     inputsSchema?: SchemaSelectProps[];
     outputsSchema?: SchemaSelectProps[];
 
+    debugIndex: number;
+    calculatedInputData?: Variable;
+
     debug?: {
       snapshot: DecisionTableType;
       trace: SimulationTrace<SimulationTraceDataTable>;
-      inputData?: Variable;
-      activeRules: string[];
+      inputData?: GetNodeDataResult;
     };
   };
 
@@ -208,6 +211,7 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
 
         derivedVariableTypes: {},
         inputVariableType: undefined,
+        debugIndex: 0,
         debug: undefined,
       })),
     [],

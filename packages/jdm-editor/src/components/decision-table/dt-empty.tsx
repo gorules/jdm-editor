@@ -1,4 +1,4 @@
-import { type Variable, createVariableType } from '@gorules/zen-engine-wasm';
+import { Variable, VariableType } from '@gorules/zen-engine-wasm';
 import equal from 'fast-deep-equal/es6/react';
 import type React from 'react';
 import { useEffect, useRef } from 'react';
@@ -6,8 +6,10 @@ import { P, match } from 'ts-pattern';
 import { useDebouncedCallback } from 'use-debounce';
 
 import type { SchemaSelectProps } from '../../helpers/components';
+import type { GetNodeDataResult } from '../../helpers/node-data';
 import { isWasmAvailable } from '../../helpers/wasm';
 import type { SimulationTrace, SimulationTraceDataTable } from '../decision-graph';
+import type { DecisionTableStoreType } from './context/dt-store.context';
 import {
   type DecisionTableType,
   parseDecisionTable,
@@ -28,12 +30,14 @@ export type DecisionTableEmptyType = {
   cellRenderer?: (props: TableCellProps) => JSX.Element | null | undefined;
   inputsSchema?: SchemaSelectProps[];
   outputsSchema?: SchemaSelectProps[];
-  inputData?: unknown;
-  debug?: { trace: SimulationTrace<SimulationTraceDataTable>; inputData?: Variable; snapshot: DecisionTableType };
+  debug?: {
+    trace: SimulationTrace<SimulationTraceDataTable>;
+    inputData?: GetNodeDataResult;
+    snapshot: DecisionTableType;
+  };
   minColWidth?: number;
   colWidth?: number;
   onChange?: (val: DecisionTableType) => void;
-  snapshot?: DecisionTableType;
 };
 
 export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
@@ -46,13 +50,11 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
   disableHitPolicy = false,
   inputsSchema,
   outputsSchema,
-  inputData,
   debug,
   colWidth,
   minColWidth,
   cellRenderer,
   onChange,
-  snapshot,
 }) => {
   const mountedRef = useRef(false);
   const { stateStore, listenerStore } = useDecisionTableRaw();
@@ -106,32 +108,62 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
   }, []);
 
   useEffect(() => {
-    if (!isWasmAvailable()) {
-      return;
-    }
-
-    stateStore.setState({ inputVariableType: createVariableType(inputData) });
-  }, [inputData]);
-
-  useEffect(() => {
     if (!debug) {
       stateStore.setState({ debug: undefined });
       return;
     }
-
-    const activeRules = match(debug.trace.traceData)
-      .with(P.array(), (t) => t.map((d) => d?.rule?._id))
-      .otherwise((t) => [t?.rule?._id]);
 
     stateStore.setState({
       debug: {
         trace: debug.trace,
         snapshot: debug.snapshot,
         inputData: debug.inputData,
-        activeRules,
       },
     });
-  }, [debug, snapshot]);
+  }, [debug]);
+
+  useEffect(() => {
+    if (!isWasmAvailable()) {
+      return;
+    }
+
+    const isLoop = (store: DecisionTableStoreType['state']) => {
+      return match(store.debug?.trace.traceData)
+        .with(P.array(), () => true)
+        .otherwise(() => false);
+    };
+
+    const applyDebug = (state: DecisionTableStoreType['state']) => {
+      const inputData = state.debug?.inputData;
+      if (!inputData) {
+        return;
+      }
+
+      const varInputData = new Variable(inputData.data);
+      if (isLoop(state)) {
+        const newInputData = varInputData.get(state.debugIndex).cloneWith('$nodes', inputData.$nodes);
+        stateStore.setState({
+          calculatedInputData: newInputData,
+          inputVariableType: VariableType.fromVariable(newInputData),
+        });
+      } else {
+        const newInputData = varInputData.cloneWith('$nodes', inputData.$nodes);
+        stateStore.setState({
+          calculatedInputData: newInputData,
+          inputVariableType: VariableType.fromVariable(newInputData),
+        });
+      }
+    };
+
+    applyDebug(stateStore.getState());
+    return stateStore.subscribe((state, prevState) => {
+      if (state.debugIndex === prevState.debugIndex && state.debug === prevState.debug) {
+        return;
+      }
+
+      applyDebug(state);
+    });
+  }, []);
 
   return null;
 };

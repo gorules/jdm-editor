@@ -5,12 +5,10 @@ type NodeDataParams = {
   decisionGraph: DecisionGraphType;
 };
 
-export const getNodeData = (nodeId: string, { trace, decisionGraph }: NodeDataParams) => {
-  const nodeInput = Object.values(trace).find((t) => t.id === nodeId)?.input;
-  if (typeof nodeInput !== 'object' || Array.isArray(nodeInput)) {
-    return nodeInput;
-  }
+export type GetNodeDataResult = { data: unknown; $nodes: unknown; $?: unknown };
 
+export const getNodeData = (nodeId: string, { trace, decisionGraph }: NodeDataParams): GetNodeDataResult => {
+  const data = Object.values(trace).find((t) => t.id === nodeId)?.input;
   const $nodes = Object.fromEntries(
     Object.values(trace)
       .map((t) => {
@@ -24,8 +22,5 @@ export const getNodeData = (nodeId: string, { trace, decisionGraph }: NodeDataPa
       .filter((s) => !!s),
   );
 
-  return {
-    ...nodeInput,
-    $nodes,
-  };
+  return { data, $nodes };
 };

@@ -42,39 +42,50 @@ const extractPosition = (error: string): [number, number] | number | null => {
 };
 
 const lintExpression = (type: string, source: string): Diagnostic[] => {
-  if (!isWasmAvailable()) {
-    return [];
+  try {
+    if (!isWasmAvailable()) {
+      return [];
+    }
+
+    const error: ExpressionError = match(type)
+      .with('standard', () => validateExpression(source))
+      .with('unary', () => validateUnaryExpression(source))
+      .otherwise(() => null);
+    if (!error) {
+      return [];
+    }
+
+    const position = match(extractPosition(error.source))
+      .with(P.number, (n) => ({ from: n, to: n }))
+      .with([P.number, P.number], ([l, r]) => ({ from: l, to: r }))
+      .otherwise(() => ({ from: 0, to: source.length }));
+
+    const errorSource = match(error.type)
+      .with('parserError', () => 'Parser error')
+      .with('lexerError', () => 'Lexer error')
+      .with('compilerError', () => 'Compiler error')
+      .with('vmError', () => 'VM error')
+      .otherwise((n) => n);
+
+    return [
+      {
+        from: position.from,
+        to: position.to,
+        message: error.source,
+        source: errorSource,
+        severity: 'error',
+      },
+    ];
+  } catch (err) {
+    return [
+      {
+        from: 0,
+        to: source.length,
+        message: String(err),
+        severity: 'error',
+      },
+    ];
   }
-
-  const error: ExpressionError = match(type)
-    .with('standard', () => validateExpression(source))
-    .with('unary', () => validateUnaryExpression(source))
-    .otherwise(() => null);
-  if (!error) {
-    return [];
-  }
-
-  const position = match(extractPosition(error.source))
-    .with(P.number, (n) => ({ from: n, to: n }))
-    .with([P.number, P.number], ([l, r]) => ({ from: l, to: r }))
-    .otherwise(() => ({ from: 0, to: source.length }));
-
-  const errorSource = match(error.type)
-    .with('parserError', () => 'Parser error')
-    .with('lexerError', () => 'Lexer error')
-    .with('compilerError', () => 'Compiler error')
-    .with('vmError', () => 'VM error')
-    .otherwise((n) => n);
-
-  return [
-    {
-      from: position.from,
-      to: position.to,
-      message: error.source,
-      source: errorSource,
-      severity: 'error',
-    },
-  ];
 };
 
 export const zenLinter = (type: string) => {

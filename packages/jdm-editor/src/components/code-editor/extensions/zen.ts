@@ -171,60 +171,66 @@ export const completionExtension = () =>
 export const hoverExtension = () => {
   const completions = getCompletions();
 
-  return hoverTooltip((view, pos) => {
-    const word = view.state.wordAt(pos);
-    if (!word) {
+  return hoverTooltip(
+    (view, pos) => {
+      const word = view.state.wordAt(pos);
+      if (!word) {
+        return null;
+      }
+
+      const data = view.state.doc.sliceString(word.from, word.to);
+      const details = completions.find((cmp) => cmp.label === data);
+      if (details) {
+        return {
+          pos: word.from,
+          end: word.to,
+          above: true,
+          create() {
+            const dom = document.createElement('div');
+            dom.classList.add('grl-ce-hover-tooltip');
+            dom.style.whiteSpace = 'pre';
+            dom.innerHTML = renderDiagnosticMessage({
+              text: `<span style="font-size: 12px">${details.info}</span>\n${details.label}: ${details.detail}\n`,
+              className: 'cm-hoverTooltipMessageToken',
+            });
+            return { dom };
+          },
+        };
+      }
+
+      const tree = syntaxTree(view.state);
+      const node = tree.resolveInner(pos, -1);
+
+      const tField = view.state.field(typeField);
+      const tBase = hoverSpan(node);
+      const targetType = (tField.types ?? []).find((t) => t.span[0] === tBase?.[0] && t.span[1] === tBase[1]);
+      if (targetType && tBase) {
+        const source = view.state.doc.toString();
+
+        return {
+          pos: tBase[0],
+          end: tBase[1],
+          above: true,
+          create() {
+            const dom = document.createElement('div');
+            dom.classList.add('grl-ce-hover-tooltip');
+            dom.style.whiteSpace = 'pre';
+            dom.innerHTML = renderDiagnosticMessage({
+              text: `${source.slice(tBase[0], tBase[1])}: \`${zenKindToString(targetType.kind)}\``,
+              className: 'cm-hoverTooltipMessageToken',
+            });
+            return { dom };
+          },
+        };
+      }
+
       return null;
-    }
-
-    const data = view.state.doc.sliceString(word.from, word.to);
-    const details = completions.find((cmp) => cmp.label === data);
-    if (details) {
-      return {
-        pos: word.from,
-        end: word.to,
-        above: true,
-        create() {
-          const dom = document.createElement('div');
-          dom.classList.add('grl-ce-hover-tooltip');
-          dom.style.whiteSpace = 'pre';
-          dom.innerHTML = renderDiagnosticMessage({
-            text: `<span style="font-size: 12px">${details.info}</span>\n${details.label}: ${details.detail}\n`,
-            className: 'cm-hoverTooltipMessageToken',
-          });
-          return { dom };
-        },
-      };
-    }
-
-    const tree = syntaxTree(view.state);
-    const node = tree.resolveInner(pos, -1);
-
-    const tField = view.state.field(typeField);
-    const tBase = hoverSpan(node);
-    const targetType = (tField.types ?? []).find((t) => t.span[0] === tBase?.[0] && t.span[1] === tBase[1]);
-    if (targetType && tBase) {
-      const source = view.state.doc.toString();
-
-      return {
-        pos: tBase[0],
-        end: tBase[1],
-        above: true,
-        create() {
-          const dom = document.createElement('div');
-          dom.classList.add('grl-ce-hover-tooltip');
-          dom.style.whiteSpace = 'pre';
-          dom.innerHTML = renderDiagnosticMessage({
-            text: `${source.slice(tBase[0], tBase[1])}: \`${zenKindToString(targetType.kind)}\``,
-            className: 'cm-hoverTooltipMessageToken',
-          });
-          return { dom };
-        },
-      };
-    }
-
-    return null;
-  });
+    },
+    {
+      hoverTime: 700,
+      hideOnChange: true,
+    },
+  );
 };
 
 export const zenHighlightLight = syntaxHighlighting(
