@@ -6,6 +6,7 @@ import { GripVerticalIcon } from 'lucide-react';
 import React, { useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
+import { getTrace } from '../../helpers/trace';
 import { CodeEditorPreview } from '../code-editor/ce-preview';
 import { ConfirmAction } from '../confirm-action';
 import { DiffIcon } from '../diff-icon';
@@ -13,6 +14,7 @@ import { DiffAutosizeTextArea } from '../shared';
 import { DiffCodeEditor } from '../shared/diff-ce';
 import type { ExpressionEntry } from './context/expression-store.context';
 import { useExpressionStore } from './context/expression-store.context';
+import { ExpressionItemContextMenu } from './expression-item-context-menu';
 
 export type ExpressionItemProps = {
   expression: ExpressionEntry;
@@ -106,34 +108,40 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
           inputElement.setSelectionRange(inputLength, inputLength);
         }}
       >
-        <DiffAutosizeTextArea
-          noStyle
-          placeholder='Key'
-          maxRows={10}
-          readOnly={!configurable || disabled}
-          displayDiff={expression?._diff?.fields?.key?.status === 'modified'}
-          previousValue={expression?._diff?.fields?.key?.previousValue}
-          value={expression?.key}
-          onChange={(e) => onChange({ key: e.target.value })}
-          autoComplete='off'
-        />
+        <ExpressionItemContextMenu index={index}>
+          <DiffAutosizeTextArea
+            noStyle
+            placeholder='Key'
+            maxRows={10}
+            readOnly={!configurable || disabled}
+            displayDiff={expression?._diff?.fields?.key?.status === 'modified'}
+            previousValue={expression?._diff?.fields?.key?.previousValue}
+            value={expression?.key}
+            onChange={(e) => onChange({ key: e.target.value })}
+            autoComplete='off'
+          />
+        </ExpressionItemContextMenu>
       </div>
       <div className='expression-list-item__code'>
-        <DiffCodeEditor
-          className='expression-list-item__value'
-          placeholder='Expression'
-          maxRows={9}
-          disabled={disabled}
-          value={expression?.value}
-          displayDiff={expression?._diff?.fields?.value?.status === 'modified'}
-          previousValue={expression?._diff?.fields?.value?.previousValue}
-          onChange={(value) => onChange({ value })}
-          variableType={variableType}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          noStyle={true}
-        />
-        <ResultOverlay expression={expression} />
+        <ExpressionItemContextMenu index={index}>
+          <div>
+            <DiffCodeEditor
+              className='expression-list-item__value'
+              placeholder='Expression'
+              maxRows={9}
+              disabled={disabled}
+              value={expression?.value}
+              displayDiff={expression?._diff?.fields?.value?.status === 'modified'}
+              previousValue={expression?._diff?.fields?.value?.previousValue}
+              onChange={(value) => onChange({ value })}
+              variableType={variableType}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              noStyle={true}
+            />
+            <ResultOverlay expression={expression} />
+          </div>
+        </ExpressionItemContextMenu>
       </div>
       <div className='expression-list-item__action'>
         <ConfirmAction iconOnly disabled={!configurable || disabled} onConfirm={onRemove} />
@@ -144,12 +152,12 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
 };
 
 const LivePreview = React.memo<{ id: string; value: string }>(({ id, value }) => {
-  const { inputData, initial } = useExpressionStore(({ debug }) => {
+  const { inputData, initial } = useExpressionStore(({ debug, debugIndex, calculatedInputData }) => {
     const snapshot = (debug?.snapshot?.expressions ?? []).find((e) => e.id === id);
-    const trace = snapshot?.key ? debug?.trace.traceData[snapshot.key] : undefined;
+    const trace = snapshot?.key ? getTrace(debug?.trace.traceData, debugIndex)?.[snapshot.key] : undefined;
 
     return {
-      inputData: debug?.inputData,
+      inputData: calculatedInputData,
       initial: snapshot && trace ? { expression: snapshot.value, result: safeJson(trace.result) } : undefined,
     };
   });
@@ -162,8 +170,8 @@ const LivePreview = React.memo<{ id: string; value: string }>(({ id, value }) =>
 });
 
 const ResultOverlay: React.FC<{ expression: ExpressionEntry }> = ({ expression }) => {
-  const { trace } = useExpressionStore(({ debug }) => ({
-    trace: debug?.trace?.traceData?.[expression.key]?.result,
+  const { trace } = useExpressionStore(({ debug, debugIndex }) => ({
+    trace: getTrace(debug?.trace?.traceData, debugIndex)?.[expression.key]?.result,
   }));
   if (!trace) {
     return null;

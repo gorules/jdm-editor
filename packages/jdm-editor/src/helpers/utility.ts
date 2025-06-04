@@ -1,13 +1,3 @@
-export const isTrue = (str: string | boolean | number | undefined) => {
-  if (typeof str === 'string') return ((str as string) || '').toLowerCase() === 'true';
-  else if (typeof str === 'boolean') return str === true;
-  else if (typeof str === 'number') return str === 1;
-  return false;
-};
-
-export const chunk = <T = unknown>(arr: T[], size: number): T[][] =>
-  Array.from({ length: Math.ceil(arr.length / size) }, (v, i) => arr.slice(i * size, i * size + size));
-
 const unsecuredCopyToClipboard = (text: string) => {
   const textArea = document.createElement('textarea');
   textArea.value = text;

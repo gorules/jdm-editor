@@ -1,4 +1,5 @@
 use crate::intellisense::recursive_set::RecursiveGetSet;
+use crate::variable::JsVariable;
 use gloo_utils::format::JsValueSerdeExt;
 use serde_json::Value;
 use std::hash::{DefaultHasher, Hash, Hasher};
@@ -55,6 +56,12 @@ impl JsVariableType {
             .filter(|v| !matches!(v.0, VariableType::Any))
             .fold(empty_object, |a, b| a.merge(&b));
 
+        Self(vt)
+    }
+
+    #[wasm_bindgen(js_name = "fromVariable")]
+    pub fn from_variable(value: &JsVariable) -> Self {
+        let vt = VariableType::from(value.var.to_value());
         Self(vt)
     }
 

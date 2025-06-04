@@ -128,12 +128,12 @@ export const TableHeadCellOutput: React.FC<TableHeadCellProps> = ({ configurable
 
 export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({ configurable, disabled, schema }) => {
   const tableActions = useDecisionTableActions();
-  const { inputData, inputVariableType } = useDecisionTableState(({ debug, inputVariableType }) => ({
-    inputData: debug?.inputData,
+  const { inputData, inputVariableType } = useDecisionTableState(({ calculatedInputData, inputVariableType }) => ({
+    inputData: calculatedInputData,
     inputVariableType,
   }));
 
-  const referenceData = useDecisionTableState(({ debug }) => {
+  const referenceData = useDecisionTableState(({ debug, debugIndex }) => {
     if (!debug) {
       return undefined;
     }
@@ -144,7 +144,7 @@ export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({ con
       return undefined;
     }
 
-    const referenceMap = getReferenceMap(trace);
+    const referenceMap = getReferenceMap(trace, debugIndex);
     return {
       field: snapshotField.field,
       value: referenceMap?.[snapshotField.field],

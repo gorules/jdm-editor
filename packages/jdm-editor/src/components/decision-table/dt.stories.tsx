@@ -128,7 +128,6 @@ const meta: Meta<typeof DecisionTable> = {
   argTypes: {
     configurable: { control: 'boolean' },
     disabled: { control: 'boolean' },
-    inputData: { control: 'object' },
     cellRenderer: {
       control: false,
     },
@@ -137,10 +136,6 @@ const meta: Meta<typeof DecisionTable> = {
     inputsSchema: inputSchemaDefault,
     configurable: true,
     disabled: false,
-    inputData: {
-      cart: { weight: 100, total: 100 },
-      customer: { country: 'US', firstName: 'John', lastName: 'Doe' },
-    },
     onChange: fn(),
   },
 };

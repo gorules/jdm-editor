@@ -196,14 +196,14 @@ const TableInputCell: React.FC<TableCellProps> = ({ column, value, onChange, dis
 };
 
 const TableInputCellStatus: React.FC<{ columnId: string; index: number }> = React.memo(({ columnId, index }) => {
-  const inputData = useDecisionTableState(({ debug }) => debug?.inputData);
-  const expressionContext = useDecisionTableState(({ debug }) => {
+  const inputData = useDecisionTableState(({ calculatedInputData }) => calculatedInputData);
+  const expressionContext = useDecisionTableState(({ debug, debugIndex }) => {
     if (!isWasmAvailable() || !debug) {
       return;
     }
 
     const { trace, snapshot } = debug;
-    const referenceMap = getReferenceMap(trace);
+    const referenceMap = getReferenceMap(trace, debugIndex);
     if (!referenceMap) {
       return null;
     }
@@ -246,7 +246,7 @@ const TableInputCellStatus: React.FC<{ columnId: string; index: number }> = Reac
     try {
       let isOk: boolean;
       if (type === 'unary') {
-        const newInputData = inputData.cloneWithReference($);
+        const newInputData = inputData.cloneWith('$', $);
         isOk = newInputData.evaluateUnaryExpression(expression);
       } else {
         isOk = inputData.evaluateExpression(expression) === true;

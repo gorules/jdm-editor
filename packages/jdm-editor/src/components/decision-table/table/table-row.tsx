@@ -5,6 +5,7 @@ import { Typography } from 'antd';
 import clsx from 'clsx';
 import React, { useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
+import { P, match } from 'ts-pattern';
 
 import { composeRefs } from '../../../helpers/compose-refs';
 import type { DiffMetadata } from '../../decision-graph';
@@ -19,9 +20,11 @@ export const TableRow: React.FC<{
 }> = ({ ref, row, disabled, virtualItem, onResize }) => {
   const trRef = useRef<HTMLTableRowElement>(null);
   const tableActions = useDecisionTableActions();
-  const { cursor, isActive } = useDecisionTableState(({ cursor, debug }) => ({
+  const { cursor, isActive } = useDecisionTableState(({ cursor, debug, debugIndex }) => ({
     cursor,
-    isActive: !!debug?.activeRules.includes(row.id),
+    isActive: match(debug?.trace.traceData)
+      .with(P.array(), (t) => t?.[debugIndex]?.rule?._id === row.id)
+      .otherwise((t) => t?.rule?._id === row.id),
   }));
 
   const [{ isDropping, direction }, dropRef] = useDrop({
