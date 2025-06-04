@@ -64,13 +64,15 @@ export declare const anyNodeSchema: z.ZodObject<z.objectUtil.extendShape<{
 }, {
     type: string;
     name: string;
-    id?: string | undefined;
     content?: any;
+    id?: string | undefined;
     position?: {
         x: number;
         y: number;
     } | undefined;
 }>;
+
+declare type Arrayable<T> = T | T[];
 
 declare type AutosizeTextAreaProps = {
     maxRows: number;
@@ -209,11 +211,11 @@ export declare const customNodeSchema: z.ZodObject<z.objectUtil.extendShape<{
     }>>;
 }>, "strip", z.ZodTypeAny, {
     type: "customNode";
-    id: string;
     content: {
         kind: string;
         config?: any;
     };
+    id: string;
     name: string;
     position: {
         x: number;
@@ -392,11 +394,11 @@ export declare const decisionModelSchema: z.ZodObject<{
             outputPath: z.ZodEffects<z.ZodDefault<z.ZodOptional<z.ZodNullable<z.ZodString>>>, string | null, string | null | undefined>;
             executionMode: z.ZodEffects<z.ZodOptional<z.ZodNullable<z.ZodEnum<["single", "loop"]>>>, "single" | "loop", "single" | "loop" | null | undefined>;
         }, "strip", z.ZodTypeAny, {
+            key: string;
             passThrough: boolean;
             inputField: string | null;
             outputPath: string | null;
             executionMode: "single" | "loop";
-            key: string;
         }, {
             key: string;
             passThrough?: boolean | null | undefined;
@@ -419,14 +421,14 @@ export declare const decisionModelSchema: z.ZodObject<{
         }>>;
     }>, "strip", z.ZodTypeAny, {
         type: NodeKind.Decision;
-        id: string;
         content: {
+            key: string;
             passThrough: boolean;
             inputField: string | null;
             outputPath: string | null;
             executionMode: "single" | "loop";
-            key: string;
         };
+        id: string;
         name: string;
         position: {
             x: number;
@@ -456,12 +458,12 @@ export declare const decisionModelSchema: z.ZodObject<{
                 value: z.ZodDefault<z.ZodString>;
             }, "strip", z.ZodTypeAny, {
                 value: string;
-                id: string;
                 key: string;
+                id: string;
             }, {
                 value?: string | undefined;
-                id?: string | undefined;
                 key?: string | undefined;
+                id?: string | undefined;
             }>, "many">;
             passThrough: z.ZodEffects<z.ZodOptional<z.ZodNullable<z.ZodBoolean>>, boolean, boolean | null | undefined>;
             inputField: z.ZodEffects<z.ZodDefault<z.ZodOptional<z.ZodNullable<z.ZodString>>>, string | null, string | null | undefined>;
@@ -474,14 +476,14 @@ export declare const decisionModelSchema: z.ZodObject<{
             executionMode: "single" | "loop";
             expressions: {
                 value: string;
-                id: string;
                 key: string;
+                id: string;
             }[];
         }, {
             expressions: {
                 value?: string | undefined;
-                id?: string | undefined;
                 key?: string | undefined;
+                id?: string | undefined;
             }[];
             passThrough?: boolean | null | undefined;
             inputField?: string | null | undefined;
@@ -503,7 +505,6 @@ export declare const decisionModelSchema: z.ZodObject<{
         }>>;
     }>, "strip", z.ZodTypeAny, {
         type: NodeKind.Expression;
-        id: string;
         content: {
             passThrough: boolean;
             inputField: string | null;
@@ -511,10 +512,11 @@ export declare const decisionModelSchema: z.ZodObject<{
             executionMode: "single" | "loop";
             expressions: {
                 value: string;
-                id: string;
                 key: string;
+                id: string;
             }[];
         };
+        id: string;
         name: string;
         position: {
             x: number;
@@ -525,8 +527,8 @@ export declare const decisionModelSchema: z.ZodObject<{
         content: {
             expressions: {
                 value?: string | undefined;
-                id?: string | undefined;
                 key?: string | undefined;
+                id?: string | undefined;
             }[];
             passThrough?: boolean | null | undefined;
             inputField?: string | null | undefined;
@@ -575,10 +577,10 @@ export declare const decisionModelSchema: z.ZodObject<{
     }, {
         type: NodeKind.Function;
         name: string;
-        id?: string | undefined;
         content?: string | {
             source?: string | undefined;
         } | null | undefined;
+        id?: string | undefined;
         position?: {
             x: number;
             y: number;
@@ -595,14 +597,14 @@ export declare const decisionModelSchema: z.ZodObject<{
                 defaultValue: z.ZodOptional<z.ZodNullable<z.ZodString>>;
             }, "strip", z.ZodTypeAny, {
                 id: string;
-                defaultValue?: string | null | undefined;
                 name?: string | null | undefined;
                 field?: string | null | undefined;
-            }, {
                 defaultValue?: string | null | undefined;
+            }, {
                 id?: string | undefined;
                 name?: string | null | undefined;
                 field?: string | null | undefined;
+                defaultValue?: string | null | undefined;
             }>, "many">;
             outputs: z.ZodArray<z.ZodObject<{
                 id: z.ZodDefault<z.ZodString>;
@@ -617,51 +619,51 @@ export declare const decisionModelSchema: z.ZodObject<{
             }, {
                 name: string;
                 field: string;
-                defaultValue?: string | null | undefined;
                 id?: string | undefined;
+                defaultValue?: string | null | undefined;
             }>, "many">;
             passThrough: z.ZodEffects<z.ZodOptional<z.ZodNullable<z.ZodBoolean>>, boolean, boolean | null | undefined>;
             inputField: z.ZodEffects<z.ZodDefault<z.ZodOptional<z.ZodNullable<z.ZodString>>>, string | null, string | null | undefined>;
             outputPath: z.ZodEffects<z.ZodDefault<z.ZodOptional<z.ZodNullable<z.ZodString>>>, string | null, string | null | undefined>;
             executionMode: z.ZodEffects<z.ZodOptional<z.ZodNullable<z.ZodEnum<["single", "loop"]>>>, "single" | "loop", "single" | "loop" | null | undefined>;
         }, "strip", z.ZodTypeAny, {
-            hitPolicy: "first" | "collect";
-            rules: Record<string, string>[];
-            inputs: {
-                id: string;
-                defaultValue?: string | null | undefined;
-                name?: string | null | undefined;
-                field?: string | null | undefined;
-            }[];
-            outputs: {
-                id: string;
-                name: string;
-                field: string;
-                defaultValue?: string | null | undefined;
-            }[];
             passThrough: boolean;
             inputField: string | null;
             outputPath: string | null;
             executionMode: "single" | "loop";
+            hitPolicy: "first" | "collect";
+            rules: Record<string, string>[];
+            inputs: {
+                id: string;
+                name?: string | null | undefined;
+                field?: string | null | undefined;
+                defaultValue?: string | null | undefined;
+            }[];
+            outputs: {
+                id: string;
+                name: string;
+                field: string;
+                defaultValue?: string | null | undefined;
+            }[];
         }, {
             inputs: {
-                defaultValue?: string | null | undefined;
                 id?: string | undefined;
                 name?: string | null | undefined;
                 field?: string | null | undefined;
+                defaultValue?: string | null | undefined;
             }[];
             outputs: {
                 name: string;
                 field: string;
-                defaultValue?: string | null | undefined;
                 id?: string | undefined;
+                defaultValue?: string | null | undefined;
             }[];
-            hitPolicy?: "first" | "collect" | null | undefined;
-            rules?: Record<string, string | null | undefined>[] | undefined;
             passThrough?: boolean | null | undefined;
             inputField?: string | null | undefined;
             outputPath?: string | null | undefined;
             executionMode?: "single" | "loop" | null | undefined;
+            hitPolicy?: "first" | "collect" | null | undefined;
+            rules?: Record<string, string | null | undefined>[] | undefined;
         }>;
     }, {
         id: z.ZodDefault<z.ZodString>;
@@ -678,15 +680,18 @@ export declare const decisionModelSchema: z.ZodObject<{
         }>>;
     }>, "strip", z.ZodTypeAny, {
         type: NodeKind.DecisionTable;
-        id: string;
         content: {
+            passThrough: boolean;
+            inputField: string | null;
+            outputPath: string | null;
+            executionMode: "single" | "loop";
             hitPolicy: "first" | "collect";
             rules: Record<string, string>[];
             inputs: {
                 id: string;
-                defaultValue?: string | null | undefined;
                 name?: string | null | undefined;
                 field?: string | null | undefined;
+                defaultValue?: string | null | undefined;
             }[];
             outputs: {
                 id: string;
@@ -694,11 +699,8 @@ export declare const decisionModelSchema: z.ZodObject<{
                 field: string;
                 defaultValue?: string | null | undefined;
             }[];
-            passThrough: boolean;
-            inputField: string | null;
-            outputPath: string | null;
-            executionMode: "single" | "loop";
         };
+        id: string;
         name: string;
         position: {
             x: number;
@@ -708,23 +710,23 @@ export declare const decisionModelSchema: z.ZodObject<{
         type: NodeKind.DecisionTable;
         content: {
             inputs: {
-                defaultValue?: string | null | undefined;
                 id?: string | undefined;
                 name?: string | null | undefined;
                 field?: string | null | undefined;
+                defaultValue?: string | null | undefined;
             }[];
             outputs: {
                 name: string;
                 field: string;
-                defaultValue?: string | null | undefined;
                 id?: string | undefined;
+                defaultValue?: string | null | undefined;
             }[];
-            hitPolicy?: "first" | "collect" | null | undefined;
-            rules?: Record<string, string | null | undefined>[] | undefined;
             passThrough?: boolean | null | undefined;
             inputField?: string | null | undefined;
             outputPath?: string | null | undefined;
             executionMode?: "single" | "loop" | null | undefined;
+            hitPolicy?: "first" | "collect" | null | undefined;
+            rules?: Record<string, string | null | undefined>[] | undefined;
         };
         name: string;
         id?: string | undefined;
@@ -779,7 +781,6 @@ export declare const decisionModelSchema: z.ZodObject<{
         }>>;
     }>, "strip", z.ZodTypeAny, {
         type: NodeKind.Switch;
-        id: string;
         content: {
             hitPolicy: "first" | "collect";
             statements: {
@@ -788,6 +789,7 @@ export declare const decisionModelSchema: z.ZodObject<{
                 isDefault: boolean;
             }[];
         };
+        id: string;
         name: string;
         position: {
             x: number;
@@ -836,11 +838,11 @@ export declare const decisionModelSchema: z.ZodObject<{
         }>>;
     }>, "strip", z.ZodTypeAny, {
         type: "customNode";
-        id: string;
         content: {
             kind: string;
             config?: any;
         };
+        id: string;
         name: string;
         position: {
             x: number;
@@ -882,10 +884,10 @@ export declare const decisionModelSchema: z.ZodObject<{
         }>>;
     }>, "strip", z.ZodTypeAny, {
         type: NodeKind.Input;
-        id: string;
         content: {
             schema: string;
         };
+        id: string;
         name: string;
         position: {
             x: number;
@@ -894,10 +896,10 @@ export declare const decisionModelSchema: z.ZodObject<{
     }, {
         type: NodeKind.Input;
         name: string;
-        id?: string | undefined;
         content?: {
             schema?: string | null | undefined;
         } | undefined;
+        id?: string | undefined;
         position?: {
             x: number;
             y: number;
@@ -926,10 +928,10 @@ export declare const decisionModelSchema: z.ZodObject<{
         }>>;
     }>, "strip", z.ZodTypeAny, {
         type: NodeKind.Output;
-        id: string;
         content: {
             schema: string;
         };
+        id: string;
         name: string;
         position: {
             x: number;
@@ -938,10 +940,10 @@ export declare const decisionModelSchema: z.ZodObject<{
     }, {
         type: NodeKind.Output;
         name: string;
-        id?: string | undefined;
         content?: {
             schema?: string | null | undefined;
         } | undefined;
+        id?: string | undefined;
         position?: {
             x: number;
             y: number;
@@ -974,8 +976,8 @@ export declare const decisionModelSchema: z.ZodObject<{
     }, {
         type: string;
         name: string;
-        id?: string | undefined;
         content?: any;
+        id?: string | undefined;
         position?: {
             x: number;
             y: number;
@@ -1002,50 +1004,34 @@ export declare const decisionModelSchema: z.ZodObject<{
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
     nodes: ({
-        type: NodeKind.Input;
-        id: string;
+        type: NodeKind.Decision;
         content: {
-            schema: string;
-        };
-        name: string;
-        position: {
-            x: number;
-            y: number;
-        };
-    } | {
-        type: NodeKind.Output;
-        id: string;
-        content: {
-            schema: string;
-        };
-        name: string;
-        position: {
-            x: number;
-            y: number;
-        };
-    } | {
-        type: NodeKind.DecisionTable;
-        id: string;
-        content: {
-            hitPolicy: "first" | "collect";
-            rules: Record<string, string>[];
-            inputs: {
-                id: string;
-                defaultValue?: string | null | undefined;
-                name?: string | null | undefined;
-                field?: string | null | undefined;
-            }[];
-            outputs: {
-                id: string;
-                name: string;
-                field: string;
-                defaultValue?: string | null | undefined;
-            }[];
+            key: string;
             passThrough: boolean;
             inputField: string | null;
             outputPath: string | null;
             executionMode: "single" | "loop";
         };
+        id: string;
+        name: string;
+        position: {
+            x: number;
+            y: number;
+        };
+    } | {
+        type: NodeKind.Expression;
+        content: {
+            passThrough: boolean;
+            inputField: string | null;
+            outputPath: string | null;
+            executionMode: "single" | "loop";
+            expressions: {
+                value: string;
+                key: string;
+                id: string;
+            }[];
+        };
+        id: string;
         name: string;
         position: {
             x: number;
@@ -1063,34 +1049,28 @@ export declare const decisionModelSchema: z.ZodObject<{
             source: string;
         } | null | undefined;
     } | {
-        type: NodeKind.Expression;
-        id: string;
+        type: NodeKind.DecisionTable;
         content: {
             passThrough: boolean;
             inputField: string | null;
             outputPath: string | null;
             executionMode: "single" | "loop";
-            expressions: {
-                value: string;
+            hitPolicy: "first" | "collect";
+            rules: Record<string, string>[];
+            inputs: {
                 id: string;
-                key: string;
+                name?: string | null | undefined;
+                field?: string | null | undefined;
+                defaultValue?: string | null | undefined;
+            }[];
+            outputs: {
+                id: string;
+                name: string;
+                field: string;
+                defaultValue?: string | null | undefined;
             }[];
         };
-        name: string;
-        position: {
-            x: number;
-            y: number;
-        };
-    } | {
-        type: NodeKind.Decision;
         id: string;
-        content: {
-            passThrough: boolean;
-            inputField: string | null;
-            outputPath: string | null;
-            executionMode: "single" | "loop";
-            key: string;
-        };
         name: string;
         position: {
             x: number;
@@ -1098,7 +1078,6 @@ export declare const decisionModelSchema: z.ZodObject<{
         };
     } | {
         type: NodeKind.Switch;
-        id: string;
         content: {
             hitPolicy: "first" | "collect";
             statements: {
@@ -1107,6 +1086,7 @@ export declare const decisionModelSchema: z.ZodObject<{
                 isDefault: boolean;
             }[];
         };
+        id: string;
         name: string;
         position: {
             x: number;
@@ -1114,11 +1094,33 @@ export declare const decisionModelSchema: z.ZodObject<{
         };
     } | {
         type: "customNode";
-        id: string;
         content: {
             kind: string;
             config?: any;
         };
+        id: string;
+        name: string;
+        position: {
+            x: number;
+            y: number;
+        };
+    } | {
+        type: NodeKind.Input;
+        content: {
+            schema: string;
+        };
+        id: string;
+        name: string;
+        position: {
+            x: number;
+            y: number;
+        };
+    } | {
+        type: NodeKind.Output;
+        content: {
+            schema: string;
+        };
+        id: string;
         name: string;
         position: {
             x: number;
@@ -1143,44 +1145,28 @@ export declare const decisionModelSchema: z.ZodObject<{
     }[];
 }, {
     nodes?: ({
-        type: NodeKind.Input;
-        name: string;
-        id?: string | undefined;
-        content?: {
-            schema?: string | null | undefined;
-        } | undefined;
-        position?: {
-            x: number;
-            y: number;
-        } | undefined;
-    } | {
-        type: NodeKind.Output;
-        name: string;
-        id?: string | undefined;
-        content?: {
-            schema?: string | null | undefined;
-        } | undefined;
-        position?: {
-            x: number;
-            y: number;
-        } | undefined;
-    } | {
-        type: NodeKind.DecisionTable;
+        type: NodeKind.Decision;
         content: {
-            inputs: {
-                defaultValue?: string | null | undefined;
+            key: string;
+            passThrough?: boolean | null | undefined;
+            inputField?: string | null | undefined;
+            outputPath?: string | null | undefined;
+            executionMode?: "single" | "loop" | null | undefined;
+        };
+        name: string;
+        id?: string | undefined;
+        position?: {
+            x: number;
+            y: number;
+        } | undefined;
+    } | {
+        type: NodeKind.Expression;
+        content: {
+            expressions: {
+                value?: string | undefined;
+                key?: string | undefined;
                 id?: string | undefined;
-                name?: string | null | undefined;
-                field?: string | null | undefined;
             }[];
-            outputs: {
-                name: string;
-                field: string;
-                defaultValue?: string | null | undefined;
-                id?: string | undefined;
-            }[];
-            hitPolicy?: "first" | "collect" | null | undefined;
-            rules?: Record<string, string | null | undefined>[] | undefined;
             passThrough?: boolean | null | undefined;
             inputField?: string | null | undefined;
             outputPath?: string | null | undefined;
@@ -1195,41 +1181,35 @@ export declare const decisionModelSchema: z.ZodObject<{
     } | {
         type: NodeKind.Function;
         name: string;
-        id?: string | undefined;
         content?: string | {
             source?: string | undefined;
         } | null | undefined;
+        id?: string | undefined;
         position?: {
             x: number;
             y: number;
         } | undefined;
     } | {
-        type: NodeKind.Expression;
+        type: NodeKind.DecisionTable;
         content: {
-            expressions: {
-                value?: string | undefined;
+            inputs: {
                 id?: string | undefined;
-                key?: string | undefined;
+                name?: string | null | undefined;
+                field?: string | null | undefined;
+                defaultValue?: string | null | undefined;
+            }[];
+            outputs: {
+                name: string;
+                field: string;
+                id?: string | undefined;
+                defaultValue?: string | null | undefined;
             }[];
             passThrough?: boolean | null | undefined;
             inputField?: string | null | undefined;
             outputPath?: string | null | undefined;
             executionMode?: "single" | "loop" | null | undefined;
-        };
-        name: string;
-        id?: string | undefined;
-        position?: {
-            x: number;
-            y: number;
-        } | undefined;
-    } | {
-        type: NodeKind.Decision;
-        content: {
-            key: string;
-            passThrough?: boolean | null | undefined;
-            inputField?: string | null | undefined;
-            outputPath?: string | null | undefined;
-            executionMode?: "single" | "loop" | null | undefined;
+            hitPolicy?: "first" | "collect" | null | undefined;
+            rules?: Record<string, string | null | undefined>[] | undefined;
         };
         name: string;
         id?: string | undefined;
@@ -1266,10 +1246,32 @@ export declare const decisionModelSchema: z.ZodObject<{
             y: number;
         } | undefined;
     } | {
+        type: NodeKind.Input;
+        name: string;
+        content?: {
+            schema?: string | null | undefined;
+        } | undefined;
+        id?: string | undefined;
+        position?: {
+            x: number;
+            y: number;
+        } | undefined;
+    } | {
+        type: NodeKind.Output;
+        name: string;
+        content?: {
+            schema?: string | null | undefined;
+        } | undefined;
+        id?: string | undefined;
+        position?: {
+            x: number;
+            y: number;
+        } | undefined;
+    } | {
         type: string;
         name: string;
-        id?: string | undefined;
         content?: any;
+        id?: string | undefined;
         position?: {
             x: number;
             y: number;
@@ -1313,11 +1315,11 @@ export declare const decisionNodeSchema: z.ZodObject<z.objectUtil.extendShape<{
         outputPath: z.ZodEffects<z.ZodDefault<z.ZodOptional<z.ZodNullable<z.ZodString>>>, string | null, string | null | undefined>;
         executionMode: z.ZodEffects<z.ZodOptional<z.ZodNullable<z.ZodEnum<["single", "loop"]>>>, "single" | "loop", "single" | "loop" | null | undefined>;
     }, "strip", z.ZodTypeAny, {
+        key: string;
         passThrough: boolean;
         inputField: string | null;
         outputPath: string | null;
         executionMode: "single" | "loop";
-        key: string;
     }, {
         key: string;
         passThrough?: boolean | null | undefined;
@@ -1340,14 +1342,14 @@ export declare const decisionNodeSchema: z.ZodObject<z.objectUtil.extendShape<{
     }>>;
 }>, "strip", z.ZodTypeAny, {
     type: NodeKind.Decision;
-    id: string;
     content: {
+        key: string;
         passThrough: boolean;
         inputField: string | null;
         outputPath: string | null;
         executionMode: "single" | "loop";
-        key: string;
     };
+    id: string;
     name: string;
     position: {
         x: number;
@@ -1385,16 +1387,14 @@ declare type DecisionTableEmptyType = {
     cellRenderer?: (props: TableCellProps) => JSX.Element | null | undefined;
     inputsSchema?: SchemaSelectProps[];
     outputsSchema?: SchemaSelectProps[];
-    inputData?: unknown;
     debug?: {
         trace: SimulationTrace<SimulationTraceDataTable>;
-        inputData?: Variable;
+        inputData?: GetNodeDataResult;
         snapshot: DecisionTableType;
     };
     minColWidth?: number;
     colWidth?: number;
     onChange?: (val: DecisionTableType) => void;
-    snapshot?: DecisionTableType;
 };
 
 export declare type DecisionTableProps = {
@@ -1416,14 +1416,14 @@ export declare const decisionTableSchema: z.ZodObject<z.objectUtil.extendShape<{
             defaultValue: z.ZodOptional<z.ZodNullable<z.ZodString>>;
         }, "strip", z.ZodTypeAny, {
             id: string;
-            defaultValue?: string | null | undefined;
             name?: string | null | undefined;
             field?: string | null | undefined;
-        }, {
             defaultValue?: string | null | undefined;
+        }, {
             id?: string | undefined;
             name?: string | null | undefined;
             field?: string | null | undefined;
+            defaultValue?: string | null | undefined;
         }>, "many">;
         outputs: z.ZodArray<z.ZodObject<{
             id: z.ZodDefault<z.ZodString>;
@@ -1438,51 +1438,51 @@ export declare const decisionTableSchema: z.ZodObject<z.objectUtil.extendShape<{
         }, {
             name: string;
             field: string;
-            defaultValue?: string | null | undefined;
             id?: string | undefined;
+            defaultValue?: string | null | undefined;
         }>, "many">;
         passThrough: z.ZodEffects<z.ZodOptional<z.ZodNullable<z.ZodBoolean>>, boolean, boolean | null | undefined>;
         inputField: z.ZodEffects<z.ZodDefault<z.ZodOptional<z.ZodNullable<z.ZodString>>>, string | null, string | null | undefined>;
         outputPath: z.ZodEffects<z.ZodDefault<z.ZodOptional<z.ZodNullable<z.ZodString>>>, string | null, string | null | undefined>;
         executionMode: z.ZodEffects<z.ZodOptional<z.ZodNullable<z.ZodEnum<["single", "loop"]>>>, "single" | "loop", "single" | "loop" | null | undefined>;
     }, "strip", z.ZodTypeAny, {
-        hitPolicy: "first" | "collect";
-        rules: Record<string, string>[];
-        inputs: {
-            id: string;
-            defaultValue?: string | null | undefined;
-            name?: string | null | undefined;
-            field?: string | null | undefined;
-        }[];
-        outputs: {
-            id: string;
-            name: string;
-            field: string;
-            defaultValue?: string | null | undefined;
-        }[];
         passThrough: boolean;
         inputField: string | null;
         outputPath: string | null;
         executionMode: "single" | "loop";
+        hitPolicy: "first" | "collect";
+        rules: Record<string, string>[];
+        inputs: {
+            id: string;
+            name?: string | null | undefined;
+            field?: string | null | undefined;
+            defaultValue?: string | null | undefined;
+        }[];
+        outputs: {
+            id: string;
+            name: string;
+            field: string;
+            defaultValue?: string | null | undefined;
+        }[];
     }, {
         inputs: {
-            defaultValue?: string | null | undefined;
             id?: string | undefined;
             name?: string | null | undefined;
             field?: string | null | undefined;
+            defaultValue?: string | null | undefined;
         }[];
         outputs: {
             name: string;
             field: string;
-            defaultValue?: string | null | undefined;
             id?: string | undefined;
+            defaultValue?: string | null | undefined;
         }[];
-        hitPolicy?: "first" | "collect" | null | undefined;
-        rules?: Record<string, string | null | undefined>[] | undefined;
         passThrough?: boolean | null | undefined;
         inputField?: string | null | undefined;
         outputPath?: string | null | undefined;
         executionMode?: "single" | "loop" | null | undefined;
+        hitPolicy?: "first" | "collect" | null | undefined;
+        rules?: Record<string, string | null | undefined>[] | undefined;
     }>;
 }, {
     id: z.ZodDefault<z.ZodString>;
@@ -1499,15 +1499,18 @@ export declare const decisionTableSchema: z.ZodObject<z.objectUtil.extendShape<{
     }>>;
 }>, "strip", z.ZodTypeAny, {
     type: NodeKind.DecisionTable;
-    id: string;
     content: {
+        passThrough: boolean;
+        inputField: string | null;
+        outputPath: string | null;
+        executionMode: "single" | "loop";
         hitPolicy: "first" | "collect";
         rules: Record<string, string>[];
         inputs: {
             id: string;
-            defaultValue?: string | null | undefined;
             name?: string | null | undefined;
             field?: string | null | undefined;
+            defaultValue?: string | null | undefined;
         }[];
         outputs: {
             id: string;
@@ -1515,11 +1518,8 @@ export declare const decisionTableSchema: z.ZodObject<z.objectUtil.extendShape<{
             field: string;
             defaultValue?: string | null | undefined;
         }[];
-        passThrough: boolean;
-        inputField: string | null;
-        outputPath: string | null;
-        executionMode: "single" | "loop";
     };
+    id: string;
     name: string;
     position: {
         x: number;
@@ -1529,23 +1529,23 @@ export declare const decisionTableSchema: z.ZodObject<z.objectUtil.extendShape<{
     type: NodeKind.DecisionTable;
     content: {
         inputs: {
-            defaultValue?: string | null | undefined;
             id?: string | undefined;
             name?: string | null | undefined;
             field?: string | null | undefined;
+            defaultValue?: string | null | undefined;
         }[];
         outputs: {
             name: string;
             field: string;
-            defaultValue?: string | null | undefined;
             id?: string | undefined;
+            defaultValue?: string | null | undefined;
         }[];
-        hitPolicy?: "first" | "collect" | null | undefined;
-        rules?: Record<string, string | null | undefined>[] | undefined;
         passThrough?: boolean | null | undefined;
         inputField?: string | null | undefined;
         outputPath?: string | null | undefined;
         executionMode?: "single" | "loop" | null | undefined;
+        hitPolicy?: "first" | "collect" | null | undefined;
+        rules?: Record<string, string | null | undefined>[] | undefined;
     };
     name: string;
     id?: string | undefined;
@@ -1715,12 +1715,12 @@ export declare const expressionNodeSchema: z.ZodObject<z.objectUtil.extendShape<
             value: z.ZodDefault<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             value: string;
-            id: string;
             key: string;
+            id: string;
         }, {
             value?: string | undefined;
-            id?: string | undefined;
             key?: string | undefined;
+            id?: string | undefined;
         }>, "many">;
         passThrough: z.ZodEffects<z.ZodOptional<z.ZodNullable<z.ZodBoolean>>, boolean, boolean | null | undefined>;
         inputField: z.ZodEffects<z.ZodDefault<z.ZodOptional<z.ZodNullable<z.ZodString>>>, string | null, string | null | undefined>;
@@ -1733,14 +1733,14 @@ export declare const expressionNodeSchema: z.ZodObject<z.objectUtil.extendShape<
         executionMode: "single" | "loop";
         expressions: {
             value: string;
-            id: string;
             key: string;
+            id: string;
         }[];
     }, {
         expressions: {
             value?: string | undefined;
-            id?: string | undefined;
             key?: string | undefined;
+            id?: string | undefined;
         }[];
         passThrough?: boolean | null | undefined;
         inputField?: string | null | undefined;
@@ -1762,7 +1762,6 @@ export declare const expressionNodeSchema: z.ZodObject<z.objectUtil.extendShape<
     }>>;
 }>, "strip", z.ZodTypeAny, {
     type: NodeKind.Expression;
-    id: string;
     content: {
         passThrough: boolean;
         inputField: string | null;
@@ -1770,10 +1769,11 @@ export declare const expressionNodeSchema: z.ZodObject<z.objectUtil.extendShape<
         executionMode: "single" | "loop";
         expressions: {
             value: string;
-            id: string;
             key: string;
+            id: string;
         }[];
     };
+    id: string;
     name: string;
     position: {
         x: number;
@@ -1784,8 +1784,8 @@ export declare const expressionNodeSchema: z.ZodObject<z.objectUtil.extendShape<
     content: {
         expressions: {
             value?: string | undefined;
-            id?: string | undefined;
             key?: string | undefined;
+            id?: string | undefined;
         }[];
         passThrough?: boolean | null | undefined;
         inputField?: string | null | undefined;
@@ -1803,7 +1803,7 @@ export declare const expressionNodeSchema: z.ZodObject<z.objectUtil.extendShape<
 export declare type ExpressionProps = {
     manager?: DragDropManager;
     debug?: ExpressionStore['debug'];
-    inputData?: unknown;
+    hideCommandBar?: boolean;
 } & ExpressionControllerProps;
 
 declare type ExpressionStore = {
@@ -1817,10 +1817,12 @@ declare type ExpressionStore = {
     updateRow: (index: number, update: Partial<Omit<ExpressionEntry, 'id'>>) => void;
     removeRow: (index: number) => void;
     inputVariableType?: VariableType;
+    debugIndex: number;
+    calculatedInputData?: Variable;
     debug?: {
         snapshot: z.infer<typeof expressionNodeSchema>['content'];
         trace: SimulationTrace<SimulationTraceDataExpression>;
-        inputData?: Variable;
+        inputData?: GetNodeDataResult;
     };
 };
 
@@ -1875,10 +1877,10 @@ export declare const functionNodeSchema: z.ZodObject<z.objectUtil.extendShape<{
 }, {
     type: NodeKind.Function;
     name: string;
-    id?: string | undefined;
     content?: string | {
         source?: string | undefined;
     } | null | undefined;
+    id?: string | undefined;
     position?: {
         x: number;
         y: number;
@@ -1911,6 +1913,12 @@ declare type GenerateNodeParams = {
 
 declare type GenerateNodeParams_2 = {
     index: number;
+};
+
+declare type GetNodeDataResult = {
+    data: unknown;
+    $nodes: unknown;
+    $?: unknown;
 };
 
 export declare const GraphDecisionNode: default_2.FC<GraphDecisionNodeProps>;
@@ -2017,10 +2025,10 @@ export declare const inputNodeSchema: z.ZodObject<z.objectUtil.extendShape<{
     }>>;
 }>, "strip", z.ZodTypeAny, {
     type: NodeKind.Input;
-    id: string;
     content: {
         schema: string;
     };
+    id: string;
     name: string;
     position: {
         x: number;
@@ -2029,10 +2037,10 @@ export declare const inputNodeSchema: z.ZodObject<z.objectUtil.extendShape<{
 }, {
     type: NodeKind.Input;
     name: string;
-    id?: string | undefined;
     content?: {
         schema?: string | null | undefined;
     } | undefined;
+    id?: string | undefined;
     position?: {
         x: number;
         y: number;
@@ -2106,11 +2114,11 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
         outputPath: z.ZodEffects<z.ZodDefault<z.ZodOptional<z.ZodNullable<z.ZodString>>>, string | null, string | null | undefined>;
         executionMode: z.ZodEffects<z.ZodOptional<z.ZodNullable<z.ZodEnum<["single", "loop"]>>>, "single" | "loop", "single" | "loop" | null | undefined>;
     }, "strip", z.ZodTypeAny, {
+        key: string;
         passThrough: boolean;
         inputField: string | null;
         outputPath: string | null;
         executionMode: "single" | "loop";
-        key: string;
     }, {
         key: string;
         passThrough?: boolean | null | undefined;
@@ -2133,14 +2141,14 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
     }>>;
 }>, "strip", z.ZodTypeAny, {
     type: NodeKind.Decision;
-    id: string;
     content: {
+        key: string;
         passThrough: boolean;
         inputField: string | null;
         outputPath: string | null;
         executionMode: "single" | "loop";
-        key: string;
     };
+    id: string;
     name: string;
     position: {
         x: number;
@@ -2170,12 +2178,12 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
             value: z.ZodDefault<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             value: string;
-            id: string;
             key: string;
+            id: string;
         }, {
             value?: string | undefined;
-            id?: string | undefined;
             key?: string | undefined;
+            id?: string | undefined;
         }>, "many">;
         passThrough: z.ZodEffects<z.ZodOptional<z.ZodNullable<z.ZodBoolean>>, boolean, boolean | null | undefined>;
         inputField: z.ZodEffects<z.ZodDefault<z.ZodOptional<z.ZodNullable<z.ZodString>>>, string | null, string | null | undefined>;
@@ -2188,14 +2196,14 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
         executionMode: "single" | "loop";
         expressions: {
             value: string;
-            id: string;
             key: string;
+            id: string;
         }[];
     }, {
         expressions: {
             value?: string | undefined;
-            id?: string | undefined;
             key?: string | undefined;
+            id?: string | undefined;
         }[];
         passThrough?: boolean | null | undefined;
         inputField?: string | null | undefined;
@@ -2217,7 +2225,6 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
     }>>;
 }>, "strip", z.ZodTypeAny, {
     type: NodeKind.Expression;
-    id: string;
     content: {
         passThrough: boolean;
         inputField: string | null;
@@ -2225,10 +2232,11 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
         executionMode: "single" | "loop";
         expressions: {
             value: string;
-            id: string;
             key: string;
+            id: string;
         }[];
     };
+    id: string;
     name: string;
     position: {
         x: number;
@@ -2239,8 +2247,8 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
     content: {
         expressions: {
             value?: string | undefined;
-            id?: string | undefined;
             key?: string | undefined;
+            id?: string | undefined;
         }[];
         passThrough?: boolean | null | undefined;
         inputField?: string | null | undefined;
@@ -2289,10 +2297,10 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
 }, {
     type: NodeKind.Function;
     name: string;
-    id?: string | undefined;
     content?: string | {
         source?: string | undefined;
     } | null | undefined;
+    id?: string | undefined;
     position?: {
         x: number;
         y: number;
@@ -2309,14 +2317,14 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
             defaultValue: z.ZodOptional<z.ZodNullable<z.ZodString>>;
         }, "strip", z.ZodTypeAny, {
             id: string;
-            defaultValue?: string | null | undefined;
             name?: string | null | undefined;
             field?: string | null | undefined;
-        }, {
             defaultValue?: string | null | undefined;
+        }, {
             id?: string | undefined;
             name?: string | null | undefined;
             field?: string | null | undefined;
+            defaultValue?: string | null | undefined;
         }>, "many">;
         outputs: z.ZodArray<z.ZodObject<{
             id: z.ZodDefault<z.ZodString>;
@@ -2331,51 +2339,51 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
         }, {
             name: string;
             field: string;
-            defaultValue?: string | null | undefined;
             id?: string | undefined;
+            defaultValue?: string | null | undefined;
         }>, "many">;
         passThrough: z.ZodEffects<z.ZodOptional<z.ZodNullable<z.ZodBoolean>>, boolean, boolean | null | undefined>;
         inputField: z.ZodEffects<z.ZodDefault<z.ZodOptional<z.ZodNullable<z.ZodString>>>, string | null, string | null | undefined>;
         outputPath: z.ZodEffects<z.ZodDefault<z.ZodOptional<z.ZodNullable<z.ZodString>>>, string | null, string | null | undefined>;
         executionMode: z.ZodEffects<z.ZodOptional<z.ZodNullable<z.ZodEnum<["single", "loop"]>>>, "single" | "loop", "single" | "loop" | null | undefined>;
     }, "strip", z.ZodTypeAny, {
-        hitPolicy: "first" | "collect";
-        rules: Record<string, string>[];
-        inputs: {
-            id: string;
-            defaultValue?: string | null | undefined;
-            name?: string | null | undefined;
-            field?: string | null | undefined;
-        }[];
-        outputs: {
-            id: string;
-            name: string;
-            field: string;
-            defaultValue?: string | null | undefined;
-        }[];
         passThrough: boolean;
         inputField: string | null;
         outputPath: string | null;
         executionMode: "single" | "loop";
+        hitPolicy: "first" | "collect";
+        rules: Record<string, string>[];
+        inputs: {
+            id: string;
+            name?: string | null | undefined;
+            field?: string | null | undefined;
+            defaultValue?: string | null | undefined;
+        }[];
+        outputs: {
+            id: string;
+            name: string;
+            field: string;
+            defaultValue?: string | null | undefined;
+        }[];
     }, {
         inputs: {
-            defaultValue?: string | null | undefined;
             id?: string | undefined;
             name?: string | null | undefined;
             field?: string | null | undefined;
+            defaultValue?: string | null | undefined;
         }[];
         outputs: {
             name: string;
             field: string;
-            defaultValue?: string | null | undefined;
             id?: string | undefined;
+            defaultValue?: string | null | undefined;
         }[];
-        hitPolicy?: "first" | "collect" | null | undefined;
-        rules?: Record<string, string | null | undefined>[] | undefined;
         passThrough?: boolean | null | undefined;
         inputField?: string | null | undefined;
         outputPath?: string | null | undefined;
         executionMode?: "single" | "loop" | null | undefined;
+        hitPolicy?: "first" | "collect" | null | undefined;
+        rules?: Record<string, string | null | undefined>[] | undefined;
     }>;
 }, {
     id: z.ZodDefault<z.ZodString>;
@@ -2392,15 +2400,18 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
     }>>;
 }>, "strip", z.ZodTypeAny, {
     type: NodeKind.DecisionTable;
-    id: string;
     content: {
+        passThrough: boolean;
+        inputField: string | null;
+        outputPath: string | null;
+        executionMode: "single" | "loop";
         hitPolicy: "first" | "collect";
         rules: Record<string, string>[];
         inputs: {
             id: string;
-            defaultValue?: string | null | undefined;
             name?: string | null | undefined;
             field?: string | null | undefined;
+            defaultValue?: string | null | undefined;
         }[];
         outputs: {
             id: string;
@@ -2408,11 +2419,8 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
             field: string;
             defaultValue?: string | null | undefined;
         }[];
-        passThrough: boolean;
-        inputField: string | null;
-        outputPath: string | null;
-        executionMode: "single" | "loop";
     };
+    id: string;
     name: string;
     position: {
         x: number;
@@ -2422,23 +2430,23 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
     type: NodeKind.DecisionTable;
     content: {
         inputs: {
-            defaultValue?: string | null | undefined;
             id?: string | undefined;
             name?: string | null | undefined;
             field?: string | null | undefined;
+            defaultValue?: string | null | undefined;
         }[];
         outputs: {
             name: string;
             field: string;
-            defaultValue?: string | null | undefined;
             id?: string | undefined;
+            defaultValue?: string | null | undefined;
         }[];
-        hitPolicy?: "first" | "collect" | null | undefined;
-        rules?: Record<string, string | null | undefined>[] | undefined;
         passThrough?: boolean | null | undefined;
         inputField?: string | null | undefined;
         outputPath?: string | null | undefined;
         executionMode?: "single" | "loop" | null | undefined;
+        hitPolicy?: "first" | "collect" | null | undefined;
+        rules?: Record<string, string | null | undefined>[] | undefined;
     };
     name: string;
     id?: string | undefined;
@@ -2493,7 +2501,6 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
     }>>;
 }>, "strip", z.ZodTypeAny, {
     type: NodeKind.Switch;
-    id: string;
     content: {
         hitPolicy: "first" | "collect";
         statements: {
@@ -2502,6 +2509,7 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
             isDefault: boolean;
         }[];
     };
+    id: string;
     name: string;
     position: {
         x: number;
@@ -2550,11 +2558,11 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
     }>>;
 }>, "strip", z.ZodTypeAny, {
     type: "customNode";
-    id: string;
     content: {
         kind: string;
         config?: any;
     };
+    id: string;
     name: string;
     position: {
         x: number;
@@ -2596,10 +2604,10 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
     }>>;
 }>, "strip", z.ZodTypeAny, {
     type: NodeKind.Input;
-    id: string;
     content: {
         schema: string;
     };
+    id: string;
     name: string;
     position: {
         x: number;
@@ -2608,10 +2616,10 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
 }, {
     type: NodeKind.Input;
     name: string;
-    id?: string | undefined;
     content?: {
         schema?: string | null | undefined;
     } | undefined;
+    id?: string | undefined;
     position?: {
         x: number;
         y: number;
@@ -2640,10 +2648,10 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
     }>>;
 }>, "strip", z.ZodTypeAny, {
     type: NodeKind.Output;
-    id: string;
     content: {
         schema: string;
     };
+    id: string;
     name: string;
     position: {
         x: number;
@@ -2652,10 +2660,10 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
 }, {
     type: NodeKind.Output;
     name: string;
-    id?: string | undefined;
     content?: {
         schema?: string | null | undefined;
     } | undefined;
+    id?: string | undefined;
     position?: {
         x: number;
         y: number;
@@ -2688,8 +2696,8 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
 }, {
     type: string;
     name: string;
-    id?: string | undefined;
     content?: any;
+    id?: string | undefined;
     position?: {
         x: number;
         y: number;
@@ -2776,10 +2784,10 @@ export declare const outputNodeSchema: z.ZodObject<z.objectUtil.extendShape<{
     }>>;
 }>, "strip", z.ZodTypeAny, {
     type: NodeKind.Output;
-    id: string;
     content: {
         schema: string;
     };
+    id: string;
     name: string;
     position: {
         x: number;
@@ -2788,10 +2796,10 @@ export declare const outputNodeSchema: z.ZodObject<z.objectUtil.extendShape<{
 }, {
     type: NodeKind.Output;
     name: string;
-    id?: string | undefined;
     content?: {
         schema?: string | null | undefined;
     } | undefined;
+    id?: string | undefined;
     position?: {
         x: number;
         y: number;
@@ -2864,9 +2872,9 @@ export declare type SimulationTrace<Trace = TraceDataVariants> = {
     order?: number;
 };
 
-export declare type SimulationTraceDataExpression = Record<string, {
+export declare type SimulationTraceDataExpression = Arrayable<Record<string, {
     result: string;
-}>;
+}>>;
 
 export declare type SimulationTraceDataFunction = {
     log?: TraceFunctionLog[];
@@ -2958,7 +2966,6 @@ export declare const switchNodeSchema: z.ZodObject<z.objectUtil.extendShape<{
     }>>;
 }>, "strip", z.ZodTypeAny, {
     type: NodeKind.Switch;
-    id: string;
     content: {
         hitPolicy: "first" | "collect";
         statements: {
@@ -2967,6 +2974,7 @@ export declare const switchNodeSchema: z.ZodObject<z.objectUtil.extendShape<{
             isDefault: boolean;
         }[];
     };
+    id: string;
     name: string;
     position: {
         x: number;
