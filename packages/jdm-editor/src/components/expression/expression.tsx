@@ -4,7 +4,6 @@ import equal from 'fast-deep-equal/es6/react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { P, match } from 'ts-pattern';
 
 import { isWasmAvailable } from '../../helpers/wasm';
 import type { ExpressionStore } from './context/expression-store.context';
@@ -78,9 +77,7 @@ const SimulateDataSync: React.FC<Pick<ExpressionProps, 'debug'>> = ({ debug }) =
     }
 
     const isLoop = (store: ExpressionStore) => {
-      return match(store.debug?.trace.traceData)
-        .with(P.array(), () => true)
-        .otherwise(() => false);
+      return store.debug?.snapshot.executionMode === 'loop';
     };
 
     const applyDebug = (state: ExpressionStore) => {
