@@ -2,7 +2,6 @@ import { Variable, VariableType } from '@gorules/zen-engine-wasm';
 import equal from 'fast-deep-equal/es6/react';
 import type React from 'react';
 import { useEffect, useRef } from 'react';
-import { P, match } from 'ts-pattern';
 import { useDebouncedCallback } from 'use-debounce';
 
 import type { SchemaSelectProps } from '../../helpers/components';
@@ -128,9 +127,7 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
     }
 
     const isLoop = (store: DecisionTableStoreType['state']) => {
-      return match(store.debug?.trace.traceData)
-        .with(P.array(), () => true)
-        .otherwise(() => false);
+      return store.debug?.snapshot.executionMode === 'loop';
     };
 
     const applyDebug = (state: DecisionTableStoreType['state']) => {
