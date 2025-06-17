@@ -1,5 +1,5 @@
 import { syntaxTree } from '@codemirror/language';
-import { Variable, generateAst, generateAstUnary } from '@gorules/zen-engine-wasm';
+import { Variable, generateAst, generateAstUnary, createVariableType } from '@gorules/zen-engine-wasm';
 import type { SyntaxNodeRef } from '@lezer/common';
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
@@ -99,12 +99,17 @@ export const NoStyle: Story = {
   ],
 };
 
-export const Debug: StoryObj<CodeEditorProps & { showEditorState: boolean; showParserState: boolean }> = {
+export const Debug: StoryObj<CodeEditorProps & { showEditorState: boolean; showParserState: boolean; showTypeInfo: boolean; }> = {
   args: {
-    showParserState: true,
+    showTypeInfo: false,
+    showParserState: false,
     showEditorState: false,
   },
   argTypes: {
+    showTypeInfo: {
+      control: 'boolean',
+      description: 'Toggle type info visibility',
+    },
     showParserState: {
       control: 'boolean',
       description: 'Toggle parser state visibility',
@@ -118,6 +123,11 @@ export const Debug: StoryObj<CodeEditorProps & { showEditorState: boolean; showP
     const { token } = theme.useToken();
     const [editorState, setEditorState] = useState('');
     const [parserState, setParserState] = useState('');
+    const [typeInfo, setTypeInfo] = useState('');
+
+    const vt = useMemo(() => {
+      return createVariableType(args.variableType);
+    }, [args.variableType]);
 
     return (
       <>
@@ -130,6 +140,11 @@ export const Debug: StoryObj<CodeEditorProps & { showEditorState: boolean; showP
               .otherwise(() => null);
 
             setParserState(ast ?? '');
+
+            const typeInfo = match(args.type)
+              .with('unary', () => vt.typeCheckUnary(expression))
+              .otherwise(() => vt.typeCheck(expression));
+            setTypeInfo(JSON.stringify(typeInfo, undefined, 2));
           }}
           onStateChange={(state) => {
             const nodes: string[] = [];
@@ -144,6 +159,22 @@ export const Debug: StoryObj<CodeEditorProps & { showEditorState: boolean; showP
             setEditorState(JSON.stringify(nodes, undefined, 2));
           }}
         />
+        {args.showTypeInfo && (
+          <div style={{ marginTop: token.marginMD }}>
+            <Typography.Text>Type Info (ZEN)</Typography.Text>
+            <div
+              style={{
+                background: token.colorBgLayout,
+                border: `1px solid ${token.colorBorder}`,
+                borderRadius: token.borderRadiusOuter,
+                padding: token.paddingSM,
+              }}
+            >
+              <Typography.Text style={{ whiteSpace: 'pre', fontFamily: 'monospace' }}>{typeInfo}</Typography.Text>
+            </div>
+          </div>
+        )}
+
         {args.showParserState && (
           <div style={{ marginTop: token.marginMD }}>
             <Typography.Text>Parser state (ZEN)</Typography.Text>
