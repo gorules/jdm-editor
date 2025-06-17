@@ -1,6 +1,5 @@
 use wasm_bindgen::prelude::wasm_bindgen;
 
-pub(crate) mod recursive_set;
 mod variable_type;
 
 #[wasm_bindgen(typescript_custom_section)]
