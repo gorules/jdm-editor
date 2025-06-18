@@ -1,5 +1,5 @@
 import { syntaxTree } from '@codemirror/language';
-import { Variable, generateAst, generateAstUnary, createVariableType } from '@gorules/zen-engine-wasm';
+import { Variable, createVariableType, generateAst, generateAstUnary } from '@gorules/zen-engine-wasm';
 import type { SyntaxNodeRef } from '@lezer/common';
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
@@ -99,7 +99,9 @@ export const NoStyle: Story = {
   ],
 };
 
-export const Debug: StoryObj<CodeEditorProps & { showEditorState: boolean; showParserState: boolean; showTypeInfo: boolean; }> = {
+export const Debug: StoryObj<
+  CodeEditorProps & { showEditorState: boolean; showParserState: boolean; showTypeInfo: boolean }
+> = {
   args: {
     showTypeInfo: false,
     showParserState: false,
