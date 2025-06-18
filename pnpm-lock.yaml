@@ -330,7 +330,7 @@ importers:
   packages/zen-engine-wasm:
     devDependencies:
       wasm-pack:
-        specifier: ^0.13.0
+        specifier: ^0.13.1
         version: 0.13.1
 
 packages:

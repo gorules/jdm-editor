@@ -28,4 +28,5 @@ export const
   and = 43,
   or = 44,
   questionOp = 47,
-  SequenceExpression = 52
+  SequenceExpression = 52,
+  AssignmentStatement = 54

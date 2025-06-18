@@ -12,10 +12,20 @@
   or @left,
   nullCoalesce @left,
   ternary @right,
+  assign @right,
   comma @left
 }
 
-@top Standard[group=autoComplete] { expression* }
+@top Standard[group=autoComplete] { statement* }
+
+statement {
+  expression ";"? |
+  AssignmentStatement
+}
+
+AssignmentStatement {
+  VariableName "=" expression ";"?
+}
 
 expression[@isGroup=Expression] {
   expressionNoComma | SequenceExpression
@@ -154,7 +164,10 @@ questionOp[@name=LogicOp] { "?" }
   @precedence { spaces, word }
 
   Number {
-    (@digit ("_" | @digit)* ("." ("_" | @digit)*)? | "." @digit ("_" | @digit)*)
+    (
+      (@digit ("_" | @digit)* ("." ("_" | @digit)*)? | "." @digit ("_" | @digit)*)
+      ($[eE] $[+\-]? @digit ("_" | @digit)*)?
+    )
   }
 
   @precedence { Number "." }
@@ -174,7 +187,7 @@ questionOp[@name=LogicOp] { "?" }
   "(" ")" "[" "]" "<" ">"
   "{" "}"
 
-  "." "," ";" ":" "@"
+  "." "," ";" ":" "@" "="
 }
 
 @detectDelim
