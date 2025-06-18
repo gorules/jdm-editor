@@ -1008,7 +1008,9 @@ dependencies = [
 
 [[package]]
 name = "zen-expression"
-version = "0.47.2"
+version = "0.48.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6049d043bea0c15227ae3d3a5b3e5125ed41842aa663eabd96f1275f5b925a20"
 dependencies = [
  "ahash 0.8.12",
  "anyhow",
