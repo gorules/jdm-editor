@@ -28,14 +28,3 @@ pub fn evaluate_unary_expression(expression: &str, context: JsValue) -> Result<b
 
     Ok(result)
 }
-
-#[wasm_bindgen(js_name = "renderTemplate")]
-pub fn render_template(template: &str, context: JsValue) -> Result<JsValue, JsError> {
-    let context_value: Value = context.into_serde()?;
-
-    Ok(JsValue::NULL)
-    // let result = zen_tmpl::render(template, context_value.into())
-    //     .map_err(|e| JsError::new(e.to_string().as_str()))?;
-    // 
-    // Ok(JsValue::from_serde(&result)?)
-}
