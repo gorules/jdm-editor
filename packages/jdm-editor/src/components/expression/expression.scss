@@ -16,7 +16,7 @@
     background: var(--grl-color-bg-container);
     grid-auto-flow: column;
     align-items: flex-start;
-    grid-template-columns: 40px minmax(240px, 1.1fr) 3fr 40px;
+    grid-template-columns: 28px minmax(240px, 1.1fr) 3fr 40px;
 
     &:focus-within {
       box-shadow: 0 0 0 1px var(--grl-color-border);
@@ -34,10 +34,6 @@
 
     &__th {
       padding: $pv $ph;
-
-      &--order {
-        height: 100%;
-      }
     }
 
     &:after {
@@ -87,14 +83,15 @@
     }
 
     &__drag {
+      width: 100%;
+      background: #F5F5F5;
       color: var(--grl-color-text-secondary);
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      padding-top: 15px;
+      padding-top: 17px;
       cursor: grab;
       height: 100%;
-      border-right: 1px solid var(--border-color);
 
       &[aria-disabled='true'] {
         cursor: not-allowed;
@@ -103,8 +100,7 @@
       &__inner {
         display: flex;
         align-content: center;
-        gap: 3px;
-        opacity: 0.5;
+        opacity: 0.4;
 
         > span {
           line-height: 1.4;
@@ -117,13 +113,14 @@
     }
 
     &__key {
-      border-right: 1px solid var(--border-color);
+      background: #F5F5F5;
 
       textarea {
+        display: block;
         border: 0;
         width: 100%;
         background-color: transparent;
-        padding: $pv $ph;
+        padding: $pv $ph $pv 0;
         border-radius: 0;
         font-family: var(--mono-font-family);
         line-height: 1.5em;

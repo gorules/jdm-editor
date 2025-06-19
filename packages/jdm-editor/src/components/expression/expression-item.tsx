@@ -12,12 +12,12 @@ import { ConfirmAction } from '../confirm-action';
 import { DiffIcon } from '../diff-icon';
 import { DiffAutosizeTextArea } from '../shared';
 import { DiffCodeEditor } from '../shared/diff-ce';
-import type { ExpressionEntry } from './context/expression-store.context';
+import type { ExpressionEntryItem } from './context/expression-store.context';
 import { useExpressionStore } from './context/expression-store.context';
 import { ExpressionItemContextMenu } from './expression-item-context-menu';
 
 export type ExpressionItemProps = {
-  expression: ExpressionEntry;
+  expression: ExpressionEntryItem;
   index: number;
   variableType?: VariableType;
 };
@@ -35,7 +35,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
     }),
   );
 
-  const onChange = (update: Partial<Omit<ExpressionEntry, 'id'>>) => {
+  const onChange = (update: Partial<Omit<ExpressionEntryItem, 'id'>>) => {
     updateRow(index, update);
   };
 
@@ -80,12 +80,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
       <div ref={dragRef} className='expression-list-item__drag' aria-disabled={!configurable || disabled}>
         <div className='expression-list-item__drag__inner'>
           {expression?._diff?.status ? (
-            <DiffIcon
-              status={expression?._diff?.status}
-              style={{
-                fontSize: 16,
-              }}
-            />
+            <DiffIcon status={expression?._diff?.status} style={{ fontSize: 16 }} />
           ) : (
             <GripVerticalIcon size={10} />
           )}
@@ -93,20 +88,21 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
       </div>
       <div
         className='expression-list-item__key'
-        onClick={(e) => {
-          if (e.target instanceof HTMLTextAreaElement) {
-            return;
-          }
-
-          const inputElement = e.currentTarget.querySelector<HTMLTextAreaElement>('textarea');
-          if (!inputElement) {
-            return;
-          }
-
-          inputElement.focus();
-          const inputLength = inputElement.value.length;
-          inputElement.setSelectionRange(inputLength, inputLength);
-        }}
+        aria-disabled={!configurable || disabled}
+        // onClick={(e) => {
+        //   if (e.target instanceof HTMLTextAreaElement) {
+        //     return;
+        //   }
+        //
+        //   const inputElement = e.currentTarget.querySelector<HTMLTextAreaElement>('textarea');
+        //   if (!inputElement) {
+        //     return;
+        //   }
+        //
+        //   inputElement.focus();
+        //   const inputLength = inputElement.value.length;
+        //   inputElement.setSelectionRange(inputLength, inputLength);
+        // }}
       >
         <ExpressionItemContextMenu index={index}>
           <DiffAutosizeTextArea
@@ -122,7 +118,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
           />
         </ExpressionItemContextMenu>
       </div>
-      <div className='expression-list-item__code'>
+      <div className='expression-list-item__code' style={{ position: 'relative' }}>
         <ExpressionItemContextMenu index={index}>
           <div>
             <DiffCodeEditor
@@ -169,7 +165,7 @@ const LivePreview = React.memo<{ id: string; value: string }>(({ id, value }) =>
   );
 });
 
-const ResultOverlay: React.FC<{ expression: ExpressionEntry }> = ({ expression }) => {
+const ResultOverlay: React.FC<{ expression: ExpressionEntryItem }> = ({ expression }) => {
   const { trace } = useExpressionStore(({ debug, debugIndex }) => ({
     trace: getTrace(debug?.trace?.traceData, debugIndex)?.[expression.key]?.result,
   }));

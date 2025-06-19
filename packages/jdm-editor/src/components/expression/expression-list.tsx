@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 
 import { isWasmAvailable } from '../../helpers/wasm';
 import { useExpressionStore } from './context/expression-store.context';
+import { ExpressionGroup } from './expression-group';
 import { ExpressionItem } from './expression-item';
 
 export type ExpressionListProps = {
@@ -56,6 +57,32 @@ export const ExpressionList: React.FC<ExpressionListProps> = ({}) => {
           </Typography.Text>
           <div />
         </div>
+        {(expressions || []).map((expression, index) => (
+          <ExpressionItem key={expression.id} expression={expression} index={index} variableType={variableType} />
+        ))}
+        <ExpressionGroup
+          index={4}
+          group={{
+            id: '123',
+            rules: [
+              {
+                if: 'hello world',
+                then: [
+                  {
+                    id: '1',
+                    key: 'customer.firstName',
+                    value: '"hello world"',
+                  },
+                  {
+                    id: '1',
+                    key: 'customer.lastName',
+                    value: '"hello world"',
+                  },
+                ],
+              },
+            ],
+          }}
+        />
         {(expressions || []).map((expression, index) => (
           <ExpressionItem key={expression.id} expression={expression} index={index} variableType={variableType} />
         ))}

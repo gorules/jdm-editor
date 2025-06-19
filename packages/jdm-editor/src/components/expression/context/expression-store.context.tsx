@@ -17,12 +17,22 @@ const ExpressionStoreContext = React.createContext<
   }
 >({} as any);
 
-export type ExpressionEntry = {
+export type ExpressionEntry = ExpressionEntryItem | ExpressionEntryGroup;
+
+export type ExpressionEntryItem = {
   id: string;
   key: string;
   value: string;
   _diff?: DiffMetadata;
-};
+}
+
+export type ExpressionEntryGroup = {
+  id: string;
+  rules: {
+    if?: string;
+    then: ExpressionEntry[];
+  }[];
+}
 
 export type ExpressionStore = {
   configurable: boolean;
