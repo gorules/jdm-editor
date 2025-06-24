@@ -30,10 +30,11 @@ export type PanelType = {
 type DraftUpdateCallback<T> = (draft: WritableDraft<T>) => WritableDraft<T>;
 
 export type ViewConfigPermission = 'edit:values' | 'edit:rules' | 'edit:full';
+
 export type ViewConfig = {
   enabled: boolean;
   description?: string;
-  permissions: Record<string, ViewConfigPermission>;
+  permissions?: Record<string, ViewConfigPermission | null | undefined> | null;
 };
 
 export enum NodeTypeKind {

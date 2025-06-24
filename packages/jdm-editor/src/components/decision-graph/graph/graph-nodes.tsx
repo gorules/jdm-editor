@@ -114,33 +114,58 @@ export const GraphNodes: React.FC<GraphComponentsProps> = React.memo(({ classNam
     ];
   }, [search, nodes]);
 
+  const isEmpty = (nodes?.length || 0) === 0;
+
   return (
     <div className={clsx(['grl-dg__view', className])}>
       <div className={'grl-dg__view__content'}>
         <div className={'grl-dg__view__content__heading'}>
           <Title level={4} style={{ margin: 0, marginBottom: '8px' }}>
-            Decision View
+            {isEmpty ? 'Decision View Not Configured' : 'Decision View'}
           </Title>
-          <Text type='secondary'>{viewConfig?.description || 'Configure business rules for your decision model'}</Text>
+          {!isEmpty ? (
+            <Text type='secondary'>
+              {viewConfig?.description || 'Configure business rules for your decision model'}
+            </Text>
+          ) : (
+            <>
+              {decisionGraph?.nodes?.length > 0 ? (
+                <Text type='secondary'>
+                  This decision model contains multiple components, but no view has been configured yet.
+                </Text>
+              ) : (
+                <Text type='secondary'>{`This decision model doesn't contain any component.`}</Text>
+              )}
+            </>
+          )}
         </div>
 
-        <div className={'grl-dg__view__content__search'}>
-          <Space>
-            <Input
-              placeholder='Search configurations...'
-              prefix={<SearchOutlined />}
-              style={{ width: '400px' }}
-              onChange={(e) => setSearch(e.target.value)}
-              value={search}
-            />
-            {search?.trim()?.length > 0 && (
-              <Button type='text' size={'small'} icon={<CloseOutlined />} onClick={() => setSearch('')}>
-                Clear
-              </Button>
-            )}
-          </Space>
-          <Text type='secondary'>{nodes?.length || 0} configurable items</Text>
-        </div>
+        {!isEmpty && (
+          <div className={'grl-dg__view__content__search'}>
+            <Space>
+              <Input
+                placeholder='Search nodes'
+                prefix={<SearchOutlined />}
+                style={{ width: 350 }}
+                onChange={(e) => setSearch(e.target.value)}
+                value={search}
+              />
+              {search?.trim()?.length > 0 && (
+                <Button type='text' size={'small'} icon={<CloseOutlined />} onClick={() => setSearch('')}>
+                  Clear
+                </Button>
+              )}
+            </Space>
+            <Text
+              type='secondary'
+              style={{
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {nodes?.length || 0} configurable items
+            </Text>
+          </div>
+        )}
 
         {nodeGroups
           .filter((group) => group?.nodes?.length > 0)
