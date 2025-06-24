@@ -11,6 +11,7 @@ import { GraphPanel } from './dg-panel';
 import './dg.scss';
 import type { GraphRef } from './graph/graph';
 import { Graph } from './graph/graph';
+import { GraphNodes } from './graph/graph-nodes';
 import { GraphSideToolbar } from './graph/graph-side-toolbar';
 import type { GraphTabsProps } from './graph/graph-tabs';
 import { GraphTabs } from './graph/graph-tabs';
@@ -32,8 +33,8 @@ export const DecisionGraphWrapper = React.memo(
     ref,
   ) {
     const [disableTabs, setDisableTabs] = useState(false);
-    const hasActiveNode = useDecisionGraphState(({ decisionGraph, activeTab }) => {
-      return (decisionGraph?.nodes ?? []).some((node) => node.id === activeTab);
+    const { hasActiveNode, viewConfig } = useDecisionGraphState(({ decisionGraph, activeTab, viewConfig }) => {
+      return { hasActiveNode: (decisionGraph?.nodes ?? []).some((node) => node.id === activeTab), viewConfig };
     });
 
     return (
@@ -41,12 +42,14 @@ export const DecisionGraphWrapper = React.memo(
         <GraphSideToolbar />
         <div className={'grl-dg__graph'}>
           <GraphTabs disabled={disableTabs} tabBarExtraContent={tabBarExtraContent} />
+
           <Graph
             ref={ref}
-            className={clsx([!hasActiveNode && 'active'])}
+            className={clsx([!hasActiveNode && !viewConfig?.enabled && 'active'])}
             reactFlowProOptions={reactFlowProOptions}
             onDisableTabs={setDisableTabs}
           />
+          <GraphNodes className={clsx([!hasActiveNode && viewConfig?.enabled && 'active'])} />
           <TabContents />
         </div>
         <GraphPanel />

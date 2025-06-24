@@ -19,9 +19,16 @@ export type FunctionDebuggerProps = {
   editor?: editor.IStandaloneCodeEditor;
   editorValue?: string;
   libraries: FunctionLibrary[];
+  disabled?: boolean;
 };
 
-export const FunctionDebugger: React.FC<FunctionDebuggerProps> = ({ trace, editor, libraries = [], editorValue }) => {
+export const FunctionDebugger: React.FC<FunctionDebuggerProps> = ({
+  trace,
+  editor,
+  libraries = [],
+  editorValue,
+  disabled,
+}) => {
   const traceLog = trace?.traceData?.log || [];
   const [activeTab, setActiveTab] = useState<TabKey>(TabKey.Console);
 
@@ -72,6 +79,7 @@ export const FunctionDebugger: React.FC<FunctionDebuggerProps> = ({ trace, edito
                   <FunctionLibraryItem
                     key={lib.name}
                     lib={lib}
+                    disabled={disabled}
                     editorValue={editorValue}
                     onImport={() => {
                       if (!editor) {
@@ -92,11 +100,12 @@ export const FunctionDebugger: React.FC<FunctionDebuggerProps> = ({ trace, edito
   );
 };
 
-const FunctionLibraryItem: React.FC<{ lib: FunctionLibrary; onImport?: () => void; editorValue?: string }> = ({
-  lib,
-  onImport,
-  editorValue,
-}) => {
+const FunctionLibraryItem: React.FC<{
+  lib: FunctionLibrary;
+  onImport?: () => void;
+  editorValue?: string;
+  disabled?: boolean;
+}> = ({ lib, onImport, editorValue, disabled }) => {
   const canImport = useMemo(() => {
     if (!editorValue) {
       return true;
@@ -114,7 +123,13 @@ const FunctionLibraryItem: React.FC<{ lib: FunctionLibrary; onImport?: () => voi
       </Typography.Text>
       <div className='grl-function__libraries__item__actions'>
         <Tooltip title='Import library' placement='bottomLeft'>
-          <Button type='text' size='small' icon={<PlusOutlined />} disabled={!canImport} onClick={onImport} />
+          <Button
+            type='text'
+            size='small'
+            icon={<PlusOutlined />}
+            disabled={!canImport || disabled}
+            onClick={onImport}
+          />
         </Tooltip>
         <Tooltip title='Go to documentation' placement='bottomLeft'>
           <Button

@@ -50,9 +50,9 @@ export const Table: React.FC<TableProps> = ({ id, maxHeight }) => {
   const { cellRenderer } = useDecisionTableListeners(({ cellRenderer }) => ({ cellRenderer }));
   const [columnSizing, setColumnSizing] = useState<ColumnSizing>(() => loadColumnSizing(id));
 
-  const { configurable, disabled, inputs, outputs, colWidth, minColWidth } = useDecisionTableState(
-    ({ configurable, disabled, minColWidth, colWidth, decisionTable }) => ({
-      configurable,
+  const { permission, disabled, inputs, outputs, colWidth, minColWidth } = useDecisionTableState(
+    ({ permission, disabled, minColWidth, colWidth, decisionTable }) => ({
+      permission,
       disabled,
       minColWidth,
       colWidth,
@@ -79,7 +79,7 @@ export const Table: React.FC<TableProps> = ({ id, maxHeight }) => {
         minSize: minColWidth,
         size: colWidth,
         enableResizing: true,
-        header: () => <TableHeadCellInput configurable={configurable} disabled={disabled} />,
+        header: () => <TableHeadCellInput permission={permission} disabled={disabled} />,
         columns: [
           ...(inputs || []).map((input: any) => {
             return {
@@ -87,7 +87,7 @@ export const Table: React.FC<TableProps> = ({ id, maxHeight }) => {
               id: input.id,
               minSize: minColWidth,
               size: colWidth,
-              header: () => <TableHeadCellInputField schema={input} configurable={configurable} disabled={disabled} />,
+              header: () => <TableHeadCellInputField schema={input} permission={permission} disabled={disabled} />,
             };
           }),
         ],
@@ -96,16 +96,14 @@ export const Table: React.FC<TableProps> = ({ id, maxHeight }) => {
         id: 'outputs',
         minSize: minColWidth,
         size: minColWidth,
-        header: () => <TableHeadCellOutput disabled={disabled} configurable={configurable} />,
+        header: () => <TableHeadCellOutput disabled={disabled} permission={permission} />,
         columns: [
           ...(outputs || []).map((output: any) => {
             return {
               accessorKey: output.id,
               minSize: minColWidth,
               size: colWidth,
-              header: () => (
-                <TableHeadCellOutputField schema={output} configurable={configurable} disabled={disabled} />
-              ),
+              header: () => <TableHeadCellOutputField schema={output} permission={permission} disabled={disabled} />,
             };
           }),
         ],
@@ -122,7 +120,7 @@ export const Table: React.FC<TableProps> = ({ id, maxHeight }) => {
         size: colWidth,
       },
     ],
-    [configurable, disabled, inputs, outputs],
+    [permission, disabled, inputs, outputs],
   );
 
   const table = useReactTable({

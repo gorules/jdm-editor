@@ -616,6 +616,82 @@
     pointer-events: all;
     z-index: 1000;
   }
+
+  &__view {
+    padding: 24px;
+    background-color: var(--grl-color-bg-layout);
+    height: 100%;
+    overflow-y: auto;
+
+    flex: 1;
+    width: 100%;
+    position: relative;
+    display: none;
+    min-height: 0;
+
+    &.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    &:focus,
+    &:focus-within {
+      outline: none;
+    }
+
+    &__content {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+
+      &__heading {
+        margin-bottom: 24px;
+      }
+
+      &__search {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+      }
+
+      &__node-groups {
+        margin-bottom: 32px;
+      }
+    }
+
+    .config-item-card {
+      border-radius: 8px;
+      border: 1px solid var(--grl-color-border);
+
+      &__content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      &:hover {
+        border-color: var(--grl-color-border-hover);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      &.success {
+        --node-background: var(--grl-color-success-bg);
+      }
+
+      &.error {
+        --node-background: var(--grl-color-error-bg);
+      }
+
+      &.modified {
+        border-color: var(--grl-color-warning) !important;
+
+        &:hover {
+          border-color: var(--grl-color-warning) !important;
+        }
+      }
+    }
+  }
 }
 
 .grl-edge-delete-button {

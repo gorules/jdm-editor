@@ -24,9 +24,12 @@ export type ExpressionEntry = {
   _diff?: DiffMetadata;
 };
 
+export type ExpressionPermission = 'edit:full' | 'edit:values' | 'view';
+
 export type ExpressionStore = {
-  configurable: boolean;
   disabled: boolean;
+
+  permission?: ExpressionPermission;
 
   addRowAbove: (index?: number, data?: Partial<ExpressionEntry>) => void;
   addRowBelow: (index?: number, data?: Partial<ExpressionEntry>) => void;
@@ -66,7 +69,6 @@ export const ExpressionStoreProvider: React.FC<React.PropsWithChildren<Expressio
   const store = useMemo(
     () =>
       create<ExpressionStore>((set) => ({
-        configurable: true,
         disabled: false,
         debugIndex: 0,
         addRowAbove: (index = 0) => {

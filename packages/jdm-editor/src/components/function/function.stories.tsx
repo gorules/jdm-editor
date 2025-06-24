@@ -58,6 +58,10 @@ const meta: Meta<typeof Function> = {
     defaultValue: { control: 'text' },
     inputData: { control: 'object' },
     value: { table: { disable: true } },
+    permission: {
+      control: 'select',
+      options: ['edit:full'],
+    },
   },
 };
 

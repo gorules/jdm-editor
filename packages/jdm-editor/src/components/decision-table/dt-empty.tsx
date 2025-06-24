@@ -24,11 +24,11 @@ export type DecisionTableEmptyType = {
   defaultValue?: DecisionTableType;
   value?: DecisionTableType;
   disabled?: boolean;
-  configurable?: boolean;
   disableHitPolicy?: boolean;
   cellRenderer?: (props: TableCellProps) => JSX.Element | null | undefined;
   inputsSchema?: SchemaSelectProps[];
   outputsSchema?: SchemaSelectProps[];
+  permission?: DecisionTableStoreType['state']['permission'];
   debug?: {
     trace: SimulationTrace<SimulationTraceDataTable>;
     inputData?: GetNodeDataResult;
@@ -45,7 +45,6 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
   defaultValue,
   value,
   disabled = false,
-  configurable = true,
   disableHitPolicy = false,
   inputsSchema,
   outputsSchema,
@@ -53,6 +52,7 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
   colWidth,
   minColWidth,
   cellRenderer,
+  permission = 'edit:full',
   onChange,
 }) => {
   const mountedRef = useRef(false);
@@ -71,14 +71,14 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
       id,
       name,
       disabled,
-      configurable,
       disableHitPolicy,
       inputsSchema,
       outputsSchema,
       colWidth: colWidth || 200,
       minColWidth: minColWidth || 150,
+      permission,
     });
-  }, [id, name, disabled, configurable, disableHitPolicy, inputsSchema, minColWidth, colWidth, outputsSchema]);
+  }, [id, name, disabled, disableHitPolicy, inputsSchema, minColWidth, colWidth, outputsSchema, permission]);
 
   useEffect(() => {
     listenerStore.setState({

@@ -18,25 +18,27 @@ export type TabDecisionTableProps = {
 
 export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager }) => {
   const graphActions = useDecisionGraphActions();
-  const { nodeName, nodeTrace, inputData, nodeSnapshot } = useDecisionGraphState(({ simulate, decisionGraph }) => ({
-    nodeName: decisionGraph.nodes.find((n) => n.id === id)?.name,
-    nodeTrace: match(simulate)
-      .with({ result: P.nonNullable }, ({ result }) => result.trace[id] as SimulationTrace<SimulationTraceDataTable>)
-      .otherwise(() => null),
-    inputData: match(simulate)
-      .with({ result: P.nonNullable }, ({ result }) => getNodeData(id, { trace: result.trace, decisionGraph }))
-      .otherwise(() => null),
-    nodeSnapshot: match(simulate)
-      .with(
-        { result: P.nonNullable },
-        ({ result }) => result.snapshot.nodes.find((n) => n.id === id)?.content as DecisionTableType,
-      )
-      .otherwise(() => null),
-  }));
+  const { nodeName, nodeTrace, inputData, nodeSnapshot, viewConfig } = useDecisionGraphState(
+    ({ simulate, decisionGraph, viewConfig }) => ({
+      nodeName: decisionGraph.nodes.find((n) => n.id === id)?.name,
+      nodeTrace: match(simulate)
+        .with({ result: P.nonNullable }, ({ result }) => result.trace[id] as SimulationTrace<SimulationTraceDataTable>)
+        .otherwise(() => null),
+      inputData: match(simulate)
+        .with({ result: P.nonNullable }, ({ result }) => getNodeData(id, { trace: result.trace, decisionGraph }))
+        .otherwise(() => null),
+      nodeSnapshot: match(simulate)
+        .with(
+          { result: P.nonNullable },
+          ({ result }) => result.snapshot.nodes.find((n) => n.id === id)?.content as DecisionTableType,
+        )
+        .otherwise(() => null),
+      viewConfig,
+    }),
+  );
 
-  const { disabled, configurable, content } = useDecisionGraphState(({ disabled, configurable, decisionGraph }) => ({
+  const { disabled, content } = useDecisionGraphState(({ disabled, decisionGraph }) => ({
     disabled,
-    configurable,
     content: (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content as NodeDecisionTableData,
   }));
 
@@ -65,7 +67,7 @@ export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager 
       value={content as any}
       manager={manager}
       disabled={disabled}
-      configurable={configurable}
+      permission={viewConfig?.enabled ? viewConfig?.permissions?.[id] : 'edit:full'}
       debug={debug}
       onChange={(val) => {
         graphActions.updateNode(id, (draft) => {

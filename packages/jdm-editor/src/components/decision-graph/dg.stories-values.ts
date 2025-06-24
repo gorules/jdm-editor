@@ -136,8 +136,8 @@ export const defaultGraph = {
       id: 'a750cebf-ca75-4acd-a272-7040626abd73',
       name: 'expression1',
       position: {
-        x: 355,
-        y: 75,
+        x: 370,
+        y: 145,
       },
     },
   ],
@@ -151,6 +151,18 @@ export const defaultGraph = {
     {
       id: 'c5d49d3a-fdfd-4f4b-8838-791cee4d4a55',
       sourceId: '359173d8-0068-45f8-bb71-8240ad73201d',
+      type: 'edge',
+      targetId: 'c5e747fe-b74b-4b74-9fd0-bfd7d67007c3',
+    },
+    {
+      id: '9600509a-8f11-44eb-a835-5f0b5e6e91a5',
+      sourceId: 'ca98730e-a40f-4601-98cc-b5a57429596d',
+      type: 'edge',
+      targetId: 'a750cebf-ca75-4acd-a272-7040626abd73',
+    },
+    {
+      id: '6e763bcd-af53-41d3-8434-aded3f664384',
+      sourceId: 'a750cebf-ca75-4acd-a272-7040626abd73',
       type: 'edge',
       targetId: 'c5e747fe-b74b-4b74-9fd0-bfd7d67007c3',
     },

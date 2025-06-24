@@ -21,11 +21,14 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
   const excelFileInput = useRef<HTMLInputElement>(null);
 
   const { setDecisionGraph, setActivePanel } = useDecisionGraphActions();
-  const { disabled, panels, activePanel } = useDecisionGraphState(({ disabled, panels, activePanel }) => ({
-    disabled,
-    panels,
-    activePanel,
-  }));
+  const { disabled, panels, activePanel, viewConfig } = useDecisionGraphState(
+    ({ disabled, panels, activePanel, viewConfig }) => ({
+      disabled,
+      panels,
+      activePanel,
+      viewConfig,
+    }),
+  );
 
   const handleUploadInput = async (event: any) => {
     const fileList = event?.target?.files as FileList;
@@ -147,11 +150,12 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
 
   const downloadJDMExcel = async () => {
     try {
-      const { name, decisionGraph } = decisionGraphRaw.stateStore.getState();
+      const { name, decisionGraph, viewConfig } = decisionGraphRaw.stateStore.getState();
       const fileName = name.replaceAll('.json', '');
 
       const decisionTableNodes = decisionGraph.nodes
         .filter((node) => node.type === NodeKind.DecisionTable)
+        .filter((node) => (viewConfig?.enabled ? !!viewConfig?.permissions?.[node.id] : true))
         .map((decisionTable) => ({
           ...decisionTable.content,
           id: decisionTable.id,
@@ -166,7 +170,7 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
   };
 
   const uploadItems: MenuProps['items'] = [
-    {
+    !viewConfig?.enabled && {
       key: 'upload-json',
       label: 'Upload JSON',
       onClick: () => fileInput?.current?.click?.(),
@@ -176,10 +180,10 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
       label: 'Upload Excel',
       onClick: () => excelFileInput?.current?.click?.(),
     },
-  ];
+  ].filter((item) => !!item);
 
   const downloadItems: MenuProps['items'] = [
-    {
+    !viewConfig?.enabled && {
       key: 'download-json',
       label: 'Download JSON',
       onClick: () => downloadJDM(),
@@ -189,7 +193,7 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
       label: 'Download Excel',
       onClick: () => downloadJDMExcel(),
     },
-  ];
+  ].filter((item) => !!item);
 
   return (
     <div className={'grl-dg__aside'}>

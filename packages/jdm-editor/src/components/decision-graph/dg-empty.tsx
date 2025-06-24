@@ -17,12 +17,13 @@ export type DecisionGraphEmptyType = {
   value?: DecisionGraphType;
 
   disabled?: boolean;
-  configurable?: boolean;
 
   components?: DecisionGraphStoreType['state']['components'];
   customNodes?: DecisionGraphStoreType['state']['customNodes'];
 
   name?: DecisionGraphStoreType['state']['name'];
+
+  viewConfig?: DecisionGraphStoreType['state']['viewConfig'];
 
   defaultActivePanel?: string;
   panels?: DecisionGraphStoreType['state']['panels'];
@@ -43,13 +44,13 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
   value,
   name,
   disabled = false,
-  configurable = true,
   onChange,
   components,
   customNodes,
   defaultActivePanel,
   panels,
   simulate,
+  viewConfig,
   onPanelsChange,
   onReactFlowInit,
   onCodeExtension,
@@ -58,8 +59,10 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
   const mountedRef = useRef(false);
   const graphActions = useDecisionGraphActions();
   const { stateStore, listenerStore } = useDecisionGraphRaw();
-  const { decisionGraph } = useDecisionGraphState(({ decisionGraph }) => ({
+  const { decisionGraph, openTabs, activeTab } = useDecisionGraphState(({ decisionGraph, openTabs, activeTab }) => ({
     decisionGraph,
+    openTabs,
+    activeTab,
   }));
 
   const innerChange = useDebouncedCallback((graph: DecisionGraphType) => {
@@ -67,15 +70,26 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
   }, 100);
 
   useEffect(() => {
+    if (viewConfig?.enabled) {
+      const filtered = openTabs.filter((tab) => !!viewConfig?.permissions?.[tab]);
+
+      stateStore.setState({
+        openTabs: filtered,
+        activeTab: !!viewConfig?.permissions?.[activeTab] ? activeTab : 'graph',
+      });
+    }
+  }, [viewConfig]);
+
+  useEffect(() => {
     stateStore.setState({
       id,
       disabled,
-      configurable,
       components: Array.isArray(components) ? components : [],
       customNodes: Array.isArray(customNodes) ? customNodes : [],
       panels,
+      viewConfig: viewConfig,
     });
-  }, [id, disabled, configurable, components, customNodes, panels]);
+  }, [id, disabled, components, customNodes, panels, viewConfig]);
 
   useEffect(() => {
     stateStore.setState({ name: name ?? 'graph.json' });

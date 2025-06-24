@@ -40,6 +40,10 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
   const [search, setSearch] = usePersistentState<string>('simulation.search', '');
   const [segment, setSegment] = usePersistentState<SimulationSegment>('simulation.segment', SimulationSegment.Output);
 
+  const { viewConfig } = useDecisionGraphState((state) => ({
+    viewConfig: state.viewConfig,
+  }));
+
   const { actions } = useDecisionGraphRaw();
   const { nodeTypes, simulate, hasInputNode } = useDecisionGraphState(({ decisionGraph, simulate }) => ({
     simulate,
@@ -65,6 +69,7 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
     }
 
     return Object.entries(simulate.result?.trace ?? {})
+      .filter(([id]) => (viewConfig?.enabled ? !!viewConfig?.permissions?.[id] : true))
       .map(([key, data]) => ({ ...data, nodeId: key }))
       .filter((t) => ![NodeKind.Input].includes(nodeTypes?.[t.nodeId] as NodeKind))
       .filter((t) => t.name.toLowerCase().includes(search?.toLowerCase() ?? ''))

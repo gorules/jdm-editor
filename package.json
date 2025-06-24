@@ -14,7 +14,7 @@
     "format:fix": "run-s lint:fix prettier:fix"
   },
   "engines": {
-    "pnpm": "~9"
+    "pnpm": "~10"
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.8",

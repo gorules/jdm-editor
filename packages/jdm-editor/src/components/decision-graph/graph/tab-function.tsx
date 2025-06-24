@@ -4,6 +4,7 @@ import React, { Suspense, useEffect, useMemo, useState } from 'react';
 import { P, match } from 'ts-pattern';
 
 import { useNodeType } from '../../../helpers/node-type';
+import type { FunctionPermission } from '../../function';
 import {
   useDecisionGraphActions,
   useDecisionGraphListeners,
@@ -28,8 +29,8 @@ export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
   const onFunctionReady = useDecisionGraphListeners((s) => s.onFunctionReady);
   const [monaco, setMonaco] = useState<Monaco>();
   const nodeType = useNodeType(id);
-  const { nodeTrace, disabled, content, nodeError } = useDecisionGraphState(
-    ({ simulate, disabled, configurable, decisionGraph }) => ({
+  const { nodeTrace, disabled, content, nodeError, viewConfig } = useDecisionGraphState(
+    ({ simulate, disabled, decisionGraph, viewConfig }) => ({
       nodeTrace: match(simulate)
         .with({ result: P._ }, ({ result }) => result?.trace?.[id])
         .otherwise(() => null),
@@ -37,8 +38,8 @@ export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
         .with({ error: { data: { nodeId: id } } }, ({ error }) => error)
         .otherwise(() => null),
       disabled,
-      configurable,
       content: (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content,
+      viewConfig,
     }),
   );
 
@@ -73,6 +74,7 @@ export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
         previousValue={typeof previousValue === 'string' ? previousValue : undefined}
         error={nodeError ?? undefined}
         inputData={nodeType}
+        permission={(viewConfig?.enabled ? viewConfig?.permissions?.[id] : 'edit:full') as FunctionPermission}
         onChange={(val) => {
           graphActions.updateNode(id, (draft) => {
             if (kind === FunctionKind.Stable) {
