@@ -95,7 +95,7 @@ export const GraphNodes: React.FC<GraphComponentsProps> = React.memo(({ classNam
 
   const nodeGroups = useMemo(() => {
     const filtered = nodes.filter((node) =>
-      search.trim()?.length > 0 ? node.name?.indexOf?.(search?.trim?.()) > -1 : true,
+      search.trim()?.length > 0 ? node.name?.toLowerCase?.()?.indexOf?.(search?.trim?.()?.toLowerCase?.()) > -1 : true,
     );
 
     return [
