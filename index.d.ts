@@ -160,6 +160,8 @@ export declare const codemirror: {
     linter: typeof linter;
 };
 
+declare type ColumnType = 'inputs' | 'outputs';
+
 export declare const compareAndUnifyLists: <T extends BaseItem>(newList: T[], oldList: T[], options?: DiffOptions<T>) => T[];
 
 export declare const compareStringFields: (field1?: string | null, field2?: string | null) => boolean;
@@ -293,10 +295,12 @@ declare type DecisionGraphEmptyType = {
     defaultValue?: DecisionGraphType;
     value?: DecisionGraphType;
     disabled?: boolean;
-    configurable?: boolean;
     components?: DecisionGraphStoreType['state']['components'];
     customNodes?: DecisionGraphStoreType['state']['customNodes'];
     name?: DecisionGraphStoreType['state']['name'];
+    viewConfigCta?: DecisionGraphStoreType['state']['viewConfigCta'];
+    viewConfig?: DecisionGraphStoreType['state']['viewConfig'];
+    onViewConfigCta?: DecisionGraphStoreType['listeners']['onViewConfigCta'];
     defaultActivePanel?: string;
     panels?: DecisionGraphStoreType['state']['panels'];
     onPanelsChange?: DecisionGraphStoreType['listeners']['onPanelsChange'];
@@ -318,11 +322,12 @@ declare type DecisionGraphStoreType = {
         id?: string;
         components: NodeSpecification[];
         disabled?: boolean;
-        configurable?: boolean;
         decisionGraph: DecisionGraphType;
         hoveredEdgeId: string | null;
         openTabs: string[];
         activeTab: string;
+        viewConfigCta?: string;
+        viewConfig?: ViewConfig;
         name: string;
         customNodes: CustomNodeSpecification<object, any>[];
         panels?: PanelType[];
@@ -371,6 +376,7 @@ declare type DecisionGraphStoreType = {
         onReactFlowInit?: (instance: ReactFlowInstance) => void;
         onCodeExtension?: CodeEditorProps['extension'];
         onFunctionReady?: (monaco: Monaco) => void;
+        onViewConfigCta?: () => void;
     };
 };
 
@@ -1382,11 +1388,11 @@ declare type DecisionTableEmptyType = {
     defaultValue?: DecisionTableType;
     value?: DecisionTableType;
     disabled?: boolean;
-    configurable?: boolean;
     disableHitPolicy?: boolean;
     cellRenderer?: (props: TableCellProps) => JSX.Element | null | undefined;
     inputsSchema?: SchemaSelectProps[];
     outputsSchema?: SchemaSelectProps[];
+    permission?: DecisionTableStoreType['state']['permission'];
     debug?: {
         trace: SimulationTrace<SimulationTraceDataTable>;
         inputData?: GetNodeDataResult;
@@ -1396,6 +1402,8 @@ declare type DecisionTableEmptyType = {
     colWidth?: number;
     onChange?: (val: DecisionTableType) => void;
 };
+
+declare type DecisionTablePermission = 'edit:full' | 'edit:rules' | 'edit:values';
 
 export declare type DecisionTableProps = {
     id?: string;
@@ -1555,6 +1563,50 @@ export declare const decisionTableSchema: z.ZodObject<z.objectUtil.extendShape<{
     } | undefined;
 }>;
 
+declare type DecisionTableStoreType = {
+    state: {
+        id?: string;
+        name?: string;
+        decisionTable: DecisionTableType;
+        cursor: TableCursor | null;
+        disabled: boolean;
+        disableHitPolicy: boolean;
+        minColWidth: number;
+        colWidth: number;
+        permission?: DecisionTablePermission;
+        inputVariableType?: VariableType;
+        derivedVariableTypes: Record<string, VariableType>;
+        inputsSchema?: SchemaSelectProps[];
+        outputsSchema?: SchemaSelectProps[];
+        debugIndex: number;
+        calculatedInputData?: Variable;
+        debug?: {
+            snapshot: DecisionTableType;
+            trace: SimulationTrace<SimulationTraceDataTable>;
+            inputData?: GetNodeDataResult;
+        };
+    };
+    actions: {
+        setDecisionTable: (val: DecisionTableType) => void;
+        setCursor: (cursor: TableCursor | null) => void;
+        commitData: (data: string, cursor: TableCursor) => void;
+        swapRows: (source: number, target: number) => void;
+        addRowAbove: (target?: number) => void;
+        addRowBelow: (target?: number) => void;
+        removeRow: (target?: number) => void;
+        addColumn: (type: ColumnType, column: TableSchemaItem) => void;
+        updateColumn: (type: ColumnType, id: string, column: TableSchemaItem) => void;
+        removeColumn: (type: ColumnType, id: string) => void;
+        reorderColumns: (type: ColumnType, columns: TableSchemaItem[]) => void;
+        updateHitPolicy: (hitPolicy: HitPolicy) => void;
+    };
+    listeners: {
+        onChange?: (val: DecisionTableType) => void;
+        cellRenderer?: (props: TableCellProps) => default_2.ReactNode | null | undefined;
+        onColumnResize?: () => void;
+    };
+};
+
 export declare type DecisionTableType = {
     hitPolicy: HitPolicy | string;
     passThorough?: boolean;
@@ -1692,9 +1744,9 @@ declare type ExposedStore<T> = UseBoundStore<StoreApi<T>> & {
 export declare const Expression: default_2.FC<ExpressionProps>;
 
 declare type ExpressionControllerProps = {
-    configurable?: boolean;
     disabled?: boolean;
     defaultValue?: ExpressionEntry[];
+    permission?: ExpressionStore['permission'];
     value?: ExpressionEntry[];
     onChange?: (value: ExpressionEntry[]) => void;
 };
@@ -1800,6 +1852,8 @@ export declare const expressionNodeSchema: z.ZodObject<z.objectUtil.extendShape<
     } | undefined;
 }>;
 
+declare type ExpressionPermission = 'edit:full' | 'edit:values' | 'view';
+
 export declare type ExpressionProps = {
     manager?: DragDropManager;
     debug?: ExpressionStore['debug'];
@@ -1807,8 +1861,8 @@ export declare type ExpressionProps = {
 } & ExpressionControllerProps;
 
 declare type ExpressionStore = {
-    configurable: boolean;
     disabled: boolean;
+    permission?: ExpressionPermission;
     addRowAbove: (index?: number, data?: Partial<ExpressionEntry>) => void;
     addRowBelow: (index?: number, data?: Partial<ExpressionEntry>) => void;
     expressions: ExpressionEntry[];
@@ -1887,6 +1941,8 @@ export declare const functionNodeSchema: z.ZodObject<z.objectUtil.extendShape<{
     } | undefined;
 }>;
 
+export declare type FunctionPermission = 'edit:full';
+
 export declare type FunctionProps = {
     disabled?: boolean;
     defaultValue?: string;
@@ -1899,6 +1955,7 @@ export declare type FunctionProps = {
     onMonacoReady?: (monaco: Monaco) => void;
     libraries?: FunctionLibrary[];
     inputData?: unknown;
+    permission?: FunctionPermission;
     error?: {
         data: {
             nodeId: string;
@@ -3015,6 +3072,11 @@ declare type TableCellProps = {
     index: number;
 };
 
+declare type TableCursor = {
+    x: string;
+    y: number;
+};
+
 declare type TableSchemaItem = {
     id: string;
     name: string;
@@ -3087,5 +3149,13 @@ export declare const validationSchema: z.ZodObject<{
     inputSchema?: any;
     outputSchema?: any;
 }>;
+
+declare type ViewConfig = {
+    enabled: boolean;
+    description?: string;
+    permissions?: Record<string, ViewConfigPermission | null | undefined> | null;
+};
+
+declare type ViewConfigPermission = 'edit:values' | 'edit:rules' | 'edit:full';
 
 export { }
