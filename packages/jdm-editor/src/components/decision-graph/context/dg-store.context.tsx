@@ -58,6 +58,7 @@ export type DecisionGraphStoreType = {
     openTabs: string[];
     activeTab: string;
 
+    viewConfigCta?: string;
     viewConfig?: ViewConfig;
 
     name: string;
@@ -125,6 +126,7 @@ export type DecisionGraphStoreType = {
     onReactFlowInit?: (instance: ReactFlowInstance) => void;
     onCodeExtension?: CodeEditorProps['extension'];
     onFunctionReady?: (monaco: Monaco) => void;
+    onViewConfigCta?: () => void;
   };
 };
 

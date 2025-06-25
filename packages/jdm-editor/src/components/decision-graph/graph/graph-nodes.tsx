@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import React, { useMemo, useState } from 'react';
 import { match } from 'ts-pattern';
 
-import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
+import { useDecisionGraphActions, useDecisionGraphListeners, useDecisionGraphState } from '../context/dg-store.context';
 import { type DecisionNode } from '../dg-types';
 import { NodeColor } from '../nodes/specifications/colors';
 import { NodeKind } from '../nodes/specifications/specification-types';
@@ -18,14 +18,16 @@ export type GraphComponentsProps = {
 };
 
 export const GraphNodes: React.FC<GraphComponentsProps> = React.memo(({ className }) => {
-  const { decisionGraph, customComponents, viewConfig } = useDecisionGraphState((store) => ({
+  const { decisionGraph, customComponents, viewConfig, viewConfigCta } = useDecisionGraphState((store) => ({
     decisionGraph: store.decisionGraph || [],
     customComponents: store.components,
     activeTabId: store.activeTab,
     viewConfig: store.viewConfig,
+    viewConfigCta: store.viewConfigCta,
   }));
 
   const { openTab } = useDecisionGraphActions();
+  const onViewConfigCta = useDecisionGraphListeners((s) => s.onViewConfigCta);
 
   const nodes = useMemo(() => {
     return (decisionGraph?.nodes || [])
@@ -61,7 +63,7 @@ export const GraphNodes: React.FC<GraphComponentsProps> = React.memo(({ classNam
         className={clsx(['config-item-card', node?._diff?.status])}
         styles={{
           body: {
-            padding: 20,
+            padding: 16,
           },
         }}
         onClick={() => openTab(node.id)}
@@ -120,9 +122,21 @@ export const GraphNodes: React.FC<GraphComponentsProps> = React.memo(({ classNam
     <div className={clsx(['grl-dg__view', className])}>
       <div className={'grl-dg__view__content'}>
         <div className={'grl-dg__view__content__heading'}>
-          <Title level={4} style={{ margin: 0, marginBottom: '8px' }}>
-            {isEmpty ? 'Decision View Not Configured' : 'Decision View'}
-          </Title>
+          <div className={'grl-dg__view__content__heading__first-row'}>
+            <Title level={4} style={{ margin: 0, marginBottom: '8px' }}>
+              {isEmpty ? 'Decision View Not Configured' : 'Decision View'}
+            </Title>
+            {viewConfigCta && (
+              <Button
+                type={'primary'}
+                onClick={() => {
+                  onViewConfigCta?.();
+                }}
+              >
+                {viewConfigCta}
+              </Button>
+            )}
+          </div>
           {!isEmpty ? (
             <Text type='secondary'>
               {viewConfig?.description || 'Configure business rules for your decision model'}

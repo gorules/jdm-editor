@@ -23,7 +23,9 @@ export type DecisionGraphEmptyType = {
 
   name?: DecisionGraphStoreType['state']['name'];
 
+  viewConfigCta?: DecisionGraphStoreType['state']['viewConfigCta'];
   viewConfig?: DecisionGraphStoreType['state']['viewConfig'];
+  onViewConfigCta?: DecisionGraphStoreType['listeners']['onViewConfigCta'];
 
   defaultActivePanel?: string;
   panels?: DecisionGraphStoreType['state']['panels'];
@@ -50,7 +52,9 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
   defaultActivePanel,
   panels,
   simulate,
+  viewConfigCta,
   viewConfig,
+  onViewConfigCta,
   onPanelsChange,
   onReactFlowInit,
   onCodeExtension,
@@ -87,9 +91,10 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
       components: Array.isArray(components) ? components : [],
       customNodes: Array.isArray(customNodes) ? customNodes : [],
       panels,
-      viewConfig: viewConfig,
+      viewConfig,
+      viewConfigCta,
     });
-  }, [id, disabled, components, customNodes, panels, viewConfig]);
+  }, [id, disabled, components, customNodes, panels, viewConfig, viewConfigCta]);
 
   useEffect(() => {
     stateStore.setState({ name: name ?? 'graph.json' });
@@ -105,8 +110,9 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
       onPanelsChange,
       onCodeExtension,
       onFunctionReady,
+      onViewConfigCta,
     });
-  }, [onReactFlowInit, onPanelsChange, onCodeExtension, onFunctionReady]);
+  }, [onReactFlowInit, onPanelsChange, onCodeExtension, onFunctionReady, onViewConfigCta]);
 
   useEffect(() => {
     listenerStore.setState({ onChange: innerChange });

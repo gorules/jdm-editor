@@ -423,6 +423,7 @@ export const View: Story = {
         'a750cebf-ca75-4acd-a272-7040626abd73': 'edit:values',
       },
     },
+    viewConfigCta: 'Configure',
   },
   render: (args) => {
     const [value, setValue] = useState<any>(defaultGraph);

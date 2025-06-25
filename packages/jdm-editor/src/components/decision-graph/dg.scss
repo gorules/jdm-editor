@@ -646,6 +646,11 @@
 
       &__heading {
         margin-bottom: 24px;
+
+        &__first-row {
+          display: flex;
+          justify-content: space-between;
+        }
       }
 
       &__search {
