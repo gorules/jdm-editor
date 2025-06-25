@@ -11,7 +11,8 @@
     "prettier": "prettier --check .",
     "prettier:fix": "pnpm prettier --write",
     "format": "run-s lint prettier",
-    "format:fix": "run-s lint:fix prettier:fix"
+    "storybook": "lerna run storybook",
+    "clean": "rm -rf node_modules && rm -rf **/node_modules && rm -rf package-lock.json"
   },
   "engines": {
     "pnpm": "~10"
