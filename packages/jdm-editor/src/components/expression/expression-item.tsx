@@ -14,15 +14,15 @@ import { DiffAutosizeTextArea } from '../shared';
 import { DiffCodeEditor } from '../shared/diff-ce';
 import type { ExpressionEntryItem } from './context/expression-store.context';
 import { useExpressionStore } from './context/expression-store.context';
-import { ExpressionItemContextMenu } from './expression-item-context-menu';
 
 export type ExpressionItemProps = {
   expression: ExpressionEntryItem;
   index: number;
   variableType?: VariableType;
+  squares?: number;
 };
 
-export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, index, variableType }) => {
+export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, index, variableType, squares = 0 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const expressionRef = useRef<HTMLDivElement>(null);
   const { updateRow, removeRow, swapRows, disabled, configurable } = useExpressionStore(
@@ -68,76 +68,73 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
   return (
     <div
       ref={expressionRef}
-      className={clsx(
-        'expression-list-item',
-        'expression-list__item',
-        isDropping && direction === 'down' && 'dropping-down',
-        isDropping && direction === 'up' && 'dropping-up',
-        expression?._diff?.status && `expression-list__item--${expression?._diff?.status}`,
-      )}
-      style={{ opacity: !isDragging ? 1 : 0.5 }}
+      className={clsx('expression-list-item')}
+      data-dragging={isDragging ? 'true' : 'false'}
+      data-dropping={isDropping ? direction : undefined}
+      data-diff={expression?._diff?.status}
     >
-      <div ref={dragRef} className='expression-list-item__drag' aria-disabled={!configurable || disabled}>
-        <div className='expression-list-item__drag__inner'>
-          {expression?._diff?.status ? (
-            <DiffIcon status={expression?._diff?.status} style={{ fontSize: 16 }} />
-          ) : (
-            <GripVerticalIcon size={10} />
-          )}
+      {squares > 0 && (
+        <div className="expression-list-item__squares" data-count={squares}>
+          {Array.from({ length: squares }).map((_, i) => (
+            <div key={i} className="expression-list-item__squares__square" />
+          ))}
         </div>
+      )}
+      <div ref={dragRef} className='expression-list-item__drag' aria-disabled={!configurable || disabled}>
+        {expression?._diff?.status ? (
+          <DiffIcon status={expression?._diff?.status} style={{ fontSize: 16 }} />
+        ) : (
+          <GripVerticalIcon size={10} />
+        )}
       </div>
       <div
         className='expression-list-item__key'
         aria-disabled={!configurable || disabled}
-        // onClick={(e) => {
-        //   if (e.target instanceof HTMLTextAreaElement) {
-        //     return;
-        //   }
-        //
-        //   const inputElement = e.currentTarget.querySelector<HTMLTextAreaElement>('textarea');
-        //   if (!inputElement) {
-        //     return;
-        //   }
-        //
-        //   inputElement.focus();
-        //   const inputLength = inputElement.value.length;
-        //   inputElement.setSelectionRange(inputLength, inputLength);
-        // }}
+        onClick={(e) => {
+          if (e.target instanceof HTMLTextAreaElement) {
+            return;
+          }
+
+          const inputElement = e.currentTarget.querySelector<HTMLTextAreaElement>('textarea');
+          if (!inputElement) {
+            return;
+          }
+
+          inputElement.focus();
+          const inputLength = inputElement.value.length;
+          inputElement.setSelectionRange(inputLength, inputLength);
+        }}
       >
-        <ExpressionItemContextMenu index={index}>
-          <DiffAutosizeTextArea
-            noStyle
-            placeholder='Key'
-            maxRows={10}
-            readOnly={!configurable || disabled}
-            displayDiff={expression?._diff?.fields?.key?.status === 'modified'}
-            previousValue={expression?._diff?.fields?.key?.previousValue}
-            value={expression?.key}
-            onChange={(e) => onChange({ key: e.target.value })}
-            autoComplete='off'
-          />
-        </ExpressionItemContextMenu>
+        <DiffAutosizeTextArea
+          noStyle
+          placeholder='Key'
+          maxRows={10}
+          readOnly={!configurable || disabled}
+          displayDiff={expression?._diff?.fields?.key?.status === 'modified'}
+          previousValue={expression?._diff?.fields?.key?.previousValue}
+          value={expression?.key}
+          onChange={(e) => onChange({ key: e.target.value })}
+          autoComplete='off'
+        />
       </div>
       <div className='expression-list-item__code' style={{ position: 'relative' }}>
-        <ExpressionItemContextMenu index={index}>
-          <div>
-            <DiffCodeEditor
-              className='expression-list-item__value'
-              placeholder='Expression'
-              maxRows={9}
-              disabled={disabled}
-              value={expression?.value}
-              displayDiff={expression?._diff?.fields?.value?.status === 'modified'}
-              previousValue={expression?._diff?.fields?.value?.previousValue}
-              onChange={(value) => onChange({ value })}
-              variableType={variableType}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-              noStyle={true}
-            />
-            <ResultOverlay expression={expression} />
-          </div>
-        </ExpressionItemContextMenu>
+        <div>
+          <DiffCodeEditor
+            className='expression-list-item__value'
+            placeholder='Expression'
+            maxRows={9}
+            disabled={disabled}
+            value={expression?.value}
+            displayDiff={expression?._diff?.fields?.value?.status === 'modified'}
+            previousValue={expression?._diff?.fields?.value?.previousValue}
+            onChange={(value) => onChange({ value })}
+            variableType={variableType}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            noStyle
+          />
+          <ResultOverlay expression={expression} />
+        </div>
       </div>
       <div className='expression-list-item__action'>
         <ConfirmAction iconOnly disabled={!configurable || disabled} onConfirm={onRemove} />

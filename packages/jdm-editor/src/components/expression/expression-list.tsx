@@ -1,14 +1,13 @@
-import { PlusCircleOutlined } from '@ant-design/icons';
 import type { VariableType } from '@gorules/zen-engine-wasm';
-import { Button, Typography } from 'antd';
-import clsx from 'clsx';
 import equal from 'fast-deep-equal/es6/react';
 import React, { useEffect, useState } from 'react';
 
 import { isWasmAvailable } from '../../helpers/wasm';
 import { useExpressionStore } from './context/expression-store.context';
-import { ExpressionGroup } from './expression-group';
+import { ExpressionCondition } from './expression-condition';
+import { ExpressionHeading } from './expression-heading';
 import { ExpressionItem } from './expression-item';
+import { ExpressionLineButton } from './expression-line-button';
 
 export type ExpressionListProps = {
   //
@@ -46,59 +45,67 @@ export const ExpressionList: React.FC<ExpressionListProps> = ({}) => {
 
   return (
     <>
+      <ExpressionHeading />
       <div className={'expression-list'}>
-        <div className={clsx('expression-list__item', 'expression-list__item--heading')}>
-          <div className={'expression-list__item__th expression-list__item__th--order'} />
-          <Typography.Text type='secondary' className={'expression-list__item__th expression-list__item__th--key'}>
-            Key
-          </Typography.Text>
-          <Typography.Text type='secondary' className={'expression-list__item__th'}>
-            Expression
-          </Typography.Text>
-          <div />
-        </div>
+        <ExpressionLineButton index={0} />
         {(expressions || []).map((expression, index) => (
-          <ExpressionItem key={expression.id} expression={expression} index={index} variableType={variableType} />
+          <React.Fragment key={expression.id}>
+            <ExpressionItem expression={expression} index={index} variableType={variableType} />
+            {index !== expressions.length - 1 && <ExpressionLineButton index={index + 1} />}
+          </React.Fragment>
         ))}
-        <ExpressionGroup
-          index={4}
-          group={{
-            id: '123',
-            rules: [
-              {
-                if: 'hello world',
-                then: [
-                  {
-                    id: '1',
-                    key: 'customer.firstName',
-                    value: '"hello world"',
-                  },
-                  {
-                    id: '1',
-                    key: 'customer.lastName',
-                    value: '"hello world"',
-                  },
-                ],
-              },
-            ],
-          }}
+        <ExpressionLineButton index={0} />
+
+        <ExpressionCondition kind='If' />
+        <div>
+          <ExpressionLineButton index={0} style={{ paddingLeft: 20 }} />
+          <div className="hello" style={{ paddingLeft: 20 }}>
+            {(expressions || []).map((expression, index) => (
+              <React.Fragment key={expression.id}>
+                <ExpressionItem squares={1} expression={expression} index={index} variableType={variableType} />
+                {index !== expressions.length - 1 && <ExpressionLineButton index={index + 1} />}
+              </React.Fragment>
+            ))}
+            <ExpressionLineButton index={0} />
+
+            <ExpressionCondition kind='If' />
+            <div>
+              <ExpressionLineButton index={0} style={{ paddingLeft: 20 }} />
+              <div style={{ paddingLeft: 20 }}>
+                {(expressions || []).map((expression, index) => (
+                  <React.Fragment key={expression.id}>
+                    <ExpressionItem squares={2} expression={expression} index={index} variableType={variableType} />
+                    {index !== expressions.length - 1 && <ExpressionLineButton index={index + 1} />}
+                  </React.Fragment>
+                ))}
+              </div>
+              <ExpressionLineButton index={0} style={{ paddingLeft: 20 }} />
+            </div>
+          </div>
+          <ExpressionLineButton index={0} style={{ paddingLeft: 20 }} />
+        </div>
+
+        <ExpressionCondition kind='Else if' />
+        <div>
+          <ExpressionLineButton index={0} style={{ paddingLeft: 20 }} />
+          <div style={{ paddingLeft: 20 }}>
+            {(expressions || []).map((expression, index) => (
+              <React.Fragment key={expression.id}>
+                <ExpressionItem squares={1} expression={expression} index={index} variableType={variableType} />
+                {index !== expressions.length - 1 && <ExpressionLineButton index={index + 1} />}
+              </React.Fragment>
+            ))}
+          </div>
+          <ExpressionLineButton index={0} style={{ paddingLeft: 20 }} />
+        </div>
+
+        <ExpressionLineButton
+          className='expression-list__lineButton--bottom'
+          index={expressions.length}
+          alwaysVisible
+          size='large'
         />
-        {(expressions || []).map((expression, index) => (
-          <ExpressionItem key={expression.id} expression={expression} index={index} variableType={variableType} />
-        ))}
       </div>
-      {configurable && !disabled && (
-        <div className={'expression-list__button-wrapper'}>
-          <Button
-            className='expression-list__button'
-            icon={<PlusCircleOutlined />}
-            type='link'
-            onClick={() => addRowBelow()}
-          >
-            Add row
-          </Button>
-        </div>
-      )}
     </>
   );
 };
