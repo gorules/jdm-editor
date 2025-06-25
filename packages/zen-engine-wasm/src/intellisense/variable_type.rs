@@ -115,7 +115,9 @@ impl JsVariableType {
 
     pub fn set(&mut self, path: &str, value: &JsVariableType) {
         let variable_type = value.0.clone();
-        self.0.dot_insert(path, variable_type);
+        if let Some(new_type) = self.0.dot_insert_detached(path, variable_type) {
+            self.0 = new_type;
+        }
     }
 
     #[wasm_bindgen(js_name = "setJson")]
