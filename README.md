@@ -41,7 +41,7 @@ export type DecisionGraphProps = {
   defaultValue?: DecisionGraphType;
   value?: DecisionGraphType;
   disabled?: boolean;
-  configurable?: boolean;
+  viewConfig?: ViewConfig;
   components?: CustomNodeType[];
   onChange?: (val: DecisionGraphType) => void;
   manager?: DragDropManager;
@@ -63,7 +63,7 @@ export type DecisionTableProps = {
   value?: DecisionTableType;
   onChange?: (decisionTable: DecisionTableType) => void;
   activeRules?: string[];
-  configurable?: boolean;
+  permission?: DecisionTablePermission;
   disabled?: boolean;
   disableHitPolicy?: boolean;
   minColWidth?: number;

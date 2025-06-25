@@ -14,11 +14,11 @@ export type ExpressionListProps = {
 };
 
 export const ExpressionList: React.FC<ExpressionListProps> = ({}) => {
-  const { expressions, addRowBelow, configurable, disabled, inputVariableType } = useExpressionStore(
-    ({ expressions, addRowBelow, configurable, disabled, inputVariableType }) => ({
+  const { expressions, addRowBelow, permission, disabled, inputVariableType } = useExpressionStore(
+    ({ expressions, addRowBelow, permission, disabled, inputVariableType }) => ({
       expressions,
       addRowBelow,
-      configurable,
+      permission,
       disabled,
       inputVariableType,
     }),
@@ -60,7 +60,7 @@ export const ExpressionList: React.FC<ExpressionListProps> = ({}) => {
           <ExpressionItem key={expression.id} expression={expression} index={index} variableType={variableType} />
         ))}
       </div>
-      {configurable && !disabled && (
+      {permission === 'edit:full' && !disabled && (
         <div className={'expression-list__button-wrapper'}>
           <Button
             className='expression-list__button'

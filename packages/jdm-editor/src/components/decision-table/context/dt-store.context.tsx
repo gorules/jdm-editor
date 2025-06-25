@@ -122,6 +122,8 @@ export const parseDecisionTable = (decisionTable?: DecisionTableType) => {
   return dt;
 };
 
+export type DecisionTablePermission = 'edit:full' | 'edit:rules' | 'edit:values';
+
 export type DecisionTableStoreType = {
   state: {
     id?: string;
@@ -130,11 +132,12 @@ export type DecisionTableStoreType = {
     cursor: TableCursor | null;
 
     disabled: boolean;
-    configurable: boolean;
     disableHitPolicy: boolean;
 
     minColWidth: number;
     colWidth: number;
+
+    permission?: DecisionTablePermission;
 
     inputVariableType?: VariableType;
     derivedVariableTypes: Record<string, VariableType>;
@@ -200,7 +203,6 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
         cursor: null,
 
         disabled: false,
-        configurable: true,
         disableHitPolicy: false,
 
         colWidth: 200,

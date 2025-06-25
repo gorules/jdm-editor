@@ -1,8 +1,8 @@
-import { CloseOutlined, DeploymentUnitOutlined } from '@ant-design/icons';
+import { CloseOutlined, DeploymentUnitOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import type { TabsProps } from 'antd';
 import { Avatar, Button, Dropdown, Tabs } from 'antd';
 import clsx from 'clsx';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { DiffIcon } from '../../diff-icon';
 import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
@@ -21,21 +21,44 @@ type TabItem = NonUndefined<TabsProps['items']>[number];
 
 export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled, tabBarExtraContent }) => {
   const graphActions = useDecisionGraphActions();
-  const { openNodes, activeNodeId } = useDecisionGraphState(({ decisionGraph, activeTab, openTabs }) => ({
-    activeNodeId: (decisionGraph?.nodes ?? []).find((node) => node.id === activeTab)?.id,
-    openNodes: (openTabs || [])
-      .map((tab) => {
-        const node = (decisionGraph?.nodes ?? []).find((node) => node.id === tab);
-        if (!node) return undefined;
-        return {
-          id: node?.id,
-          name: node.name,
-          type: node.type,
-          diff: node?._diff,
-        };
-      })
-      .filter((node) => !!node),
-  }));
+  const { openNodes, activeNodeId, viewConfig } = useDecisionGraphState(
+    ({ decisionGraph, activeTab, openTabs, viewConfig }) => ({
+      activeNodeId: (decisionGraph?.nodes ?? []).find((node) => node.id === activeTab)?.id,
+      openNodes: (openTabs || [])
+        .map((tab) => {
+          const node = (decisionGraph?.nodes ?? []).find((node) => node.id === tab);
+          if (!node) return undefined;
+          return {
+            id: node?.id,
+            name: node.name,
+            type: node.type,
+            diff: node?._diff,
+          };
+        })
+        .filter((node) => !!node),
+      viewConfig,
+    }),
+  );
+
+  const defaultItems = useMemo(() => {
+    return [
+      {
+        closable: false,
+        key: 'graph',
+        label: (
+          <TabLabel
+            total={openNodes?.length}
+            icon={viewConfig?.enabled ? <UnorderedListOutlined /> : <DeploymentUnitOutlined />}
+            name={viewConfig?.enabled ? 'Nodes' : 'Graph'}
+            active={!activeNodeId || activeNodeId === 'graph'}
+            onContextClick={(action) => {
+              graphActions.closeTab('graph', action);
+            }}
+          />
+        ),
+      },
+    ];
+  }, [viewConfig]);
 
   return (
     <div>
@@ -47,21 +70,7 @@ export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled, tabBarExtraConte
         onChange={(val) => graphActions.openTab(val)}
         tabBarExtraContent={tabBarExtraContent}
         items={[
-          {
-            closable: false,
-            key: 'graph',
-            label: (
-              <TabLabel
-                total={openNodes?.length}
-                icon={<DeploymentUnitOutlined />}
-                name='Graph'
-                active={!activeNodeId || activeNodeId === 'graph'}
-                onContextClick={(action) => {
-                  graphActions.closeTab('graph', action);
-                }}
-              />
-            ),
-          },
+          ...defaultItems,
           ...openNodes.map((node, index) => {
             const specification = nodeSpecification[node.type as NodeKind];
 

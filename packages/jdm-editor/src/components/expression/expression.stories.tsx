@@ -19,12 +19,16 @@ const meta: Meta<typeof Expression> = {
   title: 'Expression',
   component: Expression,
   args: {
-    configurable: true,
     disabled: false,
     defaultValue: expressionDefault,
     onChange: fn(),
+    permission: 'edit:full',
   },
   argTypes: {
+    permission: {
+      control: 'select',
+      options: ['edit:full', 'edit:values', 'view'],
+    },
     manager: { table: { disable: true } },
     value: { table: { disable: true } },
   },

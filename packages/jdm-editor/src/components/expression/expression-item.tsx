@@ -25,13 +25,13 @@ export type ExpressionItemProps = {
 export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, index, variableType }) => {
   const [isFocused, setIsFocused] = useState(false);
   const expressionRef = useRef<HTMLDivElement>(null);
-  const { updateRow, removeRow, swapRows, disabled, configurable } = useExpressionStore(
-    ({ updateRow, removeRow, swapRows, disabled, configurable }) => ({
+  const { updateRow, removeRow, swapRows, disabled, permission } = useExpressionStore(
+    ({ updateRow, removeRow, swapRows, disabled, permission }) => ({
       updateRow,
       removeRow,
       swapRows,
       disabled,
-      configurable,
+      permission,
     }),
   );
 
@@ -55,7 +55,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
   });
 
   const [{ isDragging }, dragRef, previewRef] = useDrag({
-    canDrag: configurable && !disabled,
+    canDrag: permission === 'edit:full' && !disabled,
     item: () => ({ ...expression, index }),
     type: 'row',
     collect: (monitor) => ({
@@ -77,7 +77,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
       )}
       style={{ opacity: !isDragging ? 1 : 0.5 }}
     >
-      <div ref={dragRef} className='expression-list-item__drag' aria-disabled={!configurable || disabled}>
+      <div ref={dragRef} className='expression-list-item__drag' aria-disabled={permission !== 'edit:full' || disabled}>
         <div className='expression-list-item__drag__inner'>
           {expression?._diff?.status ? (
             <DiffIcon
@@ -113,7 +113,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
             noStyle
             placeholder='Key'
             maxRows={10}
-            readOnly={!configurable || disabled}
+            readOnly={permission !== 'edit:full' || disabled}
             displayDiff={expression?._diff?.fields?.key?.status === 'modified'}
             previousValue={expression?._diff?.fields?.key?.previousValue}
             value={expression?.key}
@@ -144,7 +144,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
         </ExpressionItemContextMenu>
       </div>
       <div className='expression-list-item__action'>
-        <ConfirmAction iconOnly disabled={!configurable || disabled} onConfirm={onRemove} />
+        <ConfirmAction iconOnly disabled={permission !== 'edit:full' || disabled} onConfirm={onRemove} />
         {isFocused && <LivePreview id={expression.id} value={expression.value} />}
       </div>
     </div>

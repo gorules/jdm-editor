@@ -2,13 +2,13 @@ import equal from 'fast-deep-equal/es6/react';
 import type React from 'react';
 import { useEffect, useRef } from 'react';
 
-import type { ExpressionEntry } from './context/expression-store.context';
+import type { ExpressionEntry, ExpressionStore } from './context/expression-store.context';
 import { useExpressionStore, useExpressionStoreRaw } from './context/expression-store.context';
 
 export type ExpressionControllerProps = {
-  configurable?: boolean;
   disabled?: boolean;
   defaultValue?: ExpressionEntry[];
+  permission?: ExpressionStore['permission'];
   value?: ExpressionEntry[];
   onChange?: (value: ExpressionEntry[]) => void;
 };
@@ -17,8 +17,8 @@ export const ExpressionController: React.FC<ExpressionControllerProps> = ({
   value,
   onChange,
   defaultValue = [],
-  configurable = true,
   disabled = false,
+  permission = 'edit:full',
 }) => {
   const mounted = useRef<boolean>(false);
   const store = useExpressionStoreRaw();
@@ -29,10 +29,10 @@ export const ExpressionController: React.FC<ExpressionControllerProps> = ({
 
   useEffect(() => {
     store.setState({
-      configurable,
       disabled,
+      permission,
     });
-  }, [configurable, disabled]);
+  }, [disabled, permission]);
 
   useEffect(() => {
     if (!onChange) {

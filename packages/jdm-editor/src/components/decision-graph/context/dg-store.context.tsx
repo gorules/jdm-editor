@@ -29,6 +29,14 @@ export type PanelType = {
 
 type DraftUpdateCallback<T> = (draft: WritableDraft<T>) => WritableDraft<T>;
 
+export type ViewConfigPermission = 'edit:values' | 'edit:rules' | 'edit:full';
+
+export type ViewConfig = {
+  enabled: boolean;
+  description?: string;
+  permissions?: Record<string, ViewConfigPermission | null | undefined> | null;
+};
+
 export enum NodeTypeKind {
   Input,
   Output,
@@ -45,11 +53,13 @@ export type DecisionGraphStoreType = {
     id?: string;
     components: NodeSpecification[];
     disabled?: boolean;
-    configurable?: boolean;
     decisionGraph: DecisionGraphType;
     hoveredEdgeId: string | null;
     openTabs: string[];
     activeTab: string;
+
+    viewConfigCta?: string;
+    viewConfig?: ViewConfig;
 
     name: string;
 
@@ -116,6 +126,7 @@ export type DecisionGraphStoreType = {
     onReactFlowInit?: (instance: ReactFlowInstance) => void;
     onCodeExtension?: CodeEditorProps['extension'];
     onFunctionReady?: (monaco: Monaco) => void;
+    onViewConfigCta?: () => void;
   };
 };
 
@@ -148,7 +159,6 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
         activeTab: 'graph',
         name: 'graph.json',
         disabled: false,
-        configurable: true,
         components: [],
         customNodes: [],
         activePanel: undefined,
