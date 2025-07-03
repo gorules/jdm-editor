@@ -96,6 +96,13 @@ export const functionSpecification: NodeSpecification<NodeFunctionData> = {
             status: 'modified',
           });
         }
+
+        if ((current?.omitNodes || false) !== (previous?.omitNodes || false)) {
+          _.set(fields, 'omitNodes', {
+            status: 'modified',
+            previousValue: previous.omitNodes,
+          });
+        }
       })
       .otherwise(() => {
         // do nothing
