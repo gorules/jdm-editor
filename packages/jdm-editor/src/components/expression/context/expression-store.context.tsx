@@ -1,7 +1,10 @@
 import type { Variable, VariableType } from '@gorules/zen-engine-wasm';
 import equal from 'fast-deep-equal/es6/react';
-import { produce } from 'immer';
+import type { WritableDraft } from 'immer';
+import { current, produce } from 'immer';
+import _ from 'lodash';
 import React, { useMemo } from 'react';
+import { P, match } from 'ts-pattern';
 import type { z } from 'zod';
 import type { StoreApi, UseBoundStore } from 'zustand';
 import { create } from 'zustand';
@@ -11,6 +14,25 @@ import type { expressionNodeSchema } from '../../../helpers/schema';
 import type { SimulationTrace, SimulationTraceDataExpression } from '../../decision-graph';
 import type { DiffMetadata } from '../../decision-graph/dg-types';
 
+const pathToArray = (path: string[]): [string, number] => {
+  const newPath = path.join('.').split('.');
+  const index = newPath.pop();
+  if (isNaN(index as unknown as number)) {
+    return [[...newPath, index].filter(Boolean).join('.'), 0];
+  }
+
+  return [newPath.join('.'), Number.parseInt(index ?? '0')];
+};
+
+const pathToBase = <Item,>(arr: Item[], path: string[]): [Item[], number] => {
+  const [basePath, index] = pathToArray(path);
+  const array = match(basePath)
+    .with(P.string.minLength(1), () => _.get(arr, basePath) as Item[])
+    .otherwise(() => arr);
+
+  return [array, index];
+};
+
 const ExpressionStoreContext = React.createContext<
   UseBoundStore<StoreApi<ExpressionStore>> & {
     setState: (partial: Partial<ExpressionStore>) => void;
@@ -18,35 +40,43 @@ const ExpressionStoreContext = React.createContext<
 >({} as any);
 
 export type ExpressionEntry = ExpressionEntryItem | ExpressionEntryGroup;
+type ExpressionEntryKind = 'item' | 'group';
 
 export type ExpressionEntryItem = {
   id: string;
   key: string;
   value: string;
   _diff?: DiffMetadata;
-}
+};
 
 export type ExpressionEntryGroup = {
   id: string;
   rules: {
+    id: string;
     if?: string;
     then: ExpressionEntry[];
   }[];
-}
+};
+
+type AddRowOptions = {
+  path?: string[];
+  kind?: ExpressionEntryKind;
+};
 
 export type ExpressionStore = {
   configurable: boolean;
   disabled: boolean;
 
-  addRowAbove: (index?: number, data?: Partial<ExpressionEntry>) => void;
-  addRowBelow: (index?: number, data?: Partial<ExpressionEntry>) => void;
+  addRowAbove: (options?: AddRowOptions) => void;
+  addRowBelow: (options?: AddRowOptions) => void;
 
   expressions: ExpressionEntry[];
   setExpressions: (expressions: ExpressionEntry[]) => void;
 
-  swapRows: (sourceIndex: number, targetIndex: number) => void;
-  updateRow: (index: number, update: Partial<Omit<ExpressionEntry, 'id'>>) => void;
-  removeRow: (index: number) => void;
+  swapRows: (sourcePath: string[], targetPath: string[]) => void;
+  patchRow: (path: string[], update: Partial<Omit<ExpressionEntry, 'id'>>) => void;
+  updateRow: (path: string[], updater: (draft: WritableDraft<ExpressionEntry>) => void) => void;
+  removeRow: (path: string[]) => void;
 
   inputVariableType?: VariableType;
 
@@ -63,12 +93,32 @@ type ExpressionStoreProviderProps = {
   //
 };
 
-export const createExpression = (data: Partial<ExpressionEntry> = {}): ExpressionEntry => ({
-  id: crypto.randomUUID(),
-  key: '',
-  value: '',
-  ...data,
-});
+export const createExpression = (kind: ExpressionEntryKind): ExpressionEntry =>
+  match(kind)
+    .with(
+      'item',
+      () =>
+        ({
+          id: crypto.randomUUID(),
+          key: '',
+          value: '',
+        }) satisfies ExpressionEntryItem,
+    )
+    .with(
+      'group',
+      () =>
+        ({
+          id: crypto.randomUUID(),
+          rules: [
+            {
+              id: crypto.randomUUID(),
+              if: '',
+              then: [createExpression('item')],
+            },
+          ],
+        }) satisfies ExpressionEntryGroup,
+    )
+    .exhaustive();
 
 export const ExpressionStoreProvider: React.FC<React.PropsWithChildren<ExpressionStoreProviderProps>> = ({
   children,
@@ -79,21 +129,33 @@ export const ExpressionStoreProvider: React.FC<React.PropsWithChildren<Expressio
         configurable: true,
         disabled: false,
         debugIndex: 0,
-        addRowAbove: (index = 0) => {
-          set(
-            produce<ExpressionStore>((draft) => {
-              draft.expressions.splice(index, 0, createExpression());
-              return draft;
-            }),
-          );
-        },
-        addRowBelow: (index) => {
-          set(
-            produce<ExpressionStore>((draft) => {
-              index = index ?? draft.expressions.length - 1;
-              draft.expressions.splice(index + 1, 0, createExpression());
+        addRowAbove: (options = {}) => {
+          const { kind = 'item' } = options;
+          const path = match(options.path)
+            .with(
+              P.when((s) => s && s.length > 0),
+              (a) => a as string[],
+            )
+            .otherwise(() => []);
 
-              return draft;
+          const newState = produce<ExpressionStore>((draft) => {
+            const [base, index] = pathToBase(draft.expressions, path);
+            base.splice(index, 0, createExpression(kind));
+          });
+
+          set(newState);
+        },
+        addRowBelow: (options = {}) => {
+          const { path: defaultPath, kind = 'item' } = options;
+
+          set(
+            produce<ExpressionStore>((draft) => {
+              const path = match(defaultPath)
+                .with(P.nonNullable, (p) => p)
+                .otherwise(() => [(draft.expressions.length - 1).toString()]);
+
+              const [base, index] = pathToBase(draft.expressions, path);
+              base.splice(index + 1, 0, createExpression(kind));
             }),
           );
         },
@@ -101,29 +163,53 @@ export const ExpressionStoreProvider: React.FC<React.PropsWithChildren<Expressio
         setExpressions: (expressions) => {
           set({ expressions });
         },
-        swapRows: (sourceIndex, targetIndex) => {
+        swapRows: (sourcePath, targetPath) => {
           set(
             produce<ExpressionStore>((draft) => {
-              const [input] = draft.expressions.splice(sourceIndex, 1);
-              draft.expressions.splice(targetIndex, 0, input);
+              const [sourceBase, sourceIndex] = pathToBase(draft.expressions, sourcePath);
+              const [targetBase, targetIndex] = pathToBase(draft.expressions, targetPath);
 
-              return draft;
+              const [input] = sourceBase.splice(sourceIndex, 1);
+
+              console.log({
+                sourcePath,
+                targetPath,
+                sourceBase: current(sourceBase),
+                sourceIndex,
+                targetBase: current(targetBase),
+                targetIndex,
+                input: current(input),
+              });
+
+              targetBase.splice(targetIndex, 0, input);
             }),
           );
         },
-        removeRow: (index) => {
+        removeRow: (path) => {
           set(
             produce<ExpressionStore>((draft) => {
-              draft.expressions.splice(index, 1);
-              return draft;
+              const [base, index] = pathToBase(draft.expressions, path);
+
+              base.splice(index, 1);
             }),
           );
         },
-        updateRow: (index, update) => {
+        updateRow: (path, updater) => {
           set(
             produce<ExpressionStore>((draft) => {
-              draft.expressions[index] = {
-                ...draft.expressions[index],
+              const [base, index] = pathToBase(draft.expressions, path);
+              const target = base[index];
+
+              updater(target);
+            }),
+          );
+        },
+        patchRow: (path, update) => {
+          set(
+            produce<ExpressionStore>((draft) => {
+              const [base, index] = pathToBase(draft.expressions, path);
+              base[index] = {
+                ...base[index],
                 ...update,
               };
 

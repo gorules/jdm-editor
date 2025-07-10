@@ -1,21 +1,21 @@
 import type { VariableType } from '@gorules/zen-engine-wasm';
 import equal from 'fast-deep-equal/es6/react';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { P, match } from 'ts-pattern';
 
-import { isWasmAvailable } from '../../helpers/wasm';
-import { useExpressionStore } from './context/expression-store.context';
-import { ExpressionCondition } from './expression-condition';
-import { ExpressionHeading } from './expression-heading';
+import { ExpressionEntry, useExpressionStore } from './context/expression-store.context';
+import { ExpressionGroup } from './expression-group';
 import { ExpressionItem } from './expression-item';
 import { ExpressionLineButton } from './expression-line-button';
 
 export type ExpressionListProps = {
-  //
+  expressions: ExpressionEntry[];
+  path?: string[];
 };
 
-export const ExpressionList: React.FC<ExpressionListProps> = ({}) => {
-  const { expressions, addRowBelow, configurable, disabled, inputVariableType } = useExpressionStore(
-    ({ expressions, addRowBelow, configurable, disabled, inputVariableType }) => ({
+export const ExpressionList: React.FC<ExpressionListProps> = ({ expressions, path = [] }) => {
+  const { addRowBelow, configurable, disabled, inputVariableType } = useExpressionStore(
+    ({ addRowBelow, configurable, disabled, inputVariableType }) => ({
       expressions,
       addRowBelow,
       configurable,
@@ -27,84 +27,55 @@ export const ExpressionList: React.FC<ExpressionListProps> = ({}) => {
 
   const [variableType, setVariableType] = useState<VariableType>();
 
-  useEffect(() => {
-    if (!isWasmAvailable() || !inputVariableType) {
-      return;
-    }
+  const isRoot = path.length === 0;
 
-    const resultingVariableType = inputVariableType.clone();
-    expressions
-      .filter((e) => e.key.length > 0)
-      .forEach((expr) => {
-        const calculatedType = resultingVariableType.calculateType(expr.value);
-        resultingVariableType.set(`$.${expr.key}`, calculatedType);
-      });
-
-    setVariableType(resultingVariableType);
-  }, [expressions, inputVariableType]);
+  // useEffect(() => {
+  //   if (!isWasmAvailable() || !inputVariableType) {
+  //     return;
+  //   }
+  //
+  //   const resultingVariableType = inputVariableType.clone();
+  //   expressions
+  //     .filter((e) => e.key.length > 0)
+  //     .forEach((expr) => {
+  //       const calculatedType = resultingVariableType.calculateType(expr.value);
+  //       resultingVariableType.set(`$.${expr.key}`, calculatedType);
+  //     });
+  //
+  //   setVariableType(resultingVariableType);
+  // }, [expressions, inputVariableType]);
 
   return (
     <>
-      <ExpressionHeading />
       <div className={'expression-list'}>
-        <ExpressionLineButton index={0} />
-        {(expressions || []).map((expression, index) => (
+        <ExpressionLineButton path={path} />
+        {(expressions || []).map((expression, expressionIndex) => (
           <React.Fragment key={expression.id}>
-            <ExpressionItem expression={expression} index={index} variableType={variableType} />
-            {index !== expressions.length - 1 && <ExpressionLineButton index={index + 1} />}
+            {match(expression)
+              .with({ rules: P.array() }, (group) => (
+                <ExpressionGroup key={group.id} group={group} path={[...path, expressionIndex.toString()]} />
+              ))
+              .otherwise((item) => (
+                <ExpressionItem
+                  expression={item}
+                  path={[...path, expressionIndex.toString()]}
+                  variableType={variableType}
+                />
+              ))}
+
+            {(!isRoot || expressionIndex !== expressions.length - 1) && (
+              <ExpressionLineButton path={[...path, (expressionIndex + 1).toString()]} />
+            )}
           </React.Fragment>
         ))}
-        <ExpressionLineButton index={0} />
-
-        <ExpressionCondition kind='If' />
-        <div>
-          <ExpressionLineButton index={0} style={{ paddingLeft: 20 }} />
-          <div className="hello" style={{ paddingLeft: 20 }}>
-            {(expressions || []).map((expression, index) => (
-              <React.Fragment key={expression.id}>
-                <ExpressionItem squares={1} expression={expression} index={index} variableType={variableType} />
-                {index !== expressions.length - 1 && <ExpressionLineButton index={index + 1} />}
-              </React.Fragment>
-            ))}
-            <ExpressionLineButton index={0} />
-
-            <ExpressionCondition kind='If' />
-            <div>
-              <ExpressionLineButton index={0} style={{ paddingLeft: 20 }} />
-              <div style={{ paddingLeft: 20 }}>
-                {(expressions || []).map((expression, index) => (
-                  <React.Fragment key={expression.id}>
-                    <ExpressionItem squares={2} expression={expression} index={index} variableType={variableType} />
-                    {index !== expressions.length - 1 && <ExpressionLineButton index={index + 1} />}
-                  </React.Fragment>
-                ))}
-              </div>
-              <ExpressionLineButton index={0} style={{ paddingLeft: 20 }} />
-            </div>
-          </div>
-          <ExpressionLineButton index={0} style={{ paddingLeft: 20 }} />
-        </div>
-
-        <ExpressionCondition kind='Else if' />
-        <div>
-          <ExpressionLineButton index={0} style={{ paddingLeft: 20 }} />
-          <div style={{ paddingLeft: 20 }}>
-            {(expressions || []).map((expression, index) => (
-              <React.Fragment key={expression.id}>
-                <ExpressionItem squares={1} expression={expression} index={index} variableType={variableType} />
-                {index !== expressions.length - 1 && <ExpressionLineButton index={index + 1} />}
-              </React.Fragment>
-            ))}
-          </div>
-          <ExpressionLineButton index={0} style={{ paddingLeft: 20 }} />
-        </div>
-
-        <ExpressionLineButton
-          className='expression-list__lineButton--bottom'
-          index={expressions.length}
-          alwaysVisible
-          size='large'
-        />
+        {isRoot && (
+          <ExpressionLineButton
+            className='expression-list__lineButton--bottom'
+            path={[expressions.length.toString()]}
+            alwaysVisible
+            size='large'
+          />
+        )}
       </div>
     </>
   );

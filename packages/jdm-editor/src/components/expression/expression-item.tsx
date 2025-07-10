@@ -1,10 +1,8 @@
 import type { VariableType } from '@gorules/zen-engine-wasm';
-import type { Row } from '@tanstack/react-table';
 import { Typography } from 'antd';
 import clsx from 'clsx';
 import { GripVerticalIcon } from 'lucide-react';
-import React, { useRef, useState } from 'react';
-import { useDrag, useDrop } from 'react-dnd';
+import React, { useState } from 'react';
 
 import { getTrace } from '../../helpers/trace';
 import { CodeEditorPreview } from '../code-editor/ce-preview';
@@ -14,72 +12,47 @@ import { DiffAutosizeTextArea } from '../shared';
 import { DiffCodeEditor } from '../shared/diff-ce';
 import type { ExpressionEntryItem } from './context/expression-store.context';
 import { useExpressionStore } from './context/expression-store.context';
+import { useExpressionDnd } from './dnd';
 
 export type ExpressionItemProps = {
   expression: ExpressionEntryItem;
-  index: number;
+  path: string[];
   variableType?: VariableType;
-  squares?: number;
 };
 
-export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, index, variableType, squares = 0 }) => {
+export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, path, variableType }) => {
   const [isFocused, setIsFocused] = useState(false);
-  const expressionRef = useRef<HTMLDivElement>(null);
-  const { updateRow, removeRow, swapRows, disabled, configurable } = useExpressionStore(
-    ({ updateRow, removeRow, swapRows, disabled, configurable }) => ({
-      updateRow,
+  const { updateRow, removeRow, disabled, configurable } = useExpressionStore(
+    ({ patchRow, removeRow, disabled, configurable }) => ({
+      updateRow: patchRow,
       removeRow,
-      swapRows,
       disabled,
       configurable,
     }),
   );
 
   const onChange = (update: Partial<Omit<ExpressionEntryItem, 'id'>>) => {
-    updateRow(index, update);
+    updateRow(path, update);
   };
 
   const onRemove = () => {
-    removeRow(index);
+    removeRow(path);
   };
 
-  const [{ isDropping, direction }, dropRef] = useDrop({
-    accept: 'row',
-    collect: (monitor) => ({
-      isDropping: monitor.isOver({ shallow: true }),
-      direction: (monitor.getDifferenceFromInitialOffset()?.y || 0) > 0 ? 'down' : 'up',
-    }),
-    drop: (draggedRow: Row<Record<string, string>>) => {
-      swapRows(draggedRow.index, index);
-    },
+  const { dropRef, dragRef, isDragging, isDropping, dropDirection } = useExpressionDnd({
+    type: 'item',
+    accept: ['item', 'group'],
+    path,
   });
-
-  const [{ isDragging }, dragRef, previewRef] = useDrag({
-    canDrag: configurable && !disabled,
-    item: () => ({ ...expression, index }),
-    type: 'row',
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  });
-
-  previewRef(dropRef(expressionRef));
 
   return (
     <div
-      ref={expressionRef}
+      ref={dropRef}
       className={clsx('expression-list-item')}
       data-dragging={isDragging ? 'true' : 'false'}
-      data-dropping={isDropping ? direction : undefined}
+      data-dropping={isDropping ? dropDirection : undefined}
       data-diff={expression?._diff?.status}
     >
-      {squares > 0 && (
-        <div className="expression-list-item__squares" data-count={squares}>
-          {Array.from({ length: squares }).map((_, i) => (
-            <div key={i} className="expression-list-item__squares__square" />
-          ))}
-        </div>
-      )}
       <div ref={dragRef} className='expression-list-item__drag' aria-disabled={!configurable || disabled}>
         {expression?._diff?.status ? (
           <DiffIcon status={expression?._diff?.status} style={{ fontSize: 16 }} />

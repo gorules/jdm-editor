@@ -7,10 +7,11 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import { isWasmAvailable } from '../../helpers/wasm';
 import type { ExpressionStore } from './context/expression-store.context';
-import { ExpressionStoreProvider, useExpressionStoreRaw } from './context/expression-store.context';
+import { ExpressionStoreProvider, useExpressionStore, useExpressionStoreRaw } from './context/expression-store.context';
 import { ExpressionCommandBar } from './expression-command-bar';
 import type { ExpressionControllerProps } from './expression-controller';
 import { ExpressionController } from './expression-controller';
+import { ExpressionHeading } from './expression-heading';
 import { ExpressionList } from './expression-list';
 import './expression.scss';
 
@@ -50,13 +51,29 @@ export const Expression: React.FC<ExpressionProps> = ({ manager, debug, hideComm
           <ExpressionStoreProvider>
             <ExpressionController {...props} />
             {!hideCommandBar && <ExpressionCommandBar />}
-            <ExpressionList />
+            <ExpressionHeading />
+            <ExpressionBody />
             <SimulateDataSync debug={debug} />
           </ExpressionStoreProvider>
         </DndProvider>
       )}
     </div>
   );
+};
+
+const ExpressionBody: React.FC = () => {
+  const { expressions, addRowBelow, configurable, disabled, inputVariableType } = useExpressionStore(
+    ({ expressions, addRowBelow, configurable, disabled, inputVariableType }) => ({
+      expressions,
+      addRowBelow,
+      configurable,
+      disabled,
+      inputVariableType,
+    }),
+    equal,
+  );
+
+  return <ExpressionList expressions={expressions} />;
 };
 
 const SimulateDataSync: React.FC<Pick<ExpressionProps, 'debug'>> = ({ debug }) => {
