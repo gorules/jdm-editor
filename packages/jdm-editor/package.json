@@ -1,9 +1,9 @@
 {
-  "name": "@gorules/jdm-editor",
+  "name": "giorules-jdm-editor",
   "version": "1.45.0",
-  "description": "",
-  "author": "GoRules <hi@gorules.io> (https://gorules.io)",
-  "homepage": "https://github.com/gorules/jdm-editor",
+  "description": "React 19 Compatible Fork of GoRules JDM Editor",
+  "author": "Giorgio Delgado & CoPlane Inc.",
+  "homepage": "https://github.com/supermacro/gio-rules",
   "license": "MIT",
   "keywords": [],
   "type": "module",
