@@ -1,11 +1,12 @@
 import { WarningFilled } from '@ant-design/icons';
-import { Button, Tooltip, Typography } from 'antd';
+import { Button, Form, Tooltip, Typography } from 'antd';
 import _ from 'lodash';
 import React from 'react';
 import { P, match } from 'ts-pattern';
 
 import { defaultFunctionValue } from '../../../function/helpers/libs';
-import { useDecisionGraphActions, useDecisionGraphState } from '../../context/dg-store.context';
+import { DiffSwitch } from '../../../shared';
+import { useDecisionGraphActions, useDecisionGraphState, useNodeDiff } from '../../context/dg-store.context';
 import type { DiffMetadata } from '../../dg-types';
 import { TabFunction } from '../../graph/tab-function';
 import { GraphNode } from '../graph-node';
@@ -17,6 +18,7 @@ export type NodeFunctionData =
   | string
   | {
       source: string;
+      omitNodes?: boolean;
     };
 
 export const functionSpecification: NodeSpecification<NodeFunctionData> = {
@@ -27,6 +29,51 @@ export const functionSpecification: NodeSpecification<NodeFunctionData> = {
   shortDescription: 'Javascript lambda',
   color: NodeColor.Orange,
   renderTab: ({ id }) => <TabFunction id={id} />,
+  renderSettings: ({ id }) => {
+    const graphActions = useDecisionGraphActions();
+    const { contentDiff } = useNodeDiff(id);
+    const storeData = useDecisionGraphState(({ decisionGraph, disabled }) => {
+      const content = (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content as NodeFunctionData;
+      if (typeof content === 'string') {
+        return { version: 'v1' as const };
+      }
+
+      return {
+        version: 'v2' as const,
+        disabled,
+        fields: {
+          omitNodes: content?.omitNodes || null,
+        },
+      };
+    });
+
+    if (storeData.version === 'v1') {
+      return <div className={'settings-form'}>Settings not available for function v1.</div>;
+    }
+
+    const { disabled, fields } = storeData;
+    const updateNode = (data: Partial<NodeFunctionData>) => {
+      graphActions.updateNode(id, (draft) => {
+        Object.assign(draft.content, data);
+        return draft;
+      });
+    };
+
+    return (
+      <div className={'settings-form'}>
+        <Form.Item label='Omit $nodes'>
+          <DiffSwitch
+            disabled={disabled}
+            size={'small'}
+            displayDiff={contentDiff?.fields?.omitNodes?.status === 'modified'}
+            checked={!!fields?.omitNodes}
+            previousChecked={contentDiff?.fields?.omitNodes?.previousValue}
+            onChange={(e) => updateNode({ omitNodes: e })}
+          />
+        </Form.Item>
+      </div>
+    );
+  },
   getDiffContent: (current, previous): any => {
     const fields: DiffMetadata['fields'] = {};
     const kind = match(current)
@@ -47,6 +94,13 @@ export const functionSpecification: NodeSpecification<NodeFunctionData> = {
           _.set(fields, 'source', {
             previousValue: previous.source,
             status: 'modified',
+          });
+        }
+
+        if ((current?.omitNodes || false) !== (previous?.omitNodes || false)) {
+          _.set(fields, 'omitNodes', {
+            status: 'modified',
+            previousValue: previous.omitNodes,
           });
         }
       })
