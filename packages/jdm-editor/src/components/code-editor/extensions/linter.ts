@@ -158,18 +158,22 @@ export const validateZenExpression = ({
   const expressionDiagnostics = source ? lintExpression(expressionType, source) : [];
   const typeDiagnostics: Diagnostic[] = types
     .filter((t) => !!t.error)
-    .map((t) =>
-      createDiagnostic({
-        from: t.span[0],
-        to: t.span[1],
+    .map((t) => {
+      // Ensure span values are valid to prevent CodeMirror infinite loops
+      const from = Math.min(t.span[0], t.span[1]);
+      const to = Math.max(t.span[0], t.span[1]);
+      
+      return createDiagnostic({
+        from,
+        to,
         severity: match(t.error as string)
           .with(P.string.startsWith('Hint:'), () => 'hint' as const)
           .with(P.string.startsWith('Info:'), () => 'info' as const)
           .otherwise(() => 'warning' as const),
         message: t.error as string,
         source: 'Type check',
-      }),
-    );
+      });
+    });
 
   const diagnostics = [...expressionDiagnostics, ...typeDiagnostics];
 
