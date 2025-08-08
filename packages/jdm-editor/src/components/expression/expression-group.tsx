@@ -41,9 +41,9 @@ const ExpressionGroupLineButton: React.FC<
   }
 > = ({ dragRef, path = [], alwaysVisible, size: _size = 'default', className, ...props }) => {
   const storeRaw = useExpressionStoreRaw();
-  const { disabled, configurable } = useExpressionStore(({ disabled, configurable }) => ({
+  const { disabled, permission } = useExpressionStore(({ disabled, permission }) => ({
     disabled,
-    configurable,
+    permission,
   }));
 
   const size = match(_size)
@@ -84,7 +84,7 @@ const ExpressionGroupLineButton: React.FC<
       </div>
       <ConfirmAction
         iconOnly
-        disabled={!configurable || disabled}
+        disabled={permission !== 'edit:full' || disabled}
         onConfirm={() => {
           storeRaw.getState().removeRow(path);
         }}

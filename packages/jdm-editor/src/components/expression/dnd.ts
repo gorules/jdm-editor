@@ -32,9 +32,9 @@ const getDropDirection = (monitor: DropTargetMonitor): 'down' | 'up' => {
 
 export const useExpressionDnd = ({ type, accept, path, dropDirection: allowedDropDirection }: ExpressionDndOptions) => {
   const _dropRef = useRef<HTMLDivElement>(null);
-  const { disabled, configurable, swapRows } = useExpressionStore(({ disabled, configurable, swapRows }) => ({
+  const { disabled, permission, swapRows } = useExpressionStore(({ disabled, permission, swapRows }) => ({
     disabled,
-    configurable,
+    permission,
     swapRows,
   }));
 
@@ -70,7 +70,7 @@ export const useExpressionDnd = ({ type, accept, path, dropDirection: allowedDro
 
   const [{ isDragging }, dragRef, previewRef] = useDrag<ExpressionDragObject, unknown, ExpressionDragCollect>({
     type,
-    canDrag: configurable && !disabled,
+    canDrag: permission === 'edit:full' && !disabled,
     item: () => ({ path }),
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),

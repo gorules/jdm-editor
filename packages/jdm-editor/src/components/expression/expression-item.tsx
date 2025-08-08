@@ -22,12 +22,12 @@ export type ExpressionItemProps = {
 export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, path, dragRef }) => {
   const visualDebug = useVisualDebug();
   const [isFocused, setIsFocused] = useState(false);
-  const { updateRow, removeRow, disabled, configurable, calculatedVariableType } = useExpressionStore(
-    ({ patchRow, removeRow, disabled, configurable, calculatedVariableType }) => ({
+  const { updateRow, removeRow, disabled, permission, calculatedVariableType } = useExpressionStore(
+    ({ patchRow, removeRow, disabled, permission, calculatedVariableType }) => ({
       updateRow: patchRow,
       removeRow,
       disabled,
-      configurable,
+      permission,
       calculatedVariableType,
     }),
   );
@@ -47,7 +47,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, path
           <Typography.Text type='secondary'>{path.join('.')}</Typography.Text>
         </div>
       )}
-      <div ref={dragRef} className='expression-item__drag' aria-disabled={!configurable || disabled}>
+      <div ref={dragRef} className='expression-item__drag' aria-disabled={permission !== 'edit:full' || disabled}>
         {expression?._diff?.status ? (
           <DiffIcon status={expression?._diff?.status} style={{ fontSize: 16 }} />
         ) : (
@@ -56,7 +56,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, path
       </div>
       <div
         className='expression-item__key'
-        aria-disabled={!configurable || disabled}
+        aria-disabled={permission !== 'edit:full' || disabled}
         onClick={(e) => {
           if (e.target instanceof HTMLTextAreaElement) {
             return;
@@ -76,7 +76,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, path
           noStyle
           placeholder='Key'
           maxRows={10}
-          readOnly={!configurable || disabled}
+          readOnly={permission !== 'edit:full' || disabled}
           displayDiff={expression?._diff?.fields?.key?.status === 'modified'}
           previousValue={expression?._diff?.fields?.key?.previousValue}
           value={expression?.key}
@@ -104,7 +104,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, path
         </div>
       </div>
       <div className='expression-item__action'>
-        <ConfirmAction iconOnly disabled={!configurable || disabled} onConfirm={onRemove} />
+        <ConfirmAction iconOnly disabled={permission !== 'edit:full' || disabled} onConfirm={onRemove} />
         {isFocused && <ExpressionLivePreview id={expression.id} value={expression.value} />}
       </div>
     </div>

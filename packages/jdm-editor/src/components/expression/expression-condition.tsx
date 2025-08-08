@@ -30,12 +30,12 @@ export const ExpressionCondition: React.FC<ExpressionConditionProps> = ({
   const visualDebug = useVisualDebug();
   const [isFocused, setIsFocused] = useState(false);
   const storeRaw = useExpressionStoreRaw();
-  const { disabled, configurable, updateRow, calculatedVariableType } = useExpressionStore(
-    ({ disabled, configurable, updateRow, calculatedVariableType }) => ({
+  const { disabled, updateRow, calculatedVariableType, permission } = useExpressionStore(
+    ({ disabled, updateRow, calculatedVariableType, permission }) => ({
       disabled,
-      configurable,
       updateRow,
       calculatedVariableType,
+      permission,
     }),
   );
 
@@ -59,7 +59,7 @@ export const ExpressionCondition: React.FC<ExpressionConditionProps> = ({
           <Typography.Text type='secondary'>{path.join('.')}</Typography.Text>
         </div>
       )}
-      <div ref={dragRef} className='expression-item__drag' aria-disabled={!configurable || disabled}>
+      <div ref={dragRef} className='expression-item__drag' aria-disabled={permission !== 'edit:full' || disabled}>
         <GripVerticalIcon size={10} />
         {/*{expression?._diff?.status ? (*/}
         {/*  <DiffIcon status={expression?._diff?.status} style={{ fontSize: 16 }} />*/}
@@ -97,7 +97,7 @@ export const ExpressionCondition: React.FC<ExpressionConditionProps> = ({
       <div className='expression-item__action'>
         <ConfirmAction
           iconOnly
-          disabled={!configurable || disabled}
+          disabled={permission !== 'edit:full' || disabled}
           onConfirm={() => {
             storeRaw.getState().removeRow(path);
           }}
