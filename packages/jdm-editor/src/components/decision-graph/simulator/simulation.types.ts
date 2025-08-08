@@ -46,7 +46,11 @@ export type SimulationTraceDataFunction = {
 
 type Arrayable<T> = T | T[];
 
-export type SimulationTraceDataExpression = Arrayable<Record<string, { result: string }>>;
+type SimulationTraceDataExpressionSingle = {
+  expressions: Record<string, { result: string }>;
+};
+
+export type SimulationTraceDataExpression = Arrayable<SimulationTraceDataExpressionSingle>;
 
 type SimulationTraceDataTableSingle = {
   index: number;
@@ -55,7 +59,7 @@ type SimulationTraceDataTableSingle = {
   rule: Record<string, string>;
 };
 
-export type SimulationTraceDataTable = SimulationTraceDataTableSingle | SimulationTraceDataTableSingle[];
+export type SimulationTraceDataTable = Arrayable<SimulationTraceDataTableSingle>;
 
 export type SimulationTraceDataSwitch = {
   statements: {

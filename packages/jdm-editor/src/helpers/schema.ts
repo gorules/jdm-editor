@@ -21,216 +21,213 @@ const nodeCommon = z.object({
   position: z.object({ x: z.number(), y: z.number() }).default({ x: 0, y: 0 }),
 });
 
-export const inputNodeSchema = z
-  .object({
-    type: z.literal(NodeKind.Input),
-    content: z
-      .object({
-        schema: z
-          .string()
-          .nullish()
-          .transform((val) => val ?? ''),
-      })
-      .default({
-        schema: '',
-      }),
-  })
-  .merge(nodeCommon);
+const node = nodeCommon.extend;
 
-export const outputNodeSchema = z
-  .object({
-    type: z.literal(NodeKind.Output),
-    content: z
-      .object({
-        schema: z
-          .string()
-          .nullish()
-          .transform((val) => val ?? ''),
-      })
-      .default({
-        schema: '',
-      }),
-  })
-  .merge(nodeCommon);
-
-export const decisionTableSchema = z
-  .object({
-    type: z.literal(NodeKind.DecisionTable),
-    content: z.object({
-      hitPolicy: z
-        .enum(['first', 'collect'])
-        .nullish()
-        .transform((val) => val ?? 'first'),
-      rules: z
-        .array(
-          z.record(
-            z.string(),
-            z
-              .string()
-              .nullish()
-              .transform((val) => val ?? ''),
-          ),
-        )
-        .default([]),
-      inputs: z.array(
-        z.object({
-          id,
-          name: z.string().nullish(),
-          field: z.string().nullish(),
-          defaultValue: z.string().nullish(),
-        }),
-      ),
-      outputs: z.array(
-        z.object({
-          id,
-          name: z.string(),
-          field: z.string(),
-          defaultValue: z.string().nullish(),
-        }),
-      ),
-      passThrough: z
-        .boolean()
-        .nullish()
-        .transform((val) => val ?? false),
-      inputField: z
+export const inputNodeSchema = node({
+  type: z.literal(NodeKind.Input),
+  content: z
+    .object({
+      schema: z
         .string()
         .nullish()
-        .default(null)
-        .transform((val) => (val && val.trim().length > 0 ? val : null)),
-      outputPath: z
-        .string()
-        .nullish()
-        .default(null)
-        .transform((val) => (val && val.trim().length > 0 ? val : null)),
-      executionMode: z
-        .enum(['single', 'loop'])
-        .nullish()
-        .transform((val) => val ?? 'single'),
+        .transform((val) => val ?? ''),
+    })
+    .default({
+      schema: '',
     }),
-  })
-  .merge(nodeCommon);
+});
 
-export const functionNodeSchema = z
-  .object({
-    type: z.literal(NodeKind.Function),
-    content: z
-      .string()
-      .or(
-        z.object({
-          source: z.string().default(''),
-          omitNodes: z
-            .boolean()
-            .nullish()
-            .transform((val) => val ?? false),
-        }),
-      )
-      .nullish(),
-  })
-  .merge(nodeCommon);
-
-export const expressionNodeSchema = z
-  .object({
-    type: z.literal(NodeKind.Expression),
-    content: z.object({
-      expressions: z.array(
-        z.object({
-          id,
-          key: z.string().default(''),
-          value: z.string().default(''),
-        }),
-      ),
-      passThrough: z
-        .boolean()
-        .nullish()
-        .transform((val) => val ?? false),
-      inputField: z
+export const outputNodeSchema = node({
+  type: z.literal(NodeKind.Output),
+  content: z
+    .object({
+      schema: z
         .string()
         .nullish()
-        .default(null)
-        .transform((val) => (val && val.trim().length > 0 ? val : null)),
-      outputPath: z
-        .string()
-        .nullish()
-        .default(null)
-        .transform((val) => (val && val.trim().length > 0 ? val : null)),
-      executionMode: z
-        .enum(['single', 'loop'])
-        .nullish()
-        .transform((val) => val ?? 'single'),
-    }),
-  })
-  .merge(nodeCommon);
+        .transform((val) => val ?? ''),
+    })
+    .default({ schema: '' }),
+});
 
-export const decisionNodeSchema = z
-  .object({
-    type: z.literal(NodeKind.Decision),
-    content: z.object({
-      key: z.string(),
-      passThrough: z
-        .boolean()
-        .nullish()
-        .transform((val) => val ?? false),
-      inputField: z
-        .string()
-        .nullish()
-        .default(null)
-        .transform((val) => (val && val.trim().length > 0 ? val : null)),
-      outputPath: z
-        .string()
-        .nullish()
-        .default(null)
-        .transform((val) => (val && val.trim().length > 0 ? val : null)),
-      executionMode: z
-        .enum(['single', 'loop'])
-        .nullish()
-        .transform((val) => val ?? 'single'),
-    }),
-  })
-  .merge(nodeCommon);
-
-export const switchNodeSchema = z
-  .object({
-    type: z.literal(NodeKind.Switch),
-    content: z.object({
-      hitPolicy: z
-        .enum(['first', 'collect'])
-        .nullish()
-        .transform((val) => val ?? 'first'),
-      statements: z.array(
-        z.object({
-          id,
-          condition: z
+export const decisionTableSchema = node({
+  type: z.literal(NodeKind.DecisionTable),
+  content: z.object({
+    hitPolicy: z
+      .enum(['first', 'collect'])
+      .nullish()
+      .transform((val) => val ?? 'first'),
+    rules: z
+      .array(
+        z.record(
+          z.string(),
+          z
             .string()
             .nullish()
             .transform((val) => val ?? ''),
-          isDefault: z
-            .boolean()
-            .nullish()
-            .transform((val) => val ?? false),
-        }),
-      ),
-    }),
-  })
-  .merge(nodeCommon);
+        ),
+      )
+      .default([]),
+    inputs: z.array(
+      z.object({
+        id,
+        name: z.string().nullish(),
+        field: z.string().nullish(),
+        defaultValue: z.string().nullish(),
+      }),
+    ),
+    outputs: z.array(
+      z.object({
+        id,
+        name: z.string(),
+        field: z.string(),
+        defaultValue: z.string().nullish(),
+      }),
+    ),
+    passThrough: z
+      .boolean()
+      .nullish()
+      .transform((val) => val ?? false),
+    inputField: z
+      .string()
+      .nullish()
+      .default(null)
+      .transform((val) => (val && val.trim().length > 0 ? val : null)),
+    outputPath: z
+      .string()
+      .nullish()
+      .default(null)
+      .transform((val) => (val && val.trim().length > 0 ? val : null)),
+    executionMode: z
+      .enum(['single', 'loop'])
+      .nullish()
+      .transform((val) => val ?? 'single'),
+  }),
+});
 
-export const customNodeSchema = z
-  .object({
-    type: z.literal(CustomKind),
-    content: z.object({
-      kind: z.string(),
-      config: z.any(),
-    }),
-  })
-  .merge(nodeCommon);
+export const functionNodeSchema = node({
+  type: z.literal(NodeKind.Function),
+  content: z
+    .string()
+    .or(
+      z.object({
+        source: z.string().default(''),
+        omitNodes: z
+          .boolean()
+          .nullish()
+          .transform((val) => val ?? false),
+      }),
+    )
+    .nullish(),
+});
 
-export const anyNodeSchema = z
-  .object({
-    type: z.string().refine((val) => !(Object.values(NodeKind) as string[]).includes(val), {
-      message: 'Invalid type',
-    }),
-    content: z.any().nullish(),
-  })
-  .merge(nodeCommon);
+const expressionItemSchema = z.object({
+  id,
+  key: z.string().default(''),
+  value: z.string().default(''),
+});
+
+const expressionGroupSchema = z.object({
+  id,
+  rules: z
+    .object({
+      id,
+      if: z.string().trim().optional(),
+      get then() {
+        return expressionEntrySchema.array();
+      },
+    })
+    .array(),
+});
+
+const expressionEntrySchema = z.union([expressionItemSchema, expressionGroupSchema]);
+
+export const expressionNodeSchema = node({
+  type: z.literal(NodeKind.Expression),
+  content: z.object({
+    expressions: expressionEntrySchema.array(),
+    passThrough: z
+      .boolean()
+      .nullish()
+      .transform((val) => val ?? false),
+    inputField: z
+      .string()
+      .nullish()
+      .default(null)
+      .transform((val) => (val && val.trim().length > 0 ? val : null)),
+    outputPath: z
+      .string()
+      .nullish()
+      .default(null)
+      .transform((val) => (val && val.trim().length > 0 ? val : null)),
+    executionMode: z
+      .enum(['single', 'loop'])
+      .nullish()
+      .transform((val) => val ?? 'single'),
+  }),
+});
+
+export const decisionNodeSchema = node({
+  type: z.literal(NodeKind.Decision),
+  content: z.object({
+    key: z.string(),
+    passThrough: z
+      .boolean()
+      .nullish()
+      .transform((val) => val ?? false),
+    inputField: z
+      .string()
+      .nullish()
+      .default(null)
+      .transform((val) => (val && val.trim().length > 0 ? val : null)),
+    outputPath: z
+      .string()
+      .nullish()
+      .default(null)
+      .transform((val) => (val && val.trim().length > 0 ? val : null)),
+    executionMode: z
+      .enum(['single', 'loop'])
+      .nullish()
+      .transform((val) => val ?? 'single'),
+  }),
+});
+
+export const switchNodeSchema = node({
+  type: z.literal(NodeKind.Switch),
+  content: z.object({
+    hitPolicy: z
+      .enum(['first', 'collect'])
+      .nullish()
+      .transform((val) => val ?? 'first'),
+    statements: z.array(
+      z.object({
+        id,
+        condition: z
+          .string()
+          .nullish()
+          .transform((val) => val ?? ''),
+        isDefault: z
+          .boolean()
+          .nullish()
+          .transform((val) => val ?? false),
+      }),
+    ),
+  }),
+});
+
+export const customNodeSchema = node({
+  type: z.literal(CustomKind),
+  content: z.object({
+    kind: z.string(),
+    config: z.any(),
+  }),
+});
+
+export const anyNodeSchema = node({
+  type: z.string().refine((val) => !(Object.values(NodeKind) as string[]).includes(val), {
+    message: 'Invalid type',
+  }),
+  content: z.any().nullish(),
+});
 
 export const nodeSchema = z
   .discriminatedUnion('type', [

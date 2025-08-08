@@ -1,77 +1,118 @@
-import { PlusCircleOutlined } from '@ant-design/icons';
-import type { VariableType } from '@gorules/zen-engine-wasm';
-import { Button, Typography } from 'antd';
-import clsx from 'clsx';
-import equal from 'fast-deep-equal/es6/react';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { P, match } from 'ts-pattern';
 
-import { isWasmAvailable } from '../../helpers/wasm';
-import { useExpressionStore } from './context/expression-store.context';
+import type { ExpressionEntry, ExpressionEntryGroup, ExpressionEntryItem } from './context/expression-store.context';
+import { useExpressionDnd } from './dnd';
+import { ExpressionGroup } from './expression-group';
 import { ExpressionItem } from './expression-item';
+import { ExpressionLineButton } from './expression-line-button';
 
 export type ExpressionListProps = {
-  //
+  expressions: ExpressionEntry[];
+  path?: string[];
 };
 
-export const ExpressionList: React.FC<ExpressionListProps> = ({}) => {
-  const { expressions, addRowBelow, permission, disabled, inputVariableType } = useExpressionStore(
-    ({ expressions, addRowBelow, permission, disabled, inputVariableType }) => ({
-      expressions,
-      addRowBelow,
-      permission,
-      disabled,
-      inputVariableType,
-    }),
-    equal,
-  );
-
-  const [variableType, setVariableType] = useState<VariableType>();
-
-  useEffect(() => {
-    if (!isWasmAvailable() || !inputVariableType) {
-      return;
-    }
-
-    const resultingVariableType = inputVariableType.clone();
-    expressions
-      .filter((e) => e.key.length > 0)
-      .forEach((expr) => {
-        const calculatedType = resultingVariableType.calculateType(expr.value);
-        resultingVariableType.set(`$.${expr.key}`, calculatedType);
-      });
-
-    setVariableType(resultingVariableType);
-  }, [expressions, inputVariableType]);
+export const ExpressionList: React.FC<ExpressionListProps> = ({ expressions, path = [] }) => {
+  const isRoot = path.length === 0;
 
   return (
     <>
       <div className={'expression-list'}>
-        <div className={clsx('expression-list__item', 'expression-list__item--heading')}>
-          <div className={'expression-list__item__th expression-list__item__th--order'} />
-          <Typography.Text type='secondary' className={'expression-list__item__th expression-list__item__th--key'}>
-            Key
-          </Typography.Text>
-          <Typography.Text type='secondary' className={'expression-list__item__th'}>
-            Expression
-          </Typography.Text>
-          <div />
-        </div>
-        {(expressions || []).map((expression, index) => (
-          <ExpressionItem key={expression.id} expression={expression} index={index} variableType={variableType} />
-        ))}
+        {(expressions || []).map((expression, expressionIndex) => {
+          const showTopButton = expressionIndex === 0;
+          const showBottomButton = !isRoot || expressionIndex !== expressions.length - 1;
+
+          return match(expression)
+            .with({ rules: P.array() }, (group) => (
+              <ExpressionListGroup
+                key={group.id}
+                basePath={path}
+                group={group}
+                index={expressionIndex}
+                showTopButton={showTopButton}
+                showBottomButton={showBottomButton}
+              />
+            ))
+            .otherwise((item) => (
+              <ExpressionListItem
+                key={item.id}
+                basePath={path}
+                item={item}
+                showTopButton={showTopButton}
+                showBottomButton={showBottomButton}
+                index={expressionIndex}
+              />
+            ));
+        })}
+        {(isRoot || expressions.length === 0) && (
+          <ExpressionLineButton
+            className='expression-list__lineButton--bottom'
+            path={[...path, expressions.length.toString()]}
+            alwaysVisible
+            size='large'
+          />
+        )}
       </div>
-      {permission === 'edit:full' && !disabled && (
-        <div className={'expression-list__button-wrapper'}>
-          <Button
-            className='expression-list__button'
-            icon={<PlusCircleOutlined />}
-            type='link'
-            onClick={() => addRowBelow()}
-          >
-            Add row
-          </Button>
-        </div>
-      )}
     </>
+  );
+};
+
+const ExpressionListItem: React.FC<{
+  basePath: string[];
+  item: ExpressionEntryItem;
+  index: number;
+  showTopButton?: boolean;
+  showBottomButton?: boolean;
+}> = ({ basePath, item, index, showTopButton = false, showBottomButton = true }) => {
+  const path = [...basePath, index.toString()];
+  const { dropRef, dragRef, isDragging, dropDirection } = useExpressionDnd({
+    path,
+    type: 'item',
+    accept: ['item', 'group'],
+  });
+
+  return (
+    <div
+      ref={dropRef}
+      className='expression-list__item'
+      data-dragging={isDragging ? 'true' : 'false'}
+      data-dropping={dropDirection}
+      data-top-button={showTopButton}
+      data-bottom-button={showBottomButton}
+    >
+      {showTopButton && <ExpressionLineButton path={basePath} />}
+      <ExpressionItem expression={item} path={path} dragRef={dragRef} />
+      {showBottomButton && <ExpressionLineButton path={[...basePath, (index + 1).toString()]} />}
+    </div>
+  );
+};
+
+const ExpressionListGroup: React.FC<{
+  basePath: string[];
+  group: ExpressionEntryGroup;
+  index: number;
+  showTopButton?: boolean;
+  showBottomButton?: boolean;
+}> = ({ basePath, group, index, showTopButton = false, showBottomButton = true }) => {
+  const path = [...basePath, index.toString()];
+  const { dropRef, dragRef, isDragging, dropDirection } = useExpressionDnd({
+    path,
+    type: 'group',
+    accept: ['item', 'group'],
+  });
+
+  return (
+    <div
+      ref={dropRef}
+      className='expression-list__group'
+      data-dragging={isDragging ? 'true' : 'false'}
+      data-dropping={dropDirection}
+      data-top-button={showTopButton}
+      data-bottom-button={showBottomButton}
+    >
+      {showTopButton && <ExpressionLineButton path={basePath} />}
+      <ExpressionGroup key={group.id} group={group} path={path} dragRef={dragRef} />
+      {showBottomButton && <ExpressionLineButton path={[...basePath, (index + 1).toString()]} />}
+    </div>
   );
 };
