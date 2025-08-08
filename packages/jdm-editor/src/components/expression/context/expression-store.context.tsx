@@ -1,7 +1,7 @@
 import type { Variable, VariableType } from '@gorules/zen-engine-wasm';
 import equal from 'fast-deep-equal/es6/react';
 import type { WritableDraft } from 'immer';
-import { current, produce } from 'immer';
+import { produce } from 'immer';
 import _ from 'lodash';
 import React, { useMemo } from 'react';
 import { P, match } from 'ts-pattern';
@@ -17,7 +17,7 @@ import type { DiffMetadata } from '../../decision-graph/dg-types';
 const pathToArray = (path: string[]): [string, number] => {
   const newPath = path.join('.').split('.');
   const index = newPath.pop();
-  if (isNaN(index as unknown as number)) {
+  if (isNaN(Number(index))) {
     return [[...newPath, index].filter(Boolean).join('.'), 0];
   }
 
@@ -39,8 +39,9 @@ const ExpressionStoreContext = React.createContext<
   }
 >({} as any);
 
-export type ExpressionEntry = ExpressionEntryItem | ExpressionEntryGroup;
 type ExpressionEntryKind = 'item' | 'group';
+
+export type ExpressionEntry = ExpressionEntryItem | ExpressionEntryGroup;
 
 export type ExpressionEntryItem = {
   id: string;
@@ -49,13 +50,15 @@ export type ExpressionEntryItem = {
   _diff?: DiffMetadata;
 };
 
+export type ExpressionEntryGroupRule = {
+  id: string;
+  if?: string;
+  then: ExpressionEntry[];
+};
+
 export type ExpressionEntryGroup = {
   id: string;
-  rules: {
-    id: string;
-    if?: string;
-    then: ExpressionEntry[];
-  }[];
+  rules: ExpressionEntryGroupRule[];
 };
 
 type AddRowOptions = {
@@ -73,7 +76,7 @@ export type ExpressionStore = {
   expressions: ExpressionEntry[];
   setExpressions: (expressions: ExpressionEntry[]) => void;
 
-  swapRows: (sourcePath: string[], targetPath: string[]) => void;
+  swapRows: (sourcePath: string[], targetPath: string[], direction?: 'up' | 'down') => void;
   patchRow: (path: string[], update: Partial<Omit<ExpressionEntry, 'id'>>) => void;
   updateRow: (path: string[], updater: (draft: WritableDraft<ExpressionEntry>) => void) => void;
   removeRow: (path: string[]) => void;
@@ -82,6 +85,8 @@ export type ExpressionStore = {
 
   debugIndex: number;
   calculatedInputData?: Variable;
+  calculatedVariableType?: VariableType;
+
   debug?: {
     snapshot: z.infer<typeof expressionNodeSchema>['content'];
     trace: SimulationTrace<SimulationTraceDataExpression>;
@@ -150,9 +155,10 @@ export const ExpressionStoreProvider: React.FC<React.PropsWithChildren<Expressio
 
           set(
             produce<ExpressionStore>((draft) => {
+              const expressionLength = Math.max(draft.expressions.length - 1, 0);
               const path = match(defaultPath)
                 .with(P.nonNullable, (p) => p)
-                .otherwise(() => [(draft.expressions.length - 1).toString()]);
+                .otherwise(() => [expressionLength.toString()]);
 
               const [base, index] = pathToBase(draft.expressions, path);
               base.splice(index + 1, 0, createExpression(kind));
@@ -163,25 +169,19 @@ export const ExpressionStoreProvider: React.FC<React.PropsWithChildren<Expressio
         setExpressions: (expressions) => {
           set({ expressions });
         },
-        swapRows: (sourcePath, targetPath) => {
+        swapRows: (sourcePath, targetPath, direction = 'up') => {
           set(
             produce<ExpressionStore>((draft) => {
               const [sourceBase, sourceIndex] = pathToBase(draft.expressions, sourcePath);
               const [targetBase, targetIndex] = pathToBase(draft.expressions, targetPath);
 
+              const sameLevel = sourceBase === targetBase;
+              const additional = match([direction, sameLevel])
+                .with(['down', false], () => 1)
+                .otherwise(() => 0);
+
               const [input] = sourceBase.splice(sourceIndex, 1);
-
-              console.log({
-                sourcePath,
-                targetPath,
-                sourceBase: current(sourceBase),
-                sourceIndex,
-                targetBase: current(targetBase),
-                targetIndex,
-                input: current(input),
-              });
-
-              targetBase.splice(targetIndex, 0, input);
+              targetBase.splice(targetIndex + additional, 0, input);
             }),
           );
         },
@@ -189,7 +189,6 @@ export const ExpressionStoreProvider: React.FC<React.PropsWithChildren<Expressio
           set(
             produce<ExpressionStore>((draft) => {
               const [base, index] = pathToBase(draft.expressions, path);
-
               base.splice(index, 1);
             }),
           );

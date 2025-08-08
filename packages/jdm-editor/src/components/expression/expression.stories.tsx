@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 import React, { useState } from 'react';
 
+import { VisualDebugContext } from '../visual-debug.context';
 import type { ExpressionEntry } from './context/expression-store.context';
 import { Expression } from './expression';
 
@@ -12,10 +13,6 @@ const expressionDefault: ExpressionEntry[] = [
 ];
 
 const meta: Meta<typeof Expression> = {
-  /* 👇 The title prop is optional.
-   * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
-   * to learn how to generate automatic titles
-   */
   title: 'Expression',
   component: Expression,
   args: {
@@ -34,28 +31,19 @@ export default meta;
 
 type Story = StoryObj<typeof Expression>;
 
-const StoryWrapper: React.FC<React.PropsWithChildren<any>> = ({ children }) => (
-  <div style={{ maxWidth: 900 }}>{children}</div>
-);
-
-export const Uncontrolled: Story = {
-  render: (args) => {
-    return (
-      <StoryWrapper>
-        <Expression {...args} />
-      </StoryWrapper>
-    );
-  },
-};
+export const Uncontrolled: Story = {};
 
 export const Controlled: Story = {
   render: (args) => {
     const [value, setValue] = useState(expressionDefault);
-
-    return (
-      <StoryWrapper>
-        <Expression value={value} onChange={setValue} {...args} />
-      </StoryWrapper>
-    );
+    return <Expression value={value} onChange={setValue} {...args} />;
   },
+};
+
+export const VisualDebug: Story = {
+  render: (args) => (
+    <VisualDebugContext.Provider value={{ enabled: true }}>
+      <Expression {...args} />
+    </VisualDebugContext.Provider>
+  ),
 };

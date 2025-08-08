@@ -1,6 +1,6 @@
 import type { Completion } from '@codemirror/autocomplete';
 import { StateEffect, StateField } from '@codemirror/state';
-import type { VariableType } from '@gorules/zen-engine-wasm';
+import { VariableType } from '@gorules/zen-engine-wasm';
 import { P, match } from 'ts-pattern';
 
 import { applyCompletion } from './zen';
@@ -47,18 +47,14 @@ export const typeField = StateField.define<TypeField>({
         .otherwise(() => value.expectedVariableType);
 
       const updateVariableType = transaction.effects.find((e) => e.is(updateVariableTypeEffect));
-      const variableType: VariableType | null = match(updateVariableType)
-        .with({ value: P._ }, (e) => e.value)
-        .otherwise(() => value.root || null);
+      const variableType: VariableType = match(updateVariableType)
+        .with({ value: P._ }, (e) => e.value ?? VariableType.fromJson('Any'))
+        .otherwise(() => value.root ?? VariableType.fromJson('Any'));
 
       const updateStrictMode = transaction.effects.find((e) => e.is(updateStrictModeEffect));
       const strict: boolean = match(updateStrictMode)
         .with({ value: P.boolean }, ({ value }) => value)
         .otherwise(() => value.strict);
-
-      if (!variableType) {
-        return { ...value, expressionType, expectedVariableType, strict };
-      }
 
       // Triggered without effect and no changes, bail
       if (!transaction.docChanged && !updateExpressionType && !updateVariableType) {

@@ -374,7 +374,7 @@ const DecisionGraphWithSimulator: React.FC = () => {
             )}
             onRun={async ({ graph, context }) => {
               try {
-                const response = await fetch('https://editor.gorules.io/api/simulate', {
+                const response = await fetch('http://localhost:3000/api/simulate', {
                   method: 'POST',
                   body: JSON.stringify({ content: graph, context }),
                   headers: { 'content-type': 'application/json' },

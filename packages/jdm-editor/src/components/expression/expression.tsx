@@ -14,6 +14,7 @@ import { ExpressionController } from './expression-controller';
 import { ExpressionHeading } from './expression-heading';
 import { ExpressionList } from './expression-list';
 import './expression.scss';
+import { walkExpressions } from './walker';
 
 export type ExpressionProps = {
   manager?: DragDropManager;
@@ -53,7 +54,10 @@ export const Expression: React.FC<ExpressionProps> = ({ manager, debug, hideComm
             {!hideCommandBar && <ExpressionCommandBar />}
             <ExpressionHeading />
             <ExpressionBody />
+            {/* Expression overscroll */}
+            <div style={{ height: '40px' }} />
             <SimulateDataSync debug={debug} />
+            <ExpressionDataInference />
           </ExpressionStoreProvider>
         </DndProvider>
       )}
@@ -62,16 +66,7 @@ export const Expression: React.FC<ExpressionProps> = ({ manager, debug, hideComm
 };
 
 const ExpressionBody: React.FC = () => {
-  const { expressions, addRowBelow, configurable, disabled, inputVariableType } = useExpressionStore(
-    ({ expressions, addRowBelow, configurable, disabled, inputVariableType }) => ({
-      expressions,
-      addRowBelow,
-      configurable,
-      disabled,
-      inputVariableType,
-    }),
-    equal,
-  );
+  const { expressions } = useExpressionStore(({ expressions }) => ({ expressions }), equal);
 
   return <ExpressionList expressions={expressions} />;
 };
@@ -134,6 +129,58 @@ const SimulateDataSync: React.FC<Pick<ExpressionProps, 'debug'>> = ({ debug }) =
       }
 
       applyDebug(state);
+    });
+  }, []);
+
+  return null;
+};
+
+const ExpressionDataInference: React.FC = () => {
+  const expressionStoreRaw = useExpressionStoreRaw();
+
+  useEffect(() => {
+    const calculateHash = (store: ExpressionStore) => {
+      if (!store.inputVariableType) {
+        return null;
+      }
+
+      const referenceHash: Record<string, string> = {};
+      walkExpressions(store.expressions).forEach(({ type, entry }) => {
+        if (type === 'item') {
+          referenceHash[entry.key] = entry.value;
+        }
+      });
+
+      return referenceHash;
+    };
+
+    const applyCalculatedType = (store: ExpressionStore) => {
+      if (!store.inputVariableType) {
+        expressionStoreRaw.setState({ calculatedVariableType: undefined });
+        return;
+      }
+
+      const variableType = store.inputVariableType.clone();
+      walkExpressions(store.expressions).forEach(({ type, entry }) => {
+        if (type === 'item') {
+          const newType = variableType.calculateType(entry.value);
+          variableType.set(`$.${entry.key}`, newType);
+        }
+      });
+
+      expressionStoreRaw.setState({ calculatedVariableType: variableType });
+    };
+
+    applyCalculatedType(expressionStoreRaw.getState());
+    return expressionStoreRaw.subscribe((state, prevState) => {
+      const prevHash = calculateHash(prevState);
+      const hash = calculateHash(state);
+
+      if (equal(prevHash, hash)) {
+        return;
+      }
+
+      applyCalculatedType(state);
     });
   }, []);
 

@@ -1,12 +1,12 @@
-import { type VariableType } from '@gorules/zen-engine-wasm';
 import { Typography } from 'antd';
 import clsx from 'clsx';
 import { GripVerticalIcon, PlusIcon } from 'lucide-react';
 import React from 'react';
-import { ConnectDragSource } from 'react-dnd';
+import type { ConnectDragSource } from 'react-dnd';
 import { match } from 'ts-pattern';
 
 import { ConfirmAction } from '../confirm-action';
+import type { ExpressionEntryGroupRule } from './context/expression-store.context';
 import {
   type ExpressionEntryGroup,
   createExpression,
@@ -21,29 +21,15 @@ import { ExpressionList } from './expression-list';
 export type ExpressionGroupProps = {
   group: ExpressionEntryGroup;
   path: string[];
-  variableType?: VariableType;
+  dragRef?: ConnectDragSource;
 };
 
-export const ExpressionGroup: React.FC<ExpressionGroupProps> = ({ group, path, variableType }) => {
-  const { dragRef, dropRef, dropDirection, isDragging, isDropping } = useExpressionDnd({
-    type: 'group',
-    accept: ['group', 'item'],
-    path,
-  });
-
+export const ExpressionGroup: React.FC<ExpressionGroupProps> = ({ group, path, dragRef }) => {
   return (
-    <div
-      className={clsx('expression-group')}
-      ref={dropRef}
-      data-dragging={isDragging ? 'true' : 'false'}
-      data-dropping={isDropping ? dropDirection : undefined}
-    >
+    <div className='expression-group'>
       <ExpressionGroupLineButton dragRef={dragRef} alwaysVisible size='large' path={path} />
       {group.rules.map((r, index) => (
-        <React.Fragment key={r.id}>
-          <ExpressionCondition kind='If' path={[...path, `rules.${index}`]} />
-          <ExpressionList expressions={r.then} path={[...path, `rules.${index}.then`]} />
-        </React.Fragment>
+        <ExpressionGroupRule key={r.id} basePath={path} index={index} rule={r} />
       ))}
     </div>
   );
@@ -51,7 +37,7 @@ export const ExpressionGroup: React.FC<ExpressionGroupProps> = ({ group, path, v
 
 const ExpressionGroupLineButton: React.FC<
   React.ComponentProps<typeof ExpressionLineButton> & {
-    dragRef: ConnectDragSource;
+    dragRef?: ConnectDragSource;
   }
 > = ({ dragRef, path = [], alwaysVisible, size: _size = 'default', className, ...props }) => {
   const storeRaw = useExpressionStoreRaw();
@@ -103,6 +89,38 @@ const ExpressionGroupLineButton: React.FC<
           storeRaw.getState().removeRow(path);
         }}
       />
+    </div>
+  );
+};
+
+const ExpressionGroupRule: React.FC<{
+  basePath: string[];
+  index: number;
+  rule: ExpressionEntryGroupRule;
+}> = ({ basePath, index, rule }) => {
+  const conditionPath = [...basePath, `rules.${index}`];
+  const { dragRef, dropRef, isDragging, dropDirection } = useExpressionDnd({
+    type: 'condition',
+    accept: ['condition'],
+    path: conditionPath,
+  });
+
+  return (
+    <div
+      ref={dropRef}
+      className='expression-group__rule'
+      data-dragging={isDragging ? 'true' : 'false'}
+      data-dropping={dropDirection}
+      data-top-button={index === 0}
+    >
+      <ExpressionCondition
+        id={rule.id}
+        condition={rule.if}
+        kind={index === 0 ? 'If' : 'Else if'}
+        path={conditionPath}
+        dragRef={dragRef}
+      />
+      <ExpressionList expressions={rule.then} path={[...conditionPath, 'then']} />
     </div>
   );
 };

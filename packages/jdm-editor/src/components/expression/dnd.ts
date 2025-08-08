@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import type { DropTargetMonitor } from 'react-dnd';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { useExpressionStore } from './context/expression-store.context';
@@ -12,8 +13,7 @@ type ExpressionDragCollect = {
 };
 
 type ExpressionDropCollect = {
-  isDropping: boolean;
-  dropDirection: 'down' | 'up';
+  dropDirection?: 'down' | 'up';
 };
 
 type ExpressionDndType = 'item' | 'group' | 'condition';
@@ -22,9 +22,15 @@ type ExpressionDndOptions = {
   type: ExpressionDndType;
   accept: ExpressionDndType[];
   path: string[];
+  dropDirection?: ('up' | 'down')[];
 };
 
-export const useExpressionDnd = ({ type, accept, path }: ExpressionDndOptions) => {
+const getDropDirection = (monitor: DropTargetMonitor): 'down' | 'up' => {
+  const dropOffset = monitor.getDifferenceFromInitialOffset()?.y || 0;
+  return dropOffset > 0 ? 'down' : 'up';
+};
+
+export const useExpressionDnd = ({ type, accept, path, dropDirection: allowedDropDirection }: ExpressionDndOptions) => {
   const _dropRef = useRef<HTMLDivElement>(null);
   const { disabled, configurable, swapRows } = useExpressionStore(({ disabled, configurable, swapRows }) => ({
     disabled,
@@ -32,14 +38,33 @@ export const useExpressionDnd = ({ type, accept, path }: ExpressionDndOptions) =
     swapRows,
   }));
 
-  const [{ isDropping, dropDirection }, dropRef] = useDrop<ExpressionDragObject, unknown, ExpressionDropCollect>({
+  const [{ dropDirection }, dropRef] = useDrop<ExpressionDragObject, unknown, ExpressionDropCollect>({
     accept,
-    collect: (monitor) => ({
-      isDropping: monitor.isOver({ shallow: true }),
-      dropDirection: (monitor.getDifferenceFromInitialOffset()?.y || 0) > 0 ? 'down' : 'up',
-    }),
-    drop: (draggedRow) => {
-      swapRows(draggedRow.path, path);
+    collect: (monitor) => {
+      const isDropping = monitor.isOver({ shallow: true }) && monitor.canDrop();
+      if (!isDropping) {
+        return {};
+      }
+
+      return { dropDirection: getDropDirection(monitor) };
+    },
+    canDrop: (item, monitor) => {
+      if (!monitor.isOver({ shallow: true })) {
+        return false;
+      }
+
+      if (item.path.join('.') === path.join('.')) {
+        return false;
+      }
+
+      if (allowedDropDirection) {
+        return allowedDropDirection.includes(getDropDirection(monitor));
+      }
+
+      return true;
+    },
+    drop: (draggedRow, monitor) => {
+      swapRows(draggedRow.path, path, getDropDirection(monitor));
     },
   });
 
@@ -58,7 +83,6 @@ export const useExpressionDnd = ({ type, accept, path }: ExpressionDndOptions) =
     dropRef: _dropRef,
     dragRef,
     isDragging,
-    isDropping,
     dropDirection,
   };
 };
