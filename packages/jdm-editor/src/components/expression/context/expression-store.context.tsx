@@ -66,9 +66,12 @@ type AddRowOptions = {
   kind?: ExpressionEntryKind;
 };
 
+export type ExpressionPermission = 'edit:full' | 'edit:values' | 'view';
+
 export type ExpressionStore = {
-  configurable: boolean;
   disabled: boolean;
+
+  permission?: ExpressionPermission;
 
   addRowAbove: (options?: AddRowOptions) => void;
   addRowBelow: (options?: AddRowOptions) => void;
@@ -131,7 +134,6 @@ export const ExpressionStoreProvider: React.FC<React.PropsWithChildren<Expressio
   const store = useMemo(
     () =>
       create<ExpressionStore>((set) => ({
-        configurable: true,
         disabled: false,
         debugIndex: 0,
         addRowAbove: (options = {}) => {

@@ -14,6 +14,8 @@ import './function.scss';
 import { variableTypeToTypescript } from './helpers/determine-type';
 import { type FunctionLibrary, functionDefinitions, functionLibraries } from './helpers/libs';
 
+export type FunctionPermission = 'edit:full';
+
 export type FunctionProps = {
   disabled?: boolean;
   defaultValue?: string;
@@ -26,6 +28,7 @@ export type FunctionProps = {
   onMonacoReady?: (monaco: Monaco) => void;
   libraries?: FunctionLibrary[];
   inputData?: unknown;
+  permission?: FunctionPermission;
   error?: {
     data: { nodeId: string; source?: string };
   };
@@ -43,6 +46,7 @@ export const Function: React.FC<FunctionProps> = ({
   error,
   inputData,
   previousValue,
+  permission = 'edit:full',
   libraries = functionLibraries,
 }) => {
   const monaco = useMonaco();
@@ -266,7 +270,7 @@ export const Function: React.FC<FunctionProps> = ({
               height='100%'
               options={{
                 ...monacoOptions,
-                readOnly: disabled,
+                readOnly: disabled || permission !== 'edit:full',
               }}
             />
           )}
@@ -276,7 +280,13 @@ export const Function: React.FC<FunctionProps> = ({
             <PanelResizeHandle />
             <Panel minSize={25}>
               {!disableDebug && (
-                <FunctionDebugger libraries={functionLibraries} trace={trace} editor={editor} editorValue={value} />
+                <FunctionDebugger
+                  libraries={functionLibraries}
+                  trace={trace}
+                  editor={editor}
+                  editorValue={value}
+                  disabled={disabled || permission !== 'edit:full'}
+                />
               )}
             </Panel>
           </>

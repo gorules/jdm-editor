@@ -11,23 +11,17 @@ import React, { useMemo, useRef } from 'react';
 import { P, match } from 'ts-pattern';
 
 import type { DecisionNode } from '../decision-graph';
-import { DiffSelect } from '../shared';
 import { Stack } from '../stack';
-import {
-  type HitPolicy,
-  useDecisionTableActions,
-  useDecisionTableRaw,
-  useDecisionTableState,
-} from './context/dt-store.context';
+import { useDecisionTableActions, useDecisionTableRaw, useDecisionTableState } from './context/dt-store.context';
 import { exportDecisionTable, readDecisionTableFile } from './excel';
 
 export const DecisionTableCommandBar: React.FC = () => {
   const tableActions = useDecisionTableActions();
-  const { disableHitPolicy, disabled, configurable, hitPolicy, diffHitPolicy, debugIndex, traceCount, cursor } =
-    useDecisionTableState(({ disableHitPolicy, disabled, configurable, decisionTable, cursor, debugIndex, debug }) => ({
+  const { disabled, debugIndex, traceCount, cursor } = useDecisionTableState(
+    ({ disableHitPolicy, disabled, permission, decisionTable, cursor, debugIndex, debug }) => ({
       disableHitPolicy,
       disabled,
-      configurable,
+      permission,
       cursor,
       debugIndex,
       hitPolicy: decisionTable.hitPolicy,
@@ -35,7 +29,8 @@ export const DecisionTableCommandBar: React.FC = () => {
       traceCount: match(debug?.trace?.traceData)
         .with(P.array(), (some) => some.length)
         .otherwise(() => null),
-    }));
+    }),
+  );
 
   const { listenerStore, stateStore } = useDecisionTableRaw();
   const fileInput = useRef<HTMLInputElement>(null);
@@ -156,27 +151,6 @@ export const DecisionTableCommandBar: React.FC = () => {
             <Divider type='vertical' />
           </Stack>
         )}
-        <DiffSelect
-          displayDiff={diffHitPolicy?.status === 'modified'}
-          style={{ width: 140 }}
-          previousValue={diffHitPolicy?.previousValue}
-          size={'small'}
-          disabled={disabled || !configurable || disableHitPolicy}
-          value={hitPolicy}
-          onSelect={(data) => tableActions.updateHitPolicy(data as HitPolicy)}
-          options={[
-            {
-              key: 'first',
-              label: 'First',
-              value: 'first',
-            },
-            {
-              key: 'collect',
-              label: 'Collect',
-              value: 'collect',
-            },
-          ]}
-        />
       </Stack>
       <input
         multiple

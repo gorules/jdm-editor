@@ -111,6 +111,10 @@ export const functionNodeSchema = node({
     .or(
       z.object({
         source: z.string().default(''),
+        omitNodes: z
+          .boolean()
+          .nullish()
+          .transform((val) => val ?? false),
       }),
     )
     .nullish(),

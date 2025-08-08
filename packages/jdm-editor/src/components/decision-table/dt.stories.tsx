@@ -126,7 +126,10 @@ const meta: Meta<typeof DecisionTable> = {
   title: 'Decision Table',
   component: DecisionTable,
   argTypes: {
-    configurable: { control: 'boolean' },
+    permission: {
+      control: 'select',
+      options: ['edit:full', 'edit:rules', 'edit:values'],
+    },
     disabled: { control: 'boolean' },
     cellRenderer: {
       control: false,
@@ -134,7 +137,7 @@ const meta: Meta<typeof DecisionTable> = {
   },
   args: {
     inputsSchema: inputSchemaDefault,
-    configurable: true,
+    permission: 'edit:full',
     disabled: false,
     onChange: fn(),
   },

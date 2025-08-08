@@ -412,3 +412,30 @@ const DecisionGraphWithSimulator: React.FC = () => {
     </div>
   );
 };
+
+export const View: Story = {
+  args: {
+    viewConfig: {
+      enabled: true,
+      description: 'Configure business rules for your decision model',
+      permissions: {
+        '359173d8-0068-45f8-bb71-8240ad73201d': 'edit:values',
+        'a750cebf-ca75-4acd-a272-7040626abd73': 'edit:values',
+      },
+    },
+    viewConfigCta: 'Configure',
+  },
+  render: (args) => {
+    const [value, setValue] = useState<any>(defaultGraph);
+
+    return (
+      <div
+        style={{
+          height: '100%',
+        }}
+      >
+        <DecisionGraph {...args} value={value} onChange={(val) => setValue?.(val)} />
+      </div>
+    );
+  },
+};

@@ -55,12 +55,11 @@ export const TabJsonSchema: React.FC<TabJsonSchemaProps> = ({ id, type = 'input'
   const resizeEditor = useThrottledCallback(() => editor?.layout(), 100, { trailing: true });
   const resizeDiffEditor = useThrottledCallback(() => diffEditor?.layout(), 100, { trailing: true });
 
-  const { disabled, content } = useDecisionGraphState(({ simulate, disabled, configurable, decisionGraph }) => ({
+  const { disabled, content } = useDecisionGraphState(({ simulate, disabled, decisionGraph }) => ({
     nodeError: match(simulate)
       .with({ error: { data: { nodeId: id } } }, ({ error }) => error)
       .otherwise(() => null),
     disabled,
-    configurable,
     content: (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content,
   }));
 

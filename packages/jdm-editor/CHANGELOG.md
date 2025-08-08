@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.45.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.44.1...@gorules/jdm-editor@1.45.0) (2025-07-03)
+
+### Features
+
+- function settings ([#191](https://github.com/gorules/jdm-editor/issues/191)) ([67a7b63](https://github.com/gorules/jdm-editor/commit/67a7b63090afd26f55a01f9ab7482e1f9a86251f))
+
+## [1.44.1](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.44.0...@gorules/jdm-editor@1.44.1) (2025-06-25)
+
+**Note:** Version bump only for package @gorules/jdm-editor
+
+# [1.44.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.43.0...@gorules/jdm-editor@1.44.0) (2025-06-25)
+
+### Features
+
+- views ([#187](https://github.com/gorules/jdm-editor/issues/187)) ([68ac0e6](https://github.com/gorules/jdm-editor/commit/68ac0e6d9649b4551f4af16a852745db27651e17))
+
 # [1.43.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.42.1...@gorules/jdm-editor@1.43.0) (2025-06-18)
 
 ### Features

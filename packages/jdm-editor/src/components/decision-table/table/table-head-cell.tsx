@@ -9,21 +9,22 @@ import { TextEdit } from '../../text-edit';
 import { InputFieldEdit } from '../components/input-field-edit';
 import { OutputFieldEdit } from '../components/output-field-edit';
 import { useDecisionTableDialog } from '../context/dt-dialog.context';
+import type { DecisionTablePermission } from '../context/dt-store.context';
 import { type TableSchemaItem, useDecisionTableActions, useDecisionTableState } from '../context/dt-store.context';
 import { getReferenceMap } from '../util';
 
 export type TableHeadCellProps = {
-  configurable?: boolean;
+  permission?: DecisionTablePermission;
   disabled?: boolean;
 };
 
 export type TableHeadCellFieldProps = {
-  configurable?: boolean;
+  permission?: DecisionTablePermission;
   disabled?: boolean;
   schema: TableSchemaItem;
 };
 
-export const TableHeadCellInput: React.FC<TableHeadCellProps> = ({ configurable, disabled }) => {
+export const TableHeadCellInput: React.FC<TableHeadCellProps> = ({ permission, disabled }) => {
   const inputs = useDecisionTableState((store) => store.decisionTable?.inputs);
   const tableActions = useDecisionTableActions();
   const { setDialog } = useDecisionTableDialog();
@@ -34,7 +35,7 @@ export const TableHeadCellInput: React.FC<TableHeadCellProps> = ({ configurable,
         <Stack gap={0} className={'text-wrapper'} verticalAlign={'center'}>
           <Typography.Text className={'span-overflow grl-dt-text-primary'}>Inputs</Typography.Text>
         </Stack>
-        {configurable && (
+        {(permission === 'edit:full' || permission === 'edit:rules') && (
           <div className={'cta-wrapper'}>
             {inputs?.length > 1 && (
               <Tooltip title='Reorder fields'>
@@ -76,7 +77,7 @@ export const TableHeadCellInput: React.FC<TableHeadCellProps> = ({ configurable,
   );
 };
 
-export const TableHeadCellOutput: React.FC<TableHeadCellProps> = ({ configurable, disabled }) => {
+export const TableHeadCellOutput: React.FC<TableHeadCellProps> = ({ permission, disabled }) => {
   const outputs = useDecisionTableState((store) => store.decisionTable?.outputs);
   const tableActions = useDecisionTableActions();
   const { setDialog } = useDecisionTableDialog();
@@ -87,7 +88,7 @@ export const TableHeadCellOutput: React.FC<TableHeadCellProps> = ({ configurable
         <Stack gap={0} className={'text-wrapper'} verticalAlign={'center'}>
           <Typography.Text className={'span-overflow grl-dt-text-primary'}>Outputs</Typography.Text>
         </Stack>
-        {configurable && (
+        {permission === 'edit:full' && (
           <div className={'cta-wrapper'}>
             {outputs?.length > 1 && (
               <Tooltip title='Reorder fields'>
@@ -126,7 +127,7 @@ export const TableHeadCellOutput: React.FC<TableHeadCellProps> = ({ configurable
   );
 };
 
-export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({ configurable, disabled, schema }) => {
+export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({ permission, disabled, schema }) => {
   const tableActions = useDecisionTableActions();
   const { inputData, inputVariableType } = useDecisionTableState(({ calculatedInputData, inputVariableType }) => ({
     inputData: calculatedInputData,
@@ -181,7 +182,7 @@ export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({ con
             variableType={inputVariableType}
             inputData={inputData}
             referenceData={referenceData}
-            disabled={disabled || !configurable}
+            disabled={disabled || (permission !== 'edit:full' && permission !== 'edit:rules')}
             onRemove={() => {
               tableActions.removeColumn('inputs', schema.id);
             }}
@@ -198,7 +199,7 @@ export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({ con
   );
 };
 
-export const TableHeadCellOutputField: React.FC<TableHeadCellFieldProps> = ({ configurable, disabled, schema }) => {
+export const TableHeadCellOutputField: React.FC<TableHeadCellFieldProps> = ({ permission, disabled, schema }) => {
   const tableActions = useDecisionTableActions();
 
   return (
@@ -228,7 +229,7 @@ export const TableHeadCellOutputField: React.FC<TableHeadCellFieldProps> = ({ co
           )}
           <OutputFieldEdit
             value={schema.field}
-            disabled={disabled || !configurable}
+            disabled={disabled || permission !== 'edit:full'}
             onRemove={() => {
               tableActions.removeColumn('outputs', schema.id);
             }}
