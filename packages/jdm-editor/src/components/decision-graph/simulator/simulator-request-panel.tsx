@@ -1,6 +1,6 @@
 import { InfoCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { VariableType } from '@gorules/zen-engine-wasm';
-import { Button, Tooltip, Typography, notification } from 'antd';
+import { App, Button, Tooltip, Typography } from 'antd';
 import json5 from 'json5';
 import React, { useEffect, useState } from 'react';
 
@@ -27,6 +27,8 @@ export const SimulatorRequestPanel: React.FC<SimulatorRequestPanelProps> = ({
   onRun,
   defaultRequest,
 }) => {
+  const { notification } = App.useApp();
+
   const [requestValue, setRequestValue] = useState(defaultRequest);
   const { stateStore, actions } = useDecisionGraphRaw();
 

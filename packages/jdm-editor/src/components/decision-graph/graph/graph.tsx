@@ -1,5 +1,5 @@
 import { CloseOutlined, CompressOutlined, LeftOutlined, WarningOutlined } from '@ant-design/icons';
-import { Button, Modal, Tooltip, Typography, message, notification } from 'antd';
+import { App, Button, Modal, Tooltip, Typography } from 'antd';
 import clsx from 'clsx';
 import equal from 'fast-deep-equal';
 import React, { type MutableRefObject, forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
@@ -70,6 +70,8 @@ const edgeTypes = {
 };
 
 export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reactFlowProOptions, className }, ref) {
+  const { message, notification } = App.useApp();
+
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const reactFlowInstance = useRef<ReactFlowInstance>(null);
 
