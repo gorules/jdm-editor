@@ -8,37 +8,36 @@ export type DiffCodeEditorProps = CodeEditorProps & {
   displayDiff?: boolean;
   previousValue?: string;
   noStyle?: boolean;
+  ref?: React.Ref<CodeEditorRef>;
 };
 
-export const DiffCodeEditor = React.forwardRef<CodeEditorRef, DiffCodeEditorProps>(
-  ({ displayDiff, previousValue, noStyle, ...rest }, ref) => {
-    if (displayDiff) {
-      return (
-        <div className={clsx('diff-code-editor', noStyle && 'no-style')}>
-          {(previousValue || '')?.length > 0 && (
-            <CodeEditor
-              {...rest}
-              className={clsx(rest.className, 'previous-input')}
-              value={previousValue}
-              onChange={undefined}
-              disabled={true}
-              noStyle
-              lint={false}
-            />
-          )}
-          {(rest?.value || '')?.length > 0 && (
-            <CodeEditor
-              {...rest}
-              className={clsx(rest.className, 'current-input')}
-              disabled={true}
-              noStyle
-              lint={false}
-            />
-          )}
-        </div>
-      );
-    }
+export const DiffCodeEditor = ({ displayDiff, previousValue, noStyle, ref, ...rest }: DiffCodeEditorProps) => {
+  if (displayDiff) {
+    return (
+      <div className={clsx('diff-code-editor', noStyle && 'no-style')}>
+        {(previousValue || '')?.length > 0 && (
+          <CodeEditor
+            {...rest}
+            className={clsx(rest.className, 'previous-input')}
+            value={previousValue}
+            onChange={undefined}
+            disabled={true}
+            noStyle
+            lint={false}
+          />
+        )}
+        {(rest?.value || '')?.length > 0 && (
+          <CodeEditor
+            {...rest}
+            className={clsx(rest.className, 'current-input')}
+            disabled={true}
+            noStyle
+            lint={false}
+          />
+        )}
+      </div>
+    );
+  }
 
-    return <CodeEditor ref={ref} noStyle={noStyle} {...rest} />;
-  },
-);
+  return <CodeEditor ref={ref} noStyle={noStyle} {...rest} />;
+};

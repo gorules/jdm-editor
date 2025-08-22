@@ -235,76 +235,75 @@ export const Table: React.FC<TableProps> = ({ id, maxHeight }) => {
 type TableBodyProps = {
   tableContainerRef: React.RefObject<HTMLDivElement>;
   table: ReactTable<any>;
+  ref?: React.Ref<HTMLTableSectionElement>;
 } & Omit<React.HTMLAttributes<HTMLTableSectionElement>, 'children'>;
 
-const TableBody = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(
-  ({ table, tableContainerRef, ...props }, ref) => {
-    const tableActions = useDecisionTableActions();
-    const { disabled, cursor } = useDecisionTableState(({ disabled, cursor }) => ({
-      disabled,
-      cursor,
-    }));
+const TableBody = ({ table, tableContainerRef, ref, ...props }: TableBodyProps) => {
+  const tableActions = useDecisionTableActions();
+  const { disabled, cursor } = useDecisionTableState(({ disabled, cursor }) => ({
+    disabled,
+    cursor,
+  }));
 
-    const { rows } = table.getRowModel();
-    const virtualizer = useVirtualizer({
-      getScrollElement: () => tableContainerRef.current,
-      estimateSize: () => 38,
-      indexAttribute: 'data-virtual-index',
-      count: rows.length,
-      overscan: 5,
-    });
+  const { rows } = table.getRowModel();
+  const virtualizer = useVirtualizer({
+    getScrollElement: () => tableContainerRef.current,
+    estimateSize: () => 38,
+    indexAttribute: 'data-virtual-index',
+    count: rows.length,
+    overscan: 5,
+  });
 
-    const virtualItems = virtualizer.getVirtualItems();
-    const totalSize = virtualizer.getTotalSize();
+  const virtualItems = virtualizer.getVirtualItems();
+  const totalSize = virtualizer.getTotalSize();
 
-    const paddingTop = virtualItems.length > 0 ? virtualItems?.[0]?.start || 0 : 0;
-    const paddingBottom = virtualItems.length > 0 ? totalSize - (virtualItems?.[virtualItems.length - 1]?.end || 0) : 0;
+  const paddingTop = virtualItems.length > 0 ? virtualItems?.[0]?.start || 0 : 0;
+  const paddingBottom = virtualItems.length > 0 ? totalSize - (virtualItems?.[virtualItems.length - 1]?.end || 0) : 0;
 
-    const onKeyDown = useCallback((e: React.KeyboardEvent) => {
-      if (disabled) {
-        return;
-      }
+  const onKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (disabled) {
+      return;
+    }
 
-      if (e.code === 'ArrowUp' && (e.metaKey || e.altKey)) {
-        if (cursor) tableActions.addRowAbove(cursor.y);
-      }
-      if (e.code === 'ArrowDown' && (e.metaKey || e.altKey)) {
-        if (cursor) tableActions.addRowBelow(cursor.y);
-      }
-      if (e.code === 'Backspace' && (e.metaKey || e.altKey)) {
-        if (cursor) tableActions.removeRow(cursor.y);
-      }
-    }, []);
+    if (e.code === 'ArrowUp' && (e.metaKey || e.altKey)) {
+      if (cursor) tableActions.addRowAbove(cursor.y);
+    }
+    if (e.code === 'ArrowDown' && (e.metaKey || e.altKey)) {
+      if (cursor) tableActions.addRowBelow(cursor.y);
+    }
+    if (e.code === 'Backspace' && (e.metaKey || e.altKey)) {
+      if (cursor) tableActions.removeRow(cursor.y);
+    }
+  }, []);
 
-    return (
-      <tbody ref={ref} {...props} onKeyDown={onKeyDown}>
-        {paddingTop > 0 && (
-          <tr>
-            <td style={{ height: `${paddingTop}px` }} />
-          </tr>
-        )}
-        {virtualItems.map((item) => {
-          const row = rows[item.index];
+  return (
+    <tbody ref={ref} {...props} onKeyDown={onKeyDown}>
+      {paddingTop > 0 && (
+        <tr>
+          <td style={{ height: `${paddingTop}px` }} />
+        </tr>
+      )}
+      {virtualItems.map((item) => {
+        const row = rows[item.index];
 
-          return (
-            <TableRow
-              key={item.key}
-              virtualItem={item}
-              row={row}
-              disabled={disabled}
-              onResize={virtualizer.measureElement}
-            />
-          );
-        })}
-        {paddingBottom > 0 && (
-          <tr>
-            <td style={{ height: `${paddingBottom}px` }} />
-          </tr>
-        )}
-      </tbody>
-    );
-  },
-);
+        return (
+          <TableRow
+            key={item.key}
+            virtualItem={item}
+            row={row}
+            disabled={disabled}
+            onResize={virtualizer.measureElement}
+          />
+        );
+      })}
+      {paddingBottom > 0 && (
+        <tr>
+          <td style={{ height: `${paddingBottom}px` }} />
+        </tr>
+      )}
+    </tbody>
+  );
+};
 
 const StyledTable: React.FC<React.HTMLAttributes<HTMLTableElement> & { width: number }> = ({
   style,
