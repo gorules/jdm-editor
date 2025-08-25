@@ -158,7 +158,7 @@ const LivePreview = React.memo<{ id: string; value: string }>(({ id, value }) =>
 
     return {
       inputData: calculatedInputData,
-      initial: snapshot && trace ? { expression: snapshot.value, result: safeJson(trace.result) } : undefined,
+      initial: snapshot && trace ? { expression: snapshot.value, result: trace.result } : undefined,
     };
   });
 
@@ -180,16 +180,8 @@ const ResultOverlay: React.FC<{ expression: ExpressionEntry }> = ({ expression }
   return (
     <div className='expression-list-item__resultOverlay'>
       <Typography.Text ellipsis={{ tooltip: trace }} style={{ maxWidth: 60, overflow: 'hidden' }}>
-        = {trace as string}
+        = {JSON.stringify(trace)}
       </Typography.Text>
     </div>
   );
-};
-
-const safeJson = (data: string) => {
-  try {
-    return JSON.parse(data);
-  } catch (err: any) {
-    return err.toString();
-  }
 };

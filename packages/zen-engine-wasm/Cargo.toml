@@ -9,13 +9,14 @@ crate-type = ["cdylib"]
 
 [dependencies]
 bumpalo = "3"
-zen-expression = { version = "0.48.0", default-features = false, features = ["regex-lite"] }
+zen-expression = { version = "0.50.2", default-features = false, features = ["regex-lite"] }
 
 getrandom = { version = "0.3", features = ["wasm_js"] }
 fastrand = { version = "2", features = ["js"] }
 js-sys = "0.3"
 strum = "0.27"
 
+rust_decimal = { version = "1.37", features = ["maths-nopanic"] }
 gloo-utils = { version = "0.2", features = ["serde"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

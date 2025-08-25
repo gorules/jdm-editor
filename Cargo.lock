@@ -665,6 +665,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde_derive_internals"
+version = "0.29.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "18d26a20a969b9e3fdf2fc2d9f21eda6c40e2de84c9408bb5d3b05d499aae711"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.103",
+]
+
+[[package]]
 name = "serde_json"
 version = "1.0.140"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -999,6 +1010,7 @@ dependencies = [
  "getrandom 0.3.3",
  "gloo-utils",
  "js-sys",
+ "rust_decimal",
  "serde",
  "serde_json",
  "strum",
@@ -1008,9 +1020,9 @@ dependencies = [
 
 [[package]]
 name = "zen-expression"
-version = "0.48.0"
+version = "0.50.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6049d043bea0c15227ae3d3a5b3e5125ed41842aa663eabd96f1275f5b925a20"
+checksum = "cac93e64e60d4475e35a41e2d661201ca3abbc813b9273dec26a1566b9519bd2"
 dependencies = [
  "ahash 0.8.12",
  "anyhow",
@@ -1030,6 +1042,35 @@ dependencies = [
  "strsim",
  "strum",
  "strum_macros",
+ "thiserror",
+ "zen-macros",
+ "zen-types",
+]
+
+[[package]]
+name = "zen-macros"
+version = "0.50.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "746aa0523a7b82c6cf1caac63e8b49a261368d2a5c7ae808c8d1cdd9dba0b63c"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "serde_derive_internals",
+ "syn 2.0.103",
+]
+
+[[package]]
+name = "zen-types"
+version = "0.50.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "be8cd7e9adc80b3de2836e5673f6f78c1f4698859e6825ccf482469d201cc850"
+dependencies = [
+ "ahash 0.8.12",
+ "nohash-hasher",
+ "rust_decimal",
+ "rust_decimal_macros",
+ "serde",
+ "serde_json",
  "thiserror",
 ]
 
