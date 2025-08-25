@@ -2948,7 +2948,7 @@ export declare type SimulationTrace<Trace = TraceDataVariants> = {
 };
 
 export declare type SimulationTraceDataExpression = Arrayable<Record<string, {
-    result: string;
+    result: unknown;
 }>>;
 
 export declare type SimulationTraceDataFunction = {
