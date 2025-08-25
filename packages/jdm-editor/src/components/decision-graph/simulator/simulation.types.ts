@@ -46,7 +46,7 @@ export type SimulationTraceDataFunction = {
 
 type Arrayable<T> = T | T[];
 
-export type SimulationTraceDataExpression = Arrayable<Record<string, { result: string }>>;
+export type SimulationTraceDataExpression = Arrayable<Record<string, { result: unknown }>>;
 
 type SimulationTraceDataTableSingle = {
   index: number;
