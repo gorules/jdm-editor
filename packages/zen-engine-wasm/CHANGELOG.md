@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.21.0](https://github.com/gorules/jdm-editor/compare/@gorules/zen-engine-wasm@0.20.1...@gorules/zen-engine-wasm@0.21.0) (2025-08-25)
+
+### Features
+
+- add variable deserializer ([#195](https://github.com/gorules/jdm-editor/issues/195)) ([c249772](https://github.com/gorules/jdm-editor/commit/c249772ec1c53073824506e11b877b6c805ae5c7))
+
 ## [0.20.1](https://github.com/gorules/jdm-editor/compare/@gorules/zen-engine-wasm@0.20.0...@gorules/zen-engine-wasm@0.20.1) (2025-06-25)
 
 ### Bug Fixes
