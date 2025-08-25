@@ -1,4 +1,4 @@
-import { Dropdown, Tooltip, message, theme } from 'antd';
+import { App, Dropdown, Tooltip, theme } from 'antd';
 import React from 'react';
 import { JSONTree } from 'react-json-tree';
 
@@ -38,6 +38,7 @@ const themes: Record<'dark' | 'light', JsonTheme> = {
 };
 
 export const FunctionDebuggerLog: React.FC<FunctionDebuggerLogProps> = ({ lines, msSinceRun }) => {
+  const { message } = App.useApp();
   const { token } = theme.useToken();
   const jsonTheme = themes[token.mode ?? 'light'];
 

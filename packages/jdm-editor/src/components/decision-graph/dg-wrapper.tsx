@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { createDragDropManager } from 'dnd-core';
-import React, { forwardRef, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import type { ProOptions } from 'reactflow';
 import 'reactflow/dist/style.css';
@@ -25,12 +25,12 @@ import { NodeKind } from './nodes/specifications/specification-types';
 export type DecisionGraphWrapperProps = {
   reactFlowProOptions?: ProOptions;
   tabBarExtraContent?: GraphTabsProps['tabBarExtraContent'];
+  ref?: React.Ref<GraphRef>;
 };
 
 export const DecisionGraphWrapper = React.memo(
-  forwardRef<GraphRef, DecisionGraphWrapperProps>(function DecisionGraphWrapperInner(
-    { reactFlowProOptions, tabBarExtraContent },
-    ref,
+  function DecisionGraphWrapperInner(
+    { reactFlowProOptions, tabBarExtraContent, ref }: DecisionGraphWrapperProps
   ) {
     const [disableTabs, setDisableTabs] = useState(false);
     const { hasActiveNode, viewConfig } = useDecisionGraphState(({ decisionGraph, activeTab, viewConfig }) => {
@@ -55,8 +55,7 @@ export const DecisionGraphWrapper = React.memo(
         <GraphPanel />
       </>
     );
-  }),
-);
+  });
 
 const TabContents: React.FC = React.memo(() => {
   const { openNodes, activeNodeId, components } = useDecisionGraphState(

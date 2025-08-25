@@ -34,6 +34,10 @@ type ExtensionParams = {
   type?: 'standard' | 'unary' | 'template';
 };
 
+export type CodeEditorRef = HTMLDivElement & {
+  codeMirror: EditorView | null;
+};
+
 export type CodeEditorProps = {
   maxRows?: number;
   value?: string;
@@ -50,34 +54,29 @@ export type CodeEditorProps = {
   livePreview?: { input: unknown; fromSimulation: boolean; result?: unknown };
   variableType?: any;
   expectedVariableType?: any;
+  ref?: React.Ref<CodeEditorRef>;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, 'disabled' | 'onChange'>;
 
-export type CodeEditorRef = HTMLDivElement & {
-  codeMirror: EditorView | null;
-};
-
-export const CodeEditor = React.forwardRef<CodeEditorRef, CodeEditorProps>(
-  (
-    {
-      noStyle = false,
-      fullHeight = false,
-      strict = false,
-      maxRows,
-      disabled,
-      value,
-      onChange,
-      placeholder,
-      className,
-      onStateChange,
-      type = 'standard',
-      extension,
-      variableType,
-      expectedVariableType,
-      lint = true,
-      ...props
-    },
+export const CodeEditor = (
+  {
+    noStyle = false,
+    fullHeight = false,
+    strict = false,
+    maxRows,
+    disabled,
+    value,
+    onChange,
+    placeholder,
+    className,
+    onStateChange,
+    type = 'standard',
+    extension,
+    variableType,
+    expectedVariableType,
+    lint = true,
     ref,
-  ) => {
+    ...props
+  }: CodeEditorProps) => {
     const container = useRef<HTMLDivElement>(null);
     const codeMirror = useRef<EditorView>(null);
     const { token } = theme.useToken();
@@ -272,5 +271,4 @@ export const CodeEditor = React.forwardRef<CodeEditorRef, CodeEditorProps>(
         {...props}
       />
     );
-  },
-);
+  };

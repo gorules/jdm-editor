@@ -2,7 +2,6 @@ import { CloseOutlined, MoreOutlined } from '@ant-design/icons';
 import { Button, Dropdown, type MenuProps, Typography } from 'antd';
 import clsx from 'clsx';
 import React from 'react';
-import { Transition } from 'transition-hook';
 import { match } from 'ts-pattern';
 
 import { DiffIcon } from '../../diff-icon';
@@ -121,34 +120,25 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
           </div>
         )}
       </GraphCard>
-      <Transition state={detailsOpen} timeout={100}>
-        {(stage, shouldMount) =>
-          shouldMount && (
-            <GraphCard
-              className='nodrag'
-              style={{
-                transition: '0.1s ease-in-out',
-                transform: stage === 'enter' ? 'translateY(0)' : 'translateY(-10px)',
-                opacity: stage === 'enter' ? 1 : 0,
-              }}
-            >
-              <div className='grl-dn__details'>
-                <div className='grl-dn__details__header'>
-                  <Typography.Text className='grl-dn__details__header__text'>{detailsTitle}</Typography.Text>
-                  <Button
-                    type={'text'}
-                    size={'small'}
-                    className='grl-dn__details__header__close'
-                    icon={<CloseOutlined style={{ fontSize: 8 }} />}
-                    onClick={onDetailsClose}
-                  />
-                </div>
-                <div className='grl-dn__details__body'>{details}</div>
-              </div>
-            </GraphCard>
-          )
-        }
-      </Transition>
+      {detailsOpen && (
+        <GraphCard
+          className='nodrag'
+        >
+          <div className='grl-dn__details'>
+            <div className='grl-dn__details__header'>
+              <Typography.Text className='grl-dn__details__header__text'>{detailsTitle}</Typography.Text>
+              <Button
+                type={'text'}
+                size={'small'}
+                className='grl-dn__details__header__close'
+                icon={<CloseOutlined style={{ fontSize: 8 }} />}
+                onClick={onDetailsClose}
+              />
+            </div>
+            <div className='grl-dn__details__body'>{details}</div>
+          </div>
+        </GraphCard>
+      )}
     </div>
   );
 };

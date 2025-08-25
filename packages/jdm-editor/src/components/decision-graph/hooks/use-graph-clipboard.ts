@@ -1,4 +1,4 @@
-import { message } from 'antd';
+import { App } from 'antd';
 import { type RefObject, useCallback, useMemo } from 'react';
 import type { Node, ReactFlowInstance, XYPosition } from 'reactflow';
 
@@ -20,6 +20,8 @@ export const useGraphClipboard = (
   reactFlow: RefObject<ReactFlowInstance | null>,
   wrapper: RefObject<HTMLDivElement | null>,
 ) => {
+  const { message } = App.useApp();
+
   const raw = useDecisionGraphRaw();
   const graphActions = useDecisionGraphActions();
 

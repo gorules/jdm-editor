@@ -6,7 +6,7 @@ import {
   ExportOutlined,
   ImportOutlined,
 } from '@ant-design/icons';
-import { Button, Divider, Popconfirm, Select, Tooltip, Typography, message } from 'antd';
+import { App, Button, Divider, Popconfirm, Select, Tooltip, Typography } from 'antd';
 import React, { useMemo, useRef } from 'react';
 import { P, match } from 'ts-pattern';
 
@@ -16,6 +16,8 @@ import { useDecisionTableActions, useDecisionTableRaw, useDecisionTableState } f
 import { exportDecisionTable, readDecisionTableFile } from './excel';
 
 export const DecisionTableCommandBar: React.FC = () => {
+  const { message } = App.useApp();
+
   const tableActions = useDecisionTableActions();
   const { disabled, debugIndex, traceCount, cursor } = useDecisionTableState(
     ({ disableHitPolicy, disabled, permission, decisionTable, cursor, debugIndex, debug }) => ({

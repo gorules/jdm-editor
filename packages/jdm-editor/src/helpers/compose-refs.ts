@@ -1,4 +1,4 @@
-import type { MutableRefObject, Ref } from 'react';
+import type { RefObject, Ref } from 'react';
 
 type OptionalRef<T> = Ref<T> | undefined;
 
@@ -47,6 +47,6 @@ function updateRef<T>(ref: NonNullRef<T>, instance: null | T): void {
   if (typeof ref === 'function') {
     ref(instance);
   } else {
-    (ref as MutableRefObject<T | null>).current = instance;
+    (ref as RefObject<T | null>).current = instance;
   }
 }

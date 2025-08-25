@@ -1,5 +1,5 @@
 import { Editor } from '@monaco-editor/react';
-import { Modal, Spin, Typography, message, theme } from 'antd';
+import { App, Modal, Spin, Typography, theme } from 'antd';
 import json5 from 'json5';
 import React, { useEffect, useState } from 'react';
 import toJsonSchema from 'to-json-schema';
@@ -15,6 +15,8 @@ export type JsonToJsonSchemaDialogProps = {
 };
 
 export const JsonToJsonSchemaDialog: React.FC<JsonToJsonSchemaDialogProps> = (props) => {
+  const { message } = App.useApp();
+
   const { isOpen, onDismiss, onSuccess, model } = props;
 
   const { token } = theme.useToken();

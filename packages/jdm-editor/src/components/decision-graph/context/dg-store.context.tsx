@@ -3,7 +3,7 @@ import type { Monaco } from '@monaco-editor/react';
 import equal from 'fast-deep-equal/es6/react';
 import type { WritableDraft } from 'immer';
 import { produce } from 'immer';
-import React, { type MutableRefObject, createRef, useMemo } from 'react';
+import React, { type RefObject, createRef, useMemo } from 'react';
 import type { EdgeChange, NodeChange, ReactFlowInstance, useEdgesState, useNodesState } from 'reactflow';
 import { match } from 'ts-pattern';
 import type { StoreApi, UseBoundStore } from 'zustand';
@@ -78,10 +78,10 @@ export type DecisionGraphStoreType = {
   };
 
   references: {
-    nodesState: MutableRefObject<ReturnType<typeof useNodesState>>;
-    edgesState: MutableRefObject<ReturnType<typeof useEdgesState>>;
-    reactFlowInstance: MutableRefObject<ReactFlowInstance | null>;
-    graphClipboard: MutableRefObject<ReturnType<typeof useGraphClipboard>>;
+    nodesState: RefObject<ReturnType<typeof useNodesState>>;
+    edgesState: RefObject<ReturnType<typeof useEdgesState>>;
+    reactFlowInstance: RefObject<ReactFlowInstance | null>;
+    graphClipboard: RefObject<ReturnType<typeof useGraphClipboard>>;
   };
 
   actions: {
@@ -182,10 +182,10 @@ export const DecisionGraphProvider: React.FC<React.PropsWithChildren<DecisionGra
   const referenceStore = useMemo(
     () =>
       create<DecisionGraphStoreType['references']>(() => ({
-        nodesState: createRef() as MutableRefObject<ReturnType<typeof useNodesState>>,
-        edgesState: createRef() as MutableRefObject<ReturnType<typeof useEdgesState>>,
-        graphClipboard: createRef() as MutableRefObject<ReturnType<typeof useGraphClipboard>>,
-        reactFlowInstance: createRef() as MutableRefObject<ReactFlowInstance | null>,
+        nodesState: createRef() as RefObject<ReturnType<typeof useNodesState>>,
+        edgesState: createRef() as RefObject<ReturnType<typeof useEdgesState>>,
+        graphClipboard: createRef() as RefObject<ReturnType<typeof useGraphClipboard>>,
+        reactFlowInstance: createRef() as RefObject<ReactFlowInstance | null>,
       })),
     [],
   );

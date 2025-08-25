@@ -1,5 +1,5 @@
 import type { ThemeConfig as AntThemeConfig } from 'antd';
-import { ConfigProvider, theme as antTheme, theme } from 'antd';
+import { App, ConfigProvider, theme as antTheme, theme } from 'antd';
 import React, { useMemo } from 'react';
 
 declare module 'antd/es/theme/interface/alias' {
@@ -35,8 +35,10 @@ export const JdmConfigProvider: React.FC<JdmConfigProviderProps> = ({
 
   return (
     <ConfigProvider prefixCls={prefixCls} theme={{ ...restTheme, algorithm, token: { ...token, mode, motion: false } }}>
-      <GlobalCssVariables mode={mode} />
-      {children}
+      <App>
+        <GlobalCssVariables mode={mode} />
+        {children}
+      </App>
     </ConfigProvider>
   );
 };
