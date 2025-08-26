@@ -6,6 +6,10 @@
   grid-template-columns: min-content 1fr min-content;
   grid-template-rows: 1fr auto;
 
+  &.hidden-left-toolbar {
+    grid-template-areas: 'graph component' 'bottom component';
+    grid-template-columns: 1fr min-content;
+  }
   * {
     box-sizing: border-box;
   }
@@ -425,6 +429,11 @@
       border-left: 1px solid var(--grl-color-border);
       display: flex;
       flex-direction: column;
+
+      &.collapsed {
+        width: 40px;
+        min-width: 40px;
+      }
 
       &__heading {
         padding: 6px 12px;

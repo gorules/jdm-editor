@@ -51,6 +51,7 @@ export type SetDecisionGraphOptions = {
 export type DecisionGraphStoreType = {
   state: {
     id?: string;
+    hideLeftToolbar?: boolean;
     components: NodeSpecification[];
     disabled?: boolean;
     decisionGraph: DecisionGraphType;

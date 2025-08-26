@@ -269,7 +269,7 @@ const getDecisionTableData = (
       hitPolicy: defaultTable?.hitPolicy || 'first',
       inputField: defaultTable?.inputField,
       outputPath: defaultTable?.outputPath,
-      passThorough: defaultTable?.passThorough,
+      passThorough: defaultTable?.passThrough,
       executionMode: defaultTable?.executionMode || 'single',
     },
   };
