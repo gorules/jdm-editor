@@ -127,6 +127,30 @@ export const defaultGraph = {
             key: '5',
             value: "'1 + 1'",
           },
+          // TODO revert
+          {
+            id: '3a302716-2d53-4399-b048-e6d9f92a1113',
+            rules: [
+              {
+                id: '8766679a-ffd2-40ba-a3c7-8c11ae3c705f',
+                if: '',
+                then: [
+                  { id: '14fc606f-f2da-4c4f-8a6b-fc9b070f58e8', key: '', value: '' },
+                  { id: '14fc606f-f2da-4c4f-8a6b-fc9b070f5820', key: '1', value: 'false' },
+                  {
+                    id: '3a302716-2d53-4399-b048-e6d9f92a1113',
+                    rules: [
+                      {
+                        id: '8766679a-ffd2-40ba-a3c7-8c11ae3c705f',
+                        if: '',
+                        then: [{ id: '14fc606f-f2da-4c4f-8a6b-fc9b070f5810', key: '1', value: 'false' }],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
         ],
         passThrough: true,
         inputField: null,

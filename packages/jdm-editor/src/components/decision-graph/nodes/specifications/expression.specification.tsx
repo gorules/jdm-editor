@@ -10,6 +10,7 @@ import type { z } from 'zod';
 
 import { useNodeType } from '../../../../helpers/node-type';
 import type { expressionNodeSchema } from '../../../../helpers/schema';
+import type { ExpressionEntry } from '../../../expression/context/expression-store.context';
 import { DiffInput, DiffRadio, DiffSwitch } from '../../../shared';
 import { DiffCodeEditor } from '../../../shared/diff-ce';
 import { useDecisionGraphActions, useDecisionGraphState, useNodeDiff } from '../../context/dg-store.context';
@@ -34,6 +35,115 @@ export type NodeExpressionData = Omit<InferredContent, 'expressions'> &
     expressions: (InferredContent['expressions'][0] & Diff)[];
   };
 
+const compareExpressions = (currentExpr: ExpressionEntry, previousExpr: ExpressionEntry) => {
+  if (!currentExpr || !previousExpr) {
+    return { hasChanges: false, fields: {} };
+  }
+
+  let hasChanges = false;
+  const fields = {};
+
+  if (currentExpr.key !== undefined || previousExpr.key !== undefined) {
+    const hasKeyChange = !compareStringFields(currentExpr.key, previousExpr.key);
+    const hasValueChange = !compareStringFields(currentExpr.value, previousExpr.value);
+
+    if (hasKeyChange) {
+      fields.key = {
+        status: 'modified',
+        previousValue: previousExpr.key,
+      };
+      hasChanges = true;
+    }
+
+    if (hasValueChange) {
+      fields.value = {
+        status: 'modified',
+        previousValue: previousExpr.value,
+      };
+      hasChanges = true;
+    }
+
+    return {
+      fields,
+      hasChanges,
+    };
+  }
+
+  if (currentExpr.rules || previousExpr.rules) {
+    const currentRules = currentExpr.rules || [];
+    const previousRules = previousExpr.rules || [];
+
+    const rulesComparison = compareAndUnifyLists(currentRules, previousRules, {
+      compareFields: (currentRule, previousRule) => {
+        let ruleHasChanges = false;
+        const ruleFields = {};
+
+        if (!compareStringFields(currentRule?.if, previousRule?.if)) {
+          ruleFields.if = {
+            status: 'modified',
+            previousValue: previousRule.if,
+          };
+          ruleHasChanges = true;
+        }
+
+        // Compare 'then' expressions recursively
+        if (currentRule?.then || previousRule?.then) {
+          const currentThen = currentRule.then || [];
+          const previousThen = previousRule.then || [];
+
+          const thenComparison = compareAndUnifyLists(currentThen, previousThen, {
+            compareFields: compareExpressions, // Recursive call
+          });
+
+          // Check if any then expressions have changes
+          const hasThenChanges = thenComparison.some(
+            (expr) =>
+              expr?._diff?.status === 'modified' ||
+              expr?._diff?.status === 'added' ||
+              expr?._diff?.status === 'removed',
+          );
+
+          if (hasThenChanges) {
+            ruleFields.then = {
+              status: 'modified',
+            };
+            ruleHasChanges = true;
+          }
+
+          // Update the rule's then array with diff information
+          currentRule.then = thenComparison;
+        }
+
+        return {
+          hasChanges: ruleHasChanges,
+          fields: ruleFields,
+        };
+      },
+    });
+
+    // Check if any rules have changes
+    const hasRulesChanges = rulesComparison.some(
+      (rule) =>
+        rule?._diff?.status === 'modified' || rule?._diff?.status === 'added' || rule?._diff?.status === 'removed',
+    );
+
+    if (hasRulesChanges) {
+      fields.rules = {
+        status: 'modified',
+      };
+      hasChanges = true;
+    }
+
+    // Update the expression's rules with diff information
+    currentExpr.rules = rulesComparison;
+  }
+
+  return {
+    hasChanges,
+    fields,
+  };
+};
+
 export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
   type: NodeKind.Expression,
   icon: <HashIcon size='1em' />,
@@ -45,6 +155,7 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
     const newContent = produce(current, (draft) => {
       const fields: DiffMetadata['fields'] = {};
 
+      // Compare top-level fields (unchanged from your original)
       if ((current.executionMode || false) !== (previous.executionMode || false)) {
         _.set(fields, 'executionMode', {
           status: 'modified',
@@ -74,28 +185,7 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
       }
 
       const expressions = compareAndUnifyLists(current?.expressions || [], previous?.expressions || [], {
-        compareFields: (current, previous) => {
-          const hasKeyChange = !compareStringFields(current.key, previous.key);
-          const hasValueChange = !compareStringFields(current.value, previous.value);
-
-          return {
-            hasChanges: hasKeyChange || hasValueChange,
-            fields: {
-              ...(hasKeyChange && {
-                key: {
-                  status: 'modified',
-                  previousValue: previous.key,
-                },
-              }),
-              ...(hasValueChange && {
-                value: {
-                  status: 'modified',
-                  previousValue: previous.value,
-                },
-              }),
-            },
-          };
-        },
+        compareFields: compareExpressions,
       });
 
       draft.expressions = expressions;
@@ -120,6 +210,7 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
 
       return draft;
     });
+
     return newContent;
   },
   inferTypes: {
