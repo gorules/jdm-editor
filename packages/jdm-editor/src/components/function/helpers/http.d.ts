@@ -12,7 +12,7 @@ interface HttpConfig {
 }
 
 type HttpIamAuth = { type: 'iam' } & (
-  | { provider: 'aws'; service: string; region: string }
+  | { provider: 'aws'; service: string; region?: string }
   | { provider: 'gcp'; service: string }
   | { provider: 'azure' }
 );
