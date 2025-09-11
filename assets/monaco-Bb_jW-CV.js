@@ -805,10 +805,17 @@ declare const config: Config;
 }
 
 interface HttpConfig {
-  headers?: Record<string, string>;
-  params?: Record<string, string>;
+  headers?: Record<string, string | number | boolean>;
+  params?: Record<string, string | number | boolean>;
   data?: any;
+  auth?: HttpIamAuth;
 }
+
+type HttpIamAuth = { type: 'iam' } & (
+  | { provider: 'aws'; service: string; region?: string }
+  | { provider: 'gcp'; service: string }
+  | { provider: 'azure' }
+);
 
 class Http {
   head(url: string, config?: HttpConfig): Promise<HttpResponse>;
