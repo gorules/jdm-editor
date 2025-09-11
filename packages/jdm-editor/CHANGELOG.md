@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.47.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.46.0...@gorules/jdm-editor@1.47.0) (2025-09-11)
+
+### Features
+
+- add http auth types ([#198](https://github.com/gorules/jdm-editor/issues/198)) ([dde7887](https://github.com/gorules/jdm-editor/commit/dde7887786aaf00f741aa9b1c76bab214efb2988))
+
 # [1.46.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.45.0...@gorules/jdm-editor@1.46.0) (2025-08-25)
 
 ### Features
