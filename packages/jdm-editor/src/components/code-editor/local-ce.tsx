@@ -4,9 +4,9 @@ import { useDecisionGraphRaw } from '../decision-graph';
 import type { CodeEditorRef } from './ce';
 import { CodeEditor, type CodeEditorProps } from './ce';
 
-type LocalCodeEditorProps = Omit<CodeEditorProps, 'extension'>;
+type LocalCodeEditorProps = Omit<CodeEditorProps, 'extension'> & { ref?: React.Ref<CodeEditorRef> };
 
-export const LocalCodeEditor = React.forwardRef<CodeEditorRef, LocalCodeEditorProps>((props, ref) => {
+export const LocalCodeEditor = ({ ref, ...props }: LocalCodeEditorProps) => {
   const raw = useDecisionGraphRaw();
   const [extension, setExtension] = useState<CodeEditorProps['extension']>(() => {
     if (raw?.listenerStore) {
@@ -25,4 +25,4 @@ export const LocalCodeEditor = React.forwardRef<CodeEditorRef, LocalCodeEditorPr
   }, [raw]);
 
   return <CodeEditor ref={ref} {...props} extension={extension} />;
-});
+};

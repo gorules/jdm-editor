@@ -1,4 +1,4 @@
-import { message } from 'antd';
+import { App } from 'antd';
 import exceljs from 'exceljs';
 import { P, match } from 'ts-pattern';
 
@@ -147,6 +147,8 @@ export const exportDecisionTable = async (fileName: string, decisionTableNodes: 
 };
 
 const parseSpreadsheetData = (spreadSheetData: any, defaultTable?: DecisionTableType) => {
+  const { message } = App.useApp();
+
   const headers: any[] = spreadSheetData.splice(0, 3)[2];
   const columnHeaders = headers.map((header) => {
     if (header.value.toLowerCase() === 'description') {

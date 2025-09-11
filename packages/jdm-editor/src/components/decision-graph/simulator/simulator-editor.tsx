@@ -1,5 +1,5 @@
 import { Editor } from '@monaco-editor/react';
-import { Spin, message, theme } from 'antd';
+import { App, Spin, theme } from 'antd';
 import json5 from 'json5';
 import React from 'react';
 
@@ -12,6 +12,7 @@ type SimulatorEditorProps = {
 };
 
 export const SimulatorEditor: React.FC<SimulatorEditorProps> = ({ value, onChange, readOnly }) => {
+  const { message } = App.useApp();
   const { token } = theme.useToken();
 
   return (

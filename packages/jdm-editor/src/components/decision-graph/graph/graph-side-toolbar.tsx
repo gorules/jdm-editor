@@ -1,6 +1,6 @@
 import { CloudDownloadOutlined, CloudUploadOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { Button, Dropdown, Tooltip, message } from 'antd';
+import { App, Button, Dropdown, Tooltip } from 'antd';
 import React, { useRef } from 'react';
 
 import { decisionModelSchema } from '../../../helpers/schema';
@@ -16,6 +16,8 @@ export type GraphSideToolbarProps = {
 };
 
 export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
+  const { message } = App.useApp();
+
   const decisionGraphRaw = useDecisionGraphRaw();
   const fileInput = useRef<HTMLInputElement>(null);
   const excelFileInput = useRef<HTMLInputElement>(null);

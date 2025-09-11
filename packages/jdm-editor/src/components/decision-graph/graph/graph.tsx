@@ -1,8 +1,8 @@
 import { CloseOutlined, CompressOutlined, LeftOutlined, WarningOutlined } from '@ant-design/icons';
-import { Button, Modal, Tooltip, Typography, message, notification } from 'antd';
+import { App, Button, Modal, Tooltip, Typography } from 'antd';
 import clsx from 'clsx';
 import equal from 'fast-deep-equal';
-import React, { type MutableRefObject, forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import React, { type RefObject, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import type { Connection, Node, ProOptions, ReactFlowInstance, XYPosition } from 'reactflow';
 import ReactFlow, {
   Background,
@@ -42,6 +42,7 @@ export type GraphProps = {
   className?: string;
   onDisableTabs?: (val: boolean) => void;
   reactFlowProOptions?: ProOptions;
+  ref?: React.Ref<GraphRef>;
 };
 
 export type GraphRef = DecisionGraphStoreType['actions'] & {
@@ -69,7 +70,9 @@ const edgeTypes = {
   edge: React.memo(edgeFunction(null)),
 };
 
-export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reactFlowProOptions, className }, ref) {
+export const Graph = function GraphInner({ reactFlowProOptions, className, ref }: GraphProps) {
+  const { message, notification } = App.useApp();
+
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const reactFlowInstance = useRef<ReactFlowInstance>(null);
 
@@ -443,7 +446,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
               nodes={nodesState[0]}
               edges={edgesState[0]}
               onInit={(instance) => {
-                (reactFlowInstance as MutableRefObject<ReactFlowInstance>).current = instance;
+                (reactFlowInstance as RefObject<ReactFlowInstance>).current = instance;
                 onReactFlowInit?.(instance);
               }}
               snapToGrid={true}
@@ -505,4 +508,4 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
       </div>
     </div>
   );
-});
+};
