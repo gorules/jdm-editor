@@ -1,13 +1,16 @@
 import { CloudDownloadOutlined, CloudUploadOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Button, Dropdown, Tooltip, message } from 'antd';
-import React, { useRef } from 'react';
+import React, { Fragment, useRef, useState } from 'react';
 
+import type { ParsedExcelData } from '../../../helpers/excel';
+import { exportDecisionTable, getExcelData } from '../../../helpers/excel';
 import { decisionModelSchema } from '../../../helpers/schema';
-import { exportDecisionTable, readDecisionTableFile } from '../../decision-table/excel';
 import { useDecisionGraphActions, useDecisionGraphRaw, useDecisionGraphState } from '../context/dg-store.context';
 import { type DecisionEdge, type DecisionNode } from '../dg-types';
 import { NodeKind } from '../nodes/specifications/specification-types';
+import type { MergedDataItem } from './graph-excel-dialog';
+import { GraphExcelDialog } from './graph-excel-dialog';
 
 const DecisionContentType = 'application/vnd.gorules.decision';
 
@@ -19,6 +22,7 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
   const decisionGraphRaw = useDecisionGraphRaw();
   const fileInput = useRef<HTMLInputElement>(null);
   const excelFileInput = useRef<HTMLInputElement>(null);
+  const [excelGraphData, setExcelGraphData] = useState<ParsedExcelData[] | null>();
 
   const { setDecisionGraph, setActivePanel } = useDecisionGraphActions();
   const { disabled, panels, activePanel, viewConfig } = useDecisionGraphState(
@@ -80,40 +84,95 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
         if (!buffer) return;
         const { decisionGraph } = decisionGraphRaw.stateStore.getState();
 
-        const nodesFromExcel = await readDecisionTableFile(buffer, decisionGraph);
+        const excelData = await getExcelData(buffer, decisionGraph);
 
-        const updatedNodes = decisionGraph.nodes.map((node) => {
-          let _node = node;
-          // updating existing nodes
-          nodesFromExcel.forEach((excelNode) => {
-            if (excelNode.id === node.id) _node = { ...node, content: excelNode.content };
-          });
+        setExcelGraphData(excelData);
 
-          return _node;
-        });
-
-        // filtering new nodes and setting them proper position
-        const newNodes = nodesFromExcel
-          .filter((node) => !updatedNodes.some((existingNode) => existingNode.id === node.id))
-          .map((newNode, index) => ({ ...newNode, position: { x: index * 250, y: 0 } }));
-
-        const modelParsed = decisionModelSchema.safeParse({
-          nodes: [...updatedNodes, ...newNodes],
-          edges: decisionGraph.edges,
-        });
-
-        if (!modelParsed.success) {
-          console.log(modelParsed.error?.message);
-          message.error(modelParsed.error?.message);
-          return;
-        }
-
-        setDecisionGraph(modelParsed.data);
         message.success('Excel file has been uploaded successfully!');
       };
     } catch {
       message.error('Failed to upload Excel!');
     }
+  };
+
+  const handleSuccess = (mappedExcelData: MergedDataItem[]) => {
+    const nodesFromExcel: DecisionNode[] = mappedExcelData.map((med) => {
+      const inputs = med.items
+        .filter((item) => item.type === 'input')
+        .map((item) => ({
+          id: item.id,
+          name: item.label,
+          field: item.value,
+        }));
+
+      const outputs = med.items
+        .filter((item) => item.type === 'output')
+        .map((item) => ({
+          id: item.id,
+          name: item.label,
+          field: item.value,
+        }));
+
+      console.log('med.rules', med.rules);
+
+      const reducedRules = med.rules.map((rule) =>
+        rule.reduce(
+          (acc: Record<string, any> & { _id: string }, item) => {
+            acc[item.headerId] = item.value;
+            return acc;
+          },
+          {
+            _id: crypto.randomUUID(),
+          },
+        ),
+      );
+
+      return {
+        id: med.id,
+        name: med.name,
+        type: NodeKind.DecisionTable,
+        content: {
+          executionMode: 'single',
+          hitPolicy: 'first',
+          inputs,
+          outputs,
+          rules: reducedRules,
+          passThorough: false,
+        },
+        position: med.position,
+      };
+    });
+
+    const { decisionGraph } = decisionGraphRaw.stateStore.getState();
+
+    const updatedNodes = decisionGraph.nodes.map((node) => {
+      let _node = node;
+      // updating existing nodes
+      nodesFromExcel.forEach((excelNode) => {
+        if (excelNode.id === node.id) _node = { ...node, content: excelNode.content };
+      });
+
+      return _node;
+    });
+
+    // filtering new nodes and setting them proper position
+    const newNodes = nodesFromExcel
+      .filter((node) => !updatedNodes.some((existingNode) => existingNode.id === node.id))
+      .map((newNode, index) => ({ ...newNode, type: NodeKind.DecisionTable, position: { x: index * 250, y: 0 } }));
+
+    const modelParsed = decisionModelSchema.safeParse({
+      nodes: [...updatedNodes, ...newNodes],
+      edges: decisionGraph.edges,
+    });
+
+    if (!modelParsed.success) {
+      console.log(modelParsed.error?.message);
+      message.error(modelParsed.error?.message);
+      return;
+    }
+
+    setDecisionGraph(modelParsed.data);
+    setExcelGraphData(null);
   };
 
   const downloadJDM = async () => {
@@ -196,62 +255,72 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
   ].filter((item) => !!item);
 
   return (
-    <div className={'grl-dg__aside'}>
-      <input
-        hidden
-        accept='application/json'
-        type='file'
-        ref={fileInput}
-        onChange={handleUploadInput}
-        onClick={(event) => {
-          (event.target as any).value = null;
-        }}
-      />
-      <input
-        hidden
-        accept='.xlsx'
-        type='file'
-        ref={excelFileInput}
-        onChange={uploadJDMExcel}
-        onClick={(event) => {
-          (event.target as any).value = null;
-        }}
-      />
-      <div className={'grl-dg__aside__side-bar'}>
-        <div className={'grl-dg__aside__side-bar__top'}>
-          {!disabled && (
-            <Dropdown menu={{ items: uploadItems }} placement='bottomRight' trigger={['click']} arrow>
-              <Button type={'text'} disabled={disabled} icon={<CloudUploadOutlined />} />
+    <Fragment>
+      <div className={'grl-dg__aside'}>
+        <input
+          hidden
+          accept='application/json'
+          type='file'
+          ref={fileInput}
+          onChange={handleUploadInput}
+          onClick={(event) => {
+            (event.target as any).value = null;
+          }}
+        />
+        <input
+          hidden
+          accept='.xlsx'
+          type='file'
+          ref={excelFileInput}
+          onChange={uploadJDMExcel}
+          onClick={(event) => {
+            (event.target as any).value = null;
+          }}
+        />
+        <div className={'grl-dg__aside__side-bar'}>
+          <div className={'grl-dg__aside__side-bar__top'}>
+            {!disabled && (
+              <Dropdown menu={{ items: uploadItems }} placement='bottomRight' trigger={['click']} arrow>
+                <Button type={'text'} disabled={disabled} icon={<CloudUploadOutlined />} />
+              </Dropdown>
+            )}
+            <Dropdown menu={{ items: downloadItems }} placement='bottomRight' trigger={['click']} arrow>
+              <Button type={'text'} icon={<CloudDownloadOutlined />} />
             </Dropdown>
-          )}
-          <Dropdown menu={{ items: downloadItems }} placement='bottomRight' trigger={['click']} arrow>
-            <Button type={'text'} icon={<CloudDownloadOutlined />} />
-          </Dropdown>
-        </div>
-        <div className={'grl-dg__aside__side-bar__bottom'}>
-          {(panels || []).map((panel) => {
-            const isActive = activePanel === panel.id;
-            return (
-              <Tooltip
-                key={panel.id}
-                title={`${!isActive ? 'Open' : 'Close'} ${panel.title.toLowerCase()} panel`}
-                placement={'right'}
-              >
-                <Button
+          </div>
+          <div className={'grl-dg__aside__side-bar__bottom'}>
+            {(panels || []).map((panel) => {
+              const isActive = activePanel === panel.id;
+              return (
+                <Tooltip
                   key={panel.id}
-                  type='text'
-                  icon={panel.icon}
-                  style={{ background: isActive ? 'rgba(0, 0, 0, 0.1)' : undefined }}
-                  onClick={() => {
-                    if (panel?.onClick) return panel.onClick();
-                    if (panel?.renderPanel) setActivePanel(isActive ? undefined : panel.id);
-                  }}
-                />
-              </Tooltip>
-            );
-          })}
+                  title={`${!isActive ? 'Open' : 'Close'} ${panel.title.toLowerCase()} panel`}
+                  placement={'right'}
+                >
+                  <Button
+                    key={panel.id}
+                    type='text'
+                    icon={panel.icon}
+                    style={{ background: isActive ? 'rgba(0, 0, 0, 0.1)' : undefined }}
+                    onClick={() => {
+                      if (panel?.onClick) return panel.onClick();
+                      if (panel?.renderPanel) setActivePanel(isActive ? undefined : panel.id);
+                    }}
+                  />
+                </Tooltip>
+              );
+            })}
+          </div>
         </div>
       </div>
-    </div>
+
+      <GraphExcelDialog
+        excelData={excelGraphData}
+        handleSuccess={handleSuccess}
+        handleCancel={() => {
+          setExcelGraphData(null);
+        }}
+      />
+    </Fragment>
   );
 };
