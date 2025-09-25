@@ -1,8 +1,9 @@
 import { message } from 'antd';
 import exceljs from 'exceljs';
+import { z } from 'zod';
 
-import type { TableSchemaItem } from '../components/decision-table/context/dt-store.context';
-import type { DecisionGraphType, DecisionTableType } from '../index';
+import type { HitPolicy, TableSchemaItem } from '../components/decision-table/context/dt-store.context';
+import { DecisionGraphType, DecisionTableType, decisionModelSchema } from '../index';
 import { NodeKind } from '../index';
 import { saveFile } from './file-helpers';
 
@@ -30,12 +31,19 @@ export type RuleData = {
   headerId: string;
 };
 
-type ExistingTableHeader = TableSchemaItem & { type: 'input' | 'output' };
+type ExistingTableData = {
+  headers: (TableSchemaItem & { type: 'input' | 'output' })[];
+  hitPolicy: HitPolicy | string;
+  inputField?: string | null;
+  outputPath?: string | null;
+  passThorough?: boolean;
+  executionMode?: 'single' | 'loop';
+};
 
 type ParsedSheetData = {
   headers: HeaderData[];
   rules: RuleData[][];
-  existingTableHeaders: ExistingTableHeader[];
+  existingTableData: ExistingTableData;
 };
 
 export type ParsedExcelData = ParsedSheetData & {
@@ -179,14 +187,15 @@ export const exportDecisionTable = async (fileName: string, decisionTableNodes: 
   saveFile(`${fileName}.xlsx`, blob);
 };
 
-const getParsedDataSheetData = (
+const parseSpreadsheetData = (
+  nodeId?: string,
   spreadSheetData: SpreadsheetCell[][] = [],
   defaultTable?: DecisionTableType,
 ): ParsedSheetData => {
   let headers: HeaderData[] = [];
   let rules: RuleData[][] = [];
 
-  if (spreadSheetData[1][0].value === 'Inputs') {
+  if (nodeId) {
     const columnHeaders: SpreadsheetCell[] = spreadSheetData.splice(0, 3)[2];
 
     headers = columnHeaders.map((columnHeader) => {
@@ -240,10 +249,17 @@ const getParsedDataSheetData = (
   return {
     headers,
     rules,
-    existingTableHeaders: [
-      ...(defaultTable?.inputs || []).map((item) => ({ ...item, type: 'input' as const })),
-      ...(defaultTable?.outputs || []).map((item) => ({ ...item, type: 'output' as const })),
-    ],
+    existingTableData: {
+      headers: [
+        ...(defaultTable?.inputs || []).map((item) => ({ ...item, type: 'input' as const })),
+        ...(defaultTable?.outputs || []).map((item) => ({ ...item, type: 'output' as const })),
+      ],
+      hitPolicy: defaultTable?.hitPolicy || 'first',
+      inputField: defaultTable?.inputField,
+      outputPath: defaultTable?.outputPath,
+      passThorough: defaultTable?.passThorough,
+      executionMode: defaultTable?.executionMode || 'single',
+    },
   };
 };
 
@@ -253,20 +269,13 @@ export const getExcelData = async (buffer: ArrayBuffer, defaultValues?: Decision
   const excelWorkbook = new Workbook();
   const workbook = await excelWorkbook.xlsx.load(buffer);
 
-  // think of another condition to prevent uploading multi-sheet excels to a single table view
-  // if (workbook.worksheets.length > 1) {
-  //   return null;
-  // }
-
   const parsedSpreadsheetData: ParsedExcelData[] = [];
 
-  workbook.eachSheet((sheet, index) => {
+  workbook.eachSheet((sheet) => {
     const spreadsheetData: SpreadsheetCell[][] = [];
     const spreadsheetName = sheet.name;
 
-    // check this
-    sheet.eachRow((row, index) => {
-      const id = crypto.randomUUID();
+    sheet.eachRow((row) => {
       const rowData: SpreadsheetCell[] = [];
 
       for (let i = 1; i <= row.cellCount; i++) {
@@ -284,7 +293,15 @@ export const getExcelData = async (buffer: ArrayBuffer, defaultValues?: Decision
       spreadsheetData.push(rowData);
     });
 
-    const nodeId = spreadsheetData[0][0].value;
+    const uuidSchema = z.string().uuid().optional();
+
+    let nodeId: z.infer<typeof uuidSchema>;
+
+    const nodeIdParse = uuidSchema.safeParse(spreadsheetData[0][0].value);
+
+    if (nodeIdParse.success) {
+      nodeId = nodeIdParse.data;
+    }
 
     let defaultTableValues;
     if (defaultValues && typeof defaultValues === 'object' && 'nodes' in defaultValues) {
@@ -294,8 +311,8 @@ export const getExcelData = async (buffer: ArrayBuffer, defaultValues?: Decision
     }
 
     parsedSpreadsheetData.push({
-      ...getParsedDataSheetData(spreadsheetData, defaultTableValues), // double-check the types,
-      id: nodeId || crypto.randomUUID(), // re-check this
+      ...parseSpreadsheetData(nodeId, spreadsheetData, defaultTableValues),
+      id: nodeId || crypto.randomUUID(),
       name: spreadsheetName,
       type: NodeKind.DecisionTable,
       position: { x: 0, y: 0 },

@@ -4,6 +4,7 @@ import React, { Fragment, useEffect, useMemo, useState } from 'react';
 
 import type { ParsedExcelData, RuleData } from '../../../helpers/excel';
 import type { NodeKind } from '../../../helpers/schema';
+import type { HitPolicy } from '../../decision-table/context/dt-store.context';
 
 // double-check this type
 type ItemValue = {
@@ -26,6 +27,11 @@ export type MergedDataItem = {
   name: string;
   type: NodeKind;
   position: { x: number; y: number };
+  hitPolicy: HitPolicy | string;
+  inputField?: string | null;
+  outputPath?: string | null;
+  passThorough?: boolean;
+  executionMode?: 'single' | 'loop';
 };
 
 type GraphExcelDialogProps = {
@@ -51,7 +57,7 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
 
       return;
     }
-    const existingTableHeaders = excelData[currentStep].existingTableHeaders.map((tableHeader) => ({
+    const existingTableHeaders = excelData[currentStep].existingTableData.headers.map((tableHeader) => ({
       ...tableHeader,
       value: tableHeader.field,
       label: tableHeader.name,
@@ -270,6 +276,11 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
                   name: excelData[index].name,
                   type: excelData[index].type,
                   position: excelData[index].position,
+                  hitPolicy: excelData[index].existingTableData.hitPolicy,
+                  inputField: excelData[index].existingTableData.inputField,
+                  outputPath: excelData[index].existingTableData.outputPath,
+                  passThorough: excelData[index].existingTableData.passThorough,
+                  executionMode: excelData[index].existingTableData.executionMode,
                 }));
 
                 handleSuccess(mergedData);

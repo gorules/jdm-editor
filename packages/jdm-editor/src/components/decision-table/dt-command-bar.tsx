@@ -21,7 +21,7 @@ import { useDecisionTableActions, useDecisionTableRaw, useDecisionTableState } f
 export const DecisionTableCommandBar: React.FC = () => {
   const [excelData, setExcelData] = useState<ParsedExcelData[] | null>();
 
-  const handleOk = (mappedExcelData: MappedExcelData) => {
+  const handleDataMapping = (mappedExcelData: MappedExcelData) => {
     const items = mappedExcelData.items;
     const rules = mappedExcelData.rules;
 
@@ -122,11 +122,13 @@ export const DecisionTableCommandBar: React.FC = () => {
 
         const excelData = await getExcelData(buffer, table);
 
-        if (excelData) {
+        console.log('excelData', excelData);
+
+        if (excelData.length === 1) {
           setExcelData(excelData);
           message.success('Excel file has been uploaded successfully!');
         } else {
-          message.error('Only excels with a single data shit can be handled in a table view.');
+          message.error('Only excel file with a single data sheet can be handled in a table view.');
         }
       };
     } catch {
@@ -221,7 +223,7 @@ export const DecisionTableCommandBar: React.FC = () => {
           (event.target as any).value = null;
         }}
       />
-      <DtExcelDialog excelData={excelData} handleSuccess={handleOk} handleCancel={handleCancel} />
+      <DtExcelDialog excelData={excelData} handleSuccess={handleDataMapping} handleCancel={handleCancel} />
     </>
   );
 };

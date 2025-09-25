@@ -95,9 +95,9 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
     }
   };
 
-  const handleSuccess = (mappedExcelData: MergedDataItem[]) => {
-    const nodesFromExcel: DecisionNode[] = mappedExcelData.map((med) => {
-      const inputs = med.items
+  const handleDataMapping = (mappedExcelData: MergedDataItem[]) => {
+    const nodesFromExcel: DecisionNode[] = mappedExcelData.map((excelData) => {
+      const inputs = excelData.items
         .filter((item) => item.type === 'input')
         .map((item) => ({
           id: item.id,
@@ -105,7 +105,7 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
           field: item.value,
         }));
 
-      const outputs = med.items
+      const outputs = excelData.items
         .filter((item) => item.type === 'output')
         .map((item) => ({
           id: item.id,
@@ -113,9 +113,7 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
           field: item.value,
         }));
 
-      console.log('med.rules', med.rules);
-
-      const reducedRules = med.rules.map((rule) =>
+      const reducedRules = excelData.rules.map((rule) =>
         rule.reduce(
           (acc: Record<string, any> & { _id: string }, item) => {
             acc[item.headerId] = item.value;
@@ -128,18 +126,20 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
       );
 
       return {
-        id: med.id,
-        name: med.name,
+        id: excelData.id,
+        name: excelData.name,
         type: NodeKind.DecisionTable,
         content: {
-          executionMode: 'single',
-          hitPolicy: 'first',
           inputs,
           outputs,
           rules: reducedRules,
-          passThorough: false,
+          executionMode: excelData.executionMode || 'single',
+          hitPolicy: excelData.hitPolicy || 'first',
+          passThorough: excelData.passThorough,
+          inputField: excelData.inputField,
+          outputPath: excelData.outputPath,
         },
-        position: med.position,
+        position: excelData.position,
       };
     });
 
@@ -316,7 +316,7 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
 
       <GraphExcelDialog
         excelData={excelGraphData}
-        handleSuccess={handleSuccess}
+        handleSuccess={handleDataMapping}
         handleCancel={() => {
           setExcelGraphData(null);
         }}

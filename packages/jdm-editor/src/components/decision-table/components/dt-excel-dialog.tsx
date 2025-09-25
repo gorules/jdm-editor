@@ -43,7 +43,7 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
       return;
     }
 
-    const existingTableHeaders = spreadSheetData.existingTableHeaders.map((tableHeader) => ({
+    const existingTableHeaders = spreadSheetData.existingTableData.headers.map((tableHeader) => ({
       ...tableHeader,
       value: tableHeader.field,
       label: tableHeader.name,
