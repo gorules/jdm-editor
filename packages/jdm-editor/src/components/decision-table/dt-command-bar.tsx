@@ -94,7 +94,7 @@ export const DecisionTableCommandBar: React.FC = () => {
 
   const exportExcel = async () => {
     try {
-      const { decisionTable, name } = stateStore.getState(); // see how you can set consistent ID
+      const { decisionTable, name } = stateStore.getState();
       await exportDecisionTable(name ?? 'table', [
         { ...decisionTable, name: 'decision table', id: crypto.randomUUID() },
       ]);
@@ -121,8 +121,6 @@ export const DecisionTableCommandBar: React.FC = () => {
         if (!buffer) return;
 
         const excelData = await getExcelData(buffer, table);
-
-        console.log('excelData', excelData);
 
         if (excelData.length === 1) {
           setExcelData(excelData);

@@ -158,7 +158,25 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
     // filtering new nodes and setting them proper position
     const newNodes = nodesFromExcel
       .filter((node) => !updatedNodes.some((existingNode) => existingNode.id === node.id))
-      .map((newNode, index) => ({ ...newNode, type: NodeKind.DecisionTable, position: { x: index * 250, y: 0 } }));
+      .map((newNode, index) => ({
+        ...newNode,
+        type: NodeKind.DecisionTable,
+        position: (() => {
+          const findAvailablePosition = (x: number, y: number) => {
+            const position = { x, y };
+
+            if (decisionGraph.nodes.some((node) => node.position.x === position.x && node.position.y === position.y)) {
+              return findAvailablePosition(x + 250, y);
+            }
+
+            return position;
+          };
+
+          const availablePosition = findAvailablePosition(0, 0);
+
+          return { x: availablePosition.x + index * 250, y: 0 };
+        })(),
+      }));
 
     const modelParsed = decisionModelSchema.safeParse({
       nodes: [...updatedNodes, ...newNodes],

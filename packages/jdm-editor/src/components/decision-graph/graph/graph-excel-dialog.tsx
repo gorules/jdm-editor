@@ -54,6 +54,8 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
   useEffect(() => {
     if (!excelData) {
       setSelectedItems(null);
+      setNewItemType('input');
+      setCurrentStep(0);
 
       return;
     }
@@ -145,7 +147,11 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
                 style={{ width: '100%' }}
                 placeholder='select field'
                 optionLabelProp='display'
-                defaultValue={(() => items.find((item) => item.id === header.id)?.value)()}
+                value={(() => {
+                  if (selectedItems) {
+                    return selectedItems[`step${currentStep}`]?.[header.id]?.value;
+                  }
+                })()}
                 onSelect={(_, option) => {
                   const { id, label, value, type } = option;
 
@@ -250,7 +256,6 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
           <Button
             type='primary'
             onClick={() => {
-              setItems([]);
               setCurrentStep(currentStep + 1);
             }}
           >
@@ -294,8 +299,6 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
           <Button
             style={{ margin: '0 8px' }}
             onClick={() => {
-              // think about this
-              // setItems([]);
               setCurrentStep(currentStep - 1);
             }}
           >

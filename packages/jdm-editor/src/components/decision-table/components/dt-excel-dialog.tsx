@@ -40,6 +40,8 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
   useEffect(() => {
     if (!spreadSheetData) {
       setSelectedItems(null);
+      setNewItemType('input');
+
       return;
     }
 
@@ -129,7 +131,7 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
                 style={{ width: '100%' }}
                 placeholder='select field'
                 optionLabelProp='display'
-                defaultValue={(() => items.find((item) => item.id === header.id)?.value)()}
+                defaultValue={(() => selectedItems?.[header.id]?.value)()}
                 onSelect={(_, option) => {
                   const { id, label, value, type } = option;
 

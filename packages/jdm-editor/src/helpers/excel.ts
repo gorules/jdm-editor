@@ -3,7 +3,7 @@ import exceljs from 'exceljs';
 import { z } from 'zod';
 
 import type { HitPolicy, TableSchemaItem } from '../components/decision-table/context/dt-store.context';
-import { DecisionGraphType, DecisionTableType, decisionModelSchema } from '../index';
+import type { DecisionGraphType, DecisionTableType } from '../index';
 import { NodeKind } from '../index';
 import { saveFile } from './file-helpers';
 
@@ -187,7 +187,7 @@ export const exportDecisionTable = async (fileName: string, decisionTableNodes: 
   saveFile(`${fileName}.xlsx`, blob);
 };
 
-const parseSpreadsheetData = (
+const getDecisionTableData = (
   nodeId?: string,
   spreadSheetData: SpreadsheetCell[][] = [],
   defaultTable?: DecisionTableType,
@@ -199,7 +199,6 @@ const parseSpreadsheetData = (
     const columnHeaders: SpreadsheetCell[] = spreadSheetData.splice(0, 3)[2];
 
     headers = columnHeaders.map((columnHeader) => {
-      // description is populated automatically if exists (maybe tweak UI a bit, so it's clear that description exists?)
       if (columnHeader.value?.toLowerCase() === 'description') {
         return {
           name: columnHeader.value,
@@ -228,7 +227,7 @@ const parseSpreadsheetData = (
 
       return {
         name: columnHeader.value,
-        value: headerMeta?.name, // you should fix mapping here
+        value: headerMeta?.name,
         _type: headerMeta?.type,
         id: headerMeta?.id,
         defaultValue: '',
@@ -239,7 +238,7 @@ const parseSpreadsheetData = (
       return data.map((d, index) => ({ value: d.value, headerId: headers[index].id }));
     });
   } else {
-    headers = spreadSheetData.splice(0, 1)[0].map((header) => ({ ...header, id: crypto.randomUUID() })); // log a lil more here
+    headers = spreadSheetData.splice(0, 1)[0].map((header) => ({ ...header, id: crypto.randomUUID() }));
 
     rules = spreadSheetData.map((data) => {
       return data.map((d, index) => ({ value: d.value, headerId: headers[index].id }));
@@ -311,7 +310,7 @@ export const getExcelData = async (buffer: ArrayBuffer, defaultValues?: Decision
     }
 
     parsedSpreadsheetData.push({
-      ...parseSpreadsheetData(nodeId, spreadsheetData, defaultTableValues),
+      ...getDecisionTableData(nodeId, spreadsheetData, defaultTableValues),
       id: nodeId || crypto.randomUUID(),
       name: spreadsheetName,
       type: NodeKind.DecisionTable,
