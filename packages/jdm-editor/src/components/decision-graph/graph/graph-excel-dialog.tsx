@@ -6,12 +6,13 @@ import type { ParsedExcelData, RuleData } from '../../../helpers/excel';
 import type { NodeKind } from '../../../helpers/schema';
 import type { HitPolicy } from '../../decision-table/context/dt-store.context';
 
-// double-check this type
 type ItemValue = {
   id: string;
   label: string;
   value?: string;
   type: string;
+  field?: string;
+  name?: string;
 };
 
 type SelectedItems = {

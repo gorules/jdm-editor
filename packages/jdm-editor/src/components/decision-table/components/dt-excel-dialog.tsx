@@ -4,12 +4,13 @@ import React, { Fragment, useEffect, useMemo, useState } from 'react';
 
 import type { ParsedExcelData, RuleData } from '../../../helpers/excel';
 
-// double-check this type
 type ItemValue = {
   id: string;
   label: string;
   value?: string;
   type: string;
+  field?: string;
+  name?: string;
 };
 
 type SelectedItems = {

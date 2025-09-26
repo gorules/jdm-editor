@@ -53,7 +53,6 @@ export type ParsedExcelData = ParsedSheetData & {
   position: { x: number; y: number };
 };
 
-// exporting decision table
 export const exportDecisionTable = async (fileName: string, decisionTableNodes: DecisionTableNode[]) => {
   const { Workbook } = exceljs;
   const workbook = new Workbook();
@@ -262,7 +261,6 @@ const getDecisionTableData = (
   };
 };
 
-// manipulating with excel data
 export const getExcelData = async (buffer: ArrayBuffer, defaultValues?: DecisionTableType | DecisionGraphType) => {
   const { Workbook } = exceljs;
   const excelWorkbook = new Workbook();
