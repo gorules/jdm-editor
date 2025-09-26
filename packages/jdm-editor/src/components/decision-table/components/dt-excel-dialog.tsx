@@ -1,5 +1,5 @@
 import { PlusOutlined, SwapOutlined } from '@ant-design/icons';
-import { Button, Divider, Input, Modal, Radio, Select, Tag } from 'antd';
+import { Button, Divider, Input, Modal, Radio, Select, Tag, Typography } from 'antd';
 import React, { Fragment, useEffect, useMemo, useState } from 'react';
 
 import type { ParsedExcelData, RuleData } from '../../../helpers/excel';
@@ -115,19 +115,18 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
               <div
                 style={{
                   padding: '12px',
-                  backgroundColor: '#f5f5f5',
+                  backgroundColor: 'var(--grl-color-bg-layout)',
                   borderRadius: '8px',
-                  border: '1px solid #d9d9d9',
+                  border: '1px solid var(--grl-color-border)',
                 }}
               >
-                <p style={{ margin: 0, fontWeight: 500, color: '#262626' }}>{header.value}</p>
+                <Typography.Text>{header.value}</Typography.Text>
               </div>
 
               <SwapOutlined
                 style={{
-                  fontSize: '18px',
-                  color: '#1890ff',
-                  justifySelf: 'center',
+                  fontSize: '16px',
+                  color: 'var(--grl-color-primary)',
                 }}
               />
 
@@ -195,8 +194,8 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
                   return (
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span>{option.data.label}</span>
-                      {option.data.type === 'input' && <Tag color='blue'>Input</Tag>}
-                      {option.data.type === 'output' && <Tag color='green'>Output</Tag>}
+                      {option.data.type === 'input' && <Tag style={{ background: '#acccec' }}>Input</Tag>}
+                      {option.data.type === 'output' && <Tag style={{ background: '#c7e0ba' }}>Output</Tag>}
                     </div>
                   );
                 }}
@@ -216,8 +215,8 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
                         }}
                       >
                         <span>{item.label}</span>
-                        {item.type === 'input' && <Tag color='blue'>Input</Tag>}
-                        {item.type === 'output' && <Tag color='green'>Output</Tag>}
+                        {item.type === 'input' && <Tag style={{ background: '#acccec' }}>Input</Tag>}
+                        {item.type === 'output' && <Tag style={{ background: '#c7e0ba' }}>Output</Tag>}
                       </div>
                     ),
                   };
