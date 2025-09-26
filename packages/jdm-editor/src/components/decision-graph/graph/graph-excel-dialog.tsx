@@ -69,8 +69,14 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
 
     setItems(existingTableHeaders);
 
-    const excelHeaderIds = excelData[currentStep]?.headers?.map((header) => header.id) || [];
-    const matchingHeaders = existingTableHeaders.filter((tableHeader) => excelHeaderIds.includes(tableHeader.id));
+    const excelHeaders = excelData[currentStep]?.headers || [];
+
+    const matchingHeaders = existingTableHeaders.filter((tableHeader) => {
+      return excelHeaders.some(
+        (excelHeader) => excelHeader.id === tableHeader.id && excelHeader.value === tableHeader.value,
+      );
+    });
+
     const selectedItemsMap = matchingHeaders.reduce(
       (acc, tableHeader) => ({
         ...acc,

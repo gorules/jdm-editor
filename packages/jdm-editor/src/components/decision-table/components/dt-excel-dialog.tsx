@@ -55,9 +55,13 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
 
     setItems(existingTableHeaders);
 
-    const excelHeaderIds = spreadSheetData?.headers?.map((header) => header.id) || [];
+    const excelHeaders = spreadSheetData?.headers || [];
 
-    const matchingHeaders = existingTableHeaders.filter((tableHeader) => excelHeaderIds.includes(tableHeader.id));
+    const matchingHeaders = existingTableHeaders.filter((tableHeader) => {
+      return excelHeaders.some(
+        (excelHeader) => excelHeader.id === tableHeader.id && excelHeader.value === tableHeader.value,
+      );
+    });
 
     const selectedItemsMap = matchingHeaders.reduce(
       (acc, tableHeader) => ({
