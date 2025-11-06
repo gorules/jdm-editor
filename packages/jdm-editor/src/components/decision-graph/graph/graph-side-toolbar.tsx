@@ -6,6 +6,7 @@ import React, { Fragment, useRef, useState } from 'react';
 import type { ParsedExcelData } from '../../../helpers/excel';
 import { exportDecisionTable, getExcelData } from '../../../helpers/excel';
 import { decisionModelSchema } from '../../../helpers/schema';
+import { parseDecisionTable } from '../../decision-table/context/dt-store.context';
 import { useDecisionGraphActions, useDecisionGraphRaw, useDecisionGraphState } from '../context/dg-store.context';
 import { type DecisionEdge, type DecisionNode } from '../dg-types';
 import { NodeKind } from '../nodes/specifications/specification-types';
@@ -130,12 +131,14 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
         name: excelData.name,
         type: NodeKind.DecisionTable,
         content: {
-          inputs,
-          outputs,
-          rules: reducedRules,
-          executionMode: excelData.executionMode || 'single',
-          hitPolicy: excelData.hitPolicy || 'first',
-          passThorough: excelData.passThorough,
+          ...parseDecisionTable({
+            inputs,
+            outputs,
+            rules: reducedRules,
+            executionMode: excelData.executionMode || 'single',
+            hitPolicy: excelData.hitPolicy || 'first',
+            passThorough: excelData.passThorough,
+          }),
           inputField: excelData.inputField,
           outputPath: excelData.outputPath,
         },

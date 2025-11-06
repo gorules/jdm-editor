@@ -1,4 +1,3 @@
-import { message } from 'antd';
 import exceljs from 'exceljs';
 import { z } from 'zod';
 
@@ -221,7 +220,10 @@ const getDecisionTableData = (
       try {
         headerMeta = JSON.parse(columnHeader.note || '');
       } catch {
-        message.error('Header note can not be parsed!');
+        return {
+          value: columnHeader.value,
+          id: crypto.randomUUID(),
+        };
       }
 
       return {
@@ -237,7 +239,19 @@ const getDecisionTableData = (
       return data.map((d, index) => ({ value: d.value, headerId: headers[index].id }));
     });
   } else {
-    headers = spreadSheetData.splice(0, 1)[0].map((header) => ({ ...header, id: crypto.randomUUID() }));
+    headers = spreadSheetData.splice(0, 1)[0].map((columnHeader) => {
+      if (columnHeader.value?.toLowerCase() === 'description') {
+        return {
+          name: columnHeader.value,
+          id: '_description',
+        };
+      }
+
+      return {
+        ...columnHeader,
+        id: crypto.randomUUID(),
+      };
+    });
 
     rules = spreadSheetData.map((data) => {
       return data.map((d, index) => ({ value: d.value, headerId: headers[index].id }));
@@ -245,7 +259,7 @@ const getDecisionTableData = (
   }
 
   return {
-    headers,
+    headers: headers.filter((item) => item.id !== '_id'),
     rules,
     existingTableData: {
       headers: [

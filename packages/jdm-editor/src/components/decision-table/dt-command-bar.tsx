@@ -15,8 +15,12 @@ import { exportDecisionTable, getExcelData } from '../../helpers/excel';
 import { Stack } from '../stack';
 import type { MappedExcelData } from './components/dt-excel-dialog';
 import { DtExcelDialog } from './components/dt-excel-dialog';
-import type { DecisionTableType } from './context/dt-store.context';
-import { useDecisionTableActions, useDecisionTableRaw, useDecisionTableState } from './context/dt-store.context';
+import {
+  parseDecisionTable,
+  useDecisionTableActions,
+  useDecisionTableRaw,
+  useDecisionTableState,
+} from './context/dt-store.context';
 
 export const DecisionTableCommandBar: React.FC = () => {
   const [excelData, setExcelData] = useState<ParsedExcelData[] | null>();
@@ -53,14 +57,14 @@ export const DecisionTableCommandBar: React.FC = () => {
       ),
     );
 
-    const newTable: DecisionTableType = {
+    const newTable = parseDecisionTable({
       executionMode: 'single',
       hitPolicy: 'first',
       inputs,
       outputs,
       rules: reducedRules,
       passThorough: false,
-    };
+    });
 
     tableActions.setDecisionTable(newTable);
     listenerStore.getState().onChange?.(newTable);
