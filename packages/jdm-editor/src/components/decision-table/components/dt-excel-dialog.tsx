@@ -143,7 +143,6 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
   }, [spreadSheetData]);
 
   useEffect(() => {
-    console.log('selectedItemsHook');
     if (!selectedItems) return;
 
     const headerTypeStates = Object.keys(selectedItems).reduce(
