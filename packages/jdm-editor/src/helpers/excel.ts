@@ -1,17 +1,56 @@
-import { message } from 'antd';
 import exceljs from 'exceljs';
-import { P, match } from 'ts-pattern';
+import { z } from 'zod';
 
-import { saveFile } from '../../helpers/file-helpers';
-import { NodeKind } from '../decision-graph/nodes/specifications/specification-types';
-import type { DecisionGraphType, DecisionNode, DecisionTableType } from '../index';
-import type { TableSchemaItem } from './context/dt-store.context';
-import { parseDecisionTable } from './context/dt-store.context';
+import type { HitPolicy, TableSchemaItem } from '../components/decision-table/context/dt-store.context';
+import type { DecisionGraphType, DecisionTableType } from '../index';
+import { NodeKind } from '../index';
+import { saveFile } from './file-helpers';
 
 type DecisionTableNode = {
   id: string;
   name: string;
 } & DecisionTableType;
+
+type SpreadsheetCell = {
+  value?: string;
+  note?: string | null;
+};
+
+type HeaderData = {
+  name?: string;
+  id: string;
+  value?: string;
+  _type?: string;
+  defaultValue?: string;
+  note?: string | null;
+};
+
+export type RuleData = {
+  value?: string;
+  headerId: string;
+};
+
+type ExistingTableData = {
+  headers: (TableSchemaItem & { type: 'input' | 'output' })[];
+  hitPolicy: HitPolicy | string;
+  inputField?: string | null;
+  outputPath?: string | null;
+  passThorough?: boolean;
+  executionMode?: 'single' | 'loop';
+};
+
+type ParsedSheetData = {
+  headers: HeaderData[];
+  rules: RuleData[][];
+  existingTableData: ExistingTableData;
+};
+
+export type ParsedExcelData = ParsedSheetData & {
+  id: string;
+  name: string;
+  type: NodeKind;
+  position: { x: number; y: number };
+};
 
 export const exportDecisionTable = async (fileName: string, decisionTableNodes: DecisionTableNode[]) => {
   const { Workbook } = exceljs;
@@ -146,103 +185,109 @@ export const exportDecisionTable = async (fileName: string, decisionTableNodes: 
   saveFile(`${fileName}.xlsx`, blob);
 };
 
-const parseSpreadsheetData = (spreadSheetData: any, defaultTable?: DecisionTableType) => {
-  const headers: any[] = spreadSheetData.splice(0, 3)[2];
-  const columnHeaders = headers.map((header) => {
-    if (header.value.toLowerCase() === 'description') {
-      return {
-        name: header.value,
-        id: '_description',
+const getDecisionTableData = (
+  nodeId?: string,
+  spreadSheetData: SpreadsheetCell[][] = [],
+  defaultTable?: DecisionTableType,
+): ParsedSheetData => {
+  let headers: HeaderData[] = [];
+  let rules: RuleData[][] = [];
+
+  if (nodeId) {
+    const columnHeaders: SpreadsheetCell[] = spreadSheetData.splice(0, 3)[2];
+
+    headers = columnHeaders.map((columnHeader) => {
+      if (columnHeader.value?.toLowerCase() === 'description') {
+        return {
+          name: columnHeader.value,
+          id: '_description',
+        };
+      }
+
+      if (columnHeader.value?.toLowerCase() === 'rule id') {
+        return {
+          name: columnHeader.value,
+          id: '_id',
+        };
+      }
+
+      let headerMeta = {
+        name: '',
+        type: '',
+        id: '',
       };
-    }
 
-    if (header.value.toLowerCase() === 'rule id') {
+      try {
+        headerMeta = JSON.parse(columnHeader.note || '');
+      } catch {
+        return {
+          value: columnHeader.value,
+          id: crypto.randomUUID(),
+        };
+      }
+
       return {
-        name: header.value,
-        id: '_id',
+        name: columnHeader.value,
+        value: headerMeta?.name,
+        _type: headerMeta?.type,
+        id: headerMeta?.id,
+        defaultValue: '',
       };
-    }
-
-    let headerMeta = {
-      name: '',
-      type: '',
-      id: '',
-    };
-
-    try {
-      headerMeta = JSON.parse(header.note);
-    } catch {
-      message.error('Header note can not be parsed!');
-    }
-
-    return {
-      name: header.value,
-      field: headerMeta?.name,
-      _type: headerMeta?.type,
-      id: headerMeta?.id,
-      defaultValue: '',
-    };
-  });
-
-  const inputs = columnHeaders
-    .filter((column) => column._type?.toLowerCase() === 'input')
-    .map((column) => ({
-      id: column.id,
-      name: column?.name,
-      field: column?.field,
-      defaultValue: column?.defaultValue,
-    })) as TableSchemaItem[];
-
-  const outputs = columnHeaders
-    .filter((column) => column._type?.toLowerCase() === 'output')
-    .map((column) => ({
-      id: column.id,
-      name: column?.name,
-      field: column?.field,
-      defaultValue: column?.defaultValue,
-    })) as TableSchemaItem[];
-
-  const rules = spreadSheetData.map((data: any) => {
-    const dataPoint: Record<string, string> = {
-      _id: crypto.randomUUID(),
-    };
-
-    columnHeaders.forEach((col, index) => {
-      dataPoint[col.id] = match(data?.[index]?.value)
-        .with(P.string, (val) => val.trim())
-        .with(P.nullish, () => '')
-        .otherwise((val) => val.toString());
     });
 
-    return dataPoint;
-  });
+    rules = spreadSheetData.map((data) => {
+      return data.map((d, index) => ({ value: d.value, headerId: headers[index].id }));
+    });
+  } else {
+    headers = spreadSheetData.splice(0, 1)[0].map((columnHeader) => {
+      if (columnHeader.value?.toLowerCase() === 'description') {
+        return {
+          name: columnHeader.value,
+          id: '_description',
+        };
+      }
 
-  return parseDecisionTable({
-    inputs,
-    outputs,
+      return {
+        ...columnHeader,
+        id: crypto.randomUUID(),
+      };
+    });
+
+    rules = spreadSheetData.map((data) => {
+      return data.map((d, index) => ({ value: d.value, headerId: headers[index].id }));
+    });
+  }
+
+  return {
+    headers: headers.filter((item) => item.id !== '_id'),
     rules,
-    hitPolicy: defaultTable?.hitPolicy || 'first',
-    inputField: defaultTable?.inputField,
-    outputPath: defaultTable?.outputPath,
-    passThorough: defaultTable?.passThorough,
-  });
+    existingTableData: {
+      headers: [
+        ...(defaultTable?.inputs || []).map((item) => ({ ...item, type: 'input' as const })),
+        ...(defaultTable?.outputs || []).map((item) => ({ ...item, type: 'output' as const })),
+      ],
+      hitPolicy: defaultTable?.hitPolicy || 'first',
+      inputField: defaultTable?.inputField,
+      outputPath: defaultTable?.outputPath,
+      passThorough: defaultTable?.passThorough,
+      executionMode: defaultTable?.executionMode || 'single',
+    },
+  };
 };
 
-export const readDecisionTableFile = async (
-  buffer: ArrayBuffer,
-  defaultValues?: DecisionTableType | DecisionGraphType,
-) => {
+export const getExcelData = async (buffer: ArrayBuffer, defaultValues?: DecisionTableType | DecisionGraphType) => {
   const { Workbook } = exceljs;
   const excelWorkbook = new Workbook();
   const workbook = await excelWorkbook.xlsx.load(buffer);
-  const nodes: DecisionNode[] = [];
+
+  const parsedSpreadsheetData: ParsedExcelData[] = [];
 
   workbook.eachSheet((sheet) => {
-    const spreadsheetData: any[] = [];
+    const spreadsheetData: SpreadsheetCell[][] = [];
     const spreadsheetName = sheet.name;
 
     sheet.eachRow((row) => {
-      const rowData: any[] = [];
+      const rowData: SpreadsheetCell[] = [];
 
       for (let i = 1; i <= row.cellCount; i++) {
         const cell = row.getCell(i);
@@ -253,12 +298,21 @@ export const readDecisionTableFile = async (
             : cell.note
           : null;
 
-        rowData.push({ value: cell.value, note: cellNote });
+        rowData.push({ value: cell.value?.toString(), note: cellNote });
       }
 
       spreadsheetData.push(rowData);
     });
-    const nodeId: string = spreadsheetData[0][0].value;
+
+    const uuidSchema = z.string().uuid().optional();
+
+    let nodeId: z.infer<typeof uuidSchema>;
+
+    const nodeIdParse = uuidSchema.safeParse(spreadsheetData[0][0].value);
+
+    if (nodeIdParse.success) {
+      nodeId = nodeIdParse.data;
+    }
 
     let defaultTableValues;
     if (defaultValues && typeof defaultValues === 'object' && 'nodes' in defaultValues) {
@@ -267,14 +321,14 @@ export const readDecisionTableFile = async (
       defaultTableValues = defaultValues as DecisionTableType;
     }
 
-    nodes.push({
-      id: nodeId,
+    parsedSpreadsheetData.push({
+      ...getDecisionTableData(nodeId, spreadsheetData, defaultTableValues),
+      id: nodeId || crypto.randomUUID(),
       name: spreadsheetName,
       type: NodeKind.DecisionTable,
-      content: parseSpreadsheetData(spreadsheetData, defaultTableValues),
       position: { x: 0, y: 0 },
     });
   });
 
-  return nodes;
+  return parsedSpreadsheetData;
 };
