@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.48.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.47.0...@gorules/jdm-editor@1.48.0) (2025-11-07)
+
+### Features
+
+- **jdm-editor:** excel data mapping ([#200](https://github.com/gorules/jdm-editor/issues/200)) ([912c16e](https://github.com/gorules/jdm-editor/commit/912c16e5be2bbc5dc435398c700aea4e974acbc5))
+
 # [1.47.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.46.0...@gorules/jdm-editor@1.47.0) (2025-09-11)
 
 ### Features
