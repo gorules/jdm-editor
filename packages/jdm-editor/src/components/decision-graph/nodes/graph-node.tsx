@@ -76,7 +76,7 @@ export const GraphNode = React.forwardRef<HTMLDivElement, GraphNodeProps>(
       !displayError && {
         key: 'copy-clipboard',
         label: <SpacedText left='Copy to clipboard' right={platform.shortcut('Ctrl + C')} />,
-        onClick: () => {},
+        onClick: () => graphActions.copyNodes([id]),
       },
       !displayError && {
         key: 'duplicate',
