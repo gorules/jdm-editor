@@ -1,5 +1,6 @@
 import { InfoCircleOutlined, PlusOutlined, SwapOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Divider, Input, Modal, Radio, Select, Steps, Tag, Tooltip, Typography } from 'antd';
+import { isEmpty } from 'lodash';
 import React, { Fragment, useEffect, useMemo, useState } from 'react';
 
 import type { ParsedExcelData, RuleData } from '../../../helpers/excel';
@@ -42,6 +43,42 @@ type GraphExcelDialogProps = {
   handleCancel: () => void;
 };
 
+type TableHeader = {
+  id: string;
+  label: string;
+  value?: string;
+  type?: 'input' | 'output';
+};
+
+const dataTypeConfig = {
+  ['input']: { label: 'Input', color: '#acccec' },
+  ['output']: { label: 'Output', color: '#c7e0ba' },
+};
+
+const isHeaderMatch = (header1: TableHeader, header2: TableHeader) => {
+  return (
+    header1.id === header2.id ||
+    header1.value?.toLowerCase() === header2.value?.toLowerCase() ||
+    header1.label?.toLowerCase() === header2.label?.toLowerCase()
+  );
+};
+
+const mergeHeaders = (newHeader: TableHeader, existingHeader?: TableHeader) => {
+  if (existingHeader) {
+    return {
+      id: newHeader.id,
+      label: newHeader.label || existingHeader.label,
+      value: newHeader.value || existingHeader.value,
+      type: newHeader.type || existingHeader.type,
+    };
+  }
+
+  return {
+    ...newHeader,
+    value: newHeader.value || newHeader.label,
+  };
+};
+
 export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, handleSuccess, handleCancel }) => {
   const [currentStep, setCurrentStep] = useState<number>(0);
   const steps = useMemo(() => excelData?.map((item) => ({ key: item.id, title: item.name })), [excelData]);
@@ -50,9 +87,6 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
   const [newItemName, setNewItemName] = useState<string>('');
 
   const [headerWrapStates, setHeaderWrapStates] = useState<Record<string, Record<string, boolean>>>({});
-  const [headerTypeStates, setHeaderTypeStates] = useState<
-    Record<string, Record<string, 'input' | 'output' | undefined>>
-  >({});
 
   const [selectedItems, setSelectedItems] = useState<SelectedItems | null>(null);
 
@@ -61,6 +95,7 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
       setSelectedItems(null);
       setCurrentStep(0);
       setNewItemName('');
+      setHeaderWrapStates({});
 
       return;
     }
@@ -68,30 +103,26 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
       .map((tableHeader) => ({
         ...tableHeader,
         value: tableHeader.field,
-        label: tableHeader.name,
+        label: tableHeader.name as string,
         type: tableHeader.type,
       }))
       .filter((header) => header.value);
 
-    const excelHeaders = excelData[currentStep]?.headers || [];
-
-    const newTableHeaders = excelHeaders.map((header) => ({
+    const newTableHeaders = (excelData[currentStep]?.headers || []).map((header) => ({
       id: header.id || crypto.randomUUID(),
       value: header.id === '_description' ? 'description' : header.value,
-      label: (header.name || header.value) as string,
-      ...(header.id !== '_description' && { type: header._type }),
+      label: header.name as string,
+      ...(header.id !== '_description' && { type: header._type as 'input' | 'output' | undefined }),
     }));
 
     const items = [
-      ...existingTableHeaders,
-      ...newTableHeaders.filter(
-        (newTableHeader) =>
-          !existingTableHeaders.some(
-            (existingHeader) =>
-              existingHeader.id === newTableHeader.id ||
-              existingHeader.value === newTableHeader.value ||
-              existingHeader.label === newTableHeader.label,
-          ),
+      ...newTableHeaders.map((newTableHeader) => {
+        const existingHeader = existingTableHeaders.find((header) => isHeaderMatch(header, newTableHeader));
+
+        return mergeHeaders(newTableHeader, existingHeader);
+      }),
+      ...existingTableHeaders.filter(
+        (existingTableHeader) => !newTableHeaders.some((newHeader) => isHeaderMatch(newHeader, existingTableHeader)),
       ),
     ];
 
@@ -103,37 +134,18 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
       });
     }
 
-    // @ts-expect-error "input" | "output" | "unset"
     setItems(items);
 
-    const matchingHeaders = items
-      .filter((tableHeader) => {
-        return excelHeaders.some(
-          (excelHeader) =>
-            excelHeader.id === tableHeader.id ||
-            excelHeader.value === tableHeader.value ||
-            excelHeader.value === tableHeader.label,
-        );
-      })
-      .map((tableHeader) => {
-        const matchingExcelHeader = excelHeaders.find(
-          (excelHeader) =>
-            excelHeader.id === tableHeader.id ||
-            excelHeader.value === tableHeader.value ||
-            excelHeader.value === tableHeader.label,
-        );
-        return {
-          ...tableHeader,
-          excelHeaderId: matchingExcelHeader?.id,
-        };
-      });
+    const matchingHeaders = items.filter((item) => {
+      return newTableHeaders.some((excelHeader) => excelHeader.id === item.id);
+    });
 
     if (matchingHeaders.length) {
       const selectedItemsMap = matchingHeaders.reduce((acc, tableHeader, index) => {
         const hasDescription = matchingHeaders.some((header) => header.value === 'description');
         const hasOutputAlready = matchingHeaders.slice(0, index).some((header) => header.type === 'output');
 
-        let shouldBeOutput = false;
+        let shouldBeOutput;
 
         if (hasDescription) {
           // If there's description, set second-to-last as output
@@ -146,7 +158,7 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
 
         return {
           ...acc,
-          [tableHeader.excelHeaderId as string]: {
+          [tableHeader.id]: {
             id: tableHeader.id,
             label: tableHeader.label,
             value: tableHeader.value,
@@ -157,40 +169,19 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
 
       setSelectedItems((prevItems) => {
         const stepKey = `step${currentStep}`;
-        const currentStepData = (prevItems || {})[stepKey] || {};
+        const currentStepData = (prevItems || {})[stepKey];
+
+        if (currentStepData) {
+          return prevItems;
+        }
 
         return {
           ...(prevItems || {}),
-          [stepKey]: {
-            ...currentStepData,
-            ...selectedItemsMap,
-          },
+          [stepKey]: selectedItemsMap,
         };
       });
     }
   }, [excelData, currentStep]);
-
-  useEffect(() => {
-    if (!selectedItems) return;
-
-    const stepKey = `step${currentStep}`;
-    const currentStepItems = selectedItems[stepKey];
-
-    if (!currentStepItems) return;
-
-    const headerTypeStates = Object.keys(currentStepItems).reduce(
-      (acc, key) => {
-        acc[key] = currentStepItems[key].type;
-        return acc;
-      },
-      {} as Record<string, 'input' | 'output' | undefined>,
-    );
-
-    setHeaderTypeStates((prev) => ({
-      ...prev,
-      [stepKey]: headerTypeStates,
-    }));
-  }, [selectedItems, currentStep]);
 
   return (
     <Modal
@@ -269,7 +260,7 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
                 border: '1px solid var(--grl-color-border)',
               }}
             >
-              <Typography.Text>{header.value || header.name}</Typography.Text>
+              <Typography.Text>{header.name || header.value}</Typography.Text>
             </div>
 
             <SwapOutlined
@@ -295,13 +286,6 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
                     ...(prevItems || {}),
                     [stepKey]: currentStepData,
                   };
-                });
-
-                setHeaderTypeStates((prev) => {
-                  const stepKey = `step${currentStep}`;
-                  const updated = { ...prev[stepKey] };
-                  delete updated[header.id];
-                  return { ...prev, [stepKey]: updated };
                 });
 
                 setHeaderWrapStates((prev) => {
@@ -330,12 +314,6 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
                   });
 
                   if (clearedHeaderIds.length > 0) {
-                    setHeaderTypeStates((prev) => {
-                      const stepData = { ...(prev[stepKey] || {}) };
-                      clearedHeaderIds.forEach((id) => delete stepData[id]);
-                      return { ...prev, [stepKey]: stepData };
-                    });
-
                     setHeaderWrapStates((prev) => {
                       const stepData = { ...(prev[stepKey] || {}) };
                       clearedHeaderIds.forEach((id) => delete stepData[id]);
@@ -399,8 +377,11 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
                 return (
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span>{option.data.label}</span>
-                    {option.data.type === 'input' && <Tag style={{ background: '#acccec' }}>Input</Tag>}
-                    {option.data.type === 'output' && <Tag style={{ background: '#c7e0ba' }}>Output</Tag>}
+                    {option.data.type && (
+                      <Tag style={{ background: dataTypeConfig[option.data.type].color }}>
+                        {dataTypeConfig[option.data.type].label}
+                      </Tag>
+                    )}
                   </div>
                 );
               }}
@@ -428,17 +409,22 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
                   };
                 })}
             />
-            {selectedItems?.[`step${currentStep}`]?.[header.id]?.value !== 'description' ? (
+            {selectedItems && selectedItems?.[`step${currentStep}`]?.[header.id]?.value !== 'description' ? (
               <Radio.Group
-                value={headerTypeStates[`step${currentStep}`]?.[header.id] ?? 'input'}
+                disabled={!selectedItems?.[`step${currentStep}`]?.[header.id]}
+                value={selectedItems[`step${currentStep}`]?.[header.id]?.type ?? 'input'}
                 onChange={(e) => {
-                  setHeaderTypeStates((prev) => {
+                  setSelectedItems((prev) => {
                     const stepKey = `step${currentStep}`;
+                    const currentStepData = (prev || {})[stepKey];
                     return {
-                      ...prev,
+                      ...(prev || {}),
                       [stepKey]: {
-                        ...(prev[stepKey] || {}),
-                        [header.id]: e.target.value,
+                        ...currentStepData,
+                        [header.id]: {
+                          ...currentStepData[header.id],
+                          type: e.target.value,
+                        },
                       },
                     };
                   });
@@ -460,6 +446,7 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
             {selectedItems?.[`step${currentStep}`]?.[header.id]?.value !== 'description' ? (
               <div style={{ display: 'flex', justifyContent: 'center' }}>
                 <Checkbox
+                  disabled={!selectedItems?.[`step${currentStep}`]?.[header.id]}
                   checked={headerWrapStates[`step${currentStep}`]?.[header.id] || false}
                   onChange={(e) => {
                     setHeaderWrapStates((prev) => {
@@ -486,6 +473,7 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
         {currentStep < (excelData || []).length - 1 && (
           <Button
             type='primary'
+            disabled={!selectedItems?.[`step${currentStep}`] || isEmpty(selectedItems[`step${currentStep}`])}
             onClick={() => {
               setCurrentStep(currentStep + 1);
             }}
@@ -496,18 +484,18 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
         {currentStep === (excelData || []).length - 1 && (
           <Button
             type='primary'
+            disabled={!selectedItems?.[`step${currentStep}`] || isEmpty(selectedItems[`step${currentStep}`])}
             onClick={() => {
               if (selectedItems && excelData) {
                 const mergedData = Object.keys(selectedItems).map((stepKey, index) => {
                   const stepItems = selectedItems[stepKey];
                   const stepWrapStates = headerWrapStates[stepKey] || {};
-                  const stepTypeStates = headerTypeStates[stepKey] || {};
 
                   const items = Object.keys(stepItems).map((key) => ({
                     ...stepItems[key],
                     wrapInQuotes: stepWrapStates[key] || false,
                     ...(stepItems[key].value !== 'description' && {
-                      type: stepTypeStates[key] ?? 'input',
+                      type: stepItems[key].type ?? 'input',
                     }),
                   }));
 

@@ -221,7 +221,7 @@ const getDecisionTableData = (
         headerMeta = JSON.parse(columnHeader.note || '');
       } catch {
         return {
-          value: columnHeader.value,
+          name: columnHeader.value,
           id: crypto.randomUUID(),
         };
       }
@@ -248,7 +248,7 @@ const getDecisionTableData = (
       }
 
       return {
-        ...columnHeader,
+        name: columnHeader.value,
         id: crypto.randomUUID(),
       };
     });

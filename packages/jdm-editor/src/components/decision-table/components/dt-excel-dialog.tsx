@@ -29,6 +29,42 @@ type DtExcelDialogProps = {
   handleCancel: () => void;
 };
 
+type TableHeader = {
+  id: string;
+  label: string;
+  value?: string;
+  type?: 'input' | 'output';
+};
+
+const dataTypeConfig = {
+  ['input']: { label: 'Input', color: '#acccec' },
+  ['output']: { label: 'Output', color: '#c7e0ba' },
+};
+
+const isHeaderMatch = (header1: TableHeader, header2: TableHeader) => {
+  return (
+    header1.id === header2.id ||
+    header1.value?.toLowerCase() === header2.value?.toLowerCase() ||
+    header1.label?.toLowerCase() === header2.label?.toLowerCase()
+  );
+};
+
+const mergeHeaders = (newHeader: TableHeader, existingHeader?: TableHeader) => {
+  if (existingHeader) {
+    return {
+      id: newHeader.id,
+      label: newHeader.label || existingHeader.label,
+      value: newHeader.value || existingHeader.value,
+      type: newHeader.type || existingHeader.type,
+    };
+  }
+
+  return {
+    ...newHeader,
+    value: newHeader.value || newHeader.label,
+  };
+};
+
 export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleSuccess, handleCancel }) => {
   const spreadSheetData = useMemo(() => excelData?.[0], [excelData]);
 
@@ -37,12 +73,12 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
   const [selectedItems, setSelectedItems] = useState<SelectedItems | null>(null);
 
   const [headerWrapStates, setHeaderWrapStates] = useState<Record<string, boolean>>({});
-  const [headerTypeStates, setHeaderTypeStates] = useState<Record<string, 'input' | 'output' | undefined>>({});
 
   useEffect(() => {
     if (!spreadSheetData) {
       setSelectedItems(null);
       setNewItemName('');
+      setHeaderWrapStates({});
 
       return;
     }
@@ -51,30 +87,26 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
       .map((tableHeader) => ({
         ...tableHeader,
         value: tableHeader.field,
-        label: tableHeader.name,
+        label: tableHeader.name as string,
         type: tableHeader.type,
       }))
       .filter((header) => header.value);
 
-    const excelHeaders = spreadSheetData?.headers || [];
-
-    const newTableHeaders = excelHeaders.map((header) => ({
+    const newTableHeaders = (spreadSheetData?.headers || []).map((header) => ({
       id: header.id || crypto.randomUUID(),
       value: header.id === '_description' ? 'description' : header.value,
-      label: (header.name || header.value) as string,
-      ...(header.id !== '_description' && { type: header._type }),
+      label: header.name as string,
+      ...(header.id !== '_description' && { type: header._type as 'input' | 'output' | undefined }),
     }));
 
     const items = [
-      ...existingTableHeaders,
-      ...newTableHeaders.filter(
-        (newTableHeader) =>
-          !existingTableHeaders.some(
-            (existingHeader) =>
-              existingHeader.id === newTableHeader.id ||
-              existingHeader.value === newTableHeader.value ||
-              existingHeader.label === newTableHeader.label,
-          ),
+      ...newTableHeaders.map((newTableHeader) => {
+        const existingHeader = existingTableHeaders.find((header) => isHeaderMatch(header, newTableHeader));
+
+        return mergeHeaders(newTableHeader, existingHeader);
+      }),
+      ...existingTableHeaders.filter(
+        (existingTableHeader) => !newTableHeaders.some((newHeader) => isHeaderMatch(newHeader, existingTableHeader)),
       ),
     ];
 
@@ -86,37 +118,18 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
       });
     }
 
-    // @ts-expect-error "input" | "output" | "unset"
     setItems(items);
 
-    const matchingHeaders = items
-      .filter((tableHeader) => {
-        return excelHeaders.some(
-          (excelHeader) =>
-            excelHeader.id === tableHeader.id ||
-            excelHeader.value === tableHeader.value ||
-            excelHeader.value === tableHeader.label,
-        );
-      })
-      .map((tableHeader) => {
-        const matchingExcelHeader = excelHeaders.find(
-          (excelHeader) =>
-            excelHeader.id === tableHeader.id ||
-            excelHeader.value === tableHeader.value ||
-            excelHeader.value === tableHeader.label,
-        );
-        return {
-          ...tableHeader,
-          excelHeaderId: matchingExcelHeader?.id,
-        };
-      });
+    const matchingHeaders = items.filter((item) => {
+      return newTableHeaders.some((excelHeader) => excelHeader.id === item.id);
+    });
 
     if (matchingHeaders.length) {
       const selectedItemsMap = matchingHeaders.reduce((acc, tableHeader, index) => {
         const hasDescription = matchingHeaders.some((header) => header.value === 'description');
         const hasOutputAlready = matchingHeaders.slice(0, index).some((header) => header.type === 'output');
 
-        let shouldBeOutput = false;
+        let shouldBeOutput;
 
         if (hasDescription) {
           // If there's description, set second-to-last as output
@@ -129,7 +142,7 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
 
         return {
           ...acc,
-          [tableHeader.excelHeaderId as string]: {
+          [tableHeader.id]: {
             id: tableHeader.id,
             label: tableHeader.label,
             value: tableHeader.value,
@@ -141,20 +154,6 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
       setSelectedItems(selectedItemsMap);
     }
   }, [spreadSheetData]);
-
-  useEffect(() => {
-    if (!selectedItems) return;
-
-    const headerTypeStates = Object.keys(selectedItems).reduce(
-      (acc, key) => {
-        acc[key] = selectedItems[key].type;
-        return acc;
-      },
-      {} as Record<string, 'input' | 'output' | undefined>,
-    );
-
-    setHeaderTypeStates(headerTypeStates);
-  }, [selectedItems]);
 
   return (
     <Modal
@@ -171,7 +170,7 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
             ...selectedItems[key],
             wrapInQuotes: headerWrapStates[key] || false,
             ...(selectedItems[key].value !== 'description' && {
-              type: headerTypeStates[key] ?? 'input',
+              type: selectedItems[key].type ?? 'input',
             }),
           }));
 
@@ -271,7 +270,7 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
                 border: '1px solid var(--grl-color-border)',
               }}
             >
-              <Typography.Text>{header.value || header.name}</Typography.Text>
+              <Typography.Text>{header.name || header.value}</Typography.Text>
             </div>
 
             <SwapOutlined
@@ -295,12 +294,6 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
                   return updatedItems;
                 });
 
-                setHeaderTypeStates((prev) => {
-                  const updated = { ...prev };
-                  delete updated[header.id];
-                  return updated;
-                });
-
                 setHeaderWrapStates((prev) => {
                   const updated = { ...prev };
                   delete updated[header.id];
@@ -322,12 +315,6 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
                   });
 
                   if (clearedHeaderIds.length > 0) {
-                    setHeaderTypeStates((prev) => {
-                      const updated = { ...prev };
-                      clearedHeaderIds.forEach((id) => delete updated[id]);
-                      return updated;
-                    });
-
                     setHeaderWrapStates((prev) => {
                       const updated = { ...prev };
                       clearedHeaderIds.forEach((id) => delete updated[id]);
@@ -388,8 +375,11 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
                 return (
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span>{option.data.label}</span>
-                    {option.data.type === 'input' && <Tag style={{ background: '#acccec' }}>Input</Tag>}
-                    {option.data.type === 'output' && <Tag style={{ background: '#c7e0ba' }}>Output</Tag>}
+                    {option.data.type && (
+                      <Tag style={{ background: dataTypeConfig[option.data.type].color }}>
+                        {dataTypeConfig[option.data.type].label}
+                      </Tag>
+                    )}
                   </div>
                 );
               }}
@@ -417,13 +407,17 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
                   };
                 })}
             />
-            {selectedItems?.[header.id]?.value !== 'description' ? (
+            {selectedItems && selectedItems?.[header.id]?.value !== 'description' ? (
               <Radio.Group
-                value={headerTypeStates[header.id] ?? 'input'}
+                disabled={!selectedItems?.[header.id]}
+                value={selectedItems[header.id]?.type ?? 'input'}
                 onChange={(e) => {
-                  setHeaderTypeStates((prev) => ({
+                  setSelectedItems((prev) => ({
                     ...prev,
-                    [header.id]: e.target.value,
+                    [header.id]: {
+                      ...selectedItems[header.id],
+                      type: e.target.value,
+                    },
                   }));
                 }}
                 buttonStyle='solid'
@@ -443,6 +437,7 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
             {selectedItems?.[header.id]?.value !== 'description' ? (
               <div style={{ display: 'flex', justifyContent: 'center' }}>
                 <Checkbox
+                  disabled={!selectedItems?.[header.id]}
                   checked={headerWrapStates[header.id] || false}
                   onChange={(e) => {
                     setHeaderWrapStates((prev) => ({

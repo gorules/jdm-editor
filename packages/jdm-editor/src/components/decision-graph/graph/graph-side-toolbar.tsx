@@ -103,7 +103,11 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
         .map((item) => ({
           id: item.id,
           name: item.label,
-          field: item.value,
+          field: item.value
+            ?.replace(/[^a-zA-Z0-9\s._]/g, '')
+            .trim()
+            .replace(/\s+/g, '.')
+            .toLowerCase(),
         }));
 
       const outputs = excelData.items
@@ -111,7 +115,14 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
         .map((item) => ({
           id: item.id,
           name: item.label,
-          field: item.value,
+          field: item.value
+            ?.replace(/[^a-zA-Z0-9\s._]/g, '')
+            .trim()
+            .split(/\s+/)
+            .map((word, index) =>
+              index === 0 ? word.toLowerCase() : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+            )
+            .join(''),
         }));
 
       const reducedRules = excelData.rules.map((rule) =>
