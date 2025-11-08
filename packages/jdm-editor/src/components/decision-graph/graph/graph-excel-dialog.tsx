@@ -1,5 +1,6 @@
 import { InfoCircleOutlined, PlusOutlined, SwapOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Divider, Input, Modal, Radio, Select, Steps, Tag, Tooltip, Typography } from 'antd';
+import { isEmpty } from 'lodash';
 import React, { Fragment, useEffect, useMemo, useState } from 'react';
 
 import type { ParsedExcelData, RuleData } from '../../../helpers/excel';
@@ -168,14 +169,15 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
 
       setSelectedItems((prevItems) => {
         const stepKey = `step${currentStep}`;
-        const currentStepData = (prevItems || {})[stepKey] || {};
+        const currentStepData = (prevItems || {})[stepKey];
+
+        if (currentStepData) {
+          return prevItems;
+        }
 
         return {
           ...(prevItems || {}),
-          [stepKey]: {
-            ...currentStepData,
-            ...selectedItemsMap,
-          },
+          [stepKey]: selectedItemsMap,
         };
       });
     }
@@ -471,6 +473,7 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
         {currentStep < (excelData || []).length - 1 && (
           <Button
             type='primary'
+            disabled={!selectedItems?.[`step${currentStep}`] || isEmpty(selectedItems[`step${currentStep}`])}
             onClick={() => {
               setCurrentStep(currentStep + 1);
             }}
@@ -481,6 +484,7 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
         {currentStep === (excelData || []).length - 1 && (
           <Button
             type='primary'
+            disabled={!selectedItems?.[`step${currentStep}`] || isEmpty(selectedItems[`step${currentStep}`])}
             onClick={() => {
               if (selectedItems && excelData) {
                 const mergedData = Object.keys(selectedItems).map((stepKey, index) => {
