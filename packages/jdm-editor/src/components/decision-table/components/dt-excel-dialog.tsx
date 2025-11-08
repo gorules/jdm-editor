@@ -409,6 +409,7 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
             />
             {selectedItems && selectedItems?.[header.id]?.value !== 'description' ? (
               <Radio.Group
+                disabled={!selectedItems?.[header.id]}
                 value={selectedItems[header.id]?.type ?? 'input'}
                 onChange={(e) => {
                   setSelectedItems((prev) => ({
@@ -436,6 +437,7 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
             {selectedItems?.[header.id]?.value !== 'description' ? (
               <div style={{ display: 'flex', justifyContent: 'center' }}>
                 <Checkbox
+                  disabled={!selectedItems?.[header.id]}
                   checked={headerWrapStates[header.id] || false}
                   onChange={(e) => {
                     setHeaderWrapStates((prev) => ({
