@@ -31,7 +31,7 @@ export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager 
       nodeSnapshot: match(simulate)
         .with(
           { result: P.nonNullable },
-          ({ result }) => result.snapshot.nodes.find((n) => n.id === id)?.content as DecisionTableType,
+          ({ result }) => (result.snapshot?.nodes || []).find((n) => n.id === id)?.content as DecisionTableType,
         )
         .otherwise(() => null),
       viewConfig,

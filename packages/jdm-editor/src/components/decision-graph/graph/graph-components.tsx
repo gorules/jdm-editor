@@ -13,9 +13,10 @@ export type GraphComponentsProps = {
   inputDisabled?: boolean;
   components?: React.ReactNode[];
   disabled?: boolean;
+  collapsed?: boolean;
 };
 
-export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inputDisabled, disabled }) => {
+export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inputDisabled, disabled, collapsed }) => {
   const customComponents = useDecisionGraphState((store) => store.components || []);
   const customNodes = useDecisionGraphState((store) => store.customNodes || []);
 
@@ -115,6 +116,7 @@ export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inp
                     {(groups['core'] || []).map((node) => (
                       <React.Fragment key={'kind' in node ? (node.kind as string) : node.type}>
                         <DragDecisionNode
+                          collapsed={collapsed}
                           disabled={match(node.type)
                             .with(NodeKind.Input, () => disabled || inputDisabled)
                             .otherwise(() => disabled)}
@@ -136,6 +138,7 @@ export const GraphComponents: React.FC<GraphComponentsProps> = React.memo(({ inp
                   <React.Fragment key={group}>
                     {(groups?.[group] || []).map((customNode) => (
                       <DragDecisionNode
+                        collapsed={collapsed}
                         key={'kind' in customNode ? (customNode.kind as string) : customNode.type}
                         disabled={disabled}
                         specification={customNode}
@@ -159,8 +162,9 @@ const DragDecisionNode: React.FC<
   {
     specification: Pick<NodeSpecification, 'color' | 'icon' | 'displayName' | 'shortDescription'>;
     disabled?: boolean;
+    collapsed?: boolean;
   } & React.HTMLAttributes<HTMLDivElement>
-> = ({ specification, disabled = false, ...props }) => {
+> = ({ specification, disabled = false, collapsed, ...props }) => {
   return (
     <div className={clsx('draggable-component')} draggable={!disabled} {...props}>
       <div style={{ pointerEvents: 'none' }}>
@@ -169,7 +173,7 @@ const DragDecisionNode: React.FC<
           compactMode
           color={specification.color}
           icon={specification.icon}
-          name={specification.displayName as string}
+          name={collapsed ? undefined : (specification.displayName as string)}
           type={specification.shortDescription}
         />
       </div>

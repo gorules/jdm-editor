@@ -148,7 +148,7 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
             rules: reducedRules,
             executionMode: excelData.executionMode || 'single',
             hitPolicy: excelData.hitPolicy || 'first',
-            passThorough: excelData.passThorough,
+            passThrough: excelData.passThrough,
           }),
           inputField: excelData.inputField,
           outputPath: excelData.outputPath,

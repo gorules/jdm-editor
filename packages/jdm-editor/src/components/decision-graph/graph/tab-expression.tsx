@@ -41,7 +41,9 @@ export const TabExpression: React.FC<TabExpressionProps> = ({ id, manager }) => 
         .with(
           { result: P.nonNullable },
           ({ result }) =>
-            result.snapshot.nodes.find((n) => n.id === id)?.content as z.infer<typeof expressionNodeSchema>['content'],
+            (result.snapshot?.nodes || []).find((n) => n.id === id)?.content as z.infer<
+              typeof expressionNodeSchema
+            >['content'],
         )
         .otherwise(() => null),
       viewConfig,

@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import type { DragDropManager } from 'dnd-core';
 import React, { forwardRef } from 'react';
 import { ReactFlowProvider } from 'reactflow';
@@ -23,7 +24,7 @@ export type DecisionGraphRef = GraphRef;
 export const DecisionGraph = forwardRef<DecisionGraphRef, DecisionGraphProps>(
   ({ manager: _, reactFlowProOptions, tabBarExtraContent, ...props }, ref) => {
     return (
-      <div className={'grl-dg'}>
+      <div className={clsx(['grl-dg', props?.hideLeftToolbar && 'hidden-left-toolbar'])}>
         <ReactFlowProvider>
           <DecisionGraphProvider>
             <DecisionGraphWrapper

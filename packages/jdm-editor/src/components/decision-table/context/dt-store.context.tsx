@@ -33,7 +33,7 @@ export type ColumnType = 'inputs' | 'outputs';
 
 export type DecisionTableType = {
   hitPolicy: HitPolicy | string;
-  passThorough?: boolean;
+  passThrough?: boolean;
   inputField?: string;
   outputPath?: string;
   executionMode?: 'single' | 'loop';
@@ -85,7 +85,7 @@ export const parseDecisionTable = (decisionTable?: DecisionTableType) => {
     inputs: decisionTable?.inputs || [],
     outputs: decisionTable?.outputs || [],
     rules: decisionTable?.rules || [],
-    passThorough: decisionTable?.passThorough ?? false,
+    passThrough: decisionTable?.passThrough ?? false,
     inputField: decisionTable?.inputField,
     outputPath: decisionTable?.outputPath,
     executionMode: decisionTable?.executionMode ?? 'single',

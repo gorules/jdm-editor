@@ -33,13 +33,19 @@ export const DecisionGraphWrapper = React.memo(
     ref,
   ) {
     const [disableTabs, setDisableTabs] = useState(false);
-    const { hasActiveNode, viewConfig } = useDecisionGraphState(({ decisionGraph, activeTab, viewConfig }) => {
-      return { hasActiveNode: (decisionGraph?.nodes ?? []).some((node) => node.id === activeTab), viewConfig };
-    });
+    const { hasActiveNode, viewConfig, hideLeftToolbar } = useDecisionGraphState(
+      ({ decisionGraph, activeTab, viewConfig, hideLeftToolbar }) => {
+        return {
+          hasActiveNode: (decisionGraph?.nodes ?? []).some((node) => node.id === activeTab),
+          viewConfig,
+          hideLeftToolbar,
+        };
+      },
+    );
 
     return (
       <>
-        <GraphSideToolbar />
+        {!hideLeftToolbar && <GraphSideToolbar />}
         <div className={'grl-dg__graph'}>
           <GraphTabs disabled={disableTabs} tabBarExtraContent={tabBarExtraContent} />
 

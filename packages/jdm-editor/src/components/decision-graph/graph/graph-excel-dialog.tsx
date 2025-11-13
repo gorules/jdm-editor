@@ -33,7 +33,7 @@ export type MergedDataItem = {
   hitPolicy: HitPolicy | string;
   inputField?: string | null;
   outputPath?: string | null;
-  passThorough?: boolean;
+  passThrough?: boolean;
   executionMode?: 'single' | 'loop';
 };
 
@@ -535,7 +535,7 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
                     hitPolicy: excelData[index].existingTableData.hitPolicy,
                     inputField: excelData[index].existingTableData.inputField,
                     outputPath: excelData[index].existingTableData.outputPath,
-                    passThorough: excelData[index].existingTableData.passThorough,
+                    passThrough: excelData[index].existingTableData.passThrough,
                     executionMode: excelData[index].existingTableData.executionMode,
                   };
                 });

@@ -21,6 +21,8 @@ export type DecisionGraphEmptyType = {
   components?: DecisionGraphStoreType['state']['components'];
   customNodes?: DecisionGraphStoreType['state']['customNodes'];
 
+  hideLeftToolbar?: DecisionGraphStoreType['state']['hideLeftToolbar'];
+
   name?: DecisionGraphStoreType['state']['name'];
 
   viewConfigCta?: DecisionGraphStoreType['state']['viewConfigCta'];
@@ -50,6 +52,7 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
   components,
   customNodes,
   defaultActivePanel,
+  hideLeftToolbar,
   panels,
   simulate,
   viewConfigCta,
@@ -93,8 +96,9 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
       panels,
       viewConfig,
       viewConfigCta,
+      hideLeftToolbar,
     });
-  }, [id, disabled, components, customNodes, panels, viewConfig, viewConfigCta]);
+  }, [id, disabled, components, customNodes, panels, viewConfig, viewConfigCta, hideLeftToolbar]);
 
   useEffect(() => {
     stateStore.setState({ name: name ?? 'graph.json' });
@@ -133,6 +137,7 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
 
     stateStore.setState({
       activePanel: defaultActivePanel,
+      hideLeftToolbar,
     });
     mountedRef.current = true;
   }, []);
