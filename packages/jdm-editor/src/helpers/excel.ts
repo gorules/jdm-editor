@@ -35,7 +35,7 @@ type ExistingTableData = {
   hitPolicy: HitPolicy | string;
   inputField?: string | null;
   outputPath?: string | null;
-  passThorough?: boolean;
+  passThrough?: boolean;
   executionMode?: 'single' | 'loop';
 };
 
@@ -269,7 +269,7 @@ const getDecisionTableData = (
       hitPolicy: defaultTable?.hitPolicy || 'first',
       inputField: defaultTable?.inputField,
       outputPath: defaultTable?.outputPath,
-      passThorough: defaultTable?.passThrough,
+      passThrough: defaultTable?.passThrough,
       executionMode: defaultTable?.executionMode || 'single',
     },
   };

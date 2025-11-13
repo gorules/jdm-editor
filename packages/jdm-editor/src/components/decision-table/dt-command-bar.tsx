@@ -74,7 +74,7 @@ export const DecisionTableCommandBar: React.FC = () => {
       inputs,
       outputs,
       rules: reducedRules,
-      passThorough: false,
+      passThrough: false,
     });
 
     tableActions.setDecisionTable(newTable);
