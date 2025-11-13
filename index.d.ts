@@ -297,6 +297,7 @@ declare type DecisionGraphEmptyType = {
     disabled?: boolean;
     components?: DecisionGraphStoreType['state']['components'];
     customNodes?: DecisionGraphStoreType['state']['customNodes'];
+    hideLeftToolbar?: DecisionGraphStoreType['state']['hideLeftToolbar'];
     name?: DecisionGraphStoreType['state']['name'];
     viewConfigCta?: DecisionGraphStoreType['state']['viewConfigCta'];
     viewConfig?: DecisionGraphStoreType['state']['viewConfig'];
@@ -320,6 +321,7 @@ export declare type DecisionGraphRef = GraphRef;
 declare type DecisionGraphStoreType = {
     state: {
         id?: string;
+        hideLeftToolbar?: boolean;
         components: NodeSpecification[];
         disabled?: boolean;
         decisionGraph: DecisionGraphType;
@@ -1616,7 +1618,7 @@ declare type DecisionTableStoreType = {
 
 export declare type DecisionTableType = {
     hitPolicy: HitPolicy | string;
-    passThorough?: boolean;
+    passThrough?: boolean;
     inputField?: string;
     outputPath?: string;
     executionMode?: 'single' | 'loop';
