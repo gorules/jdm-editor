@@ -171,7 +171,7 @@ const LivePreview = React.memo<{ id: string; value: string }>(({ id, value }) =>
 
 const ResultOverlay: React.FC<{ expression: ExpressionEntry }> = ({ expression }) => {
   const { trace } = useExpressionStore(({ debug, debugIndex }) => ({
-    trace: JSON.stringify(getTrace(debug?.trace?.traceData, debugIndex)?.[expression.key]?.result),
+    trace: getTrace(debug?.trace?.traceData, debugIndex)?.[expression.key]?.result,
   }));
   if (!trace) {
     return null;
