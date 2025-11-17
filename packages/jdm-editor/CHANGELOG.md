@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.49.2](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.49.1...@gorules/jdm-editor@1.49.2) (2025-11-17)
+
+### Bug Fixes
+
+- trace not showing for falsy values ([#208](https://github.com/gorules/jdm-editor/issues/208)) ([98660af](https://github.com/gorules/jdm-editor/commit/98660af3dbfb491ce5ce04516aa4f6ecd229e0aa))
+
 ## [1.49.1](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.49.0...@gorules/jdm-editor@1.49.1) (2025-11-17)
 
 ### Bug Fixes
