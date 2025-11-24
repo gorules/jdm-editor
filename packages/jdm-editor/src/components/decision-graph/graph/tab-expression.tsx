@@ -59,7 +59,9 @@ export const TabExpression: React.FC<TabExpressionProps> = ({ id, manager }) => 
       return { trace: nodeTrace, snapshot: nodeSnapshot };
     }
 
-    const $data = Object.fromEntries(Object.entries(nodeTrace.traceData).map(([k, v]) => [k, safeJson(v.result)]));
+    const $data = Object.fromEntries(
+      Object.entries(nodeTrace?.traceData ?? {}).map(([k, v]) => [k, safeJson(v.result)]),
+    );
     const extendedInputData: GetNodeDataResult = {
       ...inputData,
       $: $data,
