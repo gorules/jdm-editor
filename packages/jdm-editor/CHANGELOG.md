@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.50.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.49.2...@gorules/jdm-editor@1.50.0) (2025-11-24)
+
+### Bug Fixes
+
+- **GRL-300:** incorrect simulation trace type ([#210](https://github.com/gorules/jdm-editor/issues/210)) ([a51447d](https://github.com/gorules/jdm-editor/commit/a51447d5ec8b1ab21ab224a53f717559a6f62671))
+- **GRL-301:** use for-const-of for generator iteration ([#211](https://github.com/gorules/jdm-editor/issues/211)) ([88ea3ac](https://github.com/gorules/jdm-editor/commit/88ea3ac62ce558433cf3a35ffd98d3ed33c50ecd))
+- **GRL-302:** prevent mutation of frozen object ([#212](https://github.com/gorules/jdm-editor/issues/212)) ([3f44439](https://github.com/gorules/jdm-editor/commit/3f44439cdb34ca9e4f317e0ddf0570c5cd90b2f1))
+- **GRL-303:** codemirror cursor out of bounds ([#213](https://github.com/gorules/jdm-editor/issues/213)) ([675e123](https://github.com/gorules/jdm-editor/commit/675e123751293cebbda825a94dfc383eb5507782))
+- remove omitNodes fn options ([#214](https://github.com/gorules/jdm-editor/issues/214)) ([9df3374](https://github.com/gorules/jdm-editor/commit/9df3374acf3d75e9b2aebf603a5c0a61146f02e8))
+
 ## [1.49.2](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.49.1...@gorules/jdm-editor@1.49.2) (2025-11-17)
 
 ### Bug Fixes

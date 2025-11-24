@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.22.0](https://github.com/gorules/jdm-editor/compare/@gorules/zen-engine-wasm@0.21.0...@gorules/zen-engine-wasm@0.22.0) (2025-11-24)
+
+### Bug Fixes
+
+- **GRL-299:** type check return type consistency ([#209](https://github.com/gorules/jdm-editor/issues/209)) ([173d53a](https://github.com/gorules/jdm-editor/commit/173d53a7abe19a0401fe7b3370f1ade5b196376c))
+
 # [0.21.0](https://github.com/gorules/jdm-editor/compare/@gorules/zen-engine-wasm@0.20.1...@gorules/zen-engine-wasm@0.21.0) (2025-08-25)
 
 ### Features
