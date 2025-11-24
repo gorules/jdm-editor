@@ -137,12 +137,17 @@ export const CodeEditor = React.forwardRef<CodeEditorRef, CodeEditorProps>(
         return;
       }
 
+      const currentHead = cm.state.selection.main.head;
+      const newLength = value.length;
+
       cm.dispatch({
         changes: {
           from: 0,
           to: cm.state.doc.length,
           insert: value,
         },
+        // Adjust the selection if it would be out of bounds
+        ...(currentHead > newLength && { selection: { anchor: newLength } }),
       });
     }, [value]);
 
