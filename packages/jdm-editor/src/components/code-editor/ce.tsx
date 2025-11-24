@@ -1,4 +1,4 @@
-import { bracketMatching } from '@codemirror/language';
+import { bracketMatching, syntaxHighlighting } from '@codemirror/language';
 import { Compartment, EditorState, type Extension, Text } from '@codemirror/state';
 import { EditorView, placeholder as placeholderExt } from '@codemirror/view';
 import { createVariableType } from '@gorules/zen-engine-wasm';
@@ -16,7 +16,7 @@ import {
   updateStrictModeEffect,
   updateVariableTypeEffect,
 } from './extensions/types';
-import { zenExtensions, zenHighlightDark, zenHighlightLight } from './extensions/zen';
+import { zenExtensions, zenStyleDark, zenStyleLight } from './extensions/zen';
 
 const updateListener = (onChange?: (data: string) => void, onStateChange?: (state: EditorState) => void) =>
   EditorView.updateListener.of((update) => {
@@ -27,6 +27,9 @@ const updateListener = (onChange?: (data: string) => void, onStateChange?: (stat
 
     onChange?.(update.state.doc.toString());
   });
+
+const zenHighlightDark = syntaxHighlighting(zenStyleDark);
+const zenHighlightLight = syntaxHighlighting(zenStyleLight);
 
 const editorTheme = (isDark = false) => (isDark ? zenHighlightDark : zenHighlightLight);
 
