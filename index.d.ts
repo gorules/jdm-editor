@@ -2945,7 +2945,7 @@ export declare type SimulationTrace<Trace = TraceDataVariants> = {
     name: string;
     id: string;
     performance: string | null;
-    traceData: Trace;
+    traceData: Trace | null;
     order?: number;
 };
 
