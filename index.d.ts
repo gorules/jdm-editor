@@ -553,13 +553,10 @@ export declare const decisionModelSchema: z.ZodObject<{
         type: z.ZodLiteral<NodeKind.Function>;
         content: z.ZodOptional<z.ZodNullable<z.ZodUnion<[z.ZodString, z.ZodObject<{
             source: z.ZodDefault<z.ZodString>;
-            omitNodes: z.ZodEffects<z.ZodOptional<z.ZodNullable<z.ZodBoolean>>, boolean, boolean | null | undefined>;
         }, "strip", z.ZodTypeAny, {
             source: string;
-            omitNodes: boolean;
         }, {
             source?: string | undefined;
-            omitNodes?: boolean | null | undefined;
         }>]>>>;
     }, {
         id: z.ZodDefault<z.ZodString>;
@@ -584,14 +581,12 @@ export declare const decisionModelSchema: z.ZodObject<{
         };
         content?: string | {
             source: string;
-            omitNodes: boolean;
         } | null | undefined;
     }, {
         type: NodeKind.Function;
         name: string;
         content?: string | {
             source?: string | undefined;
-            omitNodes?: boolean | null | undefined;
         } | null | undefined;
         id?: string | undefined;
         position?: {
@@ -1060,7 +1055,6 @@ export declare const decisionModelSchema: z.ZodObject<{
         };
         content?: string | {
             source: string;
-            omitNodes: boolean;
         } | null | undefined;
     } | {
         type: NodeKind.DecisionTable;
@@ -1197,7 +1191,6 @@ export declare const decisionModelSchema: z.ZodObject<{
         name: string;
         content?: string | {
             source?: string | undefined;
-            omitNodes?: boolean | null | undefined;
         } | null | undefined;
         id?: string | undefined;
         position?: {
@@ -1908,13 +1901,10 @@ export declare const functionNodeSchema: z.ZodObject<z.objectUtil.extendShape<{
     type: z.ZodLiteral<NodeKind.Function>;
     content: z.ZodOptional<z.ZodNullable<z.ZodUnion<[z.ZodString, z.ZodObject<{
         source: z.ZodDefault<z.ZodString>;
-        omitNodes: z.ZodEffects<z.ZodOptional<z.ZodNullable<z.ZodBoolean>>, boolean, boolean | null | undefined>;
     }, "strip", z.ZodTypeAny, {
         source: string;
-        omitNodes: boolean;
     }, {
         source?: string | undefined;
-        omitNodes?: boolean | null | undefined;
     }>]>>>;
 }, {
     id: z.ZodDefault<z.ZodString>;
@@ -1939,14 +1929,12 @@ export declare const functionNodeSchema: z.ZodObject<z.objectUtil.extendShape<{
     };
     content?: string | {
         source: string;
-        omitNodes: boolean;
     } | null | undefined;
 }, {
     type: NodeKind.Function;
     name: string;
     content?: string | {
         source?: string | undefined;
-        omitNodes?: boolean | null | undefined;
     } | null | undefined;
     id?: string | undefined;
     position?: {
@@ -2158,7 +2146,6 @@ declare type NodeExpressionData = Omit<InferredContent_4, 'expressions'> & Diff 
 
 declare type NodeFunctionData = string | {
     source: string;
-    omitNodes?: boolean;
 };
 
 declare type NodeInputData = InferredContent & Diff;
@@ -2337,13 +2324,10 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
     type: z.ZodLiteral<NodeKind.Function>;
     content: z.ZodOptional<z.ZodNullable<z.ZodUnion<[z.ZodString, z.ZodObject<{
         source: z.ZodDefault<z.ZodString>;
-        omitNodes: z.ZodEffects<z.ZodOptional<z.ZodNullable<z.ZodBoolean>>, boolean, boolean | null | undefined>;
     }, "strip", z.ZodTypeAny, {
         source: string;
-        omitNodes: boolean;
     }, {
         source?: string | undefined;
-        omitNodes?: boolean | null | undefined;
     }>]>>>;
 }, {
     id: z.ZodDefault<z.ZodString>;
@@ -2368,14 +2352,12 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
     };
     content?: string | {
         source: string;
-        omitNodes: boolean;
     } | null | undefined;
 }, {
     type: NodeKind.Function;
     name: string;
     content?: string | {
         source?: string | undefined;
-        omitNodes?: boolean | null | undefined;
     } | null | undefined;
     id?: string | undefined;
     position?: {
