@@ -155,9 +155,9 @@ impl JsVariableType {
 
         let mut is = IntelliSense::new();
 
-        let res = is.type_check(source, &self);
-        let rr = serde_json::to_value(res);
-        JsValue::from_serde(&rr.unwrap_or_default()).unwrap()
+        let res = is.type_check(source, &self).unwrap_or_default();
+        let rr = serde_json::to_value(res).unwrap_or_else(|_| Value::Array(Vec::new()));
+        JsValue::from_serde(&rr).unwrap_or_else(|_| JsValue::from(js_sys::Array::new()))
     }
 
     #[wasm_bindgen(js_name = "typeCheckUnary")]
@@ -168,8 +168,8 @@ impl JsVariableType {
 
         let mut is = IntelliSense::new();
 
-        let res = is.type_check_unary(source, &self);
-        let rr = serde_json::to_value(res);
-        JsValue::from_serde(&rr.unwrap_or_default()).unwrap()
+        let res = is.type_check_unary(source, &self).unwrap_or_default();
+        let rr = serde_json::to_value(res).unwrap_or_else(|_| Value::Array(Vec::new()));
+        JsValue::from_serde(&rr).unwrap_or_else(|_| JsValue::from(js_sys::Array::new()))
     }
 }
