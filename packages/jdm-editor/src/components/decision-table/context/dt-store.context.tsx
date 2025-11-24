@@ -2,6 +2,7 @@ import type { Variable, VariableType } from '@gorules/zen-engine-wasm';
 import equal from 'fast-deep-equal/es6/react';
 import { produce } from 'immer';
 import React, { useMemo } from 'react';
+import { P, match } from 'ts-pattern';
 import type { StoreApi, UseBoundStore } from 'zustand';
 import { create } from 'zustand';
 
@@ -111,13 +112,11 @@ export const parseDecisionTable = (decisionTable?: DecisionTableType) => {
     ];
   }
 
-  dt.rules.forEach((r) => {
-    if (typeof (r as Record<string, unknown>)._id === 'string' && r._id.length > 0) {
-      return;
-    }
-
-    r._id = crypto.randomUUID();
-  });
+  dt.rules = dt.rules.map((r) =>
+    match(r)
+      .with({ _id: P.string.minLength(1) }, () => r)
+      .otherwise((r) => ({ ...r, _id: crypto.randomUUID() })),
+  );
 
   return dt;
 };
