@@ -85,7 +85,7 @@ export const CodeEditorBase = React.forwardRef<CodeEditorBaseRef, CodeEditorBase
     ref,
   ) => {
     const container = useRef<HTMLDivElement>(null);
-    const codeMirror = useRef<EditorView>(null);
+    const codeMirror = useRef<EditorView | null>(null);
     const { token } = theme.useToken();
 
     const compartment = useMemo(
@@ -101,9 +101,15 @@ export const CodeEditorBase = React.forwardRef<CodeEditorBaseRef, CodeEditorBase
     );
 
     useEffect(() => {
-      if (!container.current) {
+      if (!container.current || codeMirror.current) {
         return;
       }
+
+      // Strict Mode workaround: defer cleanup to avoid destroying editorView
+      let didMount = false;
+      queueMicrotask(() => {
+        didMount = true;
+      });
 
       const editorView = new EditorView({
         parent: container.current,
@@ -127,14 +133,16 @@ export const CodeEditorBase = React.forwardRef<CodeEditorBaseRef, CodeEditorBase
         editorView.focus();
       }
 
-      (codeMirror as any).current = editorView;
+      codeMirror.current = editorView;
       if (container.current) {
         (container.current as CodeEditorBaseRef).codeMirror = editorView;
       }
 
       return () => {
+        if (!didMount) return;
+
         editorView.destroy();
-        (codeMirror as any).current = null;
+        codeMirror.current = null;
       };
     }, []);
 

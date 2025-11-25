@@ -67,8 +67,8 @@ export const CodeEditor = React.forwardRef<CodeEditorRef, CodeEditorProps>(
     );
 
     const handleBlur = useCallback(
-      (e: React.FocusEvent<HTMLDivElement, HTMLDivElement>) => {
-        onBlur?.(e);
+      (event: React.FocusEvent<HTMLDivElement, HTMLDivElement>) => {
+        onBlur?.(event);
 
         if (lazy) {
           setEditorState({ type: 'lazy' });
