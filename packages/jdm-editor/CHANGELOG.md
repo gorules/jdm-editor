@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.50.3](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.50.2...@gorules/jdm-editor@1.50.3) (2025-11-25)
+
+### Bug Fixes
+
+- table cell style ([#217](https://github.com/gorules/jdm-editor/issues/217)) ([7fff728](https://github.com/gorules/jdm-editor/commit/7fff7281eb955f8fdcee145a4b45ea19da7f5527))
+
 ## [1.50.2](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.50.1...@gorules/jdm-editor@1.50.2) (2025-11-25)
 
 ### Bug Fixes
