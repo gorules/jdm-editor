@@ -90,8 +90,11 @@ export const parseDecisionTable = (decisionTable?: DecisionTableType) => {
     inputField: decisionTable?.inputField,
     outputPath: decisionTable?.outputPath,
     executionMode: decisionTable?.executionMode ?? 'single',
-    _diff: decisionTable?._diff,
   };
+
+  if (decisionTable?._diff) {
+    dt._diff = decisionTable._diff;
+  }
 
   if (dt.inputs?.length === 0) {
     dt.inputs = [

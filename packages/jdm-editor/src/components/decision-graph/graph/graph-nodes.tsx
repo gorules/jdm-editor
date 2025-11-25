@@ -1,6 +1,5 @@
 import { CloseOutlined, SearchOutlined } from '@ant-design/icons';
-import { Avatar, Button, Col, Row, Space } from 'antd';
-import { Card, Input, Typography } from 'antd';
+import { Avatar, Button, Card, Col, Input, Row, Space, Typography } from 'antd';
 import clsx from 'clsx';
 import React, { useMemo, useState } from 'react';
 import { match } from 'ts-pattern';
@@ -36,6 +35,7 @@ export const GraphNodes: React.FC<GraphComponentsProps> = React.memo(({ classNam
         const kind = node.type as NodeKind;
         const specification =
           nodeSpecification[node.type as NodeKind] || (customComponents || []).find((cmp) => cmp.type === node.type);
+
         return {
           id: node.id,
           type: node.type,
@@ -47,7 +47,7 @@ export const GraphNodes: React.FC<GraphComponentsProps> = React.memo(({ classNam
             .otherwise(() => true),
           position: node.position,
           icon: specification?.icon,
-          _diff: node?._diff,
+          ...(node?._diff ? { _diff: node._diff } : {}),
         };
       });
   }, [decisionGraph, viewConfig]);
