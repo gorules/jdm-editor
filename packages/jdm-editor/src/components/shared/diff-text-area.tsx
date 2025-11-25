@@ -9,7 +9,7 @@ export type DiffAutosizeTextAreaProps = AutosizeTextAreaProps & {
   noStyle?: boolean;
 };
 
-export const DiffAutosizeTextArea: React.FC<DiffAutosizeTextAreaProps> = forwardRef(
+export const DiffAutosizeTextArea = forwardRef<HTMLDivElement, DiffAutosizeTextAreaProps>(
   ({ previousValue, displayDiff, noStyle, ...rest }, ref) => {
     if (displayDiff) {
       return (

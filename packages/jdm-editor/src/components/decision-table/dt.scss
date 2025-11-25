@@ -164,7 +164,7 @@
         &.disabled {
           background-color: rgba(0, 0, 0, 0.02);
 
-          textarea {
+          [contenteditable] {
             background-color: transparent;
             color: var(--grl-color-text-secondary);
           }

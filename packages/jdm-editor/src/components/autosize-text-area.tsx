@@ -5,62 +5,43 @@ import { composeRefs } from '../helpers/compose-refs';
 
 export type AutosizeTextAreaProps = {
   maxRows: number;
-} & React.DetailedHTMLProps<React.TextareaHTMLAttributes<HTMLTextAreaElement>, HTMLTextAreaElement>;
+  value?: string;
+  onChange?: React.ChangeEventHandler<HTMLTextAreaElement>;
+  placeholder?: string;
+  disabled?: boolean;
+  readOnly?: boolean;
+  className?: string;
+} & Omit<React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>, 'onChange' | 'placeholder'>;
 
-const recalculateRows = (node: HTMLTextAreaElement, maxRows: number) => {
-  const computedStyles = getComputedStyle(node);
-  const lineHeight = parseInt(computedStyles.lineHeight);
-  const paddingTop = parseInt(computedStyles.paddingTop);
-  const paddingBottom = parseInt(computedStyles.paddingBottom);
-
-  node.rows = 1;
-
-  const contentHeight = node.scrollHeight - paddingTop - paddingBottom;
-  const calculatedRows = Math.floor(contentHeight / lineHeight);
-
-  node.rows = Math.min(Math.max(calculatedRows, 1), maxRows);
-};
-
-export const AutosizeTextArea = React.forwardRef<HTMLTextAreaElement, AutosizeTextAreaProps>(
-  ({ maxRows, className, value, ...props }, ref) => {
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
+export const AutosizeTextArea = React.forwardRef<HTMLDivElement, AutosizeTextAreaProps>(
+  ({ maxRows, className, value, onChange, placeholder, disabled, readOnly, style, ...props }, ref) => {
+    const divRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-      if (!textareaRef.current) {
-        return;
+      if (divRef.current && divRef.current.textContent !== value) {
+        divRef.current.textContent = value ?? '';
       }
+    }, [value]);
 
-      recalculateRows(textareaRef.current, maxRows);
-    }, [value, maxRows]);
-
-    useEffect(() => {
-      if (!textareaRef.current) {
-        return;
+    const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
+      if (onChange) {
+        const syntheticEvent = {
+          target: { value: e.currentTarget.textContent ?? '' },
+          currentTarget: { value: e.currentTarget.textContent ?? '' },
+        } as React.ChangeEvent<HTMLTextAreaElement>;
+        onChange(syntheticEvent);
       }
-
-      const observerCallback: ResizeObserverCallback = (entries: ResizeObserverEntry[]) => {
-        window.requestAnimationFrame((): void | undefined => {
-          if (!Array.isArray(entries) || entries.length === 0) {
-            return;
-          }
-
-          recalculateRows(entries[0].target as HTMLTextAreaElement, maxRows);
-        });
-      };
-
-      const resizeObserver = new ResizeObserver(observerCallback);
-      resizeObserver.observe(textareaRef.current);
-
-      return () => {
-        resizeObserver.disconnect();
-      };
-    }, [maxRows]);
+    };
 
     return (
-      <textarea
+      <div
         className={clsx('grl-textarea-input', className)}
-        ref={composeRefs(textareaRef, ref)}
-        value={value}
+        ref={composeRefs(divRef, ref)}
+        contentEditable={!disabled && !readOnly}
+        onInput={handleInput}
+        data-placeholder={placeholder}
+        aria-disabled={disabled}
+        style={{ '--textarea-max-rows': maxRows, ...style } as React.CSSProperties}
         {...props}
       />
     );
