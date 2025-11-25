@@ -66,6 +66,15 @@ export const CodeEditor = React.forwardRef<CodeEditorRef, CodeEditorProps>(
       [disabled, editorState.type],
     );
 
+    const handleFocus = useCallback(
+      (_event: React.FocusEvent<HTMLDivElement, HTMLDivElement>) => {
+        if (disabled || editorState.type !== 'lazy') return;
+
+        setEditorState({ type: 'edit', initialSelection: { anchor: value.length } });
+      },
+      [disabled, editorState.type, value],
+    );
+
     const handleBlur = useCallback(
       (event: React.FocusEvent<HTMLDivElement, HTMLDivElement>) => {
         onBlur?.(event);
@@ -97,6 +106,7 @@ export const CodeEditor = React.forwardRef<CodeEditorRef, CodeEditorProps>(
         type={type}
         value={value}
         onClick={handleClick}
+        onFocus={handleFocus}
         disabled={disabled}
         {...props}
       />

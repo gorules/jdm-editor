@@ -183,6 +183,7 @@ export const CodeHighlighter = React.forwardRef<HTMLDivElement, CodeHighlighterP
     return (
       <div
         ref={ref}
+        tabIndex={0}
         className={clsx(
           'grl-ce',
           'grl-ce-highlighter',
