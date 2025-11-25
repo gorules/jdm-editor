@@ -52,10 +52,21 @@ export const CodeEditor = React.forwardRef<CodeEditorRef, CodeEditorProps>(
   ({ lazy = false, value = '', type = 'standard', disabled, onBlur, ...props }, ref) => {
     const [editorState, setEditorState] = useState<EditorState>(() => (lazy ? { type: 'lazy' } : { type: 'edit' }));
     const containerRef = useRef<HTMLDivElement>(null);
+    const isMouseDownRef = useRef(false);
+
+    const handleMouseDown = useCallback(() => {
+      isMouseDownRef.current = true;
+    }, []);
+
+    const handleMouseUp = useCallback(() => {
+      isMouseDownRef.current = false;
+    }, []);
 
     const handleClick = useCallback(
       (event: React.MouseEvent) => {
-        if (disabled || editorState.type !== 'lazy') return;
+        if (disabled || editorState.type !== 'lazy') {
+          return;
+        }
 
         const selection = containerRef.current
           ? (getCursorPositionFromClick(event, containerRef.current) ?? undefined)
@@ -68,7 +79,9 @@ export const CodeEditor = React.forwardRef<CodeEditorRef, CodeEditorProps>(
 
     const handleFocus = useCallback(
       (_event: React.FocusEvent<HTMLDivElement, HTMLDivElement>) => {
-        if (disabled || editorState.type !== 'lazy') return;
+        if (disabled || editorState.type !== 'lazy' || isMouseDownRef.current) {
+          return;
+        }
 
         setEditorState({ type: 'edit', initialSelection: { anchor: value.length } });
       },
@@ -107,6 +120,8 @@ export const CodeEditor = React.forwardRef<CodeEditorRef, CodeEditorProps>(
         value={value}
         onClick={handleClick}
         onFocus={handleFocus}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
         disabled={disabled}
         {...props}
       />
