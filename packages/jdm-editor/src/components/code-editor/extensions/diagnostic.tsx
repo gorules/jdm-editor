@@ -17,7 +17,7 @@ export const renderDiagnosticMessage = ({ text, className }: RenderDiagnosticMes
   });
 };
 
-const escapeHtml = (str: string) => {
+export const escapeHtml = (str: string) => {
   return str
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')

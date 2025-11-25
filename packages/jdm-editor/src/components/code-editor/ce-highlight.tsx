@@ -10,7 +10,7 @@ import { P, match } from 'ts-pattern';
 
 import { isWasmAvailable } from '../../helpers/wasm';
 import type { CodeEditorBaseProps } from './ce-base';
-import { renderDiagnosticMessage } from './extensions/diagnostic';
+import { escapeHtml, renderDiagnosticMessage } from './extensions/diagnostic';
 import { validateZenExpression } from './extensions/linter';
 import { zenExtensions, zenStyleDark, zenStyleLight } from './extensions/zen';
 
@@ -81,16 +81,6 @@ export const highlightCode = ({ code, theme = 'light', type = 'standard' }: High
     console.warn('Syntax highlighting failed:', error);
     return escapeHtml(code);
   }
-};
-
-const escapeHtml = (text: string): string => {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;')
-    .replace(/\n/g, '<br/>');
 };
 
 export type CodeHighlighterProps = CodeEditorBaseProps;
