@@ -1,1 +1,1 @@
-export * from './ce';
+export { CodeEditor, type CodeEditorRef, type CodeEditorProps } from './ce';

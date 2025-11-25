@@ -9,6 +9,10 @@
   --ce-verticalPadding: 4px;
   --ce-horizontalPadding: 11px;
 
+  .cm-lintPoint {
+    -webkit-user-modify: read-write-plaintext-only;
+  }
+
   .cm-diagnosticMessageToken {
     padding: 2px 5px 3px;
     border-radius: 5px;
@@ -327,6 +331,65 @@
 
     .cm-content {
       padding: 0;
+    }
+  }
+}
+
+.grl-ce-highlighter {
+  .cm-scroller {
+    display: flex !important;
+    align-items: flex-start !important;
+    font-family: monospace;
+    height: 100%;
+    overflow-x: auto;
+    position: relative;
+    z-index: 0;
+    overflow-anchor: none;
+  }
+
+  .cm-lintRange {
+    background-position: left bottom;
+    background-repeat: repeat-x;
+  }
+
+  .cm-tooltip {
+    z-index: 999;
+
+    ul {
+      margin: 0;
+    }
+  }
+
+  .cm-diagnostic {
+    border-left: 5px solid;
+    padding: 3px 6px 3px 8px;
+    display: block;
+    white-space: pre-wrap;
+  }
+
+  .cm-content {
+    flex-grow: 2;
+  }
+
+  .cm-placeholder {
+    color: #888;
+  }
+
+  .cm-line {
+    display: block;
+  }
+
+  .cm-editor {
+    &[data-severity='warning'] {
+      .cm-lintRange {
+        background-image: url('#{lintRangeImage(#FFA500, 1.2)}');
+      }
+    }
+
+    &[data-severity='error'] {
+      .cm-lintRange {
+        background-image: url('#{lintRangeImage(#FF0000, 1.2)}');
+      }
     }
   }
 }

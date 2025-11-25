@@ -176,6 +176,7 @@ const TableInputCell: React.FC<TableCellProps> = ({ column, value, onChange, dis
     <div className='grl-dt__cell__input__container'>
       {column.colType === 'input' && <TableInputCellStatus index={index} columnId={column.id} />}
       <DiffCodeEditor
+        lazy
         ref={textareaRef as any}
         id={id}
         type={match(column)

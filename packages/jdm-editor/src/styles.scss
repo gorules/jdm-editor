@@ -9,7 +9,10 @@
 }
 
 .grl-textarea-input {
-  line-height: var(--grl-line-height);
+  --textarea-line-height: var(--grl-line-height, 1.5715);
+  --textarea-padding: 4px;
+
+  line-height: var(--textarea-line-height);
   color: var(--grl-color-text);
   resize: none;
   width: 100%;
@@ -18,8 +21,12 @@
   border-radius: var(--grl-border-radius);
   border: 1px solid var(--grl-color-border);
   background: var(--grl-color-bg-container);
-  padding: 4px 11px;
+  padding: var(--textarea-padding) 11px;
   font-size: 14px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: calc(var(--textarea-max-rows, 10) * 1em * var(--textarea-line-height) + 2 * var(--textarea-padding));
 
   transition: var(--grl-transition);
 
@@ -34,11 +41,13 @@
     border-inline-end-width: 1px;
   }
 
-  &::placeholder {
+  &:empty::before {
+    content: attr(data-placeholder);
     color: var(--grl-color-text-placeholder);
+    pointer-events: none;
   }
 
-  &[disabled] {
+  &[aria-disabled='true'] {
     cursor: not-allowed;
     background-color: var(--grl-color-bg-container-disabled);
     color: var(--grl-color-text-disabled);

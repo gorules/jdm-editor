@@ -91,23 +91,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
           )}
         </div>
       </div>
-      <div
-        className='expression-list-item__key'
-        onClick={(e) => {
-          if (e.target instanceof HTMLTextAreaElement) {
-            return;
-          }
-
-          const inputElement = e.currentTarget.querySelector<HTMLTextAreaElement>('textarea');
-          if (!inputElement) {
-            return;
-          }
-
-          inputElement.focus();
-          const inputLength = inputElement.value.length;
-          inputElement.setSelectionRange(inputLength, inputLength);
-        }}
-      >
+      <div className='expression-list-item__key'>
         <ExpressionItemContextMenu index={index}>
           <DiffAutosizeTextArea
             noStyle
@@ -118,7 +102,6 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
             previousValue={expression?._diff?.fields?.key?.previousValue}
             value={expression?.key}
             onChange={(e) => onChange({ key: e.target.value })}
-            autoComplete='off'
           />
         </ExpressionItemContextMenu>
       </div>

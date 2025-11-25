@@ -7,7 +7,7 @@ import {
   closeBracketsKeymap,
 } from '@codemirror/autocomplete';
 import { history, historyKeymap, insertNewlineAndIndent } from '@codemirror/commands';
-import { HighlightStyle, LRLanguage, LanguageSupport, syntaxHighlighting, syntaxTree } from '@codemirror/language';
+import { HighlightStyle, LRLanguage, LanguageSupport, syntaxTree } from '@codemirror/language';
 import type { EditorView } from '@codemirror/view';
 import { hoverTooltip, keymap } from '@codemirror/view';
 import { parser as zenParser } from '@gorules/lezer-zen';
@@ -233,25 +233,21 @@ export const hoverExtension = () => {
   );
 };
 
-export const zenHighlightLight = syntaxHighlighting(
-  HighlightStyle.define([
-    { tag: [t.bracket, t.operator, t.variableName, t.propertyName, t.content, t.punctuation], color: '#080808' },
-    { tag: [t.number, t.bool], color: '#015cc5' },
-    { tag: [t.function(t.variableName), t.keyword, t.self, t.special(t.brace), t.logicOperator], color: '#6f42c1' },
-    { tag: [t.string, t.meta, t.name, t.quote], color: '#077d16' },
-    { tag: t.invalid, color: '#cb2431' },
-  ]),
-);
+export const zenStyleLight = HighlightStyle.define([
+  { tag: [t.bracket, t.operator, t.variableName, t.propertyName, t.content, t.punctuation], color: '#080808' },
+  { tag: [t.number, t.bool], color: '#015cc5' },
+  { tag: [t.function(t.variableName), t.keyword, t.self, t.special(t.brace), t.logicOperator], color: '#6f42c1' },
+  { tag: [t.string, t.meta, t.name, t.quote], color: '#077d16' },
+  { tag: t.invalid, color: '#cb2431' },
+]);
 
-export const zenHighlightDark = syntaxHighlighting(
-  HighlightStyle.define([
-    { tag: [t.bracket, t.operator, t.variableName, t.propertyName, t.content, t.punctuation], color: '#bdbec4' },
-    { tag: [t.number, t.bool], color: '#57a8f5' },
-    { tag: [t.function(t.variableName), t.keyword, t.self, t.special(t.brace), t.logicOperator], color: '#c87dbb' },
-    { tag: [t.string, t.meta, t.name, t.quote], color: '#6aab73' },
-    { tag: t.invalid, color: '#cb2431' },
-  ]),
-);
+export const zenStyleDark = HighlightStyle.define([
+  { tag: [t.bracket, t.operator, t.variableName, t.propertyName, t.content, t.punctuation], color: '#bdbec4' },
+  { tag: [t.number, t.bool], color: '#57a8f5' },
+  { tag: [t.function(t.variableName), t.keyword, t.self, t.special(t.brace), t.logicOperator], color: '#c87dbb' },
+  { tag: [t.string, t.meta, t.name, t.quote], color: '#6aab73' },
+  { tag: t.invalid, color: '#cb2431' },
+]);
 
 const zenLanguage = new LanguageSupport(
   LRLanguage.define({
@@ -286,10 +282,15 @@ const zenTemplateLanguage = new LanguageSupport(
 type extensionOptions = {
   type: 'unary' | 'standard' | 'template';
   lint?: boolean;
+  lazy?: boolean;
 };
 
-export const zenExtensions = ({ type, lint = true }: extensionOptions) =>
-  [
+export const zenExtensions = ({ type, lint = true, lazy = false }: extensionOptions) => {
+  if (lazy) {
+    return [type !== 'template' ? zenLanguage : zenTemplateLanguage];
+  }
+
+  return [
     type !== 'template' ? zenLanguage : zenTemplateLanguage,
     completionExtension(),
     hoverExtension(),
@@ -303,3 +304,4 @@ export const zenExtensions = ({ type, lint = true }: extensionOptions) =>
       { key: 'Enter', run: insertNewlineAndIndent, shift: insertNewlineAndIndent },
     ]),
   ].filter((ext) => !!ext);
+};

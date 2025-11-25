@@ -3,7 +3,7 @@ import { flexRender } from '@tanstack/react-table';
 import type { VirtualItem } from '@tanstack/react-virtual';
 import { Typography } from 'antd';
 import clsx from 'clsx';
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { P, match } from 'ts-pattern';
 
@@ -68,13 +68,14 @@ export const TableRow: React.FC<{
     };
   }, []);
 
-  const { rowValue } = useDecisionTableState(({ decisionTable }) => ({
-    rowValue: (decisionTable?.rules || [])?.find((rule) => rule._id === row?.original?._id),
-  }));
+  const diff = useDecisionTableState(({ decisionTable }) => {
+    if (!decisionTable._diff) {
+      return undefined;
+    }
 
-  const diff = useMemo(() => {
-    return rowValue?._diff as DiffMetadata;
-  }, [rowValue]);
+    return decisionTable.rules.find((r) => r._id === row.original._id)?._diff as DiffMetadata | undefined;
+  });
+
   const diffStatus = diff?.status;
 
   return (
