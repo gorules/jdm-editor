@@ -1,12 +1,11 @@
-import type { HighlightStyle } from '@codemirror/language';
 import { syntaxTree } from '@codemirror/language';
 import { EditorState } from '@codemirror/state';
 import { createVariableType } from '@gorules/zen-engine-wasm';
 import { highlightTree } from '@lezer/highlight';
 import { theme } from 'antd';
 import clsx from 'clsx';
-import React, { useMemo } from 'react';
-import { match } from 'ts-pattern';
+import React, { useEffect, useMemo } from 'react';
+import { P, match } from 'ts-pattern';
 
 import { isWasmAvailable } from '../../helpers/wasm';
 import type { CodeEditorBaseProps } from './ce-base';
@@ -14,7 +13,8 @@ import { validateZenExpression } from './extensions/linter';
 import { zenExtensions, zenStyleDark, zenStyleLight } from './extensions/zen';
 
 const STYLE_ID = 'zen-highlight-styles';
-const injectStyles = (style: HighlightStyle, theme: 'light' | 'dark') => {
+const injectStyles = (theme: 'light' | 'dark') => {
+  const style = theme === 'dark' ? zenStyleDark : zenStyleLight;
   const id = `${STYLE_ID}-${theme}`;
   if (typeof document === 'undefined' || document.getElementById(id)) {
     return;
@@ -42,8 +42,6 @@ export const highlightCode = ({ code, theme = 'light', type = 'standard' }: High
 
   try {
     const highlightStyle = theme === 'dark' ? zenStyleDark : zenStyleLight;
-    injectStyles(highlightStyle, theme);
-
     const state = EditorState.create({
       doc: code,
       extensions: [zenExtensions({ type, lazy: true })],
@@ -120,20 +118,25 @@ export const CodeHighlighter = React.forwardRef<HTMLDivElement, CodeHighlighterP
     ref,
   ) => {
     const { token } = theme.useToken();
+
+    useEffect(() => {
+      injectStyles(token.mode);
+    }, [token.mode]);
+
     const highlighted = useMemo(
       () => highlightCode({ code: value ?? '', type, theme: token.mode }),
       [value, type, token.mode],
     );
 
     const diagnostics = useMemo(() => {
-      if (!value || !value.trim() || !lint || !variableType || !isWasmAvailable()) {
+      if (!value || !value.trim() || !lint || !isWasmAvailable()) {
         return [];
       }
 
-      const vt = createVariableType(variableType);
-      const types = match(type)
-        .with('unary', () => vt.typeCheckUnary(value))
-        .otherwise(() => vt.typeCheck(value));
+      const types = match([type, variableType])
+        .with(['unary', P.nonNullable], () => createVariableType(variableType).typeCheckUnary(value))
+        .with(['standard', P.nonNullable], () => createVariableType(variableType).typeCheck(value))
+        .otherwise(() => []);
 
       return validateZenExpression({
         source: value,
