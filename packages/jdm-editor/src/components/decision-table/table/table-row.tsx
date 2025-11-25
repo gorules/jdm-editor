@@ -69,8 +69,11 @@ export const TableRow: React.FC<{
   }, []);
 
   const diff = useDecisionTableState(({ decisionTable }) => {
-    const rule = decisionTable.rules.find((r) => r._id === row.original._id);
-    return rule?._diff as DiffMetadata | undefined;
+    if (!decisionTable._diff) {
+      return undefined;
+    }
+
+    return decisionTable.rules.find((r) => r._id === row.original._id)?._diff as DiffMetadata | undefined;
   });
 
   const diffStatus = diff?.status;
