@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.50.1](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.50.0...@gorules/jdm-editor@1.50.1) (2025-11-25)
+
+### Bug Fixes
+
+- improve decision table performance ([#215](https://github.com/gorules/jdm-editor/issues/215)) ([cb35cca](https://github.com/gorules/jdm-editor/commit/cb35ccaa3e478e3a7b38c9cce6c40abcf982d4fd))
+
 # [1.50.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.49.2...@gorules/jdm-editor@1.50.0) (2025-11-24)
 
 ### Bug Fixes
