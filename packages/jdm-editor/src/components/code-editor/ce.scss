@@ -332,18 +332,14 @@
 }
 
 .grl-ce-highlighter {
-  --ce-lineHeight: 1.5em;
-  --ce-verticalPadding: 4px;
-  --ce-horizontalPadding: 11px;
-
-  display: flex !important;
-  align-items: flex-start !important;
-  font-family: monospace;
-  line-height: 1.4;
-  height: 100%;
-  overflow-x: auto;
-  position: relative;
-  z-index: 0;
-  overflow-anchor: none;
-  padding: var(--ce-verticalPadding) var(--ce-horizontalPadding);
+  .cm-scroller {
+    display: flex !important;
+    align-items: flex-start !important;
+    font-family: monospace;
+    height: 100%;
+    overflow-x: auto;
+    position: relative;
+    z-index: 0;
+    overflow-anchor: none;
+  }
 }

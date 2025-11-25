@@ -282,10 +282,15 @@ const zenTemplateLanguage = new LanguageSupport(
 type extensionOptions = {
   type: 'unary' | 'standard' | 'template';
   lint?: boolean;
+  lazy?: boolean;
 };
 
-export const zenExtensions = ({ type, lint = true }: extensionOptions) =>
-  [
+export const zenExtensions = ({ type, lint = true, lazy = false }: extensionOptions) => {
+  if (lazy) {
+    return [type !== 'template' ? zenLanguage : zenTemplateLanguage];
+  }
+
+  return [
     type !== 'template' ? zenLanguage : zenTemplateLanguage,
     completionExtension(),
     hoverExtension(),
@@ -299,3 +304,4 @@ export const zenExtensions = ({ type, lint = true }: extensionOptions) =>
       { key: 'Enter', run: insertNewlineAndIndent, shift: insertNewlineAndIndent },
     ]),
   ].filter((ext) => !!ext);
+};

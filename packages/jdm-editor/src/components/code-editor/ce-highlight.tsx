@@ -1,11 +1,16 @@
 import type { HighlightStyle } from '@codemirror/language';
 import { syntaxTree } from '@codemirror/language';
 import { EditorState } from '@codemirror/state';
+import { createVariableType } from '@gorules/zen-engine-wasm';
 import { highlightTree } from '@lezer/highlight';
+import { theme } from 'antd';
 import clsx from 'clsx';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
+import { match } from 'ts-pattern';
 
-import { CodeEditor } from './ce';
+import { isWasmAvailable } from '../../helpers/wasm';
+import type { CodeEditorBaseProps } from './ce-base';
+import { validateZenExpression } from './extensions/linter';
 import { zenExtensions, zenStyleDark, zenStyleLight } from './extensions/zen';
 
 const STYLE_ID = 'zen-highlight-styles';
@@ -24,12 +29,16 @@ const injectStyles = (style: HighlightStyle, theme: 'light' | 'dark') => {
   }
 };
 
-export const highlightCode = (
-  code: string,
-  type: 'standard' | 'unary' | 'template' = 'standard',
-  theme: 'light' | 'dark' = 'light',
-): string => {
-  if (!code) return '';
+type HighlightCodeParams = {
+  code: string;
+  type?: 'standard' | 'unary' | 'template';
+  theme?: 'light' | 'dark';
+};
+
+export const highlightCode = ({ code, theme = 'light', type = 'standard' }: HighlightCodeParams): string => {
+  if (!code.trim()) {
+    return '';
+  }
 
   try {
     const highlightStyle = theme === 'dark' ? zenStyleDark : zenStyleLight;
@@ -37,16 +46,17 @@ export const highlightCode = (
 
     const state = EditorState.create({
       doc: code,
-      extensions: [zenExtensions({ type, lint: false })],
+      extensions: [zenExtensions({ type, lazy: true })],
     });
 
     const tree = syntaxTree(state);
-    if (!tree || tree.length === 0) return escapeHtml(code);
+    if (!tree || tree.length === 0) {
+      return escapeHtml(code);
+    }
 
     let html = '';
     let pos = 0;
 
-    // Use the HighlightStyle's matcher with highlightTree
     highlightTree(tree, highlightStyle, (from, to, classes) => {
       if (from > pos) {
         html += escapeHtml(code.slice(pos, from));
@@ -83,33 +93,93 @@ const escapeHtml = (text: string): string => {
     .replace(/\n/g, '<br/>');
 };
 
-interface HighlightedCodeProps {
-  code: string;
-  type?: 'standard' | 'unary' | 'template';
-  theme?: 'light' | 'dark';
-  className?: string;
-  onClick?: () => void;
-}
+export type CodeHighlighterProps = CodeEditorBaseProps;
 
-export const HighlightedCode: React.FC<HighlightedCodeProps> = ({
-  code,
-  type = 'standard',
-  theme = 'light',
-  className,
-  onClick,
-}) => {
-  const highlighted = useMemo(() => highlightCode(code, type, theme), [code, type, theme]);
-  const [isFocused, setIsFocused] = useState(false);
+export const CodeHighlighter = React.forwardRef<HTMLDivElement, CodeHighlighterProps>(
+  (
+    {
+      noStyle = false,
+      fullHeight = false,
+      strict = false,
+      maxRows,
+      value,
+      className,
+      type = 'standard',
+      variableType,
+      expectedVariableType,
+      lint = true,
+      placeholder: _placeholder,
+      extension: _extension,
+      initialSelection: _initialSelection,
+      onStateChange: _onStateChange,
+      disabled: _disabled,
+      onChange: _onChange,
+      style = {},
+      ...props
+    },
+    ref,
+  ) => {
+    const { token } = theme.useToken();
+    const highlighted = useMemo(
+      () => highlightCode({ code: value ?? '', type, theme: token.mode }),
+      [value, type, token.mode],
+    );
 
-  return (
-    <div
-      className={clsx('grl-ce-highlighter', 'no-style', className)}
-      onClick={onClick}
-      tabIndex={0}
-      onFocus={() => setIsFocused(true)}
-      onBlur={() => setIsFocused(false)}
-    >
-      {isFocused ? <CodeEditor noStyle value={code} /> : <span dangerouslySetInnerHTML={{ __html: highlighted }} />}
-    </div>
-  );
-};
+    const diagnostics = useMemo(() => {
+      if (!value || !value.trim() || !lint || !variableType || !isWasmAvailable()) {
+        return [];
+      }
+
+      const vt = createVariableType(variableType);
+      const types = match(type)
+        .with('unary', () => vt.typeCheckUnary(value))
+        .otherwise(() => vt.typeCheck(value));
+
+      return validateZenExpression({
+        source: value,
+        expectedVariableType,
+        expressionType: type as 'standard',
+        strict,
+        types,
+      });
+    }, [value, lint, variableType, expectedVariableType, type, strict]);
+
+    const diagnosticSeverity = useMemo(() => {
+      if (diagnostics.some((d) => d.severity === 'error')) {
+        return 'error';
+      } else if (diagnostics.some((d) => d.severity === 'warning')) {
+        return 'warning';
+      } else if (diagnostics.some((d) => d.severity === 'info')) {
+        return 'info';
+      } else if (diagnostics.some((d) => d.severity === 'hint')) {
+        return 'hint';
+      }
+
+      return undefined;
+    }, [diagnostics]);
+
+    return (
+      <div
+        ref={ref}
+        className={clsx(
+          'grl-ce',
+          'grl-ce-highlighter',
+          noStyle && 'no-style',
+          maxRows && !fullHeight && 'max-rows',
+          fullHeight && 'full-height',
+          className,
+        )}
+        style={{ '--editorMaxRows': maxRows, ...style } as any}
+        {...props}
+      >
+        <div className={clsx('cm-editor')} data-severity={diagnosticSeverity}>
+          <div className={clsx('cm-scroller')}>
+            <div className={clsx('cm-content', 'cm-lineWrapping')}>
+              <div className={clsx('cm-line')} dangerouslySetInnerHTML={{ __html: highlighted }} />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  },
+);

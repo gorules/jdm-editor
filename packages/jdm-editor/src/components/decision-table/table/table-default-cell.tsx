@@ -14,7 +14,6 @@ import {
   useDecisionTableState,
 } from '../context/dt-store.context';
 import { getReferenceMap } from '../util';
-import { HighlightedCode } from '../../code-editor/ce-highlight';
 
 export type TableDefaultCellProps = {
   context: CellContext<Record<string, string>, string>;
@@ -176,24 +175,23 @@ const TableInputCell: React.FC<TableCellProps> = ({ column, value, onChange, dis
   return (
     <div className='grl-dt__cell__input__container'>
       {column.colType === 'input' && <TableInputCellStatus index={index} columnId={column.id} />}
-      <HighlightedCode className='grl-dt__cell__input' code={value} />
-      {/*<span>{value}</span>*/}
-      {/*<DiffCodeEditor*/}
-      {/*  ref={textareaRef as any}*/}
-      {/*  id={id}*/}
-      {/*  type={match(column)*/}
-      {/*    .with({ colType: 'input', field: P.string }, () => 'unary' as const)*/}
-      {/*    .otherwise(() => 'standard' as const)}*/}
-      {/*  className='grl-dt__cell__input'*/}
-      {/*  noStyle*/}
-      {/*  displayDiff={diff?.status === 'modified'}*/}
-      {/*  previousValue={diff?.previousValue}*/}
-      {/*  variableType={localVariableType.value}*/}
-      {/*  maxRows={3}*/}
-      {/*  value={value}*/}
-      {/*  disabled={disabled}*/}
-      {/*  onChange={onChange}*/}
-      {/*/>*/}
+      <DiffCodeEditor
+        lazy
+        ref={textareaRef as any}
+        id={id}
+        type={match(column)
+          .with({ colType: 'input', field: P.string }, () => 'unary' as const)
+          .otherwise(() => 'standard' as const)}
+        className='grl-dt__cell__input'
+        noStyle
+        displayDiff={diff?.status === 'modified'}
+        previousValue={diff?.previousValue}
+        variableType={localVariableType.value}
+        maxRows={3}
+        value={value}
+        disabled={disabled}
+        onChange={onChange}
+      />
     </div>
   );
 };

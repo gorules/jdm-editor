@@ -29,6 +29,7 @@ const meta: Meta<typeof CodeEditor> = {
     onChange: { table: { disable: true } },
     onBlur: { table: { disable: true } },
     onFocus: { table: { disable: true } },
+    lazy: { control: 'boolean' },
   },
   args: {
     maxRows: 3,

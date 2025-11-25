@@ -1,282 +1,103 @@
-import { bracketMatching, syntaxHighlighting } from '@codemirror/language';
-import { Compartment, EditorState, type Extension, Text } from '@codemirror/state';
-import { EditorView, placeholder as placeholderExt } from '@codemirror/view';
-import { createVariableType } from '@gorules/zen-engine-wasm';
-import { theme } from 'antd';
-import clsx from 'clsx';
-import React, { useEffect, useMemo, useRef } from 'react';
-import { match } from 'ts-pattern';
+import React, { useCallback, useRef, useState } from 'react';
 
 import { composeRefs } from '../../helpers/compose-refs';
-import { isWasmAvailable } from '../../helpers/wasm';
+import type { CodeEditorBaseProps, CodeEditorBaseRef } from './ce-base';
+import { CodeEditorBase } from './ce-base';
+import { CodeHighlighter } from './ce-highlight';
 import './ce.scss';
-import {
-  updateExpectedVariableTypeEffect,
-  updateExpressionTypeEffect,
-  updateStrictModeEffect,
-  updateVariableTypeEffect,
-} from './extensions/types';
-import { zenExtensions, zenStyleDark, zenStyleLight } from './extensions/zen';
 
-const updateListener = (onChange?: (data: string) => void, onStateChange?: (state: EditorState) => void) =>
-  EditorView.updateListener.of((update) => {
-    onStateChange?.(update.state);
-    if (!update.docChanged) {
-      return;
-    }
+export type CodeEditorRef = CodeEditorBaseRef;
 
-    onChange?.(update.state.doc.toString());
-  });
-
-const zenHighlightDark = syntaxHighlighting(zenStyleDark);
-const zenHighlightLight = syntaxHighlighting(zenStyleLight);
-
-const editorTheme = (isDark = false) => (isDark ? zenHighlightDark : zenHighlightLight);
-
-type ExtensionParams = {
-  type?: 'standard' | 'unary' | 'template';
+export type CodeEditorProps = CodeEditorBaseProps & {
+  lazy?: boolean;
 };
 
-export type CodeEditorProps = {
-  maxRows?: number;
-  value?: string;
-  onChange?: (value: string) => void;
-  onStateChange?: (state: EditorState) => void;
-  placeholder?: string;
-  disabled?: boolean;
-  type?: 'unary' | 'standard' | 'template';
-  lint?: boolean;
-  strict?: boolean;
-  fullHeight?: boolean;
-  noStyle?: boolean;
-  extension?: (params: ExtensionParams) => Extension;
-  livePreview?: { input: unknown; fromSimulation: boolean; result?: unknown };
-  variableType?: any;
-  expectedVariableType?: any;
-} & Omit<React.HTMLAttributes<HTMLDivElement>, 'disabled' | 'onChange'>;
+const getCursorPositionFromClick = (
+  event: React.MouseEvent,
+  containerElement: HTMLElement,
+): CodeEditorProps['initialSelection'] | null => {
+  const selection = document.getSelection();
+  if (selection && selection.rangeCount > 0) {
+    const range = selection.getRangeAt(0);
 
-export type CodeEditorRef = HTMLDivElement & {
-  codeMirror: EditorView | null;
+    const startRange = document.createRange();
+    startRange.selectNodeContents(containerElement);
+    startRange.setEnd(range.startContainer, range.startOffset);
+
+    const endRange = document.createRange();
+    endRange.selectNodeContents(containerElement);
+    endRange.setEnd(range.endContainer, range.endOffset);
+
+    return {
+      anchor: startRange.toString().length,
+      head: endRange.toString().length,
+    };
+  }
+
+  const position = document.caretPositionFromPoint(event.clientX, event.clientY);
+  if (!position) {
+    return null;
+  }
+
+  const preRange = document.createRange();
+  preRange.selectNodeContents(containerElement);
+  preRange.setEnd(position.offsetNode, position.offset);
+
+  return { anchor: preRange.toString().length };
 };
+
+type EditorState = { type: 'lazy' } | { type: 'edit'; initialSelection?: CodeEditorProps['initialSelection'] };
 
 export const CodeEditor = React.forwardRef<CodeEditorRef, CodeEditorProps>(
-  (
-    {
-      noStyle = false,
-      fullHeight = false,
-      strict = false,
-      maxRows,
-      disabled,
-      value,
-      onChange,
-      placeholder,
-      className,
-      onStateChange,
-      type = 'standard',
-      extension,
-      variableType,
-      expectedVariableType,
-      lint = true,
-      ...props
-    },
-    ref,
-  ) => {
-    const container = useRef<HTMLDivElement>(null);
-    const codeMirror = useRef<EditorView>(null);
-    const { token } = theme.useToken();
+  ({ lazy = false, value = '', type = 'standard', disabled, onBlur, ...props }, ref) => {
+    const [editorState, setEditorState] = useState<EditorState>(() => (lazy ? { type: 'lazy' } : { type: 'edit' }));
+    const containerRef = useRef<HTMLDivElement>(null);
 
-    const compartment = useMemo(
-      () => ({
-        zenExtension: new Compartment(),
-        theme: new Compartment(),
-        placeholder: new Compartment(),
-        readOnly: new Compartment(),
-        updateListener: new Compartment(),
-        userProvided: new Compartment(),
-      }),
-      [],
+    const handleClick = useCallback(
+      (event: React.MouseEvent) => {
+        if (disabled || editorState.type !== 'lazy') return;
+
+        const selection = containerRef.current
+          ? (getCursorPositionFromClick(event, containerRef.current) ?? undefined)
+          : undefined;
+
+        setEditorState({ type: 'edit', initialSelection: selection });
+      },
+      [disabled, editorState.type],
     );
 
-    useEffect(() => {
-      if (!container.current) {
-        return;
-      }
+    const handleBlur = useCallback(
+      (e: React.FocusEvent<HTMLDivElement, HTMLDivElement>) => {
+        onBlur?.(e);
 
-      const editorView = new EditorView({
-        parent: container.current,
-        state: EditorState.create({
-          doc: value,
-          extensions: [
-            EditorView.lineWrapping,
-            bracketMatching(),
-            compartment.zenExtension.of(zenExtensions({ type, lint })),
-            compartment.updateListener.of(updateListener(onChange, onStateChange)),
-            compartment.theme.of(editorTheme(token.mode === 'dark')),
-            compartment.placeholder.of(placeholder ? placeholderExt(placeholder) : []),
-            compartment.readOnly.of(EditorView.editable.of(!disabled)),
-            compartment.userProvided.of(extension?.({ type }) ?? []),
-          ],
-        }),
-      });
+        if (lazy) {
+          setEditorState({ type: 'lazy' });
+        }
+      },
+      [lazy, onBlur],
+    );
 
-      (codeMirror as any).current = editorView;
-      if (container.current) {
-        (container.current as CodeEditorRef).codeMirror = editorView;
-      }
-
-      return () => {
-        editorView.destroy();
-        (codeMirror as any).current = null;
-      };
-    }, []);
-
-    useEffect(() => {
-      if (!codeMirror.current || value === undefined) {
-        return;
-      }
-
-      const cm = codeMirror.current;
-      if (cm.state.doc.eq(Text.of(value.split('\n')))) {
-        return;
-      }
-
-      const currentHead = cm.state.selection.main.head;
-      const newLength = value.length;
-
-      cm.dispatch({
-        changes: {
-          from: 0,
-          to: cm.state.doc.length,
-          insert: value,
-        },
-        // Adjust the selection if it would be out of bounds
-        ...(currentHead > newLength && { selection: { anchor: newLength } }),
-      });
-    }, [value]);
-
-    useEffect(() => {
-      if (!codeMirror.current) {
-        return;
-      }
-
-      codeMirror.current.dispatch({
-        effects: compartment.theme.reconfigure(editorTheme(token.mode === 'dark')),
-      });
-    }, [token.mode]);
-
-    useEffect(() => {
-      if (!codeMirror.current) {
-        return;
-      }
-
-      codeMirror.current.dispatch({
-        effects: compartment.placeholder.reconfigure(placeholder ? placeholderExt(placeholder) : []),
-      });
-    }, [placeholder]);
-
-    useEffect(() => {
-      if (!codeMirror.current) {
-        return;
-      }
-
-      codeMirror.current.dispatch({
-        effects: compartment.readOnly.reconfigure(EditorView.editable.of(!disabled)),
-      });
-    }, [disabled]);
-
-    useEffect(() => {
-      if (!codeMirror.current) {
-        return;
-      }
-
-      codeMirror.current.dispatch({
-        effects: compartment.updateListener.reconfigure(updateListener(onChange, onStateChange)),
-      });
-    }, [onChange, onStateChange]);
-
-    useEffect(() => {
-      if (!codeMirror.current) {
-        return;
-      }
-
-      codeMirror.current.dispatch({
-        effects: [
-          compartment.zenExtension.reconfigure(zenExtensions({ type, lint })),
-          updateExpressionTypeEffect.of(
-            match(type)
-              .with('unary', () => 'unary' as const)
-              .otherwise(() => 'standard' as const),
-          ),
-        ],
-      });
-    }, [type, lint]);
-
-    useEffect(() => {
-      if (!codeMirror.current) {
-        return;
-      }
-
-      codeMirror.current.dispatch({
-        effects: compartment.userProvided.reconfigure(extension?.({ type }) ?? []),
-      });
-    }, [extension, type]);
-
-    useEffect(() => {
-      if (!codeMirror.current || !isWasmAvailable()) {
-        return;
-      }
-
-      if (variableType === null || variableType === undefined) {
-        codeMirror.current.dispatch({
-          effects: updateVariableTypeEffect.of(null),
-        });
-        return;
-      }
-
-      codeMirror.current.dispatch({
-        effects: updateVariableTypeEffect.of(createVariableType(variableType)),
-      });
-    }, [variableType]);
-
-    useEffect(() => {
-      if (!codeMirror.current || !isWasmAvailable()) {
-        return;
-      }
-
-      if (expectedVariableType === null || expectedVariableType === undefined) {
-        codeMirror.current.dispatch({
-          effects: updateExpectedVariableTypeEffect.of(null),
-        });
-        return;
-      }
-
-      codeMirror.current.dispatch({
-        effects: updateExpectedVariableTypeEffect.of(createVariableType(expectedVariableType)),
-      });
-    }, [expectedVariableType]);
-
-    useEffect(() => {
-      if (!codeMirror.current) {
-        return;
-      }
-
-      codeMirror.current.dispatch({
-        effects: updateStrictModeEffect.of(strict),
-      });
-    }, [strict]);
+    if (editorState.type === 'edit' || !lazy) {
+      return (
+        <CodeEditorBase
+          ref={ref}
+          value={value}
+          type={type}
+          disabled={disabled}
+          onBlur={handleBlur}
+          initialSelection={editorState.type === 'edit' ? editorState.initialSelection : undefined}
+          {...props}
+        />
+      );
+    }
 
     return (
-      <div
-        ref={composeRefs(container, ref)}
-        className={clsx(
-          'grl-ce',
-          maxRows && !fullHeight && 'max-rows',
-          fullHeight && 'full-height',
-          noStyle && 'no-style',
-          className,
-        )}
-        style={{ '--editorMaxRows': maxRows } as any}
-        data-type={type}
+      <CodeHighlighter
+        ref={composeRefs(containerRef, ref)}
+        type={type}
+        value={value}
+        onClick={handleClick}
+        disabled={disabled}
         {...props}
       />
     );
