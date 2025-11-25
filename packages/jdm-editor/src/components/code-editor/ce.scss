@@ -342,4 +342,24 @@
     z-index: 0;
     overflow-anchor: none;
   }
+
+  .cm-lintRange {
+    background-position: left bottom;
+    background-repeat: repeat-x;
+  }
+
+  .cm-tooltip {
+    z-index: 999;
+
+    ul {
+      margin: 0;
+    }
+  }
+
+  .cm-diagnostic {
+    border-left: 5px solid;
+    padding: 3px 6px 3px 8px;
+    display: block;
+    white-space: pre-wrap;
+  }
 }

@@ -1,14 +1,16 @@
 import { syntaxTree } from '@codemirror/language';
+import type { Diagnostic } from '@codemirror/lint';
 import { EditorState } from '@codemirror/state';
 import { createVariableType } from '@gorules/zen-engine-wasm';
 import { highlightTree } from '@lezer/highlight';
 import { theme } from 'antd';
 import clsx from 'clsx';
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { P, match } from 'ts-pattern';
 
 import { isWasmAvailable } from '../../helpers/wasm';
 import type { CodeEditorBaseProps } from './ce-base';
+import { renderDiagnosticMessage } from './extensions/diagnostic';
 import { validateZenExpression } from './extensions/linter';
 import { zenExtensions, zenStyleDark, zenStyleLight } from './extensions/zen';
 
@@ -118,6 +120,7 @@ export const CodeHighlighter = React.forwardRef<HTMLDivElement, CodeHighlighterP
     ref,
   ) => {
     const { token } = theme.useToken();
+    const [tooltip, setTooltip] = useState<{ x: number; y: number; diagnostics: Diagnostic[] } | null>(null);
 
     useEffect(() => {
       injectStyles(token.mode);
@@ -161,6 +164,32 @@ export const CodeHighlighter = React.forwardRef<HTMLDivElement, CodeHighlighterP
       return undefined;
     }, [diagnostics]);
 
+    const handleMouseEnter = useCallback(
+      (e: React.MouseEvent) => {
+        if (!diagnostics.length) return;
+
+        const target = e.currentTarget as HTMLElement;
+        const rect = target.getBoundingClientRect();
+
+        setTooltip({
+          x: rect.left,
+          y: rect.bottom,
+          diagnostics,
+        });
+      },
+      [diagnostics],
+    );
+
+    const handleMouseLeave = useCallback(() => {
+      setTooltip(null);
+    }, []);
+
+    useEffect(() => {
+      if (diagnostics.length === 0) {
+        setTooltip(null);
+      }
+    }, [diagnostics]);
+
     return (
       <div
         ref={ref}
@@ -178,9 +207,48 @@ export const CodeHighlighter = React.forwardRef<HTMLDivElement, CodeHighlighterP
         <div className={clsx('cm-editor')} data-severity={diagnosticSeverity}>
           <div className={clsx('cm-scroller')}>
             <div className={clsx('cm-content', 'cm-lineWrapping')}>
-              <div className={clsx('cm-line')} dangerouslySetInnerHTML={{ __html: highlighted }} />
+              <div className={clsx('cm-line')}>
+                {diagnosticSeverity ? (
+                  <span
+                    className={`cm-lintRange cm-lintRange-${diagnosticSeverity}`}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                    dangerouslySetInnerHTML={{ __html: highlighted }}
+                  />
+                ) : (
+                  <span dangerouslySetInnerHTML={{ __html: highlighted }} />
+                )}
+              </div>
             </div>
           </div>
+          {tooltip && (
+            <div
+              className='cm-tooltip-hover cm-tooltip cm-tooltip-below'
+              style={{
+                position: 'fixed',
+                top: `${tooltip.y}px`,
+                left: `${tooltip.x}px`,
+              }}
+            >
+              <ul className='cm-tooltip-lint cm-tooltip-section'>
+                {tooltip.diagnostics.map((diagnostic, idx) => (
+                  <li key={idx} className={`cm-diagnostic cm-diagnostic-${diagnostic.severity}`}>
+                    <span className='cm-diagnosticText'>
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: renderDiagnosticMessage({
+                            text: diagnostic.message,
+                            className: 'cm-diagnosticMessageToken',
+                          }),
+                        }}
+                      />
+                    </span>
+                    {diagnostic.source && <div className='cm-diagnosticSource'>{diagnostic.source}</div>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     );
