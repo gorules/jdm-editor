@@ -10,12 +10,7 @@
   --ce-horizontalPadding: 11px;
 
   .cm-lintPoint {
-    pointer-events: none;
-  }
-
-  /* Also helpful */
-  .cm-lintPoint::before {
-    pointer-events: none;
+    -webkit-user-modify: read-write-plaintext-only;
   }
 
   .cm-diagnosticMessageToken {
@@ -80,9 +75,8 @@
     border: 1px solid var(--grl-color-border);
     border-color: var(--grl-color-border);
     border-radius: 6px;
-    transition:
-      border-color,
-      box-shadow 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+    transition: border-color,
+    box-shadow 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
     line-height: var(--ce-lineHeight);
 
     &.cm-focused {
