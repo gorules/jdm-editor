@@ -9,6 +9,15 @@
   --ce-verticalPadding: 4px;
   --ce-horizontalPadding: 11px;
 
+  .cm-lintPoint {
+    pointer-events: none;
+  }
+
+  /* Also helpful */
+  .cm-lintPoint::before {
+    pointer-events: none;
+  }
+
   .cm-diagnosticMessageToken {
     padding: 2px 5px 3px;
     border-radius: 5px;
@@ -361,5 +370,17 @@
     padding: 3px 6px 3px 8px;
     display: block;
     white-space: pre-wrap;
+  }
+
+  .cm-content {
+    flex-grow: 2;
+  }
+
+  .cm-placeholder {
+    color: #888;
+  }
+
+  .cm-line {
+    display: block;
   }
 }

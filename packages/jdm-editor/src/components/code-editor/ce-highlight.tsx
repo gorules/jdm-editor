@@ -2,10 +2,10 @@ import { syntaxTree } from '@codemirror/language';
 import type { Diagnostic } from '@codemirror/lint';
 import { EditorState } from '@codemirror/state';
 import { createVariableType } from '@gorules/zen-engine-wasm';
-import { highlightTree } from '@lezer/highlight';
+import { highlightCode as lzHighlightCode } from '@lezer/highlight';
 import { theme } from 'antd';
 import clsx from 'clsx';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { P, match } from 'ts-pattern';
 
 import { isWasmAvailable } from '../../helpers/wasm';
@@ -35,11 +35,17 @@ type HighlightCodeParams = {
   code: string;
   type?: 'standard' | 'unary' | 'template';
   theme?: 'light' | 'dark';
+  placeholder?: string;
 };
 
-export const highlightCode = ({ code, theme = 'light', type = 'standard' }: HighlightCodeParams): string => {
+export const highlightCode = ({
+  code,
+  theme = 'light',
+  type = 'standard',
+  placeholder,
+}: HighlightCodeParams): string => {
   if (!code.trim()) {
-    return '';
+    return `<span class="cm-line">${placeholder ? `<span class="cm-placeholder">${placeholder}</span>` : '<br />'}</span>`;
   }
 
   try {
@@ -54,27 +60,25 @@ export const highlightCode = ({ code, theme = 'light', type = 'standard' }: High
       return escapeHtml(code);
     }
 
-    let html = '';
-    let pos = 0;
+    let html = '<span class="cm-line">';
 
-    highlightTree(tree, highlightStyle, (from, to, classes) => {
-      if (from > pos) {
-        html += escapeHtml(code.slice(pos, from));
-      }
+    lzHighlightCode(
+      code,
+      tree,
+      highlightStyle,
+      (text, classes) => {
+        if (classes) {
+          html += `<span class="${classes}">${escapeHtml(text)}</span>`;
+        } else {
+          html += escapeHtml(text);
+        }
+      },
+      () => {
+        html += '</span><span class="cm-line">';
+      },
+    );
 
-      const tokenText = code.slice(from, to);
-      if (classes) {
-        html += `<span class="${classes}">${escapeHtml(tokenText)}</span>`;
-      } else {
-        html += escapeHtml(tokenText);
-      }
-
-      pos = to;
-    });
-
-    if (pos < code.length) {
-      html += escapeHtml(code.slice(pos));
-    }
+    html += '</span>';
 
     return html;
   } catch (error) {
@@ -98,7 +102,7 @@ export const CodeHighlighter = React.forwardRef<HTMLDivElement, CodeHighlighterP
       variableType,
       expectedVariableType,
       lint = true,
-      placeholder: _placeholder,
+      placeholder,
       extension: _extension,
       initialSelection: _initialSelection,
       onStateChange: _onStateChange,
@@ -111,36 +115,53 @@ export const CodeHighlighter = React.forwardRef<HTMLDivElement, CodeHighlighterP
   ) => {
     const { token } = theme.useToken();
     const [tooltip, setTooltip] = useState<{ x: number; y: number; diagnostics: Diagnostic[] } | null>(null);
+    const [diagnostics, setDiagnostics] = useState<Diagnostic[] | null>(null);
+    const [, startTransition] = useTransition();
 
     useEffect(() => {
       injectStyles(token.mode);
     }, [token.mode]);
 
+    useEffect(() => {
+      if (!diagnostics?.length) {
+        setTooltip(null);
+      }
+    }, [diagnostics]);
+
     const highlighted = useMemo(
-      () => highlightCode({ code: value ?? '', type, theme: token.mode }),
-      [value, type, token.mode],
+      () => highlightCode({ code: value ?? '', type, theme: token.mode, placeholder }),
+      [value, type, token.mode, placeholder],
     );
 
-    const diagnostics = useMemo(() => {
+    useEffect(() => {
       if (!value || !value.trim() || !lint || !isWasmAvailable()) {
-        return [];
+        setDiagnostics(null);
+        return;
       }
 
-      const types = match([type, variableType])
-        .with(['unary', P.nonNullable], () => createVariableType(variableType).typeCheckUnary(value))
-        .with(['standard', P.nonNullable], () => createVariableType(variableType).typeCheck(value))
-        .otherwise(() => []);
+      startTransition(() => {
+        const types = match([type, variableType])
+          .with(['unary', P.nonNullable], () => createVariableType(variableType).typeCheckUnary(value))
+          .with(['standard', P.nonNullable], () => createVariableType(variableType).typeCheck(value))
+          .otherwise(() => []);
 
-      return validateZenExpression({
-        source: value,
-        expectedVariableType,
-        expressionType: type as 'standard',
-        strict,
-        types,
+        setDiagnostics(
+          validateZenExpression({
+            source: value,
+            expectedVariableType,
+            expressionType: type as 'standard',
+            strict,
+            types,
+          }),
+        );
       });
     }, [value, lint, variableType, expectedVariableType, type, strict]);
 
     const diagnosticSeverity = useMemo(() => {
+      if (!diagnostics) {
+        return undefined;
+      }
+
       if (diagnostics.some((d) => d.severity === 'error')) {
         return 'error';
       } else if (diagnostics.some((d) => d.severity === 'warning')) {
@@ -156,7 +177,7 @@ export const CodeHighlighter = React.forwardRef<HTMLDivElement, CodeHighlighterP
 
     const handleMouseEnter = useCallback(
       (e: React.MouseEvent) => {
-        if (!diagnostics.length) return;
+        if (!diagnostics?.length) return;
 
         const target = e.currentTarget as HTMLElement;
         const rect = target.getBoundingClientRect();
@@ -173,12 +194,6 @@ export const CodeHighlighter = React.forwardRef<HTMLDivElement, CodeHighlighterP
     const handleMouseLeave = useCallback(() => {
       setTooltip(null);
     }, []);
-
-    useEffect(() => {
-      if (diagnostics.length === 0) {
-        setTooltip(null);
-      }
-    }, [diagnostics]);
 
     return (
       <div
@@ -197,20 +212,12 @@ export const CodeHighlighter = React.forwardRef<HTMLDivElement, CodeHighlighterP
       >
         <div className={clsx('cm-editor')} data-severity={diagnosticSeverity}>
           <div className={clsx('cm-scroller')}>
-            <div className={clsx('cm-content', 'cm-lineWrapping')}>
-              <div className={clsx('cm-line')}>
-                {diagnosticSeverity ? (
-                  <span
-                    className={`cm-lintRange cm-lintRange-${diagnosticSeverity}`}
-                    onMouseEnter={handleMouseEnter}
-                    onMouseLeave={handleMouseLeave}
-                    dangerouslySetInnerHTML={{ __html: highlighted }}
-                  />
-                ) : (
-                  <span dangerouslySetInnerHTML={{ __html: highlighted }} />
-                )}
-              </div>
-            </div>
+            <div
+              className={clsx('cm-content', 'cm-lineWrapping')}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+              dangerouslySetInnerHTML={{ __html: highlighted }}
+            />
           </div>
           {tooltip && (
             <div
