@@ -76,7 +76,13 @@ declare type Arrayable<T> = T | T[];
 
 declare type AutosizeTextAreaProps = {
     maxRows: number;
-} & default_2.DetailedHTMLProps<default_2.TextareaHTMLAttributes<HTMLTextAreaElement>, HTMLTextAreaElement>;
+    value?: string;
+    onChange?: default_2.ChangeEventHandler<HTMLTextAreaElement>;
+    placeholder?: string;
+    disabled?: boolean;
+    readOnly?: boolean;
+    className?: string;
+} & Omit<default_2.DetailedHTMLProps<default_2.HTMLAttributes<HTMLDivElement>, HTMLDivElement>, 'onChange' | 'placeholder'>;
 
 declare interface BaseItem {
     id?: string;
@@ -120,7 +126,9 @@ export declare const CodeEditor: default_2.ForwardRefExoticComponent<{
     strict?: boolean;
     fullHeight?: boolean;
     noStyle?: boolean;
-    extension?: (params: ExtensionParams) => Extension;
+    extension?: (params: {
+        type?: "standard" | "unary" | "template";
+    }) => Extension;
     livePreview?: {
         input: unknown;
         fromSimulation: boolean;
@@ -128,9 +136,16 @@ export declare const CodeEditor: default_2.ForwardRefExoticComponent<{
     };
     variableType?: any;
     expectedVariableType?: any;
-} & Omit<default_2.HTMLAttributes<HTMLDivElement>, "disabled" | "onChange"> & default_2.RefAttributes<CodeEditorRef>>;
+    lazy?: boolean;
+    initialSelection?: {
+        anchor: number;
+        head?: number;
+    };
+} & Omit<default_2.HTMLAttributes<HTMLDivElement>, "disabled" | "onChange"> & {
+    lazy?: boolean;
+} & default_2.RefAttributes<CodeEditorBaseRef>>;
 
-export declare type CodeEditorProps = {
+declare type CodeEditorBaseProps = {
     maxRows?: number;
     value?: string;
     onChange?: (value: string) => void;
@@ -150,11 +165,22 @@ export declare type CodeEditorProps = {
     };
     variableType?: any;
     expectedVariableType?: any;
+    lazy?: boolean;
+    initialSelection?: {
+        anchor: number;
+        head?: number;
+    };
 } & Omit<default_2.HTMLAttributes<HTMLDivElement>, 'disabled' | 'onChange'>;
 
-export declare type CodeEditorRef = HTMLDivElement & {
+declare type CodeEditorBaseRef = HTMLDivElement & {
     codeMirror: EditorView | null;
 };
+
+export declare type CodeEditorProps = CodeEditorBaseProps & {
+    lazy?: boolean;
+};
+
+export declare type CodeEditorRef = CodeEditorBaseRef;
 
 export declare const codemirror: {
     linter: typeof linter;
@@ -1011,6 +1037,13 @@ export declare const decisionModelSchema: z.ZodObject<{
         sourceHandle?: string | null | undefined;
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
+    edges: {
+        type: "edge";
+        id: string;
+        sourceId: string;
+        targetId: string;
+        sourceHandle?: string | null | undefined;
+    }[];
     nodes: ({
         type: NodeKind.Decision;
         content: {
@@ -1144,14 +1177,14 @@ export declare const decisionModelSchema: z.ZodObject<{
         };
         content?: any;
     })[];
-    edges: {
+}, {
+    edges?: {
         type: "edge";
         id: string;
         sourceId: string;
         targetId: string;
         sourceHandle?: string | null | undefined;
-    }[];
-}, {
+    }[] | undefined;
     nodes?: ({
         type: NodeKind.Decision;
         content: {
@@ -1285,13 +1318,6 @@ export declare const decisionModelSchema: z.ZodObject<{
             y: number;
         } | undefined;
     })[] | undefined;
-    edges?: {
-        type: "edge";
-        id: string;
-        sourceId: string;
-        targetId: string;
-        sourceHandle?: string | null | undefined;
-    }[] | undefined;
 }>;
 
 export declare type DecisionNode<T = any> = {
@@ -1624,7 +1650,7 @@ export declare type Diff<T = any> = {
     _diff?: DiffMetadata<T>;
 };
 
-export declare const DiffAutosizeTextArea: default_2.FC<DiffAutosizeTextAreaProps>;
+export declare const DiffAutosizeTextArea: default_2.ForwardRefExoticComponent<Omit<DiffAutosizeTextAreaProps, "ref"> & default_2.RefAttributes<HTMLDivElement>>;
 
 export declare type DiffAutosizeTextAreaProps = AutosizeTextAreaProps & {
     previousValue?: string;
@@ -1654,11 +1680,18 @@ export declare const DiffCodeEditor: default_2.ForwardRefExoticComponent<{
     };
     variableType?: any;
     expectedVariableType?: any;
+    lazy?: boolean;
+    initialSelection?: {
+        anchor: number;
+        head?: number;
+    };
 } & Omit<default_2.HTMLAttributes<HTMLDivElement>, "disabled" | "onChange"> & {
+    lazy?: boolean;
+} & {
     displayDiff?: boolean;
     previousValue?: string;
     noStyle?: boolean;
-} & default_2.RefAttributes<CodeEditorRef>>;
+} & default_2.RefAttributes<CodeEditorBaseRef>>;
 
 export declare type DiffCodeEditorProps = CodeEditorProps & {
     displayDiff?: boolean;
