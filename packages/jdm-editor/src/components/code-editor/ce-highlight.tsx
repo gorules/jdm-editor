@@ -60,7 +60,7 @@ export const highlightCode = ({
       return escapeHtml(code);
     }
 
-    let html = '<span class="cm-line">';
+    let html = '<span class="cm-line"><span class="cm-lintRange">';
 
     lzHighlightCode(
       code,
@@ -74,11 +74,11 @@ export const highlightCode = ({
         }
       },
       () => {
-        html += '</span><span class="cm-line">';
+        html += '\n</span></span><span class="cm-line"><span class="cm-lintRange">';
       },
     );
 
-    html += '</span>';
+    html += '</span></span>';
 
     return html;
   } catch (error) {

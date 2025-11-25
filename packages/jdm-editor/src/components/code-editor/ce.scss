@@ -383,4 +383,18 @@
   .cm-line {
     display: block;
   }
+
+  .cm-editor {
+    &[data-severity='warning'] {
+      .cm-lintRange {
+        background-image: url('#{lintRangeImage(#FFA500, 1.2)}');
+      }
+    }
+
+    &[data-severity='error'] {
+      .cm-lintRange {
+        background-image: url('#{lintRangeImage(#FF0000, 1.2)}');
+      }
+    }
+  }
 }
