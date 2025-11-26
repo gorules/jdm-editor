@@ -210,7 +210,7 @@ export const CodeHighlighter = React.forwardRef<HTMLDivElement, CodeHighlighterP
         style={{ '--editorMaxRows': maxRows, ...style } as any}
         {...props}
       >
-        <div className={clsx('cm-editor ͼ1 ͼ2')} data-severity={diagnosticSeverity}>
+        <div className={clsx('cm-editor')} data-severity={diagnosticSeverity}>
           <div className={clsx('cm-scroller')}>
             <div
               className={clsx('cm-content', 'cm-lineWrapping')}

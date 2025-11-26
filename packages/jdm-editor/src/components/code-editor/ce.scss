@@ -369,6 +369,10 @@
 
   .cm-content {
     flex-grow: 2;
+    flex-shrink: 1;
+    white-space: break-spaces;
+    word-break: break-word;
+    overflow-wrap: anywhere;
   }
 
   .cm-placeholder {
@@ -380,6 +384,11 @@
   }
 
   .cm-editor {
+    display: flex;
+    flex-direction: row;
+    position: static;
+    box-sizing: content-box;
+
     &[data-severity='warning'] {
       .cm-lintRange {
         background-image: url('#{lintRangeImage(#FFA500, 1.2)}');
