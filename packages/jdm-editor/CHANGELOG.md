@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.50.4](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.50.3...@gorules/jdm-editor@1.50.4) (2025-11-26)
+
+### Bug Fixes
+
+- code highlighter line breaks ([#218](https://github.com/gorules/jdm-editor/issues/218)) ([ff1b613](https://github.com/gorules/jdm-editor/commit/ff1b6136a2c66b31ed1199be2442ad590408f087))
+
 ## [1.50.3](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.50.2...@gorules/jdm-editor@1.50.3) (2025-11-25)
 
 ### Bug Fixes
