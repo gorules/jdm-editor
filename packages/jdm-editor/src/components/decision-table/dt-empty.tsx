@@ -29,6 +29,7 @@ export type DecisionTableEmptyType = {
   inputsSchema?: SchemaSelectProps[];
   outputsSchema?: SchemaSelectProps[];
   permission?: DecisionTableStoreType['state']['permission'];
+  inputVariableType?: VariableType;
   debug?: {
     trace: SimulationTrace<SimulationTraceDataTable>;
     inputData?: GetNodeDataResult;
@@ -54,6 +55,7 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
   cellRenderer,
   permission = 'edit:full',
   onChange,
+  inputVariableType,
 }) => {
   const mountedRef = useRef(false);
   const { stateStore, listenerStore } = useDecisionTableRaw();
@@ -120,6 +122,10 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
       },
     });
   }, [debug]);
+
+  useEffect(() => {
+    stateStore.setState({ inputVariableType });
+  }, [inputVariableType]);
 
   useEffect(() => {
     if (!isWasmAvailable()) {

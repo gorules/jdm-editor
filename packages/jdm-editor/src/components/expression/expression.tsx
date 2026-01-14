@@ -16,11 +16,18 @@ import './expression.scss';
 
 export type ExpressionProps = {
   manager?: DragDropManager;
+  inputVariableType?: VariableType;
   debug?: ExpressionStore['debug'];
   hideCommandBar?: boolean;
 } & ExpressionControllerProps;
 
-export const Expression: React.FC<ExpressionProps> = ({ manager, debug, hideCommandBar, ...props }) => {
+export const Expression: React.FC<ExpressionProps> = ({
+  manager,
+  debug,
+  hideCommandBar,
+  inputVariableType,
+  ...props
+}) => {
   const [_, setMounted] = useState(false);
   const container = useRef<HTMLDivElement>(null);
 
@@ -51,7 +58,7 @@ export const Expression: React.FC<ExpressionProps> = ({ manager, debug, hideComm
             <ExpressionController {...props} />
             {!hideCommandBar && <ExpressionCommandBar />}
             <ExpressionList />
-            <SimulateDataSync debug={debug} />
+            <SimulateDataSync debug={debug} inputVariableType={inputVariableType} />
           </ExpressionStoreProvider>
         </DndProvider>
       )}
@@ -59,8 +66,15 @@ export const Expression: React.FC<ExpressionProps> = ({ manager, debug, hideComm
   );
 };
 
-const SimulateDataSync: React.FC<Pick<ExpressionProps, 'debug'>> = ({ debug }) => {
+const SimulateDataSync: React.FC<Pick<ExpressionProps, 'debug' | 'inputVariableType'>> = ({
+  debug,
+  inputVariableType,
+}) => {
   const expressionStoreRaw = useExpressionStoreRaw();
+
+  useEffect(() => {
+    expressionStoreRaw.setState({ inputVariableType });
+  }, [inputVariableType]);
 
   useEffect(() => {
     const currentState = expressionStoreRaw.getState();
