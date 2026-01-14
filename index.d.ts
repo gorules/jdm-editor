@@ -1421,6 +1421,7 @@ declare type DecisionTableEmptyType = {
     inputsSchema?: SchemaSelectProps[];
     outputsSchema?: SchemaSelectProps[];
     permission?: DecisionTableStoreType['state']['permission'];
+    inputVariableType?: VariableType;
     debug?: {
         trace: SimulationTrace<SimulationTraceDataTable>;
         inputData?: GetNodeDataResult;
@@ -1891,6 +1892,7 @@ declare type ExpressionPermission = 'edit:full' | 'edit:values' | 'view';
 
 export declare type ExpressionProps = {
     manager?: DragDropManager;
+    inputVariableType?: VariableType;
     debug?: ExpressionStore['debug'];
     hideCommandBar?: boolean;
 } & ExpressionControllerProps;
