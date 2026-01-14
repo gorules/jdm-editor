@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.50.5](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.50.4...@gorules/jdm-editor@1.50.5) (2026-01-14)
+
+### Bug Fixes
+
+- allow external control of variable type for tables and expressions ([#220](https://github.com/gorules/jdm-editor/issues/220)) ([e86f199](https://github.com/gorules/jdm-editor/commit/e86f19923203a5e24ddd5d61405f5baa5481f74f))
+
 ## [1.50.4](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.50.3...@gorules/jdm-editor@1.50.4) (2025-11-26)
 
 ### Bug Fixes
