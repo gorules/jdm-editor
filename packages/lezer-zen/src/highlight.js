@@ -15,6 +15,7 @@ export const zenHighlight = styleTags({
   'ArithOp': t.arithmeticOperator,
   'LogicOp': t.logicOperator,
   'and or': t.logicOperator,
+  'as': t.keyword,
   'CallbackReference': t.self,
   'CompareOp': t.compareOperator,
   ':': t.punctuation,
