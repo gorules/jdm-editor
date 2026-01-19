@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.22.1](https://github.com/gorules/jdm-editor/compare/@gorules/zen-engine-wasm@0.22.0...@gorules/zen-engine-wasm@0.22.1) (2026-01-19)
+
+### Features
+
+- function scope alias ([#221](https://github.com/gorules/jdm-editor/issues/221)) ([a022647](https://github.com/gorules/jdm-editor/commit/a022647cf0b97fb18acf1294acb6cc76c640a708))
+
 # [0.22.0](https://github.com/gorules/jdm-editor/compare/@gorules/zen-engine-wasm@0.21.0...@gorules/zen-engine-wasm@0.22.0) (2025-11-24)
 
 ### Bug Fixes

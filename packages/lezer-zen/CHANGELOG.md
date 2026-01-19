@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.1](https://github.com/lezer-parser/json/compare/@gorules/lezer-zen@0.8.0...@gorules/lezer-zen@0.8.1) (2026-01-19)
+
+### Features
+
+- function scope alias ([#221](https://github.com/lezer-parser/json/issues/221)) ([a022647](https://github.com/lezer-parser/json/commit/a022647cf0b97fb18acf1294acb6cc76c640a708))
+
 # [0.8.0](https://github.com/lezer-parser/json/compare/@gorules/lezer-zen@0.7.0...@gorules/lezer-zen@0.8.0) (2025-06-18)
 
 ### Features
