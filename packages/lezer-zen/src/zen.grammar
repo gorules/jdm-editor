@@ -98,8 +98,12 @@ MemberExpression {
   expressionNoComma !member (MethodExpression | PropertyAccess | PropertyExpression)
 }
 
+Argument {
+  expressionNoComma (kw<"as"> VariableName)?
+}
+
 ArgList {
-  "(" commaSep<expressionNoComma> ")"
+  "(" commaSep<Argument> ")"
 }
 
 @skip {} {
