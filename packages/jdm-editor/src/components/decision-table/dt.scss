@@ -131,6 +131,24 @@
         .cta-wrapper {
           display: flex;
         }
+
+        .head-cell--with-filter {
+          flex-wrap: wrap;
+
+          .grl-dt-column-filter-btn {
+            color: var(--grl-color-text-secondary);
+
+            &--active {
+              color: var(--grl-color-primary);
+            }
+          }
+        }
+      }
+    }
+
+    .grl-dt-column-filter-dropdown-panel {
+      .grl-dt-text-secondary {
+        color: var(--grl-color-text-secondary);
       }
     }
 

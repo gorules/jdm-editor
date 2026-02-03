@@ -1,15 +1,17 @@
 import { PlusCircleOutlined } from '@ant-design/icons';
-import type { ColumnDef, Table as ReactTable } from '@tanstack/react-table';
-import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import type { ColumnDef, ColumnFiltersState, Table as ReactTable } from '@tanstack/react-table';
+import { getCoreRowModel, getFilteredRowModel, useReactTable } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { Button, Typography, theme } from 'antd';
 import clsx from 'clsx';
 import equal from 'fast-deep-equal/es6/react';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { z } from 'zod';
 
+import { DecisionTableFilterProvider } from '../context/dt-filter.context';
 import { useDecisionTableActions, useDecisionTableListeners, useDecisionTableState } from '../context/dt-store.context';
 import { TableContextMenu } from './table-context-menu';
+import { TableColumnFilter } from './table-column-filter';
 import { TableDefaultCell } from './table-default-cell';
 import {
   TableHeadCellInput,
@@ -23,6 +25,8 @@ import { TableRow } from './table-row';
 export type TableProps = {
   id?: string;
   maxHeight: string | number;
+  globalFilter?: string;
+  setGlobalFilter?: (value: string) => void;
 };
 
 type ColumnSizing = Record<string, number>;
@@ -43,12 +47,28 @@ const loadColumnSizing = (id?: string) => {
   }
 };
 
-export const Table: React.FC<TableProps> = ({ id, maxHeight }) => {
+const globalFilterFn = (row: any, _columnId: string, filterValue: string) => {
+  if (!filterValue || typeof filterValue !== 'string') return true;
+  const q = filterValue.toLowerCase().trim();
+  if (!q) return true;
+  const obj = row.original as Record<string, unknown>;
+  return Object.values(obj).some((v) => String(v ?? '').toLowerCase().includes(q));
+};
+
+const columnFilterInArrayFn = (row: any, columnId: string, filterValue: unknown) => {
+  const selected = Array.isArray(filterValue) ? filterValue : filterValue != null ? [String(filterValue)] : [];
+  if (selected.length === 0) return true;
+  const cell = String(row.getValue(columnId) ?? '');
+  return selected.includes(cell);
+};
+
+export const Table: React.FC<TableProps> = ({ id, maxHeight, globalFilter = '', setGlobalFilter }) => {
   const { token } = theme.useToken();
 
   const tableActions = useDecisionTableActions();
   const { cellRenderer } = useDecisionTableListeners(({ cellRenderer }) => ({ cellRenderer }));
   const [columnSizing, setColumnSizing] = useState<ColumnSizing>(() => loadColumnSizing(id));
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
   const { permission, disabled, inputs, outputs, colWidth, minColWidth } = useDecisionTableState(
     ({ permission, disabled, minColWidth, colWidth, decisionTable }) => ({
@@ -72,6 +92,30 @@ export const Table: React.FC<TableProps> = ({ id, maxHeight }) => {
       ),
   );
 
+  const getUniqueValues = useCallback(
+    (columnId: string) => {
+      const set = new Set<string>();
+      (rules || []).forEach((rule) => {
+        const v = rule[columnId];
+        set.add(String(v ?? ''));
+      });
+      return Array.from(set).sort((a, b) => (a === '' ? 1 : b === '' ? -1 : a.localeCompare(b)));
+    },
+    [rules],
+  );
+
+  const filterContextValue = useMemo(
+    () => ({
+      globalFilter: globalFilter ?? '',
+      setGlobalFilter: setGlobalFilter ?? (() => {}),
+      columnFilters,
+      setColumnFilters,
+      getUniqueValues,
+      rules: rules ?? [],
+    }),
+    [globalFilter, setGlobalFilter, columnFilters, getUniqueValues, rules],
+  );
+
   const columns = React.useMemo<ColumnDef<any>[]>(
     () => [
       {
@@ -87,6 +131,7 @@ export const Table: React.FC<TableProps> = ({ id, maxHeight }) => {
               id: input.id,
               minSize: minColWidth,
               size: colWidth,
+              filterFn: columnFilterInArrayFn,
               header: () => <TableHeadCellInputField schema={input} permission={permission} disabled={disabled} />,
             };
           }),
@@ -101,8 +146,10 @@ export const Table: React.FC<TableProps> = ({ id, maxHeight }) => {
           ...(outputs || []).map((output: any) => {
             return {
               accessorKey: output.id,
+              id: output.id,
               minSize: minColWidth,
               size: colWidth,
+              filterFn: columnFilterInArrayFn,
               header: () => <TableHeadCellOutputField schema={output} permission={permission} disabled={disabled} />,
             };
           }),
@@ -111,9 +158,11 @@ export const Table: React.FC<TableProps> = ({ id, maxHeight }) => {
       {
         id: '_description',
         accessorKey: '_description',
+        filterFn: columnFilterInArrayFn,
         header: () => (
-          <div className={'head-cell'}>
+          <div className={'head-cell head-cell--with-filter'}>
             <Typography.Text className='grl-dt-text-primary'>Description</Typography.Text>
+            <TableColumnFilter columnId="_description" columnName="Description" disabled={disabled} />
           </div>
         ),
         minSize: minColWidth,
@@ -129,18 +178,22 @@ export const Table: React.FC<TableProps> = ({ id, maxHeight }) => {
     getRowId: (row) => row._id,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    globalFilterFn,
     defaultColumn: {
       cell: (context) => <TableDefaultCell context={context} />,
     },
     meta: {
       getCell: cellRenderer,
     },
-    ...(!id
-      ? {}
-      : {
-          state: { columnSizing },
-          onColumnSizingChange: setColumnSizing,
-        }),
+    state: {
+      ...(id ? { columnSizing } : {}),
+      globalFilter,
+      columnFilters,
+    },
+    onGlobalFilterChange: setGlobalFilter ? (updater) => setGlobalFilter(typeof updater === 'function' ? updater(globalFilter) : updater) : undefined,
+    onColumnFiltersChange: setColumnFilters,
+    ...(id ? { onColumnSizingChange: setColumnSizing } : {}),
   });
 
   const tableContainerRef = useRef<HTMLDivElement>(null);
@@ -182,13 +235,14 @@ export const Table: React.FC<TableProps> = ({ id, maxHeight }) => {
   }, [columnSizing]);
 
   return (
-    <div
-      ref={tableContainerRef}
-      className='grl-dt__container'
-      style={{ maxHeight, overflowY: 'auto' }}
-      data-theme={token.mode}
-    >
-      <StyledTable width={table.getCenterTotalSize()}>
+    <DecisionTableFilterProvider value={filterContextValue}>
+      <div
+        ref={tableContainerRef}
+        className='grl-dt__container'
+        style={{ maxHeight, overflowY: 'auto' }}
+        data-theme={token.mode}
+      >
+        <StyledTable width={table.getCenterTotalSize()}>
         <thead>
           {table
             .getHeaderGroups()
@@ -228,7 +282,8 @@ export const Table: React.FC<TableProps> = ({ id, maxHeight }) => {
           </tr>
         </tfoot>
       </StyledTable>
-    </div>
+      </div>
+    </DecisionTableFilterProvider>
   );
 };
 
