@@ -1,5 +1,5 @@
 import { BookOutlined, DeleteOutlined } from '@ant-design/icons';
-import { Button, Modal, Typography } from 'antd';
+import { App, Button, Typography } from 'antd';
 import { produce } from 'immer';
 import _ from 'lodash';
 import { ArrowRightToLineIcon } from 'lucide-react';
@@ -40,6 +40,7 @@ export const inputSpecification: NodeSpecification<NodeInputData> = {
     const { disabled } = useDecisionGraphState(({ disabled }) => ({
       disabled,
     }));
+    const { modal } = App.useApp();
 
     return (
       <GraphNode
@@ -67,7 +68,7 @@ export const inputSpecification: NodeSpecification<NodeInputData> = {
             label: <SpacedText left='Delete' right={platform.shortcut('Backspace')} />,
             disabled,
             onClick: () =>
-              Modal.confirm({
+              modal.confirm({
                 icon: null,
                 title: 'Delete node',
                 content: (
