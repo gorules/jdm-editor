@@ -5,8 +5,9 @@ import {
   DeleteOutlined,
   ExportOutlined,
   ImportOutlined,
+  SearchOutlined,
 } from '@ant-design/icons';
-import { Button, Divider, Popconfirm, Select, Tooltip, Typography, message } from 'antd';
+import { Button, Divider, Input, Popconfirm, Select, Tooltip, Typography, message } from 'antd';
 import React, { useMemo, useRef, useState } from 'react';
 import { P, match } from 'ts-pattern';
 
@@ -22,7 +23,15 @@ import {
   useDecisionTableState,
 } from './context/dt-store.context';
 
-export const DecisionTableCommandBar: React.FC = () => {
+export type DecisionTableCommandBarProps = {
+  globalFilter?: string;
+  setGlobalFilter?: (value: string) => void;
+};
+
+export const DecisionTableCommandBar: React.FC<DecisionTableCommandBarProps> = ({
+  globalFilter = '',
+  setGlobalFilter,
+}) => {
   const [excelData, setExcelData] = useState<ParsedExcelData[] | null>();
 
   const handleDataMapping = (mappedExcelData: MappedExcelData) => {
@@ -164,6 +173,15 @@ export const DecisionTableCommandBar: React.FC = () => {
     <>
       <Stack horizontal horizontalAlign={'space-between'} verticalAlign={'center'} className={'grl-dt__command-bar'}>
         <Stack gap={8} horizontal className='full-width'>
+          <Input
+            placeholder="Search table..."
+            prefix={<SearchOutlined className="grl-dt-text-secondary" />}
+            value={globalFilter}
+            onChange={(e) => setGlobalFilter?.(e.target.value)}
+            allowClear
+            style={{ width: 200 }}
+            size="small"
+          />
           <Button type='text' size={'small'} icon={<ExportOutlined />} onClick={exportExcel}>
             Export Excel
           </Button>
