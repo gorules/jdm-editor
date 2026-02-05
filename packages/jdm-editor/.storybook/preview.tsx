@@ -1,4 +1,3 @@
-import { useEffect, } from 'react';
 import * as ZenEngineWasm from '@gorules/zen-engine-wasm';
 import type { Preview } from '@storybook/react';
 import * as React from 'react';
