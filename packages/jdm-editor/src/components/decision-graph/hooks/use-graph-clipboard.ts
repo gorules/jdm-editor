@@ -1,7 +1,6 @@
 import { message } from 'antd';
 import { type RefObject, useCallback, useMemo } from 'react';
 import type { Node, ReactFlowInstance, XYPosition } from 'reactflow';
-import { useTranslation } from 'react-i18next';
 
 import { copyToClipboard, pasteFromClipboard } from '../../../helpers/utility';
 import { useDecisionGraphActions, useDecisionGraphRaw } from '../context/dg-store.context';
