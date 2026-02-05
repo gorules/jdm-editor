@@ -20,6 +20,7 @@ import { GraphNode } from '../graph-node';
 import { NodeColor } from './colors';
 import type { MinimalNodeProps, NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
+import i18nInstance from '../../../../i18n';
 
 export type SwitchStatement = {
   id: string;
@@ -32,12 +33,15 @@ export type NodeSwitchData = {
   statements?: (SwitchStatement & Diff)[];
 } & Diff;
 
+// translation
+const { t } = i18nInstance;
+
 export const switchSpecification: NodeSpecification<NodeSwitchData> = {
   type: NodeKind.Switch,
   icon: <SplitIcon size='1em' />,
-  displayName: 'Switch',
+  displayName: t('decisionGraph.nodes.switchSpecification.displayName'),
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/switch',
-  shortDescription: 'Conditional branching',
+  shortDescription: t('decisionGraph.nodes.switchSpecification.shortDescription'),
   color: NodeColor.Purple,
   getDiffContent: (current, previous) => {
     return produce(current, (draft) => {
@@ -185,7 +189,7 @@ const SwitchNode: React.FC<
             }
           }}
         >
-          Add Condition
+          {t('decisionGraph.nodes.switchSpecification.addCondition')}
         </Button>,
         <Dropdown
           key='hitPolicy'
@@ -195,13 +199,13 @@ const SwitchNode: React.FC<
             items: [
               {
                 key: 'first',
-                label: 'First',
+                label: t('decisionGraph.nodes.switchSpecification.hitPolicyFirst'),
                 onClick: () => changeHitPolicy('first'),
                 disabled,
               },
               {
                 key: 'collect',
-                label: 'Collect',
+                label: t('decisionGraph.nodes.switchSpecification.hitPolicyCollect'),
                 disabled,
                 onClick: () => {
                   graphActions.updateNode(id, (draft) => {
@@ -231,7 +235,7 @@ const SwitchNode: React.FC<
         <div className='switchNode__body edit nodrag'>
           {!(statements?.length > 0) && (
             <Typography.Text type={'secondary'} className={'no-conditions'}>
-              No conditions
+              {t('decisionGraph.nodes.switchSpecification.noConditions')}
             </Typography.Text>
           )}
           {statements.map((statement, index) => (
@@ -401,7 +405,7 @@ const SwitchHandle: React.FC<{
           }}
         />
         {!disabled && configurable && (
-          <Popconfirm title='Remove condition?' okText='Remove' onConfirm={() => onDelete?.()}>
+          <Popconfirm title={t('decisionGraph.nodes.switchSpecification.removeConfirmTitle')} okText={t('decisionGraph.nodes.switchSpecification.okText')} onConfirm={() => onDelete?.()}>
             <Button className='switchNode__statement__delete' size='small' type='text' icon={<DeleteOutlined />} />
           </Popconfirm>
         )}

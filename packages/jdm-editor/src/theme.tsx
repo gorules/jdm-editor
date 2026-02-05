@@ -1,6 +1,8 @@
 import type { ThemeConfig as AntThemeConfig } from 'antd';
 import { ConfigProvider, theme as antTheme, theme } from 'antd';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
+import { I18nextProvider } from 'react-i18next';
+import i18nInstance from './i18n';
 
 declare module 'antd/es/theme/interface/alias' {
   export interface AliasToken {
@@ -13,12 +15,14 @@ export type ThemeConfig = Omit<AntThemeConfig, 'algorithm'> & {
 };
 
 export type JdmConfigProviderProps = {
+  locale?: string,
   theme?: ThemeConfig;
   prefixCls?: string;
   children?: React.ReactNode;
 };
 
 export const JdmConfigProvider: React.FC<JdmConfigProviderProps> = ({
+  locale = 'en',
   theme: { mode = 'light' as const, token = {}, ...restTheme } = {},
   prefixCls,
   children,
@@ -33,11 +37,18 @@ export const JdmConfigProvider: React.FC<JdmConfigProviderProps> = ({
     }
   }, [mode]);
 
+  // change language with locale prop
+  useEffect(() => {
+    i18nInstance.changeLanguage(locale);
+  }, [locale]);
+
   return (
-    <ConfigProvider prefixCls={prefixCls} theme={{ ...restTheme, algorithm, token: { ...token, mode, motion: false } }}>
-      <GlobalCssVariables mode={mode} />
-      {children}
-    </ConfigProvider>
+    <I18nextProvider i18n={i18nInstance}>
+      <ConfigProvider prefixCls={prefixCls} theme={{ ...restTheme, algorithm, token: { ...token, mode, motion: false } }}>
+        <GlobalCssVariables mode={mode} />
+        {children}
+      </ConfigProvider>
+    </I18nextProvider>
   );
 };
 

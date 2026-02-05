@@ -1,0 +1,282 @@
+{
+  "codeEditor": {
+    "livePreview": "Live Preview",
+    "noPreviewText": "Run simulation to see the results",
+    "baseTextInitial": "Based on simulation data",
+    "baseTextOther": "Based on live calculation"
+  },
+  "decisionGraph": {
+    "nodeSpecification": {
+      "shortDescription": "Execute decisions"
+    },
+    "graph": {
+      "graphTabs": {
+        "tabLabel": {
+          "Nodes": "Nodes",
+          "Graph": "Graph",
+          "Close": "Close",
+          "CloseAllTabs": "Close all Tabs",
+          "CloseOtherTabs": "Close other Tabs",
+          "CloseRight": "Close Tabs to the right",
+          "CloseLeft": "Clsoe Tabs to the left"
+        }
+      },
+      "graphNodes": {
+        "DecisionTables": "Decision Tables",
+        "Expressions": "Expressions",
+        "Functions": "Functions"
+      },
+      "tabJsonSchema": {
+        "schemaTooltip": "Provide JSON Schema format. If no JSON Schema is provided, validation will be skipped.",
+        "formatCode": "Format code",
+        "importFromJson": "Improt from JSON"
+      },
+      "jsonToJsonSchemaDialog": {
+        "title": "Convert to JSON Schema",
+        "okText": "Convert",
+        "tip": "Type or paste JSON or JSON5 model here and covert it to JSON Schema",
+        "copiedSuccess": "Copied to clipboard!",
+        "copiedError": "Failed to copy to clipboard."
+      },
+      "graphExcelDialog": {
+        "DialogTitle": "Map Excel data",
+        "Cancel": "Cancel",
+        "ExcelColumns": "Excel columns",
+        "DecisionTableColumns": "Decision table columns",
+        "DataType": "Data type",
+        "InfoTip": "Wrap value in quotes",
+        "SelectPlaceholder": "select field",
+        "InputFieldPlaceholder": "Enter field name",
+        "AddItem": "Add item",
+        "Input": "Input",
+        "Output": "Output",
+        "Next": "Next",
+        "Done": "Done",
+        "Previous": "Previous"
+      },
+      "graphSideToolbar": {
+        "uploadJDMExcelSuccess": "Excel file has been uploaded successfully!",
+        "uploadJDMExcelError": "Failed to upload Excel!",
+        "downloadJDMExcelSuccess": "Excel file has been downloaded successfully!",
+        "downloadJDMExcelError": "Failed to download Excel file!",
+        "labelUploadJson": "Upload JSON",
+        "labelUploadExcel": "Upload Excel",
+        "labelDownloadJson": "Download JSON",
+        "labelDownloadExcel": "Download Excel",
+        "Open": "Open",
+        "Close": "Close",
+        "panel": "panel"
+      }
+    },
+    "nodes": {
+      "graphNode": {
+        "Configure": "Configure",
+        "Documentation": "Documentation",
+        "CopyToClipboard": "Copy to clipboard",
+        "Duplicate": "Duplicate", 
+        "Delete": "Delete",
+        "DeleteNode": "Delete node",
+        "node": "node",
+        "DeleteConfirmText": "Are you sure you want to delete",
+        "Settings": "Settings"
+      },
+      "inputSpecification": {
+        "displayName": "Request",
+        "shortDescription": "Provides input context"
+      },
+      "outputSpecification": {
+        "displayName": "Response",
+        "shortDescription": "Outputs the context"
+      },
+      "switchSpecification": {
+        "displayName": "Switch",
+        "shortDescription": "Conditional branching",
+        "addCondition": "Add Condition",
+        "hitPolicyFirst": "First",
+        "hitPolicyCollect": "Collect",
+        "noConditions": "No conditions",
+        "removeConfirmTitle": "Remove condition?",
+        "okText": "Remove"
+      },
+      "functionSpecification": {
+        "displayName": "Function",
+        "shortDescription": "Javascript lambda",
+        "editFunction": "Edit Function"
+      },
+      "expressionSpecification": {
+        "displayName": "Expression",
+        "shortDescription": "Mapping utility",
+        "editExpression": "Edit Expression",
+        "passthrough": "Passthrough",
+        "inputField": "Input field",
+        "outputPath": "Output path",
+        "executionMode": "Execution mode",
+        "Single": "Single",
+        "Loop": "Loop"
+      },
+      "decisionTableSpecification": {
+        "displayName": "Decision table",
+        "shortDescription": "Rules spreadsheet",
+        "editTable": "Edit Table",
+        "hitPolicy": "Hit Policy",
+        "hitPolicyFirst": "First",
+        "hitPolicyCollect": "Collect",
+        "passthrough": "Passthrough",
+        "inputField": "Input field",
+        "outputPath": "Output path",
+        "executionMode": "Execution mode",
+        "Single": "Single",
+        "Loop": "Loop"
+      }
+    },
+    "simulator": {
+      "dgSimulator": {
+        "SearchNodesTip": "Search nodes...",
+        "Clear": "Clear",
+        "ReadyToSimulate": "Ready to simulate!",
+        "RunRequestTip": "Run a request to see the node trace in action.",
+        "LearnMore": "Learn more",
+        "Graph": "Graph",
+        "ClosePanel": "Close panel"
+      },
+      "simulatorEditor": {
+        "copiedSuccess": "Copied to clipboard!",
+        "copiedError": "Failed to copy to clipboard."
+      },
+      "simulatorRequestPanel": {
+        "Request": "Request",
+        "Run": "Run",
+        "requestTooltip": "Your business context that enters through the Request node, starting the decision process. Supply JSON or JSON5 format.",
+        "inputNodeTooltip": "Request node is required to run the graph. Drag-and-drop it from the Components panel.",
+        "invalidFormat": "Invalid format",
+        "invalidFormatDesc": "Unable to format request, invalid JSON format"
+      }
+    },
+    "hooks": {
+      "useGraphClipboard": {
+        "copiedSuccess": "Copied to clipboard!",
+        "pastedSuccess": "Pasted from clipboard!",
+        "pastedError": "Failed to paste from clipboard"
+      }
+    }
+  },
+  "decisionTable": {
+    "table": {
+      "table": {
+        "Description": "Description",
+        "addRow": "Add Row"
+      },
+      "tableHeadCell": {
+        "Inputs": "Inputs",
+        "Outputs": "Outputs",
+        "reorderFields": "Reorder fields",
+        "addInput": "Add input",
+        "addOutput": "Add output"
+      },
+      "contextMenu": {
+        "addRowBelow": "Add row below",
+        "addRowAbove": "Add row above",
+        "removeRow": "Remove row"
+      }
+    },
+    "dtCommandBar": {
+      "exportSuccess": "Excel file has been downloaded successfully!",
+      "exportError": "Failed to download Excel file!",
+      "importSuccess": "Excel file has been uploaded successfully!",
+      "importErrorFormat": "Only excel file with a single data sheet can be handled in a table view.",
+      "importError": "Failed to upload Excel!",
+      "exportExcel": "Export Excel",
+      "importExcel": "Import Excel",
+      "addRowBelow": "Add row below",
+      "addRowAbove": "Add row above",
+      "removeRowTip": "Remove row?",
+      "Deselect": "Deselect",
+      "okText": "Remove"
+    },
+    "dialog": {
+      "fieldAddDialog": {
+        "addAColumn": "Add a column",
+        "addColOkText": "Add",
+        "chooseFromList": "Choose from list",
+        "Label": "Label",
+        "Selector": "Selector",
+        "Field": "Field",
+        "defaultValue": "Default Value"
+      },
+      "fieldUpdateDialog": {
+        "UpdateColumn": "Update column",
+        "UpdateColOkText": "Update",
+        "ChooseFromList": "Choose from list",
+        "Label": "Label",
+        "Selector": "Selector",
+        "DefaultValue": "Default Value"
+      },
+      "fieldsReorderDialog": {
+        "Title": "Reorder fields",
+        "okText": "Update"
+      }
+    },
+    "components": {
+      "dtExcelDialog": {
+        "Input": "Input",
+        "Output": "Output",
+        "MapExcelData": "Map Excel data",
+        "ExcelColumns": "Excel Columns",
+        "DecisionTableColumns": "Decision table columns",
+        "DataType": "Data type",
+        "InfoTip": "Wrap value in quotes",
+        "SelectPlaceholder": "select field",
+        "InputFieldPlaceholder": "Enter field name",
+        "EnterFieldName": "Enter field name",
+        "AddItem": "Add Item"
+      },
+      "inputFieldEdit": {
+        "InputField": "Input Field",
+        "Cancel": "Cancel",
+        "Update": "Update"
+      },
+      "outputFieldEdit": {
+        "OutputField": "Output Field",
+        "Cancel": "Cancel",
+        "SetValue": "Set Value"
+      }
+    }
+  },
+  "expression": {
+    "expressionItem": {
+      "Key": "Key",
+      "Expression": "Expression"
+    },
+    "expressionList": {
+      "Key": "Key",
+      "Expression": "Expression",
+      "AddRow": "Add row"
+    },
+    "expressionCommandBar": {
+      "SimulationIndex": "Simulation index:"
+    },
+    "expressionItemContextMenu": {
+      "addRowBelow": "Add row below",
+      "addRowAbove": "Add row above"
+    }
+  },
+  "function": {
+    "functionDebugger": {
+      "FormatCode": "Format code",
+      "ImportLibrary": "Import library",
+      "GoToDocumentation": "Go to documentation"
+    },
+    "functionDebuggerLog": {
+      "CopyToClipboard": "Copy to clipboard",
+      "copiedSuccess": "Copied to clipboard!",
+      "copiedError": "Failed to copy to clipboard."
+    }
+  },
+  "confirmAction": {
+    "confirmText": "Really delete?",
+    "text": "Delete"
+  },
+  "editor": {
+    "addNode": "Add Node"
+  }
+}

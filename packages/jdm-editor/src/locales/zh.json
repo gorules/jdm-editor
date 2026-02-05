@@ -1,0 +1,282 @@
+{
+  "codeEditor": {
+    "livePreview": "实时预览",
+    "noPreviewText": "运行模拟以查看结果",
+    "baseTextInitial": "基于模拟数据",
+    "baseTextOther": "基于实时计算"
+  },
+  "decisionGraph": {
+    "nodeSpecification": {
+      "shortDescription": "执行决策"
+    },
+    "graph": {
+      "graphTabs": {
+        "tabLabel": {
+          "Nodes": "节点",
+          "Graph": "图",
+          "Close": "关闭",
+          "CloseAllTabs": "关闭全部",
+          "CloseOtherTabs": "关闭其他",
+          "CloseRight": "关闭右侧",
+          "CloseLeft": "关闭左侧"
+        }
+      },
+      "graphNodes": {
+        "DecisionTables": "决策表类",
+        "Expressions": "表达式类",
+        "Functions": "函数类"
+      },
+      "tabJsonSchema": {
+        "schemaTooltip": "请提供JSON模板格式. 否则, 将跳过校验.",
+        "formatCode": "格式化代码",
+        "importFromJson": "从JSON导入"
+      },
+      "jsonToJsonSchemaDialog": {
+        "title": "转换为JSON模板",
+        "okText": "转换",
+        "tip": "编写JSON/JSON5代码并转换为JSON模板",
+        "copiedSuccess": "已复制到剪切板!",
+        "copiedError": "复制出错!"
+      },
+      "graphExcelDialog": {
+        "DialogTitle": "对应Excel数据",
+        "Cancel": "取消",
+        "ExcelColumns": "Excel列",
+        "DecisionTableColumns": "决策表列",
+        "DataType": "数据类型",
+        "InfoTip": "引号包裹",
+        "SelectPlaceholder": "选择字段",
+        "InputFieldPlaceholder": "输入字段名",
+        "AddItem": "新增项目",
+        "Input": "输入",
+        "Output": "输出",
+        "Next": "下一个",
+        "Done": "完成",
+        "Previous": "上一个"
+      },
+      "graphSideToolbar": {
+        "uploadJDMExcelSuccess": "Excel文件上传成功!",
+        "uploadJDMExcelError": "Excel文件上传失败!",
+        "downloadJDMExcelSuccess": "Excel文件下载成功!",
+        "downloadJDMExcelError": "Excel文件下载失败!",
+        "labelUploadJson": "上传JSON",
+        "labelUploadExcel": "上传Excel",
+        "labelDownloadJson": "下载JSON",
+        "labelDownloadExcel": "下载Excel",
+        "Open": "打开",
+        "Close": "关闭",
+        "panel": "面板"
+      }
+    },
+    "nodes": {
+      "graphNode": {
+        "Configure": "配置",
+        "Documentation": "文档",
+        "CopyToClipboard": "复制到剪切板",
+        "Duplicate": "复制节点", 
+        "Delete": "删除",
+        "DeleteNode": "删除节点",
+        "node": "节点",
+        "DeleteConfirmText": "确认要删除",
+        "Settings": "设置"
+      },
+      "inputSpecification": {
+        "displayName": "请求",
+        "shortDescription": "提供请求上正文"
+      },
+      "outputSpecification": {
+        "displayName": "响应",
+        "shortDescription": "输出响应数据"
+      },
+      "switchSpecification": {
+        "displayName": "分支",
+        "shortDescription": "条件分支",
+        "addCondition": "新增分支",
+        "hitPolicyFirst": "优先",
+        "hitPolicyCollect": "汇集",
+        "noConditions": "无数据",
+        "removeConfirmTitle": "删除分支?",
+        "okText": "删除"
+      },
+      "functionSpecification": {
+        "displayName": "函数",
+        "shortDescription": "Javascript函数",
+        "editFunction": "编辑函数"
+      },
+      "expressionSpecification": {
+        "displayName": "表达式",
+        "shortDescription": "绑定工具",
+        "editExpression": "编辑表达式",
+        "passthrough": "直通",
+        "inputField": "输入字段",
+        "outputPath": "输出字段",
+        "executionMode": "执行模式",
+        "Single": "单次",
+        "Loop": "循环"
+      },
+      "decisionTableSpecification": {
+        "displayName": "决策表",
+        "shortDescription": "规则表格",
+        "editTable": "编辑表格",
+        "hitPolicy": "命中策略",
+        "hitPolicyFirst": "优先",
+        "hitPolicyCollect": "汇集",
+        "passthrough": "直通",
+        "inputField": "输入字段",
+        "outputPath": "输出字段",
+        "executionMode": "执行模式",
+        "Single": "单次",
+        "Loop": "循环"
+      }
+    },
+    "simulator": {
+      "dgSimulator": {
+        "SearchNodesTip": "搜索节点...",
+        "Clear": "清除",
+        "ReadyToSimulate": "准备好模拟测试!",
+        "RunRequestTip": "运行测试以查看追踪.",
+        "LearnMore": "查看更多",
+        "Graph": "图",
+        "ClosePanel": "关闭面板"
+      },
+      "simulatorEditor": {
+        "copiedSuccess": "已复制到剪切板!",
+        "copiedError": "复制出错!"
+      },
+      "simulatorRequestPanel": {
+        "Request": "请求",
+        "Run": "运行",
+        "requestTooltip": "开启决策流程所请求的业务数据, 支持JSON/JSON5格式.",
+        "inputNodeTooltip": "必须有Request节点才能运行, 可从组件面板拖拽新建.",
+        "invalidFormat": "格式错误",
+        "invalidFormatDesc": "无法格式化，JSON格式错误"
+      }
+    },
+    "hooks": {
+      "useGraphClipboard": {
+        "copiedSuccess": "已复制到剪切板!",
+        "pastedSuccess": "粘贴成功!",
+        "pastedError": "粘贴失败!"
+      }
+    }
+  },
+  "decisionTable": {
+    "table": {
+      "table": {
+        "Description": "描述",
+        "addRow": "新增行"
+      },
+      "tableHeadCell": {
+        "Inputs": "输入",
+        "Outputs": "输出",
+        "reorderFields": "字段重排",
+        "addInput": "新增输入",
+        "addOutput": "新增输出"
+      },
+      "contextMenu": {
+        "addRowBelow": "在下方新增行",
+        "addRowAbove": "在上方新增行",
+        "removeRow": "删除行"
+      }
+    },
+    "dtCommandBar": {
+      "exportSuccess": "下载Excel文件成功!",
+      "exportError": "下载Excel文件失败!",
+      "importSuccess": "上传Excel文件成功",
+      "importErrorFormat": "只能上传单表Excel文件!",
+      "importError": "上传Excel文件失败!",
+      "exportExcel": "导出Excel",
+      "importExcel": "导入Excel",
+      "addRowBelow": "在下方新增行",
+      "addRowAbove": "在上方新增行",
+      "removeRowTip": "删除行?",
+      "Deselect": "取消选择",
+      "okText": "删除"
+    },
+    "dialog": {
+      "fieldAddDialog": {
+        "addAColumn": "新增一列",
+        "addColOkText": "新增",
+        "chooseFromList": "从列表选择",
+        "Label": "标签",
+        "Selector": "选择",
+        "Field": "字段",
+        "defaultValue": "默认值"
+      },
+      "fieldUpdateDialog": {
+        "UpdateColumn": "更新列",
+        "UpdateColOkText": "更新",
+        "ChooseFromList": "从列表选择",
+        "Label": "标签",
+        "Selector": "选择",
+        "DefaultValue": "默认值"
+      },
+      "fieldsReorderDialog": {
+        "Title": "字段重排",
+        "okText": "更新"
+      }
+    },
+    "components": {
+      "dtExcelDialog": {
+        "Input": "输入",
+        "Output": "输出",
+        "MapExcelData": "映射Excel数据",
+        "ExcelColumns": "Excel列",
+        "DecisionTableColumns": "决策表列",
+        "DataType": "数据类型",
+        "InfoTip": "引号包裹",
+        "SelectPlaceholder": "选择字段",
+        "InputFieldPlaceholder": "输入字段",
+        "EnterFieldName": "输入字段名",
+        "AddItem": "新增项目"
+      },
+      "inputFieldEdit": {
+        "InputField": "输入字段",
+        "Cancel": "取消",
+        "Update": "更新"
+      },
+      "outputFieldEdit": {
+        "OutputField": "输出字段",
+        "Cancel": "取消",
+        "SetValue": "设置"
+      }
+    }
+  },
+  "expression": {
+    "expressionItem": {
+      "Key": "字段",
+      "Expression": "表达式"
+    },
+    "expressionList": {
+      "Key": "字段",
+      "Expression": "表达式",
+      "AddRow": "新增行"
+    },
+    "expressionCommandBar": {
+      "SimulationIndex": "模拟器:"
+    },
+    "expressionItemContextMenu": {
+      "addRowBelow": "在下方新增行",
+      "addRowAbove": "在上方新增行"
+    }
+  },
+  "function": {
+    "functionDebugger": {
+      "FormatCode": "格式化代码",
+      "ImportLibrary": "导入库",
+      "GoToDocumentation": "查看文档"
+    },
+    "functionDebuggerLog": {
+      "CopyToClipboard": "复制到剪切板",
+      "copiedSuccess": "已复制到剪切板!",
+      "copiedError": "复制出错!"
+    }
+  },
+  "confirmAction": {
+    "confirmText": "确认删除?",
+    "text": "删除"
+  },
+  "editor": {
+    "addNode": "Add Node"
+  }
+}

@@ -2,6 +2,7 @@ import { CloudDownloadOutlined, CloudUploadOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Button, Dropdown, Tooltip, message } from 'antd';
 import React, { Fragment, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { ParsedExcelData } from '../../../helpers/excel';
 import { exportDecisionTable, getExcelData } from '../../../helpers/excel';
@@ -20,6 +21,8 @@ export type GraphSideToolbarProps = {
 };
 
 export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
+  // translation
+  const { t } = useTranslation();
   const decisionGraphRaw = useDecisionGraphRaw();
   const fileInput = useRef<HTMLInputElement>(null);
   const excelFileInput = useRef<HTMLInputElement>(null);
@@ -89,10 +92,10 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
 
         setExcelGraphData(excelData);
 
-        message.success('Excel file has been uploaded successfully!');
+        message.success(t('decisionGraph.graph.graphSideToolbar.uploadJDMExcelSuccess'));
       };
     } catch {
-      message.error('Failed to upload Excel!');
+      message.error(t('decisionGraph.graph.graphSideToolbar.uploadJDMExcelError'));
     }
   };
 
@@ -254,21 +257,21 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
         }));
 
       await exportDecisionTable(fileName, decisionTableNodes);
-      message.success('Excel file has been downloaded successfully!');
+      message.success(t('decisionGraph.graph.graphSideToolbar.downloadJDMExcelSuccess'));
     } catch {
-      message.error('Failed to download Excel file!');
+      message.error(t('decisionGraph.graph.graphSideToolbar.downloadJDMExcelError'));
     }
   };
 
   const uploadItems: MenuProps['items'] = [
     !viewConfig?.enabled && {
       key: 'upload-json',
-      label: 'Upload JSON',
+      label: t('decisionGraph.graph.graphSideToolbar.labelUploadJson'),
       onClick: () => fileInput?.current?.click?.(),
     },
     {
       key: 'upload-excel',
-      label: 'Upload Excel',
+      label: t('decisionGraph.graph.graphSideToolbar.labelUploadExcel'),
       onClick: () => excelFileInput?.current?.click?.(),
     },
   ].filter((item) => !!item);
@@ -276,12 +279,12 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
   const downloadItems: MenuProps['items'] = [
     !viewConfig?.enabled && {
       key: 'download-json',
-      label: 'Download JSON',
+      label: t('decisionGraph.graph.graphSideToolbar.labelDownloadJson'),
       onClick: () => downloadJDM(),
     },
     {
       key: 'download-excel',
-      label: 'Download Excel',
+      label: t('decisionGraph.graph.graphSideToolbar.labelDownloadExcel'),
       onClick: () => downloadJDMExcel(),
     },
   ].filter((item) => !!item);
@@ -326,7 +329,7 @@ export const GraphSideToolbar: React.FC<GraphSideToolbarProps> = () => {
               return (
                 <Tooltip
                   key={panel.id}
-                  title={`${!isActive ? 'Open' : 'Close'} ${panel.title.toLowerCase()} panel`}
+                  title={`${!isActive ? t('decisionGraph.graph.graphSideToolbar.Open') : t('decisionGraph.graph.graphSideToolbar.Close')} ${panel.title.toLowerCase()} ${t('decisionGraph.graph.graphSideToolbar.panel')}`}
                   placement={'right'}
                 >
                   <Button

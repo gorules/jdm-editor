@@ -7,6 +7,7 @@ import clsx from 'clsx';
 import equal from 'fast-deep-equal/es6/react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
+import { useTranslation } from 'react-i18next';
 
 import { useDecisionTableActions, useDecisionTableListeners, useDecisionTableState } from '../context/dt-store.context';
 import { TableContextMenu } from './table-context-menu';
@@ -45,6 +46,8 @@ const loadColumnSizing = (id?: string) => {
 
 export const Table: React.FC<TableProps> = ({ id, maxHeight }) => {
   const { token } = theme.useToken();
+  // translation
+  const { t } = useTranslation();
 
   const tableActions = useDecisionTableActions();
   const { cellRenderer } = useDecisionTableListeners(({ cellRenderer }) => ({ cellRenderer }));
@@ -113,7 +116,7 @@ export const Table: React.FC<TableProps> = ({ id, maxHeight }) => {
         accessorKey: '_description',
         header: () => (
           <div className={'head-cell'}>
-            <Typography.Text className='grl-dt-text-primary'>Description</Typography.Text>
+            <Typography.Text className='grl-dt-text-primary'>{t('decisionTable.table.table.Description')}</Typography.Text>
           </div>
         ),
         minSize: minColWidth,
@@ -221,7 +224,7 @@ export const Table: React.FC<TableProps> = ({ id, maxHeight }) => {
                   icon={<PlusCircleOutlined />}
                   onClick={() => tableActions.addRowBelow()}
                 >
-                  Add row
+                  {t('decisionTable.table.table.addRow')}
                 </Button>
               </div>
             </td>

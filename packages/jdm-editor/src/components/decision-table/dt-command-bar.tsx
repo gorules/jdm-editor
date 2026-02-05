@@ -9,6 +9,7 @@ import {
 import { Button, Divider, Popconfirm, Select, Tooltip, Typography, message } from 'antd';
 import React, { useMemo, useRef, useState } from 'react';
 import { P, match } from 'ts-pattern';
+import { useTranslation } from 'react-i18next';
 
 import type { ParsedExcelData } from '../../helpers/excel';
 import { exportDecisionTable, getExcelData } from '../../helpers/excel';
@@ -23,6 +24,8 @@ import {
 } from './context/dt-store.context';
 
 export const DecisionTableCommandBar: React.FC = () => {
+  // translation
+  const { t } = useTranslation();
   const [excelData, setExcelData] = useState<ParsedExcelData[] | null>();
 
   const handleDataMapping = (mappedExcelData: MappedExcelData) => {
@@ -113,10 +116,10 @@ export const DecisionTableCommandBar: React.FC = () => {
       await exportDecisionTable(name ?? 'table', [
         { ...decisionTable, name: 'decision table', id: crypto.randomUUID() },
       ]);
-      message.success('Excel file has been downloaded successfully!');
+      message.success(t('decisionTable.dtCommandBar.exportSuccess'));
     } catch (e) {
-      console.error('Failed to download Excel file!', e);
-      message.error('Failed to download Excel file!');
+      console.error(t('decisionTable.dtCommandBar.exportError'), e);
+      message.error(t('decisionTable.dtCommandBar.exportError'));
     }
   };
 
@@ -139,13 +142,13 @@ export const DecisionTableCommandBar: React.FC = () => {
 
         if (excelData.length === 1) {
           setExcelData(excelData);
-          message.success('Excel file has been uploaded successfully!');
+          message.success(t('decisionTable.dtCommandBar.importSuccess'));
         } else {
-          message.error('Only excel file with a single data sheet can be handled in a table view.');
+          message.error(t('decisionTable.dtCommandBar.importErrorFormat'));
         }
       };
     } catch {
-      message.error('Failed to upload Excel!');
+      message.error(t('decisionTable.dtCommandBar.importError'));
     }
   };
 
@@ -165,7 +168,7 @@ export const DecisionTableCommandBar: React.FC = () => {
       <Stack horizontal horizontalAlign={'space-between'} verticalAlign={'center'} className={'grl-dt__command-bar'}>
         <Stack gap={8} horizontal className='full-width'>
           <Button type='text' size={'small'} icon={<ExportOutlined />} onClick={exportExcel}>
-            Export Excel
+            {t('decisionTable.dtCommandBar.exportExcel')}
           </Button>
           <Button
             type='text'
@@ -174,7 +177,7 @@ export const DecisionTableCommandBar: React.FC = () => {
             icon={<ImportOutlined />}
             onClick={() => importExcel()}
           >
-            Import Excel
+            {t('decisionTable.dtCommandBar.importExcel')}
           </Button>
           {cursor && !disabled && (
             <>
@@ -184,7 +187,7 @@ export const DecisionTableCommandBar: React.FC = () => {
                   height: 24,
                 }}
               />
-              <Tooltip title={'Add row below'}>
+              <Tooltip title={t('decisionTable.dtCommandBar.addRowBelow')}>
                 <Button
                   type='text'
                   size={'small'}
@@ -192,7 +195,7 @@ export const DecisionTableCommandBar: React.FC = () => {
                   onClick={() => tableActions.addRowBelow(cursor?.y)}
                 />
               </Tooltip>
-              <Tooltip title={'Add row above'}>
+              <Tooltip title={t('decisionTable.dtCommandBar.addRowAbove')}>
                 <Button
                   type='text'
                   size={'small'}
@@ -201,12 +204,12 @@ export const DecisionTableCommandBar: React.FC = () => {
                 />
               </Tooltip>
               <Tooltip>
-                <Popconfirm title='Remove row?' okText='Remove' onConfirm={() => tableActions.removeRow(cursor?.y)}>
+                <Popconfirm title={t('decisionTable.dtCommandBar.removeRowTip')} okText={t('decisionTable.dtCommandBar.okText')} onConfirm={() => tableActions.removeRow(cursor?.y)}>
                   <Button type='text' danger size={'small'} icon={<DeleteOutlined />} />
                 </Popconfirm>
               </Tooltip>
               <Button type='text' size={'small'} icon={<CloseOutlined />} onClick={() => tableActions.setCursor(null)}>
-                Deselect
+                {t('decisionTable.dtCommandBar.Deselect')}
               </Button>
             </>
           )}

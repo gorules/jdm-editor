@@ -12,6 +12,7 @@ import { GraphNode } from '../graph-node';
 import { NodeColor } from './colors';
 import type { NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
+import i18nInstance from '../../../../i18n';
 
 export type NodeFunctionData =
   | string
@@ -19,12 +20,15 @@ export type NodeFunctionData =
       source: string;
     };
 
+// translation
+const { t } = i18nInstance;
+
 export const functionSpecification: NodeSpecification<NodeFunctionData> = {
   type: NodeKind.Function,
   icon: <Typography.Text style={{ color: 'white', fontSize: 'inherit' }}>JS</Typography.Text>,
-  displayName: 'Function',
+  displayName: t('decisionGraph.nodes.functionSpecification.displayName'),
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/functions',
-  shortDescription: 'Javascript lambda',
+  shortDescription: t('decisionGraph.nodes.functionSpecification.shortDescription'),
   color: NodeColor.Orange,
   renderTab: ({ id }) => <TabFunction id={id} />,
   getDiffContent: (current, previous): any => {
@@ -94,7 +98,7 @@ export const functionSpecification: NodeSpecification<NodeFunctionData> = {
         helper={[kind === FunctionKind.Deprecated && <DeprecatedFunctionWarning size={16} />]}
         actions={[
           <Button key='edit-function' type='text' onClick={() => graphActions.openTab(id)}>
-            Edit Function
+            {t('decisionGraph.nodes.functionSpecification.editFunction')}
           </Button>,
         ]}
       />
