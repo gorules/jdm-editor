@@ -2,6 +2,7 @@ import { Editor } from '@monaco-editor/react';
 import { Spin, message, theme } from 'antd';
 import json5 from 'json5';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { copyToClipboard } from '../../../helpers/utility';
 
@@ -12,6 +13,8 @@ type SimulatorEditorProps = {
 };
 
 export const SimulatorEditor: React.FC<SimulatorEditorProps> = ({ value, onChange, readOnly }) => {
+  // translation
+  const { t } = useTranslation();
   const { token } = theme.useToken();
 
   return (
@@ -39,9 +42,9 @@ export const SimulatorEditor: React.FC<SimulatorEditorProps> = ({ value, onChang
           run: async (editor) => {
             try {
               await copyToClipboard(JSON.stringify(json5.parse(editor.getValue())));
-              message.success('Copied to clipboard!');
+              message.success(t('decisionGraph.simulator.simulatorEditor.copiedSuccess'));
             } catch {
-              message.error('Failed to copy to clipboard.');
+              message.error(t('decisionGraph.simulator.simulatorEditor.copiedError'));
             }
           },
         });

@@ -13,18 +13,22 @@ import { GraphNode } from '../graph-node';
 import { NodeColor } from './colors';
 import type { NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
+import i18nInstance from '../../../../i18n';
 
 type InferredContent = z.infer<typeof outputNodeSchema>['content'];
 
 export type NodeOutputData = InferredContent & Diff;
 
+// translation
+const { t } = i18nInstance;
+
 export const outputSpecification: NodeSpecification<NodeOutputData> = {
   type: NodeKind.Output,
   icon: <ArrowRightFromLineIcon size='1em' />,
   color: NodeColor.Green,
-  displayName: 'Response',
+  displayName: t('decisionGraph.nodes.outputSpecification.displayName'),
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions',
-  shortDescription: 'Outputs the context',
+  shortDescription: t('decisionGraph.nodes.outputSpecification.shortDescription'),
   generateNode: () => ({ name: 'response', content: { schema: '' } }),
   renderTab: ({ id, manager }) => <TabJsonSchema id={id} manager={manager} type={'output'} />,
   renderNode: ({ id, data, selected, specification }) => {
@@ -38,7 +42,7 @@ export const outputSpecification: NodeSpecification<NodeOutputData> = {
         handleRight={false}
         actions={[
           <Button key='edit-table' type='text' onClick={() => graphActions.openTab(id)}>
-            Configure
+            {t('decisionGraph.nodes.graphNode.Configure')}
           </Button>,
         ]}
       />

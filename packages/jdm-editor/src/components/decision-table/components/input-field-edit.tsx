@@ -3,6 +3,7 @@ import { Button, Popover, Typography } from 'antd';
 import clsx from 'clsx';
 import { ChevronDownIcon } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { CodeEditorRef } from '../../code-editor';
 import { CodeEditor } from '../../code-editor';
@@ -34,6 +35,8 @@ export const InputFieldEdit: React.FC<InputFieldEditProps> = ({
   const [open, setOpen] = useState(false);
   const [innerValue, setInnerValue] = useState(value);
   const codeEditor = useRef<CodeEditorRef>(null);
+  // translation
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (open) {
@@ -80,7 +83,7 @@ export const InputFieldEdit: React.FC<InputFieldEditProps> = ({
             }
           }}
         >
-          <Typography.Text style={{ fontSize: 12, display: 'block', marginBottom: 2 }}>Input Field</Typography.Text>
+          <Typography.Text style={{ fontSize: 12, display: 'block', marginBottom: 2 }}>{t('decisionTable.components.inputFieldEdit.InputField')}</Typography.Text>
           <CodeEditor
             ref={codeEditor}
             value={innerValue}
@@ -98,7 +101,7 @@ export const InputFieldEdit: React.FC<InputFieldEditProps> = ({
               <ConfirmAction iconOnly onConfirm={onRemove} disabled={disabled} />
               <Stack horizontal width='auto' verticalAlign='end'>
                 <Button size='small' type='text' onClick={() => setOpen(false)}>
-                  Cancel
+                  {t('decisionTable.components.inputFieldEdit.Cancel')}
                 </Button>
                 <Button
                   size='small'
@@ -109,7 +112,7 @@ export const InputFieldEdit: React.FC<InputFieldEditProps> = ({
                     setOpen(false);
                   }}
                 >
-                  Update
+                  {t('decisionTable.components.inputFieldEdit.Update')}
                 </Button>
               </Stack>
             </div>

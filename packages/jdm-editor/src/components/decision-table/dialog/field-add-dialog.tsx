@@ -1,5 +1,6 @@
 import { Cascader, Form, Input, Modal } from 'antd';
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { SchemaSelectProps } from '../../../helpers/components';
 import { recursiveSelect } from '../../../helpers/components';
@@ -20,6 +21,8 @@ export type FieldAddProps = {
 
 export const FieldAdd: React.FC<FieldAddProps> = (props) => {
   const { isOpen, onDismiss, onSuccess, schema, getContainer } = props;
+  // translation
+  const { t } = useTranslation();
   const { inputVariableType } = useDecisionTableState(({ inputVariableType }) => ({ inputVariableType }));
   const [form] = Form.useForm<TableSchemaItem>();
   const type = Form.useWatch('type', form);
@@ -32,12 +35,12 @@ export const FieldAdd: React.FC<FieldAddProps> = (props) => {
 
   return (
     <Modal
-      title='Add a column'
+      title={t('decisionTable.dialog.fieldAddDialog.addAColumn')}
       open={isOpen}
       destroyOnClose
       onCancel={onDismiss}
       width={360}
-      okText='Add'
+      okText={t('decisionTable.dialog.fieldAddDialog.addColOkText')}
       okButtonProps={{
         form: 'field-add-dialog',
         htmlType: 'submit',
@@ -60,7 +63,7 @@ export const FieldAdd: React.FC<FieldAddProps> = (props) => {
         }}
       >
         {schema && (
-          <Form.Item label={'Choose from list'}>
+          <Form.Item label={t('decisionTable.dialog.fieldAddDialog.chooseFromList')}>
             <Cascader
               fieldNames={{ label: 'name', value: 'field', children: 'items' }}
               options={schema}
@@ -76,12 +79,12 @@ export const FieldAdd: React.FC<FieldAddProps> = (props) => {
             ></Cascader>
           </Form.Item>
         )}
-        <Form.Item name='name' label='Label' rules={[{ required: true }]}>
+        <Form.Item name='name' label={t('decisionTable.dialog.fieldAddDialog.Label')} rules={[{ required: true }]}>
           <Input autoComplete='off' />
         </Form.Item>
         <Form.Item
           name='field'
-          label={type === 'expression' ? 'Selector' : 'Field'}
+          label={type === 'expression' ? t('decisionTable.dialog.fieldAddDialog.Selector') : t('decisionTable.dialog.fieldAddDialog.Field')}
           rules={[{ required: props.columnType === 'outputs' }]}
         >
           {props.columnType === 'inputs' ? (
@@ -90,7 +93,7 @@ export const FieldAdd: React.FC<FieldAddProps> = (props) => {
             <AutosizeTextArea maxRows={3} />
           )}
         </Form.Item>
-        <Form.Item name='defaultValue' label='Default Value'>
+        <Form.Item name='defaultValue' label={t('decisionTable.dialog.fieldAddDialog.defaultValue')}>
           <Input autoComplete='off' />
         </Form.Item>
       </Form>

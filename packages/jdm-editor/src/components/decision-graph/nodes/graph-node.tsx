@@ -6,6 +6,7 @@ import React from 'react';
 import type { HandleProps } from 'reactflow';
 import { Handle, Position } from 'reactflow';
 import { P, match } from 'ts-pattern';
+import { useTranslation } from 'react-i18next';
 
 import { platform } from '../../../helpers/platform';
 import { usePersistentState } from '../../../helpers/use-persistent-state';
@@ -62,41 +63,44 @@ export const GraphNode = React.forwardRef<HTMLDivElement, GraphNodeProps>(
 
     const { diff } = useNodeDiff(id);
 
+    // translation
+    const { t } = useTranslation();
+
     const Settings = specification.renderSettings;
 
     const menuItems = [
       specification.documentationUrl
         ? {
-            key: 'documentation',
-            label: <SpacedText left='Documentation' right={<BookOutlined />} />,
-            onClick: () => window.open(specification.documentationUrl, '_href'),
-          }
+          key: 'documentation',
+          label: <SpacedText left={t('decisionGraph.nodes.graphNode.Documentation')} right={<BookOutlined />} />,
+          onClick: () => window.open(specification.documentationUrl, '_href'),
+        }
         : null,
       specification.documentationUrl ? { key: 'divider-1', type: 'divider' } : null,
       !displayError && {
         key: 'copy-clipboard',
-        label: <SpacedText left='Copy to clipboard' right={platform.shortcut('Ctrl + C')} />,
+        label: <SpacedText left={t('decisionGraph.nodes.graphNode.CopyToClipboard')} right={platform.shortcut('Ctrl + C')} />,
         onClick: () => graphActions.copyNodes([id]),
       },
       !displayError && {
         key: 'duplicate',
         disabled,
-        label: <SpacedText left='Duplicate' right={platform.shortcut('Ctrl + D')} />,
+        label: <SpacedText left={t('decisionGraph.nodes.graphNode.Duplicate')} right={platform.shortcut('Ctrl + D')} />,
         onClick: () => graphActions.duplicateNodes([id]),
       },
       !displayError && { key: 'divider-2', type: 'divider' },
       {
         key: 'delete',
         danger: true,
-        label: <SpacedText left='Delete' right={platform.shortcut('Backspace')} />,
+        label: <SpacedText left={t('decisionGraph.nodes.graphNode.Delete')} right={platform.shortcut('Backspace')} />,
         disabled,
         onClick: () =>
           Modal.confirm({
             icon: null,
-            title: 'Delete node',
+            title: t('decisionGraph.nodes.graphNode.DeleteNode'),
             content: (
               <Typography.Text>
-                Are you sure you want to delete <Typography.Text strong>{name}</Typography.Text> node.
+                {t('decisionGraph.nodes.graphNode.DeleteConfirmText')} <Typography.Text strong>{name}</Typography.Text> {t('decisionGraph.nodes.graphNode.node')}.
               </Typography.Text>
             ),
             okButtonProps: { danger: true },
@@ -145,19 +149,19 @@ export const GraphNode = React.forwardRef<HTMLDivElement, GraphNodeProps>(
             !Settings
               ? actions
               : [
-                  ...(actions ?? []),
-                  <Button
-                    key='settings'
-                    type='text'
-                    style={{ marginLeft: 'auto' }}
-                    onClick={() => {
-                      setDetailsOpen(currentDetails === Details.Settings ? !detailsOpen : true);
-                      setCurrentDetails(Details.Settings);
-                    }}
-                  >
-                    Settings
-                  </Button>,
-                ]
+                ...(actions ?? []),
+                <Button
+                  key='settings'
+                  type='text'
+                  style={{ marginLeft: 'auto' }}
+                  onClick={() => {
+                    setDetailsOpen(currentDetails === Details.Settings ? !detailsOpen : true);
+                    setCurrentDetails(Details.Settings);
+                  }}
+                >
+                  {t('decisionGraph.nodes.graphNode.Settings')}
+                </Button>,
+              ]
           }
           status={match([nodeTrace, nodeError, displayError])
             .with([P._, P._, true], () => 'error' as const)

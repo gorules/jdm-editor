@@ -16,18 +16,22 @@ import { GraphNode } from '../graph-node';
 import { NodeColor } from './colors';
 import type { NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
+import i18nInstance from '../../../../i18n';
 
 type InferredContent = z.infer<typeof inputNodeSchema>['content'];
 
 export type NodeInputData = InferredContent & Diff;
 
+// translation
+const { t } = i18nInstance;
+
 export const inputSpecification: NodeSpecification<NodeInputData> = {
   type: NodeKind.Input,
   icon: <ArrowRightToLineIcon size='1em' />,
-  displayName: 'Request',
+  displayName: t('decisionGraph.nodes.inputSpecification.displayName'),
   color: NodeColor.Green,
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions',
-  shortDescription: 'Provides input context',
+  shortDescription: t('decisionGraph.nodes.inputSpecification.shortDescription'),
   generateNode: () => ({
     name: 'request',
     content: {
@@ -50,29 +54,29 @@ export const inputSpecification: NodeSpecification<NodeInputData> = {
         handleLeft={false}
         actions={[
           <Button key='edit-table' type='text' onClick={() => graphActions.openTab(id)}>
-            Configure
+            {t('decisionGraph.nodes.graphNode.Configure')}
           </Button>,
         ]}
         menuItems={[
           {
             key: 'documentation',
             icon: <BookOutlined />,
-            label: 'Documentation',
+            label: t('decisionGraph.nodes.graphNode.Documentation'),
             onClick: () => window.open(specification.documentationUrl, '_href'),
           },
           {
             key: 'delete',
             icon: <DeleteOutlined />,
             danger: true,
-            label: <SpacedText left='Delete' right={platform.shortcut('Backspace')} />,
+            label: <SpacedText left={t('decisionGraph.nodes.graphNode.Delete')} right={platform.shortcut('Backspace')} />,
             disabled,
             onClick: () =>
               Modal.confirm({
                 icon: null,
-                title: 'Delete node',
+                title: t('decisionGraph.nodes.graphNode.DeleteNode'),
                 content: (
                   <Typography.Text>
-                    Are you sure you want to delete <Typography.Text strong>{data.name}</Typography.Text> node.
+                    {t('decisionGraph.nodes.graphNode.DeleteConfirmText')} <Typography.Text strong>{data.name}</Typography.Text> {t('decisionGraph.nodes.graphNode.node')}.
                   </Typography.Text>
                 ),
                 okButtonProps: { danger: true },

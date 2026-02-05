@@ -3,6 +3,7 @@ import { Avatar, Button, Card, Col, Input, Row, Space, Typography } from 'antd';
 import clsx from 'clsx';
 import React, { useMemo, useState } from 'react';
 import { match } from 'ts-pattern';
+import { useTranslation } from 'react-i18next';
 
 import { useDecisionGraphActions, useDecisionGraphListeners, useDecisionGraphState } from '../context/dg-store.context';
 import { type DecisionNode } from '../dg-types';
@@ -27,6 +28,8 @@ export const GraphNodes: React.FC<GraphComponentsProps> = React.memo(({ classNam
 
   const { openTab } = useDecisionGraphActions();
   const onViewConfigCta = useDecisionGraphListeners((s) => s.onViewConfigCta);
+  // translation
+  const { t } = useTranslation();
 
   const nodes = useMemo(() => {
     return (decisionGraph?.nodes || [])
@@ -102,15 +105,15 @@ export const GraphNodes: React.FC<GraphComponentsProps> = React.memo(({ classNam
 
     return [
       {
-        title: 'Decision Tables',
+        title: t('decisionGraph.graph.graphNodes.DecisionTables'),
         nodes: filtered.filter((node) => node.type === NodeKind.DecisionTable),
       },
       {
-        title: 'Expressions',
+        title: t('decisionGraph.graph.graphNodes.Expressions'),
         nodes: filtered.filter((node) => node.type === NodeKind.Expression),
       },
       {
-        title: 'Functions',
+        title: t('decisionGraph.graph.graphNodes.Functions'),
         nodes: filtered.filter((node) => node.type === NodeKind.Function),
       },
     ];

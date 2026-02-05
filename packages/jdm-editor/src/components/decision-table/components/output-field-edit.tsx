@@ -3,6 +3,7 @@ import { Button, Input, Popover, Typography } from 'antd';
 import clsx from 'clsx';
 import { ChevronDownIcon } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ConfirmAction } from '../../confirm-action';
 import { Stack } from '../../stack';
@@ -25,6 +26,8 @@ export const OutputFieldEdit: React.FC<OutputFieldEditProps> = ({
   const [open, setOpen] = useState(false);
   const [innerValue, setInnerValue] = useState(value);
   const input = useRef<InputRef>(null);
+  // translation
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (open) {
@@ -65,13 +68,13 @@ export const OutputFieldEdit: React.FC<OutputFieldEditProps> = ({
             }
           }}
         >
-          <Typography.Text style={{ fontSize: 12, display: 'block', marginBottom: 2 }}>Output Field</Typography.Text>
+          <Typography.Text style={{ fontSize: 12, display: 'block', marginBottom: 2 }}>{t('decisionTable.components.outputFieldEdit.OutputField')}</Typography.Text>
           <Input ref={input} value={innerValue} onChange={(e) => setInnerValue(e.target.value)} readOnly={disabled} />
           <div className='grl-field-edit__footer'>
             <ConfirmAction iconOnly onConfirm={onRemove} disabled={disabled} />
             <Stack horizontal width='auto' verticalAlign='end'>
               <Button size='small' type='text' onClick={() => setOpen(false)}>
-                Cancel
+                {t('decisionTable.components.outputFieldEdit.Cancel')}
               </Button>
               <Button
                 disabled={disabled}
@@ -82,7 +85,7 @@ export const OutputFieldEdit: React.FC<OutputFieldEditProps> = ({
                   setOpen(false);
                 }}
               >
-                Set value
+                {t('decisionTable.components.outputFieldEdit.SetValue')}
               </Button>
             </Stack>
           </div>

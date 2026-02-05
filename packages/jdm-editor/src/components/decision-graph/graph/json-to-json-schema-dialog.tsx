@@ -3,6 +3,7 @@ import { Modal, Spin, Typography, message, theme } from 'antd';
 import json5 from 'json5';
 import React, { useEffect, useState } from 'react';
 import toJsonSchema from 'to-json-schema';
+import { useTranslation } from 'react-i18next';
 
 import { copyToClipboard } from '../../../helpers/utility';
 
@@ -18,6 +19,8 @@ export const JsonToJsonSchemaDialog: React.FC<JsonToJsonSchemaDialogProps> = (pr
   const { isOpen, onDismiss, onSuccess, model } = props;
 
   const { token } = theme.useToken();
+  // translation
+  const { t } = useTranslation();
 
   const [value, setValue] = useState<string>('');
 
@@ -29,12 +32,12 @@ export const JsonToJsonSchemaDialog: React.FC<JsonToJsonSchemaDialogProps> = (pr
 
   return (
     <Modal
-      title='Convert to JSON Schema'
+      title={t('decisionGraph.graph.jsonToJsonSchemaDialog.title')}
       open={isOpen}
       destroyOnClose
       onCancel={onDismiss}
       width={540}
-      okText='Convert'
+      okText={t('decisionGraph.graph.jsonToJsonSchemaDialog.okText')}
       onOk={() => {
         try {
           onSuccess?.({
@@ -46,7 +49,7 @@ export const JsonToJsonSchemaDialog: React.FC<JsonToJsonSchemaDialogProps> = (pr
         }
       }}
     >
-      <Typography.Text>Type or paste JSON or JSON5 model here and covert it to JSON Schema</Typography.Text>
+      <Typography.Text>{t('decisionGraph.graph.jsonToJsonSchemaDialog.tip')}</Typography.Text>
       <Editor
         loading={<Spin size='large' />}
         language='javascript'
@@ -71,9 +74,9 @@ export const JsonToJsonSchemaDialog: React.FC<JsonToJsonSchemaDialogProps> = (pr
             run: async (editor) => {
               try {
                 await copyToClipboard(JSON.stringify(json5.parse(editor.getValue())));
-                message.success('Copied to clipboard!');
+                message.success(t('decisionGraph.graph.jsonToJsonSchemaDialog.copiedSuccess'));
               } catch {
-                message.error('Failed to copy to clipboard.');
+                message.error(t('decisionGraph.graph.jsonToJsonSchemaDialog.copiedError'));
               }
             },
           });

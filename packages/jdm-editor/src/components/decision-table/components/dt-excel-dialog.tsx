@@ -1,6 +1,7 @@
 import { InfoCircleOutlined, PlusOutlined, SwapOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Divider, Input, Modal, Radio, Select, Tag, Tooltip, Typography } from 'antd';
 import React, { Fragment, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { ParsedExcelData, RuleData } from '../../../helpers/excel';
 
@@ -66,6 +67,8 @@ const mergeHeaders = (newHeader: TableHeader, existingHeader?: TableHeader) => {
 };
 
 export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleSuccess, handleCancel }) => {
+  // translation
+  const { t } = useTranslation();
   const spreadSheetData = useMemo(() => excelData?.[0], [excelData]);
 
   const [items, setItems] = useState<ItemValue[]>([]);
@@ -157,7 +160,7 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
 
   return (
     <Modal
-      title='Map Excel data'
+      title={t('decisionTable.components.dtExcelDialog.MapExcelData')}
       closable={{ 'aria-label': 'Custom Close Button' }}
       centered
       open={!!spreadSheetData}
@@ -228,7 +231,7 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
             marginBottom: '-8px',
           }}
         >
-          Excel columns
+          {t('decisionTable.components.dtExcelDialog.ExcelColumns')}
         </Typography.Text>
         {/*placeholder for grid*/}
         <div />
@@ -240,7 +243,7 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
             marginBottom: '-8px',
           }}
         >
-          Decision table columns
+          {t('decisionTable.components.dtExcelDialog.DecisionTableColumns')}
         </Typography.Text>
         <Typography.Text
           style={{
@@ -250,10 +253,10 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
             marginBottom: '-8px',
           }}
         >
-          Data type
+          {t('decisionTable.components.dtExcelDialog.DataType')}
         </Typography.Text>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '-8px' }}>
-          <Tooltip title='Wrap value in quotes'>
+          <Tooltip title={t('decisionTable.components.dtExcelDialog.InfoTip')}>
             <InfoCircleOutlined style={{ color: 'var(--grl-color-text-secondary)', cursor: 'pointer' }} />
           </Tooltip>
         </div>
@@ -283,7 +286,7 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
             <Select
               key={header.id}
               style={{ width: '100%' }}
-              placeholder='select field'
+              placeholder={t('decisionTable.components.dtExcelDialog.SelectPlaceholder')}
               optionLabelProp='display'
               value={selectedItems?.[header.id]?.value}
               allowClear
@@ -344,7 +347,7 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
                       }}
                     >
                       <Input
-                        placeholder='Enter field name'
+                        placeholder={t('decisionTable.components.dtExcelDialog.InputFieldPlaceholder')}
                         value={newItemName}
                         onChange={(event) => setNewItemName(event.target.value)}
                       />
@@ -365,7 +368,7 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
                           setNewItemName('');
                         }}
                       >
-                        Add item
+                        {t('decisionTable.components.dtExcelDialog.AddItem')}
                       </Button>
                     </div>
                   </div>
@@ -377,7 +380,7 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
                     <span>{option.data.label}</span>
                     {option.data.type && (
                       <Tag style={{ background: dataTypeConfig[option.data.type].color }}>
-                        {dataTypeConfig[option.data.type].label}
+                        {t(`decisionTable.components.dtExcelDialog.${dataTypeConfig[option.data.type].label}`)}
                       </Tag>
                     )}
                   </div>
