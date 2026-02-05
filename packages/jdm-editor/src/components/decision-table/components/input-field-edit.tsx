@@ -1,6 +1,7 @@
 import { type Variable } from '@gorules/zen-engine-wasm';
 import { Button, Popover, Typography } from 'antd';
 import clsx from 'clsx';
+import _defaultTo from 'lodash/defaultTo';
 import { ChevronDownIcon } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 
@@ -76,21 +77,21 @@ export const InputFieldEdit: React.FC<InputFieldEditProps> = ({
             e.stopPropagation();
             setOpen(false);
             if (!disabled && isSubmit) {
-              onChange?.(innerValue ?? '');
+              onChange?.(_defaultTo(innerValue, ''));
             }
           }}
         >
           <Typography.Text style={{ fontSize: 12, display: 'block', marginBottom: 2 }}>Input Field</Typography.Text>
           <CodeEditor
             ref={codeEditor}
-            value={innerValue}
+            value={_defaultTo(innerValue, '')}
             onChange={setInnerValue}
             variableType={variableType}
             disabled={disabled}
           />
           <div style={{ marginTop: 16 }}>
             <CodeEditorPreview
-              expression={innerValue ?? ''}
+              expression={_defaultTo(innerValue, '')}
               inputData={inputData}
               initial={referenceData ? { expression: referenceData.field, result: referenceData.value } : undefined}
             />
@@ -105,7 +106,7 @@ export const InputFieldEdit: React.FC<InputFieldEditProps> = ({
                   type='primary'
                   disabled={disabled}
                   onClick={() => {
-                    onChange?.(innerValue ?? '');
+                    onChange?.(_defaultTo(innerValue, ''));
                     setOpen(false);
                   }}
                 >
