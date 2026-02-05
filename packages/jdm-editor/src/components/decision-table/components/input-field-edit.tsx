@@ -77,21 +77,21 @@ export const InputFieldEdit: React.FC<InputFieldEditProps> = ({
             e.stopPropagation();
             setOpen(false);
             if (!disabled && isSubmit) {
-              onChange?.(_defaultTo(innerValue, ""));
+              onChange?.(_defaultTo(innerValue, ''));
             }
           }}
         >
           <Typography.Text style={{ fontSize: 12, display: 'block', marginBottom: 2 }}>Input Field</Typography.Text>
           <CodeEditor
             ref={codeEditor}
-            value={_defaultTo(innerValue, "")}
+            value={_defaultTo(innerValue, '')}
             onChange={setInnerValue}
             variableType={variableType}
             disabled={disabled}
           />
           <div style={{ marginTop: 16 }}>
             <CodeEditorPreview
-              expression={_defaultTo(innerValue, "")}
+              expression={_defaultTo(innerValue, '')}
               inputData={inputData}
               initial={referenceData ? { expression: referenceData.field, result: referenceData.value } : undefined}
             />
@@ -106,7 +106,7 @@ export const InputFieldEdit: React.FC<InputFieldEditProps> = ({
                   type='primary'
                   disabled={disabled}
                   onClick={() => {
-                    onChange?.(_defaultTo(innerValue, ""));
+                    onChange?.(_defaultTo(innerValue, ''));
                     setOpen(false);
                   }}
                 >
