@@ -1,8 +1,8 @@
 import { type Variable } from '@gorules/zen-engine-wasm';
 import { Button, Popover, Typography } from 'antd';
 import clsx from 'clsx';
+import _defaultTo from 'lodash/defaultTo';
 import { ChevronDownIcon } from 'lucide-react';
-import _defaultTo from 'lodash/defaultTo'
 import React, { useEffect, useRef, useState } from 'react';
 
 import type { CodeEditorRef } from '../../code-editor';
