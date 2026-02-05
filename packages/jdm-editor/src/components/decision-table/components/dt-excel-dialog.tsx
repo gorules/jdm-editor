@@ -3,6 +3,7 @@ import { Button, Checkbox, Modal, Popconfirm, Select, Switch, Tooltip, Typograph
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { XYCoord } from 'react-dnd';
 import { useDrag, useDrop } from 'react-dnd';
+import { useTranslation } from 'react-i18next';
 
 import type { ParsedExcelData, RuleData } from '../../../helpers/excel';
 import type { ColumnFieldType, OutputFieldType } from '../../../helpers/schema';
@@ -226,6 +227,8 @@ const ImportColumnRow: React.FC<{
 };
 
 export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleSuccess, handleCancel }) => {
+  // translation
+  const { t } = useTranslation();
   const spreadSheetData = useMemo(() => excelData?.[0], [excelData]);
   const { getContainer } = useDecisionTableDialog();
   const { inputVariableType } = useDecisionTableState(({ inputVariableType }) => ({ inputVariableType }));
@@ -488,7 +491,7 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
 
   return (
     <Modal
-      title='Map Excel data'
+      title={t('decisionTable.components.dtExcelDialog.MapExcelData')}
       closable={{ 'aria-label': 'Custom Close Button' }}
       centered
       open={!!spreadSheetData}
@@ -503,7 +506,7 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
         {/* Inputs Section */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <Typography.Text strong style={{ fontSize: 13 }}>
-            Inputs
+            {t('decisionTable.table.tableHeadCell.Inputs')}
           </Typography.Text>
           <InputFieldEdit
             mode='create'
@@ -533,11 +536,11 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
             <div />
             <div />
             <Typography.Text type='secondary' style={{ fontSize: 12, fontWeight: 600 }}>
-              Table column
+              {t('decisionTable.components.dtExcelDialog.TableColumn')}
             </Typography.Text>
             <div />
             <Typography.Text type='secondary' style={{ fontSize: 12, fontWeight: 600 }}>
-              Excel column
+              {t('decisionTable.components.dtExcelDialog.ExcelColumn')}
             </Typography.Text>
             <div />
             <div />
@@ -545,7 +548,7 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
           </div>
           {inputColumns.length === 0 && (
             <Typography.Text type='secondary' style={{ fontSize: 12, padding: '8px 0', display: 'block' }}>
-              No input columns
+              {t('decisionTable.components.dtExcelDialog.NoInputColumns')}
             </Typography.Text>
           )}
           {inputColumns.map((col, index) => (
@@ -586,7 +589,7 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
         {/* Outputs Section */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <Typography.Text strong style={{ fontSize: 13 }}>
-            Outputs
+            {t('decisionTable.table.tableHeadCell.Outputs')}
           </Typography.Text>
           <OutputFieldEdit mode='create' onCreate={handleAddOutput} trigger={addOutputTrigger} />
         </div>
@@ -601,7 +604,7 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
         >
           {outputColumns.length === 0 && (
             <Typography.Text type='secondary' style={{ fontSize: 12, padding: '8px 0', display: 'block' }}>
-              No output columns
+              {t('decisionTable.components.dtExcelDialog.NoOutputColumns')}
             </Typography.Text>
           )}
           {outputColumns.map((col, index) => (
@@ -642,7 +645,7 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
         {/* Description Section */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <Typography.Text strong style={{ fontSize: 13 }}>
-            Description
+            {t('decisionTable.components.dtExcelDialog.Description')}
           </Typography.Text>
         </div>
         <div

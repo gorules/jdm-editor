@@ -7,11 +7,12 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { PanelGroup } from 'react-resizable-panels';
 import { match } from 'ts-pattern';
 import { useThrottledCallback } from 'use-debounce';
+import { useTranslation } from 'react-i18next';
 
 import { useDecisionGraphActions, useDecisionGraphState, useNodeDiff } from '../context/dg-store.context';
 import { JsonToJsonSchemaDialog } from './json-to-json-schema-dialog';
 
-const schemaTooltip = 'Provide JSON Schema format. If no JSON Schema is provided, validation will be skipped.';
+// const schemaTooltip = 'Provide JSON Schema format. If no JSON Schema is provided, validation will be skipped.';
 
 const monacoOptions: editor.IStandaloneEditorConstructionOptions = {
   automaticLayout: true,
@@ -64,6 +65,9 @@ export const TabJsonSchema: React.FC<TabJsonSchemaProps> = ({ id, type = 'input'
   }));
 
   const { contentDiff } = useNodeDiff(id);
+  // translation
+  const { t } = useTranslation();
+  const tran = t;
 
   const previousValue = useMemo(() => {
     return contentDiff?.fields?.schema?.previousValue;
@@ -110,7 +114,7 @@ export const TabJsonSchema: React.FC<TabJsonSchemaProps> = ({ id, type = 'input'
                   label: (
                     <span>
                       {t}{' '}
-                      <Tooltip title={schemaTooltip}>
+                      <Tooltip title={tran('decisionGraph.graph.tabJsonSchema.schemaTooltip')}>
                         <InfoCircleOutlined
                           style={{ fontSize: 10, marginLeft: 4, opacity: 0.5, verticalAlign: 'text-top' }}
                         />
@@ -122,7 +126,7 @@ export const TabJsonSchema: React.FC<TabJsonSchemaProps> = ({ id, type = 'input'
                 onChange={(t) => setActiveTab(t as TabKey)}
                 tabBarExtraContent={
                   <Space style={{ marginRight: 8 }} size={'small'}>
-                    <Tooltip title='Format code' placement='bottomRight'>
+                    <Tooltip title={tran('decisionGraph.graph.tabJsonSchema.formatCode')} placement='bottomRight'>
                       <Button
                         size='small'
                         type='text'
@@ -131,7 +135,7 @@ export const TabJsonSchema: React.FC<TabJsonSchemaProps> = ({ id, type = 'input'
                         onClick={() => editor?.getAction?.('editor.action.formatDocument')?.run?.()}
                       />
                     </Tooltip>
-                    <Tooltip title='Import from JSON' placement='bottomRight'>
+                    <Tooltip title={tran('decisionGraph.graph.tabJsonSchema.importFromJson')} placement='bottomRight'>
                       <Button
                         type='text'
                         size={'small'}

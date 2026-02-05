@@ -1,5 +1,6 @@
 import { Dropdown } from 'antd';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { SpacedText } from '../spaced-text';
 import { useExpressionStore } from './context/expression-store.context';
@@ -15,6 +16,8 @@ export const ExpressionItemContextMenu: React.FC<ExpressionItemContextMenuProps>
     addRowAbove,
     disabled,
   }));
+  // translation
+  const { t } = useTranslation();
 
   return (
     <Dropdown
@@ -27,14 +30,14 @@ export const ExpressionItemContextMenu: React.FC<ExpressionItemContextMenuProps>
         items: [
           {
             key: 'addRowAbove',
-            label: <SpacedText left='Add row above' />,
+            label: <SpacedText left={t('expression.expressionItemContextMenu.addRowAbove')} />,
             onClick: () => {
               addRowAbove(index);
             },
           },
           {
             key: 'addRowBelow',
-            label: <SpacedText left='Add row below' />,
+            label: <SpacedText left={t('expression.expressionItemContextMenu.addRowBelow')} />,
             onClick: () => {
               addRowBelow(index);
             },

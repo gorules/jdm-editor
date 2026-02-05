@@ -3,6 +3,7 @@ import { Typography } from 'antd';
 import stringifyPretty from 'json-stringify-pretty-compact';
 import { BugIcon } from 'lucide-react';
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { isWasmAvailable } from '../../helpers/wasm';
 import { CodeEditor } from './ce';
@@ -18,8 +19,10 @@ export const CodeEditorPreview: React.FC<CodeEditorPreviewProps> = ({
   initial,
   expression,
   inputData,
-  noPreviewText = 'Run simulation to see the results',
+  noPreviewText,
 }) => {
+  // translation
+  const { t } = useTranslation();
   const preview = useMemo(() => {
     if (!inputData) {
       return undefined;
@@ -44,10 +47,10 @@ export const CodeEditorPreview: React.FC<CodeEditorPreviewProps> = ({
   return (
     <div>
       <Typography.Text style={{ fontSize: 12 }}>
-        Live Preview <BugIcon size='1em' opacity={0.5} color='#077D16' />
+        {t('codeEditor.livePreview')} <BugIcon size='1em' opacity={0.5} color='#077D16' />
       </Typography.Text>
       <Typography.Text style={{ fontSize: 12, display: 'block' }} type='secondary'>
-        {preview?.type === 'initial' ? 'Based on simulation data' : 'Based on live calculation'}
+        {preview?.type === 'initial' ? t('codeEditor.baseTextInitial') : t('codeEditor.baseTextOther')}
       </Typography.Text>
       <div className='grl-ce-preview'>
         {(preview?.type === 'success' || preview?.type === 'initial') && (
@@ -65,7 +68,7 @@ export const CodeEditorPreview: React.FC<CodeEditorPreviewProps> = ({
         )}
         {!preview && (
           <Typography.Text type='secondary' ellipsis>
-            {noPreviewText}
+            {noPreviewText || t('codeEditor.noPreviewText')}
           </Typography.Text>
         )}
       </div>

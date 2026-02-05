@@ -3,6 +3,7 @@ import { Button, Tooltip } from 'antd';
 import { TrashIcon } from 'lucide-react';
 import React, { useState } from 'react';
 import { P, match } from 'ts-pattern';
+import { useTranslation } from 'react-i18next';
 
 export type ConfirmActionProps = {
   iconOnly?: boolean;
@@ -13,8 +14,8 @@ export type ConfirmActionProps = {
 
 export const ConfirmAction: React.FC<ConfirmActionProps> = ({
   iconOnly = false,
-  text = 'Delete',
-  confirmText = 'Really delete?',
+  text,
+  confirmText,
   icon = <TrashIcon size='1em' />,
   onClick,
   onBlur,
@@ -22,6 +23,8 @@ export const ConfirmAction: React.FC<ConfirmActionProps> = ({
   disabled,
   ...props
 }) => {
+  // translation
+  const { t } = useTranslation();
   const [isConfirming, setIsConfirming] = useState(false);
   const tooltipOpen = match([iconOnly, disabled])
     .with([P._, true], () => false)
@@ -29,7 +32,7 @@ export const ConfirmAction: React.FC<ConfirmActionProps> = ({
     .otherwise(() => undefined);
 
   return (
-    <Tooltip open={tooltipOpen} title={isConfirming ? confirmText : text}>
+    <Tooltip open={tooltipOpen} title={isConfirming ? (confirmText || t('confirmAction.confirmText')) : (text || t('confirmAction.text'))}>
       <Button
         type='text'
         danger={isConfirming}

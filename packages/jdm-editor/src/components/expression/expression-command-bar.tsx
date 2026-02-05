@@ -1,6 +1,7 @@
 import { Select, Typography } from 'antd';
 import React, { useMemo } from 'react';
 import { P, match } from 'ts-pattern';
+import { useTranslation } from 'react-i18next';
 
 import { Stack } from '../stack';
 import { useExpressionStoreRaw } from './context/expression-store.context';
@@ -13,6 +14,8 @@ export const ExpressionCommandBar: React.FC = () => {
       .with(P.array(), (some) => some.length)
       .otherwise(() => null),
   }));
+  // translation
+  const { t } = useTranslation();
 
   const traceIndexOptions = useMemo(() => {
     if (!traceCount) {
@@ -34,7 +37,7 @@ export const ExpressionCommandBar: React.FC = () => {
       <Stack gap={8} horizontal className='full-width' />
       {traceIndexOptions && (
         <Stack horizontal verticalAlign='center' horizontalAlign='end'>
-          <Typography.Text style={{ fontSize: 12 }}>Simulation index:</Typography.Text>
+          <Typography.Text style={{ fontSize: 12 }}>{t('expression.expressionCommandBar.SimulationIndex')}</Typography.Text>
           <Select
             size='small'
             style={{ fontSize: 12, minWidth: 60 }}
