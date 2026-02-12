@@ -8,6 +8,8 @@ import { create } from 'zustand';
 
 import type { SchemaSelectProps } from '../../../helpers/components';
 import { type GetNodeDataResult } from '../../../helpers/node-data';
+import type { ColumnFieldType, OutputFieldType } from '../../../helpers/schema';
+import type { DictionaryMap } from '../../../theme';
 import type { SimulationTrace, SimulationTraceDataTable } from '../../decision-graph';
 import type { Diff, DiffMetadata } from '../../decision-graph/dg-types';
 import type { TableCellProps } from '../table/table-default-cell';
@@ -21,11 +23,15 @@ export type TableCursor = {
   y: number;
 };
 
+export type { ColumnFieldType, OutputFieldType };
+
 export type TableSchemaItem = {
   id: string;
   name: string;
   field?: string;
   defaultValue?: string;
+  fieldType?: ColumnFieldType;
+  outputFieldType?: OutputFieldType;
   _diff?: DiffMetadata;
 };
 
@@ -125,6 +131,9 @@ export const parseDecisionTable = (decisionTable?: DecisionTableType) => {
 };
 
 export type DecisionTablePermission = 'edit:full' | 'edit:rules' | 'edit:values';
+export type JdmUiMode = 'dev' | 'business';
+/** @deprecated Use JdmUiMode instead */
+export type DecisionTableMode = JdmUiMode;
 
 export type DecisionTableStoreType = {
   state: {
@@ -140,6 +149,8 @@ export type DecisionTableStoreType = {
     colWidth: number;
 
     permission?: DecisionTablePermission;
+    mode: JdmUiMode;
+    dictionaries?: DictionaryMap;
 
     inputVariableType?: VariableType;
     derivedVariableTypes: Record<string, VariableType>;
@@ -213,6 +224,7 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
         inputsSchema: undefined,
         outputsSchema: undefined,
 
+        mode: 'dev',
         derivedVariableTypes: {},
         inputVariableType: undefined,
         debugIndex: 0,
@@ -341,6 +353,8 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
                 name: data?.name,
                 field: data?.field,
                 defaultValue: data?.defaultValue,
+                fieldType: data?.fieldType,
+                outputFieldType: data?.outputFieldType,
               };
             }
             return item;
@@ -425,4 +439,5 @@ export function useDecisionTableActions(): DecisionTableStoreType['actions'] {
 }
 
 export const useDecisionTableRaw = () => React.useContext(DecisionTableStoreContext);
+
 export default DecisionTableProvider;

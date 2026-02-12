@@ -5,6 +5,8 @@ import { createDragDropManager } from 'dnd-core';
 import React, { useEffect, useMemo, useState } from 'react';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
+import type { DictionaryMap } from '../../theme';
+import { JdmConfigProvider } from '../../theme';
 import type { DecisionTableType } from './context/dt-store.context';
 import { DecisionTable } from './dt';
 
@@ -130,6 +132,10 @@ const meta: Meta<typeof DecisionTable> = {
       control: 'select',
       options: ['edit:full', 'edit:rules', 'edit:values'],
     },
+    mode: {
+      control: 'select',
+      options: ['dev', 'business'],
+    },
     disabled: { control: 'boolean' },
     cellRenderer: {
       control: false,
@@ -138,6 +144,7 @@ const meta: Meta<typeof DecisionTable> = {
   args: {
     inputsSchema: inputSchemaDefault,
     permission: 'edit:full',
+    mode: 'dev',
     disabled: false,
     onChange: fn(),
   },
@@ -258,6 +265,100 @@ export const StressTest: Story = {
       >
         <DecisionTable {...args} value={value} onChange={setValue} tableHeight='100%' />
       </div>
+    );
+  },
+};
+
+export const BusinessMode: Story = {
+  args: {
+    mode: 'business',
+  },
+  render: (args) => {
+    const [value, setValue] = useState<any>(shippingFeesDefault);
+    const manager = useMemo(() => {
+      return createDragDropManager(HTML5Backend);
+    }, []);
+
+    return (
+      <div style={{ height: '100%' }}>
+        <DecisionTable
+          {...args}
+          value={value}
+          manager={manager}
+          onChange={(val) => {
+            console.log(val);
+            setValue(val);
+            args?.onChange?.(val);
+          }}
+          inputsSchema={inputSchemaDefault}
+          tableHeight='100%'
+        />
+      </div>
+    );
+  },
+};
+
+const DICTIONARIES: DictionaryMap = {
+  country: [
+    { label: 'United States', value: 'US' },
+    { label: 'Canada', value: 'CA' },
+    { label: 'Mexico', value: 'MX' },
+    { label: 'United Kingdom', value: 'UK' },
+  ],
+  orderStatus: [
+    { label: 'Pending', value: 'pending' },
+    { label: 'Processing', value: 'processing' },
+    { label: 'Shipped', value: 'shipped' },
+    { label: 'Delivered', value: 'delivered' },
+    { label: 'Cancelled', value: 'cancelled' },
+  ],
+};
+
+const shippingFeesWithDictionaries = {
+  ...shippingFeesDefault,
+  inputs: [
+    {
+      id: 'HVo_JpALi8',
+      field: 'cart.weight',
+      name: 'Cart Weight (Kg)',
+      fieldType: { type: 'number' as const },
+    },
+    {
+      id: 'HW6mSVfLbs',
+      field: 'customer.country',
+      name: 'Customer Country',
+      fieldType: { type: 'string' as const, enum: { type: 'ref' as const, ref: 'country' } },
+    },
+  ],
+};
+
+export const BusinessModeDictionaries: Story = {
+  args: {
+    mode: 'business',
+  },
+  render: (args) => {
+    const [value, setValue] = useState<any>(shippingFeesWithDictionaries);
+    const manager = useMemo(() => {
+      return createDragDropManager(HTML5Backend);
+    }, []);
+
+    return (
+      <JdmConfigProvider dictionaries={DICTIONARIES}>
+        <div style={{ height: '100%' }}>
+          <DecisionTable
+            {...args}
+            value={value}
+            manager={manager}
+            onChange={(val) => {
+              console.log(val);
+              setValue(val);
+              args?.onChange?.(val);
+            }}
+            inputsSchema={inputSchemaDefault}
+            tableHeight='100%'
+          />
+        </div>
+      </JdmConfigProvider>
     );
   },
 };

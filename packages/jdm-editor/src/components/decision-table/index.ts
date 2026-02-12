@@ -1,2 +1,8 @@
 export * from './dt';
-export type { DecisionTableType } from './context/dt-store.context';
+export type {
+  DecisionTableType,
+  DecisionTableMode,
+  JdmUiMode,
+  ColumnFieldType,
+  TableSchemaItem,
+} from './context/dt-store.context';
