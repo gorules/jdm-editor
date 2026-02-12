@@ -18,16 +18,16 @@ export const AutosizeTextArea = React.forwardRef<HTMLDivElement, AutosizeTextAre
     const divRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-      if (divRef.current && divRef.current.textContent !== value) {
-        divRef.current.textContent = value ?? '';
+      if (divRef.current && divRef.current.innerText !== value) {
+        divRef.current.innerText = value ?? '';
       }
     }, [value]);
 
     const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
       if (onChange) {
         const syntheticEvent = {
-          target: { value: e.currentTarget.textContent ?? '' },
-          currentTarget: { value: e.currentTarget.textContent ?? '' },
+          target: { value: e.currentTarget.innerText ?? '' },
+          currentTarget: { value: e.currentTarget.innerText ?? '' },
         } as React.ChangeEvent<HTMLTextAreaElement>;
         onChange(syntheticEvent);
       }
