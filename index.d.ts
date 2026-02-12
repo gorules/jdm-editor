@@ -186,6 +186,152 @@ export declare const codemirror: {
     linter: typeof linter;
 };
 
+export declare const COLUMN_FIELD_TYPE_OPTIONS: {
+    value: ColumnFieldType['type'];
+    label: string;
+}[];
+
+export declare type ColumnEnum = z.infer<typeof columnEnumSchema>;
+
+export declare const columnEnumSchema: z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
+    type: z.ZodLiteral<"inline">;
+    values: z.ZodArray<z.ZodObject<{
+        label: z.ZodString;
+        value: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        value: string;
+        label: string;
+    }, {
+        value: string;
+        label: string;
+    }>, "many">;
+    loose: z.ZodOptional<z.ZodBoolean>;
+}, "strip", z.ZodTypeAny, {
+    values: {
+        value: string;
+        label: string;
+    }[];
+    type: "inline";
+    loose?: boolean | undefined;
+}, {
+    values: {
+        value: string;
+        label: string;
+    }[];
+    type: "inline";
+    loose?: boolean | undefined;
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"ref">;
+    ref: z.ZodString;
+    loose: z.ZodOptional<z.ZodBoolean>;
+}, "strip", z.ZodTypeAny, {
+    ref: string;
+    type: "ref";
+    loose?: boolean | undefined;
+}, {
+    ref: string;
+    type: "ref";
+    loose?: boolean | undefined;
+}>]>;
+
+export declare type ColumnFieldType = z.infer<typeof columnFieldTypeSchema>;
+
+export declare const columnFieldTypeSchema: z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
+    type: z.ZodLiteral<"any">;
+}, "strip", z.ZodTypeAny, {
+    type: "any";
+}, {
+    type: "any";
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"string">;
+    enum: z.ZodOptional<z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
+        type: z.ZodLiteral<"inline">;
+        values: z.ZodArray<z.ZodObject<{
+            label: z.ZodString;
+            value: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            value: string;
+            label: string;
+        }, {
+            value: string;
+            label: string;
+        }>, "many">;
+        loose: z.ZodOptional<z.ZodBoolean>;
+    }, "strip", z.ZodTypeAny, {
+        values: {
+            value: string;
+            label: string;
+        }[];
+        type: "inline";
+        loose?: boolean | undefined;
+    }, {
+        values: {
+            value: string;
+            label: string;
+        }[];
+        type: "inline";
+        loose?: boolean | undefined;
+    }>, z.ZodObject<{
+        type: z.ZodLiteral<"ref">;
+        ref: z.ZodString;
+        loose: z.ZodOptional<z.ZodBoolean>;
+    }, "strip", z.ZodTypeAny, {
+        ref: string;
+        type: "ref";
+        loose?: boolean | undefined;
+    }, {
+        ref: string;
+        type: "ref";
+        loose?: boolean | undefined;
+    }>]>>;
+}, "strip", z.ZodTypeAny, {
+    type: "string";
+    enum?: {
+        values: {
+            value: string;
+            label: string;
+        }[];
+        type: "inline";
+        loose?: boolean | undefined;
+    } | {
+        ref: string;
+        type: "ref";
+        loose?: boolean | undefined;
+    } | undefined;
+}, {
+    type: "string";
+    enum?: {
+        values: {
+            value: string;
+            label: string;
+        }[];
+        type: "inline";
+        loose?: boolean | undefined;
+    } | {
+        ref: string;
+        type: "ref";
+        loose?: boolean | undefined;
+    } | undefined;
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"number">;
+}, "strip", z.ZodTypeAny, {
+    type: "number";
+}, {
+    type: "number";
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"boolean">;
+}, "strip", z.ZodTypeAny, {
+    type: "boolean";
+}, {
+    type: "boolean";
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"date">;
+}, "strip", z.ZodTypeAny, {
+    type: "date";
+}, {
+    type: "date";
+}>]>;
+
 declare type ColumnType = 'inputs' | 'outputs';
 
 export declare const compareAndUnifyLists: <T extends BaseItem>(newList: T[], oldList: T[], options?: DiffOptions<T>) => T[];
@@ -332,6 +478,8 @@ declare type DecisionGraphEmptyType = {
     panels?: DecisionGraphStoreType['state']['panels'];
     onPanelsChange?: DecisionGraphStoreType['listeners']['onPanelsChange'];
     simulate?: DecisionGraphStoreType['state']['simulate'];
+    dictionaries?: DictionaryMap;
+    mode?: JdmUiMode;
     onChange?: DecisionGraphStoreType['listeners']['onChange'];
     onReactFlowInit?: DecisionGraphStoreType['listeners']['onReactFlowInit'];
     onCodeExtension?: DecisionGraphStoreType['listeners']['onCodeExtension'];
@@ -363,6 +511,8 @@ declare type DecisionGraphStoreType = {
         onPanelsChange?: (val?: string) => void;
         simulate?: Simulation;
         compactMode?: boolean;
+        dictionaries?: DictionaryMap;
+        mode?: JdmUiMode;
         nodeTypes: Record<string, Partial<Record<NodeTypeKind, VariableType>>>;
         globalType: Record<string, VariableType>;
     };
@@ -629,32 +779,412 @@ export declare const decisionModelSchema: z.ZodObject<{
                 name: z.ZodOptional<z.ZodNullable<z.ZodString>>;
                 field: z.ZodOptional<z.ZodNullable<z.ZodString>>;
                 defaultValue: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+                fieldType: z.ZodOptional<z.ZodNullable<z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
+                    type: z.ZodLiteral<"any">;
+                }, "strip", z.ZodTypeAny, {
+                    type: "any";
+                }, {
+                    type: "any";
+                }>, z.ZodObject<{
+                    type: z.ZodLiteral<"string">;
+                    enum: z.ZodOptional<z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
+                        type: z.ZodLiteral<"inline">;
+                        values: z.ZodArray<z.ZodObject<{
+                            label: z.ZodString;
+                            value: z.ZodString;
+                        }, "strip", z.ZodTypeAny, {
+                            value: string;
+                            label: string;
+                        }, {
+                            value: string;
+                            label: string;
+                        }>, "many">;
+                        loose: z.ZodOptional<z.ZodBoolean>;
+                    }, "strip", z.ZodTypeAny, {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    }, {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    }>, z.ZodObject<{
+                        type: z.ZodLiteral<"ref">;
+                        ref: z.ZodString;
+                        loose: z.ZodOptional<z.ZodBoolean>;
+                    }, "strip", z.ZodTypeAny, {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    }, {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    }>]>>;
+                }, "strip", z.ZodTypeAny, {
+                    type: "string";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                }, {
+                    type: "string";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                }>, z.ZodObject<{
+                    type: z.ZodLiteral<"number">;
+                }, "strip", z.ZodTypeAny, {
+                    type: "number";
+                }, {
+                    type: "number";
+                }>, z.ZodObject<{
+                    type: z.ZodLiteral<"boolean">;
+                }, "strip", z.ZodTypeAny, {
+                    type: "boolean";
+                }, {
+                    type: "boolean";
+                }>, z.ZodObject<{
+                    type: z.ZodLiteral<"date">;
+                }, "strip", z.ZodTypeAny, {
+                    type: "date";
+                }, {
+                    type: "date";
+                }>]>>>;
             }, "strip", z.ZodTypeAny, {
                 id: string;
                 name?: string | null | undefined;
                 field?: string | null | undefined;
                 defaultValue?: string | null | undefined;
+                fieldType?: {
+                    type: "any";
+                } | {
+                    type: "string";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                } | {
+                    type: "number";
+                } | {
+                    type: "boolean";
+                } | {
+                    type: "date";
+                } | null | undefined;
             }, {
                 id?: string | undefined;
                 name?: string | null | undefined;
                 field?: string | null | undefined;
                 defaultValue?: string | null | undefined;
+                fieldType?: {
+                    type: "any";
+                } | {
+                    type: "string";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                } | {
+                    type: "number";
+                } | {
+                    type: "boolean";
+                } | {
+                    type: "date";
+                } | null | undefined;
             }>, "many">;
             outputs: z.ZodArray<z.ZodObject<{
                 id: z.ZodDefault<z.ZodString>;
                 name: z.ZodString;
                 field: z.ZodString;
                 defaultValue: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+                outputFieldType: z.ZodOptional<z.ZodNullable<z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
+                    type: z.ZodLiteral<"auto">;
+                }, "strip", z.ZodTypeAny, {
+                    type: "auto";
+                }, {
+                    type: "auto";
+                }>, z.ZodObject<{
+                    type: z.ZodLiteral<"string">;
+                    enum: z.ZodOptional<z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
+                        type: z.ZodLiteral<"inline">;
+                        values: z.ZodArray<z.ZodObject<{
+                            label: z.ZodString;
+                            value: z.ZodString;
+                        }, "strip", z.ZodTypeAny, {
+                            value: string;
+                            label: string;
+                        }, {
+                            value: string;
+                            label: string;
+                        }>, "many">;
+                        loose: z.ZodOptional<z.ZodBoolean>;
+                    }, "strip", z.ZodTypeAny, {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    }, {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    }>, z.ZodObject<{
+                        type: z.ZodLiteral<"ref">;
+                        ref: z.ZodString;
+                        loose: z.ZodOptional<z.ZodBoolean>;
+                    }, "strip", z.ZodTypeAny, {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    }, {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    }>]>>;
+                }, "strip", z.ZodTypeAny, {
+                    type: "string";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                }, {
+                    type: "string";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                }>, z.ZodObject<{
+                    type: z.ZodLiteral<"string-array">;
+                    enum: z.ZodOptional<z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
+                        type: z.ZodLiteral<"inline">;
+                        values: z.ZodArray<z.ZodObject<{
+                            label: z.ZodString;
+                            value: z.ZodString;
+                        }, "strip", z.ZodTypeAny, {
+                            value: string;
+                            label: string;
+                        }, {
+                            value: string;
+                            label: string;
+                        }>, "many">;
+                        loose: z.ZodOptional<z.ZodBoolean>;
+                    }, "strip", z.ZodTypeAny, {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    }, {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    }>, z.ZodObject<{
+                        type: z.ZodLiteral<"ref">;
+                        ref: z.ZodString;
+                        loose: z.ZodOptional<z.ZodBoolean>;
+                    }, "strip", z.ZodTypeAny, {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    }, {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    }>]>>;
+                }, "strip", z.ZodTypeAny, {
+                    type: "string-array";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                }, {
+                    type: "string-array";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                }>, z.ZodObject<{
+                    type: z.ZodLiteral<"number">;
+                }, "strip", z.ZodTypeAny, {
+                    type: "number";
+                }, {
+                    type: "number";
+                }>, z.ZodObject<{
+                    type: z.ZodLiteral<"boolean">;
+                }, "strip", z.ZodTypeAny, {
+                    type: "boolean";
+                }, {
+                    type: "boolean";
+                }>, z.ZodObject<{
+                    type: z.ZodLiteral<"date">;
+                }, "strip", z.ZodTypeAny, {
+                    type: "date";
+                }, {
+                    type: "date";
+                }>]>>>;
             }, "strip", z.ZodTypeAny, {
                 id: string;
                 name: string;
                 field: string;
                 defaultValue?: string | null | undefined;
+                outputFieldType?: {
+                    type: "auto";
+                } | {
+                    type: "string";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                } | {
+                    type: "string-array";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                } | {
+                    type: "number";
+                } | {
+                    type: "boolean";
+                } | {
+                    type: "date";
+                } | null | undefined;
             }, {
                 name: string;
                 field: string;
                 id?: string | undefined;
                 defaultValue?: string | null | undefined;
+                outputFieldType?: {
+                    type: "auto";
+                } | {
+                    type: "string";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                } | {
+                    type: "string-array";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                } | {
+                    type: "number";
+                } | {
+                    type: "boolean";
+                } | {
+                    type: "date";
+                } | null | undefined;
             }>, "many">;
             passThrough: z.ZodEffects<z.ZodOptional<z.ZodNullable<z.ZodBoolean>>, boolean, boolean | null | undefined>;
             inputField: z.ZodEffects<z.ZodDefault<z.ZodOptional<z.ZodNullable<z.ZodString>>>, string | null, string | null | undefined>;
@@ -672,12 +1202,72 @@ export declare const decisionModelSchema: z.ZodObject<{
                 name?: string | null | undefined;
                 field?: string | null | undefined;
                 defaultValue?: string | null | undefined;
+                fieldType?: {
+                    type: "any";
+                } | {
+                    type: "string";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                } | {
+                    type: "number";
+                } | {
+                    type: "boolean";
+                } | {
+                    type: "date";
+                } | null | undefined;
             }[];
             outputs: {
                 id: string;
                 name: string;
                 field: string;
                 defaultValue?: string | null | undefined;
+                outputFieldType?: {
+                    type: "auto";
+                } | {
+                    type: "string";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                } | {
+                    type: "string-array";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                } | {
+                    type: "number";
+                } | {
+                    type: "boolean";
+                } | {
+                    type: "date";
+                } | null | undefined;
             }[];
         }, {
             inputs: {
@@ -685,12 +1275,72 @@ export declare const decisionModelSchema: z.ZodObject<{
                 name?: string | null | undefined;
                 field?: string | null | undefined;
                 defaultValue?: string | null | undefined;
+                fieldType?: {
+                    type: "any";
+                } | {
+                    type: "string";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                } | {
+                    type: "number";
+                } | {
+                    type: "boolean";
+                } | {
+                    type: "date";
+                } | null | undefined;
             }[];
             outputs: {
                 name: string;
                 field: string;
                 id?: string | undefined;
                 defaultValue?: string | null | undefined;
+                outputFieldType?: {
+                    type: "auto";
+                } | {
+                    type: "string";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                } | {
+                    type: "string-array";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                } | {
+                    type: "number";
+                } | {
+                    type: "boolean";
+                } | {
+                    type: "date";
+                } | null | undefined;
             }[];
             passThrough?: boolean | null | undefined;
             inputField?: string | null | undefined;
@@ -726,12 +1376,72 @@ export declare const decisionModelSchema: z.ZodObject<{
                 name?: string | null | undefined;
                 field?: string | null | undefined;
                 defaultValue?: string | null | undefined;
+                fieldType?: {
+                    type: "any";
+                } | {
+                    type: "string";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                } | {
+                    type: "number";
+                } | {
+                    type: "boolean";
+                } | {
+                    type: "date";
+                } | null | undefined;
             }[];
             outputs: {
                 id: string;
                 name: string;
                 field: string;
                 defaultValue?: string | null | undefined;
+                outputFieldType?: {
+                    type: "auto";
+                } | {
+                    type: "string";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                } | {
+                    type: "string-array";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                } | {
+                    type: "number";
+                } | {
+                    type: "boolean";
+                } | {
+                    type: "date";
+                } | null | undefined;
             }[];
         };
         id: string;
@@ -748,12 +1458,72 @@ export declare const decisionModelSchema: z.ZodObject<{
                 name?: string | null | undefined;
                 field?: string | null | undefined;
                 defaultValue?: string | null | undefined;
+                fieldType?: {
+                    type: "any";
+                } | {
+                    type: "string";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                } | {
+                    type: "number";
+                } | {
+                    type: "boolean";
+                } | {
+                    type: "date";
+                } | null | undefined;
             }[];
             outputs: {
                 name: string;
                 field: string;
                 id?: string | undefined;
                 defaultValue?: string | null | undefined;
+                outputFieldType?: {
+                    type: "auto";
+                } | {
+                    type: "string";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                } | {
+                    type: "string-array";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                } | {
+                    type: "number";
+                } | {
+                    type: "boolean";
+                } | {
+                    type: "date";
+                } | null | undefined;
             }[];
             passThrough?: boolean | null | undefined;
             inputField?: string | null | undefined;
@@ -1037,13 +1807,6 @@ export declare const decisionModelSchema: z.ZodObject<{
         sourceHandle?: string | null | undefined;
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
-    edges: {
-        type: "edge";
-        id: string;
-        sourceId: string;
-        targetId: string;
-        sourceHandle?: string | null | undefined;
-    }[];
     nodes: ({
         type: NodeKind.Decision;
         content: {
@@ -1103,12 +1866,72 @@ export declare const decisionModelSchema: z.ZodObject<{
                 name?: string | null | undefined;
                 field?: string | null | undefined;
                 defaultValue?: string | null | undefined;
+                fieldType?: {
+                    type: "any";
+                } | {
+                    type: "string";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                } | {
+                    type: "number";
+                } | {
+                    type: "boolean";
+                } | {
+                    type: "date";
+                } | null | undefined;
             }[];
             outputs: {
                 id: string;
                 name: string;
                 field: string;
                 defaultValue?: string | null | undefined;
+                outputFieldType?: {
+                    type: "auto";
+                } | {
+                    type: "string";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                } | {
+                    type: "string-array";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                } | {
+                    type: "number";
+                } | {
+                    type: "boolean";
+                } | {
+                    type: "date";
+                } | null | undefined;
             }[];
         };
         id: string;
@@ -1177,14 +2000,14 @@ export declare const decisionModelSchema: z.ZodObject<{
         };
         content?: any;
     })[];
-}, {
-    edges?: {
+    edges: {
         type: "edge";
         id: string;
         sourceId: string;
         targetId: string;
         sourceHandle?: string | null | undefined;
-    }[] | undefined;
+    }[];
+}, {
     nodes?: ({
         type: NodeKind.Decision;
         content: {
@@ -1238,12 +2061,72 @@ export declare const decisionModelSchema: z.ZodObject<{
                 name?: string | null | undefined;
                 field?: string | null | undefined;
                 defaultValue?: string | null | undefined;
+                fieldType?: {
+                    type: "any";
+                } | {
+                    type: "string";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                } | {
+                    type: "number";
+                } | {
+                    type: "boolean";
+                } | {
+                    type: "date";
+                } | null | undefined;
             }[];
             outputs: {
                 name: string;
                 field: string;
                 id?: string | undefined;
                 defaultValue?: string | null | undefined;
+                outputFieldType?: {
+                    type: "auto";
+                } | {
+                    type: "string";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                } | {
+                    type: "string-array";
+                    enum?: {
+                        values: {
+                            value: string;
+                            label: string;
+                        }[];
+                        type: "inline";
+                        loose?: boolean | undefined;
+                    } | {
+                        ref: string;
+                        type: "ref";
+                        loose?: boolean | undefined;
+                    } | undefined;
+                } | {
+                    type: "number";
+                } | {
+                    type: "boolean";
+                } | {
+                    type: "date";
+                } | null | undefined;
             }[];
             passThrough?: boolean | null | undefined;
             inputField?: string | null | undefined;
@@ -1318,6 +2201,13 @@ export declare const decisionModelSchema: z.ZodObject<{
             y: number;
         } | undefined;
     })[] | undefined;
+    edges?: {
+        type: "edge";
+        id: string;
+        sourceId: string;
+        targetId: string;
+        sourceHandle?: string | null | undefined;
+    }[] | undefined;
 }>;
 
 export declare type DecisionNode<T = any> = {
@@ -1421,6 +2311,8 @@ declare type DecisionTableEmptyType = {
     inputsSchema?: SchemaSelectProps[];
     outputsSchema?: SchemaSelectProps[];
     permission?: DecisionTableStoreType['state']['permission'];
+    mode?: JdmUiMode;
+    dictionaries?: DictionaryMap;
     inputVariableType?: VariableType;
     debug?: {
         trace: SimulationTrace<SimulationTraceDataTable>;
@@ -1431,6 +2323,8 @@ declare type DecisionTableEmptyType = {
     colWidth?: number;
     onChange?: (val: DecisionTableType) => void;
 };
+
+export declare type DecisionTableMode = JdmUiMode;
 
 declare type DecisionTablePermission = 'edit:full' | 'edit:rules' | 'edit:values';
 
@@ -1451,32 +2345,412 @@ export declare const decisionTableSchema: z.ZodObject<z.objectUtil.extendShape<{
             name: z.ZodOptional<z.ZodNullable<z.ZodString>>;
             field: z.ZodOptional<z.ZodNullable<z.ZodString>>;
             defaultValue: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+            fieldType: z.ZodOptional<z.ZodNullable<z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
+                type: z.ZodLiteral<"any">;
+            }, "strip", z.ZodTypeAny, {
+                type: "any";
+            }, {
+                type: "any";
+            }>, z.ZodObject<{
+                type: z.ZodLiteral<"string">;
+                enum: z.ZodOptional<z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
+                    type: z.ZodLiteral<"inline">;
+                    values: z.ZodArray<z.ZodObject<{
+                        label: z.ZodString;
+                        value: z.ZodString;
+                    }, "strip", z.ZodTypeAny, {
+                        value: string;
+                        label: string;
+                    }, {
+                        value: string;
+                        label: string;
+                    }>, "many">;
+                    loose: z.ZodOptional<z.ZodBoolean>;
+                }, "strip", z.ZodTypeAny, {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                }, {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                }>, z.ZodObject<{
+                    type: z.ZodLiteral<"ref">;
+                    ref: z.ZodString;
+                    loose: z.ZodOptional<z.ZodBoolean>;
+                }, "strip", z.ZodTypeAny, {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                }, {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                }>]>>;
+            }, "strip", z.ZodTypeAny, {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            }, {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            }>, z.ZodObject<{
+                type: z.ZodLiteral<"number">;
+            }, "strip", z.ZodTypeAny, {
+                type: "number";
+            }, {
+                type: "number";
+            }>, z.ZodObject<{
+                type: z.ZodLiteral<"boolean">;
+            }, "strip", z.ZodTypeAny, {
+                type: "boolean";
+            }, {
+                type: "boolean";
+            }>, z.ZodObject<{
+                type: z.ZodLiteral<"date">;
+            }, "strip", z.ZodTypeAny, {
+                type: "date";
+            }, {
+                type: "date";
+            }>]>>>;
         }, "strip", z.ZodTypeAny, {
             id: string;
             name?: string | null | undefined;
             field?: string | null | undefined;
             defaultValue?: string | null | undefined;
+            fieldType?: {
+                type: "any";
+            } | {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "number";
+            } | {
+                type: "boolean";
+            } | {
+                type: "date";
+            } | null | undefined;
         }, {
             id?: string | undefined;
             name?: string | null | undefined;
             field?: string | null | undefined;
             defaultValue?: string | null | undefined;
+            fieldType?: {
+                type: "any";
+            } | {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "number";
+            } | {
+                type: "boolean";
+            } | {
+                type: "date";
+            } | null | undefined;
         }>, "many">;
         outputs: z.ZodArray<z.ZodObject<{
             id: z.ZodDefault<z.ZodString>;
             name: z.ZodString;
             field: z.ZodString;
             defaultValue: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+            outputFieldType: z.ZodOptional<z.ZodNullable<z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
+                type: z.ZodLiteral<"auto">;
+            }, "strip", z.ZodTypeAny, {
+                type: "auto";
+            }, {
+                type: "auto";
+            }>, z.ZodObject<{
+                type: z.ZodLiteral<"string">;
+                enum: z.ZodOptional<z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
+                    type: z.ZodLiteral<"inline">;
+                    values: z.ZodArray<z.ZodObject<{
+                        label: z.ZodString;
+                        value: z.ZodString;
+                    }, "strip", z.ZodTypeAny, {
+                        value: string;
+                        label: string;
+                    }, {
+                        value: string;
+                        label: string;
+                    }>, "many">;
+                    loose: z.ZodOptional<z.ZodBoolean>;
+                }, "strip", z.ZodTypeAny, {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                }, {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                }>, z.ZodObject<{
+                    type: z.ZodLiteral<"ref">;
+                    ref: z.ZodString;
+                    loose: z.ZodOptional<z.ZodBoolean>;
+                }, "strip", z.ZodTypeAny, {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                }, {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                }>]>>;
+            }, "strip", z.ZodTypeAny, {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            }, {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            }>, z.ZodObject<{
+                type: z.ZodLiteral<"string-array">;
+                enum: z.ZodOptional<z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
+                    type: z.ZodLiteral<"inline">;
+                    values: z.ZodArray<z.ZodObject<{
+                        label: z.ZodString;
+                        value: z.ZodString;
+                    }, "strip", z.ZodTypeAny, {
+                        value: string;
+                        label: string;
+                    }, {
+                        value: string;
+                        label: string;
+                    }>, "many">;
+                    loose: z.ZodOptional<z.ZodBoolean>;
+                }, "strip", z.ZodTypeAny, {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                }, {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                }>, z.ZodObject<{
+                    type: z.ZodLiteral<"ref">;
+                    ref: z.ZodString;
+                    loose: z.ZodOptional<z.ZodBoolean>;
+                }, "strip", z.ZodTypeAny, {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                }, {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                }>]>>;
+            }, "strip", z.ZodTypeAny, {
+                type: "string-array";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            }, {
+                type: "string-array";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            }>, z.ZodObject<{
+                type: z.ZodLiteral<"number">;
+            }, "strip", z.ZodTypeAny, {
+                type: "number";
+            }, {
+                type: "number";
+            }>, z.ZodObject<{
+                type: z.ZodLiteral<"boolean">;
+            }, "strip", z.ZodTypeAny, {
+                type: "boolean";
+            }, {
+                type: "boolean";
+            }>, z.ZodObject<{
+                type: z.ZodLiteral<"date">;
+            }, "strip", z.ZodTypeAny, {
+                type: "date";
+            }, {
+                type: "date";
+            }>]>>>;
         }, "strip", z.ZodTypeAny, {
             id: string;
             name: string;
             field: string;
             defaultValue?: string | null | undefined;
+            outputFieldType?: {
+                type: "auto";
+            } | {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "string-array";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "number";
+            } | {
+                type: "boolean";
+            } | {
+                type: "date";
+            } | null | undefined;
         }, {
             name: string;
             field: string;
             id?: string | undefined;
             defaultValue?: string | null | undefined;
+            outputFieldType?: {
+                type: "auto";
+            } | {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "string-array";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "number";
+            } | {
+                type: "boolean";
+            } | {
+                type: "date";
+            } | null | undefined;
         }>, "many">;
         passThrough: z.ZodEffects<z.ZodOptional<z.ZodNullable<z.ZodBoolean>>, boolean, boolean | null | undefined>;
         inputField: z.ZodEffects<z.ZodDefault<z.ZodOptional<z.ZodNullable<z.ZodString>>>, string | null, string | null | undefined>;
@@ -1494,12 +2768,72 @@ export declare const decisionTableSchema: z.ZodObject<z.objectUtil.extendShape<{
             name?: string | null | undefined;
             field?: string | null | undefined;
             defaultValue?: string | null | undefined;
+            fieldType?: {
+                type: "any";
+            } | {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "number";
+            } | {
+                type: "boolean";
+            } | {
+                type: "date";
+            } | null | undefined;
         }[];
         outputs: {
             id: string;
             name: string;
             field: string;
             defaultValue?: string | null | undefined;
+            outputFieldType?: {
+                type: "auto";
+            } | {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "string-array";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "number";
+            } | {
+                type: "boolean";
+            } | {
+                type: "date";
+            } | null | undefined;
         }[];
     }, {
         inputs: {
@@ -1507,12 +2841,72 @@ export declare const decisionTableSchema: z.ZodObject<z.objectUtil.extendShape<{
             name?: string | null | undefined;
             field?: string | null | undefined;
             defaultValue?: string | null | undefined;
+            fieldType?: {
+                type: "any";
+            } | {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "number";
+            } | {
+                type: "boolean";
+            } | {
+                type: "date";
+            } | null | undefined;
         }[];
         outputs: {
             name: string;
             field: string;
             id?: string | undefined;
             defaultValue?: string | null | undefined;
+            outputFieldType?: {
+                type: "auto";
+            } | {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "string-array";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "number";
+            } | {
+                type: "boolean";
+            } | {
+                type: "date";
+            } | null | undefined;
         }[];
         passThrough?: boolean | null | undefined;
         inputField?: string | null | undefined;
@@ -1548,12 +2942,72 @@ export declare const decisionTableSchema: z.ZodObject<z.objectUtil.extendShape<{
             name?: string | null | undefined;
             field?: string | null | undefined;
             defaultValue?: string | null | undefined;
+            fieldType?: {
+                type: "any";
+            } | {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "number";
+            } | {
+                type: "boolean";
+            } | {
+                type: "date";
+            } | null | undefined;
         }[];
         outputs: {
             id: string;
             name: string;
             field: string;
             defaultValue?: string | null | undefined;
+            outputFieldType?: {
+                type: "auto";
+            } | {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "string-array";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "number";
+            } | {
+                type: "boolean";
+            } | {
+                type: "date";
+            } | null | undefined;
         }[];
     };
     id: string;
@@ -1570,12 +3024,72 @@ export declare const decisionTableSchema: z.ZodObject<z.objectUtil.extendShape<{
             name?: string | null | undefined;
             field?: string | null | undefined;
             defaultValue?: string | null | undefined;
+            fieldType?: {
+                type: "any";
+            } | {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "number";
+            } | {
+                type: "boolean";
+            } | {
+                type: "date";
+            } | null | undefined;
         }[];
         outputs: {
             name: string;
             field: string;
             id?: string | undefined;
             defaultValue?: string | null | undefined;
+            outputFieldType?: {
+                type: "auto";
+            } | {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "string-array";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "number";
+            } | {
+                type: "boolean";
+            } | {
+                type: "date";
+            } | null | undefined;
         }[];
         passThrough?: boolean | null | undefined;
         inputField?: string | null | undefined;
@@ -1603,6 +3117,8 @@ declare type DecisionTableStoreType = {
         minColWidth: number;
         colWidth: number;
         permission?: DecisionTablePermission;
+        mode: JdmUiMode;
+        dictionaries?: DictionaryMap;
         inputVariableType?: VariableType;
         derivedVariableTypes: Record<string, VariableType>;
         inputsSchema?: SchemaSelectProps[];
@@ -1646,6 +3162,15 @@ export declare type DecisionTableType = {
     outputs: TableSchemaItem[];
     rules: Record<string, string>[];
 } & Diff;
+
+export declare type DictionaryMap = Record<string, {
+    label: string;
+    value: string;
+}[]>;
+
+export declare const DictionaryProvider: default_2.FC<default_2.PropsWithChildren<{
+    value: DictionaryMap;
+}>>;
 
 export declare type Diff<T = any> = {
     _diff?: DiffMetadata<T>;
@@ -1773,11 +3298,27 @@ export declare const edgeSchema: z.ZodObject<{
     sourceHandle?: string | null | undefined;
 }>;
 
+export declare const ensureWasmLoaded: () => Promise<void>;
+
 declare type ExposedStore<T> = UseBoundStore<StoreApi<T>> & {
     setState: (partial: Partial<T>) => void;
 };
 
 export declare const Expression: default_2.FC<ExpressionProps>;
+
+export declare const ExpressionBuilder: default_2.ForwardRefExoticComponent<ExpressionBuilderProps & default_2.RefAttributes<ExpressionBuilderRef>>;
+
+export declare type ExpressionBuilderProps = {
+    value: string;
+    onChange: (value: string) => void;
+    disabled?: boolean;
+    fieldType?: ColumnFieldType;
+    maxRows?: number;
+};
+
+export declare type ExpressionBuilderRef = {
+    focus: () => void;
+};
 
 declare type ExpressionControllerProps = {
     disabled?: boolean;
@@ -2155,8 +3696,11 @@ export declare const JdmConfigProvider: default_2.FC<JdmConfigProviderProps>;
 export declare type JdmConfigProviderProps = {
     theme?: ThemeConfig;
     prefixCls?: string;
+    dictionaries?: DictionaryMap;
     children?: default_2.ReactNode;
 };
+
+export declare type JdmUiMode = 'dev' | 'business';
 
 export declare type MinimalNodeProps = Pick<NodeProps, 'id' | 'data' | 'selected'>;
 
@@ -2409,32 +3953,412 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
             name: z.ZodOptional<z.ZodNullable<z.ZodString>>;
             field: z.ZodOptional<z.ZodNullable<z.ZodString>>;
             defaultValue: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+            fieldType: z.ZodOptional<z.ZodNullable<z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
+                type: z.ZodLiteral<"any">;
+            }, "strip", z.ZodTypeAny, {
+                type: "any";
+            }, {
+                type: "any";
+            }>, z.ZodObject<{
+                type: z.ZodLiteral<"string">;
+                enum: z.ZodOptional<z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
+                    type: z.ZodLiteral<"inline">;
+                    values: z.ZodArray<z.ZodObject<{
+                        label: z.ZodString;
+                        value: z.ZodString;
+                    }, "strip", z.ZodTypeAny, {
+                        value: string;
+                        label: string;
+                    }, {
+                        value: string;
+                        label: string;
+                    }>, "many">;
+                    loose: z.ZodOptional<z.ZodBoolean>;
+                }, "strip", z.ZodTypeAny, {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                }, {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                }>, z.ZodObject<{
+                    type: z.ZodLiteral<"ref">;
+                    ref: z.ZodString;
+                    loose: z.ZodOptional<z.ZodBoolean>;
+                }, "strip", z.ZodTypeAny, {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                }, {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                }>]>>;
+            }, "strip", z.ZodTypeAny, {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            }, {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            }>, z.ZodObject<{
+                type: z.ZodLiteral<"number">;
+            }, "strip", z.ZodTypeAny, {
+                type: "number";
+            }, {
+                type: "number";
+            }>, z.ZodObject<{
+                type: z.ZodLiteral<"boolean">;
+            }, "strip", z.ZodTypeAny, {
+                type: "boolean";
+            }, {
+                type: "boolean";
+            }>, z.ZodObject<{
+                type: z.ZodLiteral<"date">;
+            }, "strip", z.ZodTypeAny, {
+                type: "date";
+            }, {
+                type: "date";
+            }>]>>>;
         }, "strip", z.ZodTypeAny, {
             id: string;
             name?: string | null | undefined;
             field?: string | null | undefined;
             defaultValue?: string | null | undefined;
+            fieldType?: {
+                type: "any";
+            } | {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "number";
+            } | {
+                type: "boolean";
+            } | {
+                type: "date";
+            } | null | undefined;
         }, {
             id?: string | undefined;
             name?: string | null | undefined;
             field?: string | null | undefined;
             defaultValue?: string | null | undefined;
+            fieldType?: {
+                type: "any";
+            } | {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "number";
+            } | {
+                type: "boolean";
+            } | {
+                type: "date";
+            } | null | undefined;
         }>, "many">;
         outputs: z.ZodArray<z.ZodObject<{
             id: z.ZodDefault<z.ZodString>;
             name: z.ZodString;
             field: z.ZodString;
             defaultValue: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+            outputFieldType: z.ZodOptional<z.ZodNullable<z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
+                type: z.ZodLiteral<"auto">;
+            }, "strip", z.ZodTypeAny, {
+                type: "auto";
+            }, {
+                type: "auto";
+            }>, z.ZodObject<{
+                type: z.ZodLiteral<"string">;
+                enum: z.ZodOptional<z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
+                    type: z.ZodLiteral<"inline">;
+                    values: z.ZodArray<z.ZodObject<{
+                        label: z.ZodString;
+                        value: z.ZodString;
+                    }, "strip", z.ZodTypeAny, {
+                        value: string;
+                        label: string;
+                    }, {
+                        value: string;
+                        label: string;
+                    }>, "many">;
+                    loose: z.ZodOptional<z.ZodBoolean>;
+                }, "strip", z.ZodTypeAny, {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                }, {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                }>, z.ZodObject<{
+                    type: z.ZodLiteral<"ref">;
+                    ref: z.ZodString;
+                    loose: z.ZodOptional<z.ZodBoolean>;
+                }, "strip", z.ZodTypeAny, {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                }, {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                }>]>>;
+            }, "strip", z.ZodTypeAny, {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            }, {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            }>, z.ZodObject<{
+                type: z.ZodLiteral<"string-array">;
+                enum: z.ZodOptional<z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
+                    type: z.ZodLiteral<"inline">;
+                    values: z.ZodArray<z.ZodObject<{
+                        label: z.ZodString;
+                        value: z.ZodString;
+                    }, "strip", z.ZodTypeAny, {
+                        value: string;
+                        label: string;
+                    }, {
+                        value: string;
+                        label: string;
+                    }>, "many">;
+                    loose: z.ZodOptional<z.ZodBoolean>;
+                }, "strip", z.ZodTypeAny, {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                }, {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                }>, z.ZodObject<{
+                    type: z.ZodLiteral<"ref">;
+                    ref: z.ZodString;
+                    loose: z.ZodOptional<z.ZodBoolean>;
+                }, "strip", z.ZodTypeAny, {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                }, {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                }>]>>;
+            }, "strip", z.ZodTypeAny, {
+                type: "string-array";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            }, {
+                type: "string-array";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            }>, z.ZodObject<{
+                type: z.ZodLiteral<"number">;
+            }, "strip", z.ZodTypeAny, {
+                type: "number";
+            }, {
+                type: "number";
+            }>, z.ZodObject<{
+                type: z.ZodLiteral<"boolean">;
+            }, "strip", z.ZodTypeAny, {
+                type: "boolean";
+            }, {
+                type: "boolean";
+            }>, z.ZodObject<{
+                type: z.ZodLiteral<"date">;
+            }, "strip", z.ZodTypeAny, {
+                type: "date";
+            }, {
+                type: "date";
+            }>]>>>;
         }, "strip", z.ZodTypeAny, {
             id: string;
             name: string;
             field: string;
             defaultValue?: string | null | undefined;
+            outputFieldType?: {
+                type: "auto";
+            } | {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "string-array";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "number";
+            } | {
+                type: "boolean";
+            } | {
+                type: "date";
+            } | null | undefined;
         }, {
             name: string;
             field: string;
             id?: string | undefined;
             defaultValue?: string | null | undefined;
+            outputFieldType?: {
+                type: "auto";
+            } | {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "string-array";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "number";
+            } | {
+                type: "boolean";
+            } | {
+                type: "date";
+            } | null | undefined;
         }>, "many">;
         passThrough: z.ZodEffects<z.ZodOptional<z.ZodNullable<z.ZodBoolean>>, boolean, boolean | null | undefined>;
         inputField: z.ZodEffects<z.ZodDefault<z.ZodOptional<z.ZodNullable<z.ZodString>>>, string | null, string | null | undefined>;
@@ -2452,12 +4376,72 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
             name?: string | null | undefined;
             field?: string | null | undefined;
             defaultValue?: string | null | undefined;
+            fieldType?: {
+                type: "any";
+            } | {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "number";
+            } | {
+                type: "boolean";
+            } | {
+                type: "date";
+            } | null | undefined;
         }[];
         outputs: {
             id: string;
             name: string;
             field: string;
             defaultValue?: string | null | undefined;
+            outputFieldType?: {
+                type: "auto";
+            } | {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "string-array";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "number";
+            } | {
+                type: "boolean";
+            } | {
+                type: "date";
+            } | null | undefined;
         }[];
     }, {
         inputs: {
@@ -2465,12 +4449,72 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
             name?: string | null | undefined;
             field?: string | null | undefined;
             defaultValue?: string | null | undefined;
+            fieldType?: {
+                type: "any";
+            } | {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "number";
+            } | {
+                type: "boolean";
+            } | {
+                type: "date";
+            } | null | undefined;
         }[];
         outputs: {
             name: string;
             field: string;
             id?: string | undefined;
             defaultValue?: string | null | undefined;
+            outputFieldType?: {
+                type: "auto";
+            } | {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "string-array";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "number";
+            } | {
+                type: "boolean";
+            } | {
+                type: "date";
+            } | null | undefined;
         }[];
         passThrough?: boolean | null | undefined;
         inputField?: string | null | undefined;
@@ -2506,12 +4550,72 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
             name?: string | null | undefined;
             field?: string | null | undefined;
             defaultValue?: string | null | undefined;
+            fieldType?: {
+                type: "any";
+            } | {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "number";
+            } | {
+                type: "boolean";
+            } | {
+                type: "date";
+            } | null | undefined;
         }[];
         outputs: {
             id: string;
             name: string;
             field: string;
             defaultValue?: string | null | undefined;
+            outputFieldType?: {
+                type: "auto";
+            } | {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "string-array";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "number";
+            } | {
+                type: "boolean";
+            } | {
+                type: "date";
+            } | null | undefined;
         }[];
     };
     id: string;
@@ -2528,12 +4632,72 @@ export declare const nodeSchema: z.ZodUnion<[z.ZodDiscriminatedUnion<"type", [z.
             name?: string | null | undefined;
             field?: string | null | undefined;
             defaultValue?: string | null | undefined;
+            fieldType?: {
+                type: "any";
+            } | {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "number";
+            } | {
+                type: "boolean";
+            } | {
+                type: "date";
+            } | null | undefined;
         }[];
         outputs: {
             name: string;
             field: string;
             id?: string | undefined;
             defaultValue?: string | null | undefined;
+            outputFieldType?: {
+                type: "auto";
+            } | {
+                type: "string";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "string-array";
+                enum?: {
+                    values: {
+                        value: string;
+                        label: string;
+                    }[];
+                    type: "inline";
+                    loose?: boolean | undefined;
+                } | {
+                    ref: string;
+                    type: "ref";
+                    loose?: boolean | undefined;
+                } | undefined;
+            } | {
+                type: "number";
+            } | {
+                type: "boolean";
+            } | {
+                type: "date";
+            } | null | undefined;
         }[];
         passThrough?: boolean | null | undefined;
         inputField?: string | null | undefined;
@@ -2854,6 +5018,179 @@ declare type NodeTypeParams = {
 
 declare type Output = unknown;
 
+export declare const OUTPUT_FIELD_TYPE_OPTIONS: {
+    value: OutputFieldType['type'];
+    label: string;
+}[];
+
+export declare type OutputFieldType = z.infer<typeof outputFieldTypeSchema>;
+
+export declare const outputFieldTypeSchema: z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
+    type: z.ZodLiteral<"auto">;
+}, "strip", z.ZodTypeAny, {
+    type: "auto";
+}, {
+    type: "auto";
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"string">;
+    enum: z.ZodOptional<z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
+        type: z.ZodLiteral<"inline">;
+        values: z.ZodArray<z.ZodObject<{
+            label: z.ZodString;
+            value: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            value: string;
+            label: string;
+        }, {
+            value: string;
+            label: string;
+        }>, "many">;
+        loose: z.ZodOptional<z.ZodBoolean>;
+    }, "strip", z.ZodTypeAny, {
+        values: {
+            value: string;
+            label: string;
+        }[];
+        type: "inline";
+        loose?: boolean | undefined;
+    }, {
+        values: {
+            value: string;
+            label: string;
+        }[];
+        type: "inline";
+        loose?: boolean | undefined;
+    }>, z.ZodObject<{
+        type: z.ZodLiteral<"ref">;
+        ref: z.ZodString;
+        loose: z.ZodOptional<z.ZodBoolean>;
+    }, "strip", z.ZodTypeAny, {
+        ref: string;
+        type: "ref";
+        loose?: boolean | undefined;
+    }, {
+        ref: string;
+        type: "ref";
+        loose?: boolean | undefined;
+    }>]>>;
+}, "strip", z.ZodTypeAny, {
+    type: "string";
+    enum?: {
+        values: {
+            value: string;
+            label: string;
+        }[];
+        type: "inline";
+        loose?: boolean | undefined;
+    } | {
+        ref: string;
+        type: "ref";
+        loose?: boolean | undefined;
+    } | undefined;
+}, {
+    type: "string";
+    enum?: {
+        values: {
+            value: string;
+            label: string;
+        }[];
+        type: "inline";
+        loose?: boolean | undefined;
+    } | {
+        ref: string;
+        type: "ref";
+        loose?: boolean | undefined;
+    } | undefined;
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"string-array">;
+    enum: z.ZodOptional<z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
+        type: z.ZodLiteral<"inline">;
+        values: z.ZodArray<z.ZodObject<{
+            label: z.ZodString;
+            value: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            value: string;
+            label: string;
+        }, {
+            value: string;
+            label: string;
+        }>, "many">;
+        loose: z.ZodOptional<z.ZodBoolean>;
+    }, "strip", z.ZodTypeAny, {
+        values: {
+            value: string;
+            label: string;
+        }[];
+        type: "inline";
+        loose?: boolean | undefined;
+    }, {
+        values: {
+            value: string;
+            label: string;
+        }[];
+        type: "inline";
+        loose?: boolean | undefined;
+    }>, z.ZodObject<{
+        type: z.ZodLiteral<"ref">;
+        ref: z.ZodString;
+        loose: z.ZodOptional<z.ZodBoolean>;
+    }, "strip", z.ZodTypeAny, {
+        ref: string;
+        type: "ref";
+        loose?: boolean | undefined;
+    }, {
+        ref: string;
+        type: "ref";
+        loose?: boolean | undefined;
+    }>]>>;
+}, "strip", z.ZodTypeAny, {
+    type: "string-array";
+    enum?: {
+        values: {
+            value: string;
+            label: string;
+        }[];
+        type: "inline";
+        loose?: boolean | undefined;
+    } | {
+        ref: string;
+        type: "ref";
+        loose?: boolean | undefined;
+    } | undefined;
+}, {
+    type: "string-array";
+    enum?: {
+        values: {
+            value: string;
+            label: string;
+        }[];
+        type: "inline";
+        loose?: boolean | undefined;
+    } | {
+        ref: string;
+        type: "ref";
+        loose?: boolean | undefined;
+    } | undefined;
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"number">;
+}, "strip", z.ZodTypeAny, {
+    type: "number";
+}, {
+    type: "number";
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"boolean">;
+}, "strip", z.ZodTypeAny, {
+    type: "boolean";
+}, {
+    type: "boolean";
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"date">;
+}, "strip", z.ZodTypeAny, {
+    type: "date";
+}, {
+    type: "date";
+}>]>;
+
 export declare const outputNodeSchema: z.ZodObject<z.objectUtil.extendShape<{
     type: z.ZodLiteral<NodeKind.Output>;
     content: z.ZodDefault<z.ZodObject<{
@@ -3114,11 +5451,13 @@ declare type TableCursor = {
     y: number;
 };
 
-declare type TableSchemaItem = {
+export declare type TableSchemaItem = {
     id: string;
     name: string;
     field?: string;
     defaultValue?: string;
+    fieldType?: ColumnFieldType;
+    outputFieldType?: OutputFieldType;
     _diff?: DiffMetadata;
 };
 
@@ -3153,6 +5492,8 @@ export declare function useDecisionGraphReferences<T>(selector: (state: Decision
 
 export declare function useDecisionGraphState<T>(selector: (state: DecisionGraphStoreType['state']) => T, equals?: (a: any, b: any) => boolean): T;
 
+export declare const useDictionaries: () => DictionaryMap;
+
 export declare const useEdgeDiff: (id: string) => {
     diff: {
         status: DiffStatus;
@@ -3175,6 +5516,8 @@ export declare const useNodeDiff: (id: string) => {
 export declare const useNodeType: (id: string, { attachGlobals, disabled }?: NodeTypeParams) => VariableType | undefined;
 
 export declare const usePersistentState: <S>(key: string, defaultValue?: S) => [S | undefined, Dispatch<SetStateAction<S | undefined>>];
+
+export declare const useWasmReady: () => boolean;
 
 export declare const validationSchema: z.ZodObject<{
     inputSchema: z.ZodDefault<z.ZodOptional<z.ZodNullable<z.ZodAny>>>;
