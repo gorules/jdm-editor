@@ -49,11 +49,24 @@ export type DecisionTableType = {
   rules: Record<string, string>[];
 } & Diff;
 
+const outputTypeDefault = (schemaItem: TableSchemaItem): string => {
+  const type = schemaItem.outputFieldType?.type;
+  if (!type) return '';
+  return match(type)
+    .with('string', () => '""')
+    .with('string-array', () => '[]')
+    .with('boolean', () => 'false')
+    .with('number', () => '0')
+    .with('date', () => `d('${new Date().toISOString().slice(0, 10)}')`)
+    .otherwise(() => '');
+};
+
 const cleanupTableRule = (
   decisionTable: DecisionTableType,
   rule: Record<string, string>,
   defaultId?: string,
 ): Record<string, string> => {
+  const outputIds = new Set(decisionTable.outputs.map((o) => o.id));
   const schemaItems = [...decisionTable.inputs, ...decisionTable.outputs];
   const newRule: Record<string, string> = {
     _id: rule._id || crypto.randomUUID(),
@@ -61,7 +74,8 @@ const cleanupTableRule = (
   };
   schemaItems.forEach((schemaItem) => {
     if (defaultId && newRule._id === defaultId) {
-      return (newRule[schemaItem.id] = rule?.[schemaItem.id] || schemaItem?.defaultValue || '');
+      const fallback = outputIds.has(schemaItem.id) ? outputTypeDefault(schemaItem) : '';
+      return (newRule[schemaItem.id] = rule?.[schemaItem.id] || schemaItem?.defaultValue || fallback);
     }
     newRule[schemaItem.id] = rule?.[schemaItem.id] || '';
   });
@@ -70,20 +84,7 @@ const cleanupTableRule = (
 
 const cleanupTableRules = (decisionTable: DecisionTableType, defaultId?: string): Record<string, string>[] => {
   const rules = decisionTable?.rules || [];
-  const schemaItems = [...decisionTable.inputs, ...decisionTable.outputs];
-  return rules.map((rule) => {
-    const newRule: Record<string, string> = {
-      _id: rule._id || crypto.randomUUID(),
-      _description: rule._description,
-    };
-    schemaItems.forEach((schemaItem) => {
-      if (defaultId && newRule._id === defaultId) {
-        return (newRule[schemaItem.id] = rule?.[schemaItem.id] || schemaItem?.defaultValue || '');
-      }
-      newRule[schemaItem.id] = rule?.[schemaItem.id] || '';
-    });
-    return newRule;
-  });
+  return rules.map((rule) => cleanupTableRule(decisionTable, rule, defaultId));
 };
 
 export const parseDecisionTable = (decisionTable?: DecisionTableType) => {
