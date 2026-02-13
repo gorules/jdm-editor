@@ -606,6 +606,7 @@ const DateInput: React.FC<SimpleInputProps> = ({ value, onChange, disabled }) =>
         disabled={disabled}
         variant='borderless'
         size='small'
+        popupMatchSelectWidth={false}
         suffixIcon={null}
       />
     </>
@@ -649,7 +650,14 @@ const ChipInput: React.FC<SimpleInputProps & { options: { v: number; l: string }
   options,
   defaultValues,
 }) => {
-  const sel = value?.type === 'intArray' ? value.values : defaultValues;
+  const valid = new Set(options.map((o) => o.v));
+  const raw = value?.type === 'intArray' ? value.values : defaultValues;
+  const sel = raw.filter((v) => valid.has(v));
+
+  useEffect(() => {
+    if (sel.length !== raw.length && sel.length > 0) onChange({ type: 'intArray', values: sel });
+  }, [sel.length, raw.length]);
+
   const toggle = (v: number) => {
     if (disabled) return;
     const next = sel.includes(v) ? sel.filter((x) => x !== v) : [...sel, v].sort((a, b) => a - b);
