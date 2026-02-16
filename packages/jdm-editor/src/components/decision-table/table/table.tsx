@@ -92,14 +92,30 @@ export const Table: React.FC<TableProps> = ({ id, maxHeight, globalFilter = '', 
       ),
   );
 
-  const getUniqueValues = useCallback(
-    (columnId: string) => {
+  /** Chunk size for async unique-value computation; yields to main thread between chunks */
+  const UNIQUE_VALUES_CHUNK_SIZE = 10000;
+
+  const getUniqueValuesAsync = useCallback(
+    (columnId: string): Promise<{ values: string[] }> => {
+      const list = rules ?? [];
       const set = new Set<string>();
-      (rules || []).forEach((rule) => {
-        const v = rule[columnId];
-        set.add(String(v ?? ''));
+
+      const processChunk = (start: number): Promise<void> => {
+        const end = Math.min(start + UNIQUE_VALUES_CHUNK_SIZE, list.length);
+        for (let i = start; i < end; i++) {
+          const v = list[i][columnId];
+          set.add(String(v ?? ''));
+        }
+        if (end >= list.length) return Promise.resolve();
+        return new Promise<void>((r) => setTimeout(r, 0)).then(() => processChunk(end));
+      };
+
+      return processChunk(0).then(() => {
+        const values = Array.from(set).sort((a, b) =>
+          a === '' ? 1 : b === '' ? -1 : a.localeCompare(b),
+        );
+        return { values };
       });
-      return Array.from(set).sort((a, b) => (a === '' ? 1 : b === '' ? -1 : a.localeCompare(b)));
     },
     [rules],
   );
@@ -110,10 +126,9 @@ export const Table: React.FC<TableProps> = ({ id, maxHeight, globalFilter = '', 
       setGlobalFilter: setGlobalFilter ?? (() => {}),
       columnFilters,
       setColumnFilters,
-      getUniqueValues,
-      rules: rules ?? [],
+      getUniqueValuesAsync,
     }),
-    [globalFilter, setGlobalFilter, columnFilters, getUniqueValues, rules],
+    [globalFilter, setGlobalFilter, columnFilters, getUniqueValuesAsync],
   );
 
   const columns = React.useMemo<ColumnDef<any>[]>(
