@@ -1,13 +1,17 @@
 import type { ColumnFiltersState } from '@tanstack/react-table';
 import React from 'react';
 
+export type UniqueValuesResult = {
+  values: string[];
+};
+
 export type DecisionTableFilterContextValue = {
   globalFilter: string;
   setGlobalFilter: (value: string) => void;
   columnFilters: ColumnFiltersState;
   setColumnFilters: (updater: ColumnFiltersState | ((prev: ColumnFiltersState) => ColumnFiltersState)) => void;
-  getUniqueValues: (columnId: string) => string[];
-  rules: Record<string, string>[];
+  /** Resolves with all unique values for the column; computed in chunks to avoid blocking the main thread */
+  getUniqueValuesAsync: (columnId: string) => Promise<UniqueValuesResult>;
 };
 
 const DecisionTableFilterContext = React.createContext<DecisionTableFilterContextValue | null>(null);
