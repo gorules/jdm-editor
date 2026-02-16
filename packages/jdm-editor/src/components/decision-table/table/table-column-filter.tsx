@@ -1,7 +1,8 @@
-import { FilterOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Input, Tooltip } from 'antd';
+import { FilterOutlined, LoadingOutlined } from '@ant-design/icons';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { Button, Checkbox, Input, Spin, Tooltip } from 'antd';
 import clsx from 'clsx';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useDecisionTableFilterOrThrow } from '../context/dt-filter.context';
 
@@ -18,11 +19,35 @@ export const TableColumnFilter: React.FC<TableColumnFilterProps> = ({
   disabled,
   className,
 }) => {
-  const { columnFilters, setColumnFilters, getUniqueValues } = useDecisionTableFilterOrThrow();
+  const { columnFilters, setColumnFilters, getUniqueValuesAsync } = useDecisionTableFilterOrThrow();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const [uniqueValues, setUniqueValues] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  const uniqueValues = useMemo(() => getUniqueValues(columnId), [columnId, getUniqueValues]);
+  /** Load all unique values when dropdown opens; computed in chunks so UI stays responsive */
+  useEffect(() => {
+    if (!dropdownOpen) {
+      setUniqueValues([]);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    getUniqueValuesAsync(columnId)
+      .then((result) => {
+        if (!cancelled) {
+          setUniqueValues(result.values);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [dropdownOpen, columnId, getUniqueValuesAsync]);
+
   const selectedSet = useMemo(() => {
     const filter = columnFilters.find((f) => f.id === columnId);
     const value = filter?.value;
@@ -36,6 +61,13 @@ export const TableColumnFilter: React.FC<TableColumnFilterProps> = ({
     const s = search.toLowerCase();
     return uniqueValues.filter((v) => String(v).toLowerCase().includes(s));
   }, [uniqueValues, search]);
+
+  const virtualizer = useVirtualizer({
+    count: filteredValues.length,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => 28,
+    overscan: 5,
+  });
 
   const isFilterActive = selectedSet.size > 0;
   const allSelected = filteredValues.length > 0 && filteredValues.every((v) => selectedSet.has(String(v)));
@@ -80,8 +112,15 @@ export const TableColumnFilter: React.FC<TableColumnFilterProps> = ({
         size="small"
         style={{ marginBottom: 8 }}
       />
-      <div style={{ maxHeight: 220, overflowY: 'auto', marginBottom: 8 }}>
-        {filteredValues.length === 0 ? (
+      <div ref={scrollRef} style={{ maxHeight: 220, overflowY: 'auto', marginBottom: 8 }}>
+        {loading ? (
+          <div style={{ padding: 16, textAlign: 'center' }}>
+            <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
+            <div className="grl-dt-text-secondary" style={{ fontSize: 12, marginTop: 8 }}>
+              Loading values…
+            </div>
+          </div>
+        ) : filteredValues.length === 0 ? (
           <span className="grl-dt-text-secondary" style={{ fontSize: 12 }}>
             No values
           </span>
@@ -96,20 +135,41 @@ export const TableColumnFilter: React.FC<TableColumnFilterProps> = ({
                 <span style={{ fontSize: 12 }}>(Select all)</span>
               </Checkbox>
             </div>
-            {filteredValues.map((value) => {
-              const str = String(value ?? '');
-              return (
-                <div key={str} style={{ display: 'block', marginBottom: 2 }}>
-                  <Checkbox
-                    checked={selectedSet.has(str)}
-                    onChange={() => toggleValue(str)}
-                    style={{ fontSize: 12 }}
+            <div
+              style={{
+                height: `${virtualizer.getTotalSize()}px`,
+                width: '100%',
+                position: 'relative',
+              }}
+            >
+              {virtualizer.getVirtualItems().map((virtualRow) => {
+                const value = filteredValues[virtualRow.index];
+                const str = String(value ?? '');
+                return (
+                  <div
+                    key={virtualRow.key}
+                    data-index={virtualRow.index}
+                    ref={virtualizer.measureElement}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      transform: `translateY(${virtualRow.start}px)`,
+                      marginBottom: 2,
+                    }}
                   >
-                    {str || '(empty)'}
-                  </Checkbox>
-                </div>
-              );
-            })}
+                    <Checkbox
+                      checked={selectedSet.has(str)}
+                      onChange={() => toggleValue(str)}
+                      style={{ fontSize: 12 }}
+                    >
+                      {str || '(empty)'}
+                    </Checkbox>
+                  </div>
+                );
+              })}
+            </div>
           </>
         )}
       </div>
