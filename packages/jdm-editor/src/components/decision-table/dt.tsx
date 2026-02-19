@@ -33,6 +33,7 @@ export const DecisionTable: React.FC<DecisionTableProps> = ({
   const { token } = theme.useToken();
 
   const [_, setMounted] = useState(false);
+  const [globalFilter, setGlobalFilter] = useState('');
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -62,10 +63,10 @@ export const DecisionTable: React.FC<DecisionTableProps> = ({
         <DndProvider {...dndProps}>
           <DecisionTableProvider>
             <DecisionTableDialogProvider getContainer={mountDialogsOnBody ? undefined : getContainer}>
-              <DecisionTableCommandBar />
-              <DictionaryBridge>
-                <Table id={id} maxHeight={tableHeight} />
-              </DictionaryBridge>
+              <DecisionTableCommandBar globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
+                <DictionaryBridge>
+                  <Table id={id} maxHeight={tableHeight} globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
+                </DictionaryBridge>
               <DecisionTableDialogs />
               <DecisionTableEmpty {...props} />
             </DecisionTableDialogProvider>

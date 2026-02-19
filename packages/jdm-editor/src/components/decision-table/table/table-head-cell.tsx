@@ -12,6 +12,7 @@ import { useDecisionTableDialog } from '../context/dt-dialog.context';
 import type { DecisionTablePermission } from '../context/dt-store.context';
 import { type TableSchemaItem, useDecisionTableActions, useDecisionTableState } from '../context/dt-store.context';
 import { getReferenceMap } from '../util';
+import { TableColumnFilter } from './table-column-filter';
 
 export type TableHeadCellProps = {
   permission?: DecisionTablePermission;
@@ -174,7 +175,7 @@ export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({ per
   });
 
   return (
-    <div className={clsx(['head-cell'])}>
+    <div className={clsx(['head-cell', 'head-cell--with-filter'])}>
       <Stack horizontal horizontalAlign={'space-between'} verticalAlign={'center'}>
         <Stack gap={0} className={'text-wrapper'}>
           {schema?._diff?.fields?.name?.status === 'modified' && (
@@ -214,6 +215,7 @@ export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({ per
           />
         </Stack>
         <Stack horizontal gap={2} verticalAlign={'center'} style={{ width: 'auto' }}>
+          <TableColumnFilter columnId={schema.id} columnName={schema.name} disabled={disabled} />
           <DiffIcon status={schema?._diff?.status} style={{ fontSize: 16 }} />
         </Stack>
       </Stack>
@@ -225,7 +227,7 @@ export const TableHeadCellOutputField: React.FC<TableHeadCellFieldProps> = ({ pe
   const tableActions = useDecisionTableActions();
 
   return (
-    <div className={clsx(['head-cell'])}>
+    <div className={clsx(['head-cell', 'head-cell--with-filter'])}>
       <Stack horizontal horizontalAlign='space-between' verticalAlign={'center'}>
         <Stack gap={0} className={'text-wrapper'} verticalAlign={'center'}>
           {schema?._diff?.fields?.name?.status === 'modified' && (
@@ -261,20 +263,9 @@ export const TableHeadCellOutputField: React.FC<TableHeadCellFieldProps> = ({ pe
             }}
           />
         </Stack>
-        <Stack
-          horizontal
-          gap={2}
-          verticalAlign={'center'}
-          style={{
-            width: 'auto',
-          }}
-        >
-          <DiffIcon
-            status={schema?._diff?.status}
-            style={{
-              fontSize: 16,
-            }}
-          />
+        <Stack horizontal gap={2} verticalAlign={'center'} style={{ width: 'auto' }}>
+          <TableColumnFilter columnId={schema.id} columnName={schema.name} disabled={disabled} />
+          <DiffIcon status={schema?._diff?.status} style={{ fontSize: 16 }} />
         </Stack>
       </Stack>
     </div>
