@@ -29,6 +29,10 @@ export const TableHeadCellInput: React.FC<TableHeadCellProps> = ({ permission, d
   const inputs = useDecisionTableState((store) => store.decisionTable?.inputs);
   const tableActions = useDecisionTableActions();
   const { setDialog } = useDecisionTableDialog();
+  const { inputData, inputVariableType } = useDecisionTableState(({ calculatedInputData, inputVariableType }) => ({
+    inputData: calculatedInputData,
+    inputVariableType,
+  }));
 
   return (
     <div className={'head-cell'}>
@@ -56,21 +60,29 @@ export const TableHeadCellInput: React.FC<TableHeadCellProps> = ({ permission, d
                 />
               </Tooltip>
             )}
-            <Tooltip title='Add input'>
-              <Button
-                className='grl-dt-text-secondary'
-                size={'small'}
-                type={'text'}
-                icon={<PlusOutlined />}
-                disabled={disabled}
-                onClick={() => {
-                  tableActions.addColumn('inputs', {
-                    id: crypto.randomUUID(),
-                    name: 'New field',
-                  });
-                }}
-              />
-            </Tooltip>
+            <InputFieldEdit
+              mode='create'
+              disabled={disabled}
+              variableType={inputVariableType}
+              inputData={inputData}
+              trigger={
+                <Button
+                  className='grl-dt-text-secondary'
+                  size={'small'}
+                  type={'text'}
+                  icon={<PlusOutlined />}
+                  disabled={disabled}
+                />
+              }
+              onCreate={(name, field, fieldType) => {
+                tableActions.addColumn('inputs', {
+                  id: crypto.randomUUID(),
+                  name,
+                  field: field || undefined,
+                  fieldType,
+                });
+              }}
+            />
           </div>
         )}
       </Stack>
@@ -109,18 +121,27 @@ export const TableHeadCellOutput: React.FC<TableHeadCellProps> = ({ permission, 
                 />
               </Tooltip>
             )}
-            <Tooltip title='Add output'>
-              <Button
-                className='grl-dt-text-secondary'
-                size={'small'}
-                type={'text'}
-                icon={<PlusOutlined />}
-                disabled={disabled}
-                onClick={() => {
-                  tableActions.addColumn('outputs', { id: crypto.randomUUID(), name: 'Output', field: 'output' });
-                }}
-              />
-            </Tooltip>
+            <OutputFieldEdit
+              mode='create'
+              disabled={disabled}
+              trigger={
+                <Button
+                  className='grl-dt-text-secondary'
+                  size={'small'}
+                  type={'text'}
+                  icon={<PlusOutlined />}
+                  disabled={disabled}
+                />
+              }
+              onCreate={(name, field, outputFieldType) => {
+                tableActions.addColumn('outputs', {
+                  id: crypto.randomUUID(),
+                  name,
+                  field: field || 'output',
+                  outputFieldType,
+                });
+              }}
+            />
           </div>
         )}
       </Stack>
@@ -183,12 +204,13 @@ export const TableHeadCellInputField: React.FC<TableHeadCellFieldProps> = ({ per
             variableType={inputVariableType}
             inputData={inputData}
             referenceData={referenceData}
+            fieldType={schema.fieldType}
             disabled={disabled || (permission !== 'edit:full' && permission !== 'edit:rules')}
             onRemove={() => {
               tableActions.removeColumn('inputs', schema.id);
             }}
-            onChange={(field) => {
-              tableActions.updateColumn('inputs', schema.id, { ...schema, field });
+            onChange={(field, fieldType) => {
+              tableActions.updateColumn('inputs', schema.id, { ...schema, field, fieldType });
             }}
           />
         </Stack>
@@ -231,12 +253,13 @@ export const TableHeadCellOutputField: React.FC<TableHeadCellFieldProps> = ({ pe
           )}
           <OutputFieldEdit
             value={schema.field}
+            fieldType={schema.outputFieldType}
             disabled={disabled || permission !== 'edit:full'}
             onRemove={() => {
               tableActions.removeColumn('outputs', schema.id);
             }}
-            onChange={(field) => {
-              tableActions.updateColumn('outputs', schema.id, { ...schema, field });
+            onChange={(field, outputFieldType) => {
+              tableActions.updateColumn('outputs', schema.id, { ...schema, field, outputFieldType });
             }}
           />
         </Stack>

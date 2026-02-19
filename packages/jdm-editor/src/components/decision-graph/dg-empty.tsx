@@ -3,6 +3,8 @@ import type React from 'react';
 import { useEffect, useRef } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
+import type { DictionaryMap } from '../../theme';
+import type { JdmUiMode } from '../decision-table/context/dt-store.context';
 import {
   type DecisionGraphStoreType,
   useDecisionGraphActions,
@@ -35,6 +37,9 @@ export type DecisionGraphEmptyType = {
 
   simulate?: DecisionGraphStoreType['state']['simulate'];
 
+  dictionaries?: DictionaryMap;
+  mode?: JdmUiMode;
+
   onChange?: DecisionGraphStoreType['listeners']['onChange'];
   onReactFlowInit?: DecisionGraphStoreType['listeners']['onReactFlowInit'];
 
@@ -55,6 +60,8 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
   hideLeftToolbar,
   panels,
   simulate,
+  dictionaries,
+  mode,
   viewConfigCta,
   viewConfig,
   onViewConfigCta,
@@ -97,8 +104,10 @@ export const DecisionGraphEmpty: React.FC<DecisionGraphEmptyType> = ({
       viewConfig,
       viewConfigCta,
       hideLeftToolbar,
+      dictionaries,
+      mode,
     });
-  }, [id, disabled, components, customNodes, panels, viewConfig, viewConfigCta, hideLeftToolbar]);
+  }, [id, disabled, components, customNodes, panels, viewConfig, viewConfigCta, hideLeftToolbar, dictionaries, mode]);
 
   useEffect(() => {
     stateStore.setState({ name: name ?? 'graph.json' });

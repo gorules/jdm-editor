@@ -214,19 +214,31 @@ export const Table: React.FC<TableProps> = ({ id, maxHeight, globalFilter = '', 
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!tableContainerRef.current) {
-      return;
-    }
+    const el = tableContainerRef.current;
+    if (!el) return;
+
+    let wasVisible = el.offsetWidth > 0;
 
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        if (entry.target instanceof HTMLDivElement) {
-          entry.target.style.setProperty('--dt-container-width', `${entry.contentRect.width}px`);
+        if (!(entry.target instanceof HTMLDivElement)) continue;
+        entry.target.style.setProperty('--dt-container-width', `${entry.contentRect.width}px`);
+
+        const isVisible = entry.contentRect.width > 0;
+        if (!wasVisible && isVisible) {
+          el.scrollTop = 0;
+          el.style.opacity = '0';
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              el.style.opacity = '';
+            });
+          });
         }
+        wasVisible = isVisible;
       }
     });
 
-    resizeObserver.observe(tableContainerRef.current);
+    resizeObserver.observe(el);
 
     return () => {
       resizeObserver.disconnect();

@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.51.2](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.51.1...@gorules/jdm-editor@1.51.2) (2026-02-13)
+
+### Bug Fixes
+
+- add expression builder defaults ([#233](https://github.com/gorules/jdm-editor/issues/233)) ([46dda06](https://github.com/gorules/jdm-editor/commit/46dda06568554b13adfc245d67189480df14e01d))
+
+## [1.51.1](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.51.0...@gorules/jdm-editor@1.51.1) (2026-02-13)
+
+### Bug Fixes
+
+- minor expression builder fixes ([#232](https://github.com/gorules/jdm-editor/issues/232)) ([20f9e27](https://github.com/gorules/jdm-editor/commit/20f9e275943ddc22cb5c782fbb65dea248491773))
+
+# [1.51.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.50.6...@gorules/jdm-editor@1.51.0) (2026-02-12)
+
+### Features
+
+- ui expression builder ([#231](https://github.com/gorules/jdm-editor/issues/231)) ([8fd7621](https://github.com/gorules/jdm-editor/commit/8fd76212ed5218e3267d0ea6bbc8a70ad443cd3d))
+
 ## [1.50.6](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.50.5...@gorules/jdm-editor@1.50.6) (2026-01-19)
 
 **Note:** Version bump only for package @gorules/jdm-editor

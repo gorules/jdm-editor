@@ -38,41 +38,66 @@ export const DecisionTableCommandBar: React.FC<DecisionTableCommandBarProps> = (
     const items = mappedExcelData.items;
     const rules = mappedExcelData.rules;
 
+    const existingInputs = table.inputs;
+    const existingOutputs = table.outputs;
+
+    const idRemap: Record<string, string> = {};
+
     const inputs = items
       .filter((item) => item.type === 'input')
-      .map((item) => ({
-        id: item.id,
-        name: item.label,
-        field: item.value
-          ?.replace(/[^a-zA-Z0-9\s._]/g, '')
-          .trim()
-          .replace(/\s+/g, '.')
-          .toLowerCase(),
-      }));
+      .map((item) => {
+        const existing = existingInputs.find((c) => c.name?.toLowerCase() === item.label?.toLowerCase());
+        const newId = existing?.id ?? item.id;
+        if (newId !== item.id) {
+          idRemap[item.id] = newId;
+        }
+        return {
+          id: newId,
+          name: item.label,
+          field: item.value
+            ?.replace(/[^a-zA-Z0-9\s._]/g, '')
+            .trim()
+            .replace(/\s+/g, '.')
+            .toLowerCase(),
+          fieldType: existing?.fieldType,
+          defaultValue: existing?.defaultValue,
+        };
+      });
 
     const outputs = items
       .filter((item) => item.type === 'output')
-      .map((item) => ({
-        id: item.id,
-        name: item.label,
-        field: item.value
-          ?.replace(/[^a-zA-Z0-9\s._]/g, '')
-          .trim()
-          .split(/\s+/)
-          .map((word, index) =>
-            index === 0 ? word.toLowerCase() : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
-          )
-          .join(''),
-      }));
+      .map((item) => {
+        const existing = existingOutputs.find((c) => c.name?.toLowerCase() === item.label?.toLowerCase());
+        const newId = existing?.id ?? item.id;
+        if (newId !== item.id) {
+          idRemap[item.id] = newId;
+        }
+        return {
+          id: newId,
+          name: item.label,
+          field: item.value
+            ?.replace(/[^a-zA-Z0-9\s._]/g, '')
+            .trim()
+            .split(/\s+/)
+            .map((word, index) =>
+              index === 0 ? word.toLowerCase() : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+            )
+            .join(''),
+          outputFieldType: existing?.outputFieldType,
+          defaultValue: existing?.defaultValue,
+        };
+      });
 
-    const reducedRules = rules.map((rule) =>
+    const existingRules = table.rules ?? [];
+    const reducedRules = rules.map((rule, index) =>
       rule.reduce(
         (acc: Record<string, any> & { _id: string }, item) => {
-          acc[item.headerId] = item.value;
+          const mappedId = idRemap[item.headerId] ?? item.headerId;
+          acc[mappedId] = item.value;
           return acc;
         },
         {
-          _id: crypto.randomUUID(),
+          _id: existingRules[index]?._id ?? crypto.randomUUID(),
         },
       ),
     );

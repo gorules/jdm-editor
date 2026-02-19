@@ -4,9 +4,10 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
+import { DictionaryProvider } from '../../theme';
 import { DecisionTableDialogProvider } from './context/dt-dialog.context';
 import type { DecisionTableContextProps } from './context/dt-store.context';
-import { DecisionTableProvider } from './context/dt-store.context';
+import { DecisionTableProvider, useDecisionTableState } from './context/dt-store.context';
 import { DecisionTableDialogs } from './dialog/dt-dialogs';
 import { DecisionTableCommandBar } from './dt-command-bar';
 import type { DecisionTableEmptyType } from './dt-empty';
@@ -74,4 +75,9 @@ export const DecisionTable: React.FC<DecisionTableProps> = ({
       )}
     </div>
   );
+};
+
+const DictionaryBridge: React.FC<React.PropsWithChildren> = ({ children }) => {
+  const dictionaries = useDecisionTableState((s) => s.dictionaries) ?? {};
+  return <DictionaryProvider value={dictionaries}>{children}</DictionaryProvider>;
 };
