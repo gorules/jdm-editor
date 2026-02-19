@@ -63,7 +63,9 @@ export const DecisionTable: React.FC<DecisionTableProps> = ({
           <DecisionTableProvider>
             <DecisionTableDialogProvider getContainer={mountDialogsOnBody ? undefined : getContainer}>
               <DecisionTableCommandBar globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
-              <Table id={id} maxHeight={tableHeight} globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
+                <DictionaryBridge>
+                  <Table id={id} maxHeight={tableHeight} globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
+                </DictionaryBridge>
               <DecisionTableDialogs />
               <DecisionTableEmpty {...props} />
             </DecisionTableDialogProvider>
