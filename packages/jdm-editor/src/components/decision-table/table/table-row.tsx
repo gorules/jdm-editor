@@ -96,7 +96,13 @@ export const TableRow: React.FC<{
     >
       <td
         className={clsx('sort-handler', !disabled && 'draggable', diffStatus && 'diff')}
-        ref={disabled ? undefined : dragRef}
+        ref={
+          disabled
+            ? undefined
+            : (node) => {
+                dragRef(node);
+              }
+        }
         onContextMenuCapture={() => tableActions.setCursor({ x: 'id', y: virtualItem.index })}
       >
         <div className={'text'}>

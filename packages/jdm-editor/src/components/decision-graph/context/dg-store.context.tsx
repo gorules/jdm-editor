@@ -22,7 +22,7 @@ export type PanelType = {
   id: string;
   icon: React.ReactNode;
   title: string;
-  renderPanel?: React.FC;
+  renderPanel?: () => React.ReactNode;
   hideHeader?: boolean;
   onClick?: () => void;
 };

@@ -23,6 +23,7 @@ export const GraphPanel: React.FC = () => {
   }, [activePanel]);
 
   if (!activePanel) return null;
+  const RenderPanel = activePanel.renderPanel;
 
   return (
     <Resizable
@@ -60,7 +61,7 @@ export const GraphPanel: React.FC = () => {
           </div>
         </div>
       )}
-      <div className={'grl-dg__panel__content'}>{activePanel?.renderPanel?.({})}</div>
+      <div className={'grl-dg__panel__content'}>{RenderPanel ? <RenderPanel /> : null}</div>
     </Resizable>
   );
 };

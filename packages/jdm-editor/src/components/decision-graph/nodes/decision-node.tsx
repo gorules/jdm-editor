@@ -121,9 +121,7 @@ export const DecisionNode: React.FC<DecisionNodeProps> = ({
         )}
       </GraphCard>
       {detailsOpen && (
-        <GraphCard
-          className='nodrag'
-        >
+        <GraphCard className='nodrag'>
           <div className='grl-dn__details'>
             <div className='grl-dn__details__header'>
               <Typography.Text className='grl-dn__details__header__text'>{detailsTitle}</Typography.Text>

@@ -25,7 +25,7 @@ export type DecisionTableEmptyType = {
   value?: DecisionTableType;
   disabled?: boolean;
   disableHitPolicy?: boolean;
-  cellRenderer?: (props: TableCellProps) => JSX.Element | null | undefined;
+  cellRenderer?: (props: TableCellProps) => React.ReactElement | null | undefined;
   inputsSchema?: SchemaSelectProps[];
   outputsSchema?: SchemaSelectProps[];
   permission?: DecisionTableStoreType['state']['permission'];

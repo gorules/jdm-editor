@@ -233,7 +233,7 @@ export const Table: React.FC<TableProps> = ({ id, maxHeight }) => {
 };
 
 type TableBodyProps = {
-  tableContainerRef: React.RefObject<HTMLDivElement>;
+  tableContainerRef: React.RefObject<HTMLDivElement | null>;
   table: ReactTable<any>;
 } & Omit<React.HTMLAttributes<HTMLTableSectionElement>, 'children'>;
 

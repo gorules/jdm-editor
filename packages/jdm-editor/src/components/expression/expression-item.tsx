@@ -77,7 +77,13 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
       )}
       style={{ opacity: !isDragging ? 1 : 0.5 }}
     >
-      <div ref={dragRef} className='expression-list-item__drag' aria-disabled={permission !== 'edit:full' || disabled}>
+      <div
+        ref={(node) => {
+          dragRef(node);
+        }}
+        className='expression-list-item__drag'
+        aria-disabled={permission !== 'edit:full' || disabled}
+      >
         <div className='expression-list-item__drag__inner'>
           {expression?._diff?.status ? (
             <DiffIcon
