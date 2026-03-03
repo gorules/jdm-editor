@@ -22,7 +22,7 @@ export const copyToClipboard = async (content: string) => {
 
 export const pasteFromClipboard = async (): Promise<string> => {
   try {
-    return navigator.clipboard.readText();
+    return await navigator.clipboard.readText();
   } catch {
     return '';
   }
