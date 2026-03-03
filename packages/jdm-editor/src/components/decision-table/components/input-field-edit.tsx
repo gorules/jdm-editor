@@ -83,7 +83,7 @@ export const InputFieldEdit: React.FC<InputFieldEditProps> = ({
           <Typography.Text style={{ fontSize: 12, display: 'block', marginBottom: 2 }}>Input Field</Typography.Text>
           <CodeEditor
             ref={codeEditor}
-            value={innerValue}
+            value={innerValue ?? ''}
             onChange={setInnerValue}
             variableType={variableType}
             disabled={disabled}
