@@ -1,29 +1,25 @@
 import { Select, Typography } from 'antd';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { P, match } from 'ts-pattern';
 
 import { Stack } from '../stack';
-import { useExpressionStoreRaw } from './context/expression-store.context';
+import { useExpressionStore, useExpressionStoreRaw } from './context/expression-store.context';
 
 export const ExpressionCommandBar: React.FC = () => {
   const expressionStore = useExpressionStoreRaw();
-  const { debugIndex, traceCount } = expressionStore(({ debug, debugIndex }) => ({
+  const { debugIndex, traceCount } = useExpressionStore(({ debug, debugIndex }) => ({
     debugIndex,
     traceCount: match(debug?.trace?.traceData)
       .with(P.array(), (some) => some.length)
       .otherwise(() => null),
   }));
 
-  const traceIndexOptions = useMemo(() => {
-    if (!traceCount) {
-      return null;
-    }
-
-    return Array.from({ length: traceCount }).map((_, i) => ({
-      label: String(i),
-      value: i,
-    }));
-  }, [debugIndex, traceCount]);
+  const traceIndexOptions = traceCount
+    ? Array.from({ length: traceCount }).map((_, i) => ({
+        label: String(i),
+        value: i,
+      }))
+    : null;
 
   if (!traceIndexOptions) {
     return null;

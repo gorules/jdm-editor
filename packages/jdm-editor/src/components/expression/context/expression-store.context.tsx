@@ -130,11 +130,38 @@ export const ExpressionStoreProvider: React.FC<React.PropsWithChildren<Expressio
   return <ExpressionStoreContext.Provider value={store}>{children}</ExpressionStoreContext.Provider>;
 };
 
+function useStoreSelectorWithEquality<TState, TSlice>(
+  selector: (state: TState) => TSlice,
+  equals: (a: TSlice, b: TSlice) => boolean,
+) {
+  const selectorRef = React.useRef(selector);
+  selectorRef.current = selector;
+  const equalsRef = React.useRef(equals);
+  equalsRef.current = equals;
+  const prevRef = React.useRef<TSlice | undefined>(undefined);
+  const hasPrevRef = React.useRef(false);
+
+  return React.useCallback(
+    (state: TState) => {
+      const next = selectorRef.current(state);
+      if (hasPrevRef.current && equalsRef.current(prevRef.current as TSlice, next)) {
+        return prevRef.current as TSlice;
+      }
+
+      prevRef.current = next;
+      hasPrevRef.current = true;
+      return next;
+    },
+    [],
+  );
+}
+
 export function useExpressionStore<T>(
   selector: (state: ExpressionStore) => T,
   equals: (a: any, b: any) => boolean = equal,
 ): T {
-  return React.useContext(ExpressionStoreContext)(selector, equals);
+  const stableSelector = useStoreSelectorWithEquality(selector, equals);
+  return React.useContext(ExpressionStoreContext)(stableSelector);
 }
 
 export const useExpressionStoreRaw = () => React.useContext(ExpressionStoreContext);

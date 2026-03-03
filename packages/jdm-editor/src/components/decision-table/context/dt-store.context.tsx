@@ -404,18 +404,46 @@ export const DecisionTableProvider: React.FC<React.PropsWithChildren<DecisionTab
   return <DecisionTableStoreContext.Provider value={value}>{children}</DecisionTableStoreContext.Provider>;
 };
 
+function useStoreSelectorWithEquality<TState, TSlice>(
+  selector: (state: TState) => TSlice,
+  equals: (a: TSlice, b: TSlice) => boolean,
+) {
+  const selectorRef = React.useRef(selector);
+  selectorRef.current = selector;
+  const equalsRef = React.useRef(equals);
+  equalsRef.current = equals;
+  const prevRef = React.useRef<TSlice | undefined>(undefined);
+  const hasPrevRef = React.useRef(false);
+
+  return React.useCallback(
+    (state: TState) => {
+      const next = selectorRef.current(state);
+      if (hasPrevRef.current && equalsRef.current(prevRef.current as TSlice, next)) {
+        return prevRef.current as TSlice;
+      }
+
+      prevRef.current = next;
+      hasPrevRef.current = true;
+      return next;
+    },
+    [],
+  );
+}
+
 export function useDecisionTableState<T>(
   selector: (state: DecisionTableStoreType['state']) => T,
   equals: (a: any, b: any) => boolean = equal,
 ): T {
-  return React.useContext(DecisionTableStoreContext).stateStore(selector, equals);
+  const stableSelector = useStoreSelectorWithEquality(selector, equals);
+  return React.useContext(DecisionTableStoreContext).stateStore(stableSelector);
 }
 
 export function useDecisionTableListeners<T>(
   selector: (state: DecisionTableStoreType['listeners']) => T,
   equals: (a: any, b: any) => boolean = equal,
 ): T {
-  return React.useContext(DecisionTableStoreContext).listenerStore(selector, equals);
+  const stableSelector = useStoreSelectorWithEquality(selector, equals);
+  return React.useContext(DecisionTableStoreContext).listenerStore(stableSelector);
 }
 
 export function useDecisionTableActions(): DecisionTableStoreType['actions'] {

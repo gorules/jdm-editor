@@ -35,7 +35,9 @@
     "storybook": "storybook dev -p 9009",
     "build:storybook": "storybook build -o docs",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "vite build"
+    "prepublishOnly": "vite build",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@ant-design/icons": "6.0.0",
@@ -76,7 +78,7 @@
     "ts-pattern": "^5.7.0",
     "use-debounce": "^10.0.4",
     "zod": "^3.24.2",
-    "zustand": "^4.5.5"
+    "zustand": "^5.0.11"
   },
   "devDependencies": {
     "@storybook/addon-actions": "8.6.12",
@@ -99,7 +101,10 @@
     "@types/react-dom": "^19.1.6",
     "@types/to-json-schema": "^0.2.4",
     "@vitejs/plugin-react-swc": "^3.8.1",
+    "@vitest/browser": "^4.0.18",
+    "@vitest/browser-playwright": "^4.0.18",
     "dayjs": "^1.11.13",
+    "playwright": "^1.58.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "sass": "^1.86.3",
@@ -107,7 +112,8 @@
     "storybook-dark-mode": "^4.0.2",
     "vite": "6.2.6",
     "vite-plugin-dts": "^4.5.3",
-    "vite-plugin-wasm": "^3.4.1"
+    "vite-plugin-wasm": "^3.4.1",
+    "vitest": "^4.0.18"
   },
   "jest": {
     "collectCoverageFrom": [
