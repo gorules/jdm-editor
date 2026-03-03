@@ -3,10 +3,11 @@ import { getCompletions as getCompletionsWasm } from '@gorules/zen-engine-wasm';
 import { isWasmAvailable } from '../../../helpers/wasm';
 
 type Completion = {
-  kind: string;
+  type?: string;
   label: string;
   detail: string;
   info: string;
+  methodFor?: unknown;
   boost?: number;
 };
 
