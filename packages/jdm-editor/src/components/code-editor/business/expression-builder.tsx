@@ -540,7 +540,13 @@ const ValInput: React.FC<ValInputProps> = ({ value, onChange, operator, kind, di
 type SimpleInputProps = { value: SimpleValue | null; onChange: (v: SimpleValue) => void; disabled?: boolean };
 
 const StrInput: React.FC<SimpleInputProps> = ({ value, onChange, disabled }) => {
-  const [text, setText] = useState(value?.type === 'string' ? value.value : '');
+  const externalText = value?.type === 'string' ? value.value : '';
+  const [text, setText] = useState(externalText);
+  useEffect(() => {
+    if (text !== externalText) {
+      setText(externalText);
+    }
+  }, [externalText]);
   const commit = () => onChange({ type: 'string', value: text });
   return (
     <AutosizeTextArea
