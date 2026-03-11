@@ -1,5 +1,5 @@
 import { CompressOutlined, LeftOutlined, RightOutlined, WarningOutlined } from '@ant-design/icons';
-import { Button, Modal, Typography, message, notification } from 'antd';
+import { App, Button, Typography, message, notification } from 'antd';
 import clsx from 'clsx';
 import equal from 'fast-deep-equal';
 import React, { type MutableRefObject, forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
@@ -91,6 +91,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
   const graphActions = useDecisionGraphActions();
   const graphReferences = useDecisionGraphReferences((s) => s);
   const { onReactFlowInit } = useDecisionGraphListeners(({ onReactFlowInit }) => ({ onReactFlowInit }));
+  const { modal } = App.useApp();
   const { disabled, hasInputNode, components, customNodes, id } = useDecisionGraphState(
     ({ id, disabled, components, customNodes, decisionGraph }) => ({
       id,
@@ -403,7 +404,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
                 if (selectedNodes.length > 0) {
                   const length = selectedNodes.length;
                   const text = length > 1 ? 'nodes' : 'node';
-                  Modal.confirm({
+                  modal.confirm({
                     icon: null,
                     title: `Delete ${text}`,
                     content: (

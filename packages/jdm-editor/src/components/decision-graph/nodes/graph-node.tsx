@@ -1,6 +1,6 @@
 import { BookOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { Button, Modal, Typography } from 'antd';
+import { App, Button, Typography } from 'antd';
 import clsx from 'clsx';
 import React from 'react';
 import type { HandleProps } from 'reactflow';
@@ -47,6 +47,7 @@ export const GraphNode = React.forwardRef<HTMLDivElement, GraphNodeProps>(
     const [currentDetails, setCurrentDetails] = usePersistentState<Details>(`node:details:${id}`, Details.Settings);
     const [detailsOpen, setDetailsOpen] = usePersistentState<boolean>(`node:detailsOpen:${id}`, false);
     const graphActions = useDecisionGraphActions();
+    const { modal } = App.useApp();
     const { nodeError, nodeTrace, disabled, compactMode } = useDecisionGraphState(
       ({ simulate, disabled, compactMode }) => ({
         disabled,
@@ -91,7 +92,7 @@ export const GraphNode = React.forwardRef<HTMLDivElement, GraphNodeProps>(
         label: <SpacedText left='Delete' right={platform.shortcut('Backspace')} />,
         disabled,
         onClick: () =>
-          Modal.confirm({
+          modal.confirm({
             icon: null,
             title: 'Delete node',
             content: (

@@ -1,5 +1,5 @@
 import type { ThemeConfig as AntThemeConfig } from 'antd';
-import { ConfigProvider, theme as antTheme, theme } from 'antd';
+import { App, ConfigProvider, theme as antTheme, theme } from 'antd';
 import React, { useContext, useMemo } from 'react';
 
 import { useWasmReady } from './helpers/wasm';
@@ -55,8 +55,10 @@ export const JdmConfigProvider: React.FC<JdmConfigProviderProps> = ({
   return (
     <ConfigProvider prefixCls={prefixCls} theme={{ ...restTheme, algorithm, token: { ...token, mode, motion: false } }}>
       <DictionaryContext.Provider value={dicts}>
-        <GlobalCssVariables mode={mode} />
-        {children}
+        <App style={{ height: '100%' }}>
+          <GlobalCssVariables mode={mode} />
+          {children}
+        </App>
       </DictionaryContext.Provider>
     </ConfigProvider>
   );
