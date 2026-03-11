@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.51.4](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.51.3...@gorules/jdm-editor@1.51.4) (2026-03-11)
+
+### Bug Fixes
+
+- modal not showing on delete issue ([#226](https://github.com/gorules/jdm-editor/issues/226)) ([9a0982e](https://github.com/gorules/jdm-editor/commit/9a0982ed14a62591b695d9bf0ce052b2d039d866))
+
 ## [1.51.3](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.51.2...@gorules/jdm-editor@1.51.3) (2026-03-04)
 
 ### Bug Fixes
