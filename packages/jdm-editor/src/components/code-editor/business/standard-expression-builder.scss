@@ -1,0 +1,58 @@
+@use 'builder-base' as *;
+
+.seb {
+  @include builder-vars;
+}
+
+.seb-mode-btn {
+  padding: var(--b-v-padding) 6px;
+  font-size: 11px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--b-height);
+  flex-shrink: 0;
+
+  &:hover:not(:disabled) {
+    background: #e5e7eb;
+    color: #374151;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.seb-code {
+  @include builder-code;
+}
+.seb-input {
+  @include builder-input;
+}
+.seb-number {
+  @include builder-number;
+}
+
+.seb-select {
+  @include builder-select;
+  flex: 1;
+}
+
+.seb-select-multi {
+  @include builder-select-multi;
+  flex: 1;
+  min-width: 0;
+}
+
+.seb-date {
+  flex: 1;
+  min-width: 80px;
+  @include builder-date;
+}

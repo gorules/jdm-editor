@@ -57,6 +57,11 @@ export const TableRow: React.FC<{
         if (!entry.target.hasAttribute('data-virtual-index')) {
           return;
         }
+        // Skip 0-height measurements from display:none (tab hidden) to avoid
+        // the virtualizer caching incorrect sizes and causing a layout jump on return.
+        if (entry.contentRect.height === 0) {
+          return;
+        }
 
         onResize?.(entry.target as HTMLElement);
       });

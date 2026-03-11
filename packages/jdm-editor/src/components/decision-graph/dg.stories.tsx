@@ -1,10 +1,12 @@
 import { ApartmentOutlined, ApiOutlined, LeftOutlined, PlayCircleOutlined, RightOutlined } from '@ant-design/icons';
 import type { Meta, StoryObj } from '@storybook/react';
-import { Select } from 'antd';
+import { Button, Select, Space } from 'antd';
 import json5 from 'json5';
 import React, { useMemo, useRef, useState } from 'react';
 import { P, match } from 'ts-pattern';
 
+import type { DictionaryMap } from '../../theme';
+import type { JdmUiMode } from '../decision-table/context/dt-store.context';
 import type { DecisionGraphRef } from './dg';
 import { DecisionGraph } from './dg';
 import type { DecisionGraphType } from './dg-types';
@@ -435,6 +437,99 @@ export const View: Story = {
         }}
       >
         <DecisionGraph {...args} value={value} onChange={(val) => setValue?.(val)} />
+      </div>
+    );
+  },
+};
+
+const DICTIONARIES: DictionaryMap = {
+  country: [
+    { label: 'United States', value: 'US' },
+    { label: 'Canada', value: 'CA' },
+    { label: 'Mexico', value: 'MX' },
+    { label: 'United Kingdom', value: 'UK' },
+  ],
+};
+
+const businessModeGraph: DecisionGraphType = {
+  nodes: [
+    {
+      id: 'input-1',
+      type: 'inputNode',
+      position: { x: 70, y: 250 },
+      name: 'Request',
+    },
+    {
+      id: 'output-1',
+      type: 'outputNode',
+      position: { x: 670, y: 250 },
+      name: 'Response',
+    },
+    {
+      id: 'dt-1',
+      type: 'decisionTableNode',
+      position: { x: 370, y: 250 },
+      name: 'Shipping Fees',
+      content: {
+        hitPolicy: 'first',
+        inputs: [
+          {
+            id: 'i1',
+            field: 'cart.weight',
+            name: 'Cart Weight (Kg)',
+            fieldType: { type: 'number' },
+          },
+          {
+            id: 'i2',
+            field: 'customer.country',
+            name: 'Customer Country',
+            fieldType: { type: 'string', enum: { type: 'ref', ref: 'country' } },
+          },
+        ],
+        outputs: [
+          {
+            id: 'o1',
+            field: 'shippingFee',
+            name: 'Shipping Fee',
+            outputFieldType: { type: 'number' },
+          },
+        ],
+        rules: [
+          { _id: 'r1', _description: '', i1: '> 40', i2: '"US"', o1: '40' },
+          { _id: 'r2', _description: '', i1: '> 40', i2: '', o1: '50' },
+          { _id: 'r3', _description: '', i1: '[20..40]', i2: '"US"', o1: '30' },
+          { _id: 'r4', _description: '', i1: '< 20', i2: '', o1: '25' },
+        ],
+      },
+    },
+  ],
+  edges: [
+    { id: 'e1', type: 'edge', sourceId: 'input-1', targetId: 'dt-1' },
+    { id: 'e2', type: 'edge', sourceId: 'dt-1', targetId: 'output-1' },
+  ],
+};
+
+export const BusinessMode: Story = {
+  render: () => {
+    const [value, setValue] = useState<DecisionGraphType>(businessModeGraph);
+    const [mode, setMode] = useState<JdmUiMode>('business');
+
+    return (
+      <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: 8, borderBottom: '1px solid #eee' }}>
+          <Space>
+            <span>Mode:</span>
+            <Button size='small' type={mode === 'dev' ? 'primary' : 'default'} onClick={() => setMode('dev')}>
+              Dev
+            </Button>
+            <Button size='small' type={mode === 'business' ? 'primary' : 'default'} onClick={() => setMode('business')}>
+              Business
+            </Button>
+          </Space>
+        </div>
+        <div style={{ flex: 1 }}>
+          <DecisionGraph value={value} onChange={(val) => setValue(val)} mode={mode} dictionaries={DICTIONARIES} />
+        </div>
       </div>
     );
   },

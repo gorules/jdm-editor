@@ -1,8 +1,15 @@
-import { InfoCircleOutlined, PlusOutlined, SwapOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Divider, Input, Modal, Radio, Select, Tag, Tooltip, Typography } from 'antd';
-import React, { Fragment, useEffect, useMemo, useState } from 'react';
+import { DeleteOutlined, EditOutlined, HolderOutlined, LeftOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Checkbox, Modal, Popconfirm, Select, Switch, Tooltip, Typography } from 'antd';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { XYCoord } from 'react-dnd';
+import { useDrag, useDrop } from 'react-dnd';
 
 import type { ParsedExcelData, RuleData } from '../../../helpers/excel';
+import type { ColumnFieldType, OutputFieldType } from '../../../helpers/schema';
+import { useDecisionTableDialog } from '../context/dt-dialog.context';
+import { useDecisionTableState } from '../context/dt-store.context';
+import { InputFieldEdit } from './input-field-edit';
+import { OutputFieldEdit } from './output-field-edit';
 
 type ItemValue = {
   id: string;
@@ -12,10 +19,6 @@ type ItemValue = {
   field?: string;
   name?: string;
   wrapInQuotes?: boolean;
-};
-
-type SelectedItems = {
-  [headerId: string]: ItemValue;
 };
 
 export type MappedExcelData = {
@@ -29,16 +32,22 @@ type DtExcelDialogProps = {
   handleCancel: () => void;
 };
 
+type ImportColumn = {
+  id: string;
+  name: string;
+  field?: string;
+  type: 'input' | 'output';
+  excelHeaderId?: string;
+  defaultValue?: string;
+  fieldType?: ColumnFieldType;
+  outputFieldType?: OutputFieldType;
+};
+
 type TableHeader = {
   id: string;
   label: string;
   value?: string;
   type?: 'input' | 'output';
-};
-
-const dataTypeConfig = {
-  ['input']: { label: 'Input', color: '#acccec' },
-  ['output']: { label: 'Output', color: '#c7e0ba' },
 };
 
 const isHeaderMatch = (header1: TableHeader, header2: TableHeader) => {
@@ -49,111 +58,433 @@ const isHeaderMatch = (header1: TableHeader, header2: TableHeader) => {
   );
 };
 
-const mergeHeaders = (newHeader: TableHeader, existingHeader?: TableHeader) => {
-  if (existingHeader) {
-    return {
-      id: newHeader.id,
-      label: newHeader.label || existingHeader.label,
-      value: newHeader.value || existingHeader.value,
-      type: newHeader.type || existingHeader.type,
-    };
-  }
+const DRAG_TYPE = 'import-col';
 
-  return {
-    ...newHeader,
-    value: newHeader.value || newHeader.label,
-  };
+interface DragItem {
+  index: number;
+  id: string;
+  type: string;
+  section: 'input' | 'output';
+}
+
+const ImportColumnRow: React.FC<{
+  col: ImportColumn;
+  index: number;
+  section: 'input' | 'output';
+  moveCard: (dragIndex: number, hoverIndex: number) => void;
+  excelHeaders: { id: string; name?: string; value?: string }[];
+  disabled: boolean;
+  wrapChecked: boolean;
+  onToggle: (enabled: boolean) => void;
+  onExcelHeaderChange: (excelHeaderId: string | undefined) => void;
+  onWrapChange: (checked: boolean) => void;
+  onFieldChange: (field: string, fieldType?: ColumnFieldType, outputFieldType?: OutputFieldType) => void;
+  onRemove: () => void;
+}> = ({
+  col,
+  index,
+  section,
+  moveCard,
+  excelHeaders,
+  disabled,
+  wrapChecked,
+  onToggle,
+  onExcelHeaderChange,
+  onWrapChange,
+  onFieldChange,
+  onRemove,
+}) => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const [, drop] = useDrop<DragItem, void>({
+    accept: DRAG_TYPE,
+    hover(item: DragItem, monitor) {
+      if (!ref.current) return;
+      if (item.section !== section) return;
+
+      const dragIndex = item.index;
+      const hoverIndex = index;
+      if (dragIndex === hoverIndex) return;
+
+      const hoverBoundingRect = ref.current.getBoundingClientRect();
+      const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+      const clientOffset = monitor.getClientOffset();
+      const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top;
+
+      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) return;
+      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) return;
+
+      moveCard(dragIndex, hoverIndex);
+      item.index = hoverIndex;
+    },
+  });
+
+  const [{ isDragging }, drag] = useDrag({
+    type: DRAG_TYPE,
+    item: () => ({ id: col.id, index, type: DRAG_TYPE, section }),
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+
+  drag(drop(ref));
+
+  const excelOptions = excelHeaders.map((h) => ({
+    label: h.name || h.value || h.id,
+    value: h.id,
+  }));
+
+  const editTrigger = (
+    <Tooltip title='Edit column'>
+      <Button type='text' size='small' icon={<EditOutlined />} style={{ padding: 0 }} />
+    </Tooltip>
+  );
+
+  return (
+    <div
+      ref={ref}
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '24px 36px 1fr 12px 1fr 28px 28px 28px',
+        gap: '8px',
+        alignItems: 'center',
+        padding: '6px 0',
+        opacity: isDragging ? 0.3 : disabled ? 0.4 : 1,
+      }}
+    >
+      <div style={{ cursor: 'grab', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <HolderOutlined style={{ color: 'var(--grl-color-text-tertiary)' }} />
+      </div>
+
+      <Switch size='small' checked={!disabled} onChange={onToggle} />
+
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '4px 10px',
+          backgroundColor: 'var(--grl-color-bg-layout)',
+          borderRadius: '6px',
+          border: '1px solid var(--grl-color-border)',
+          minHeight: 36,
+          justifyContent: 'center',
+        }}
+      >
+        <Typography.Text style={{ fontSize: 13, lineHeight: '18px' }}>{col.name}</Typography.Text>
+        {col.field && (
+          <Typography.Text type='secondary' style={{ fontSize: 11, lineHeight: '14px' }}>
+            {col.field}
+          </Typography.Text>
+        )}
+      </div>
+
+      <LeftOutlined style={{ fontSize: 12, color: 'var(--grl-color-primary)' }} />
+
+      <Select
+        allowClear
+        style={{ width: '100%' }}
+        placeholder='Select Excel column'
+        value={col.excelHeaderId}
+        disabled={disabled}
+        onChange={(val) => onExcelHeaderChange(val ?? undefined)}
+        options={excelOptions}
+      />
+
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <Tooltip title='Wrap values in quotes'>
+          <Checkbox disabled={disabled} checked={wrapChecked} onChange={(e) => onWrapChange(e.target.checked)} />
+        </Tooltip>
+      </div>
+
+      {section === 'input' ? (
+        <InputFieldEdit
+          mode='edit'
+          value={col.field}
+          fieldType={col.fieldType}
+          onChange={(field, fieldType) => onFieldChange(field, fieldType)}
+          onRemove={onRemove}
+          trigger={editTrigger}
+        />
+      ) : (
+        <OutputFieldEdit
+          mode='edit'
+          value={col.field}
+          fieldType={col.outputFieldType}
+          onChange={(field, outputFieldType) => onFieldChange(field, undefined, outputFieldType)}
+          onRemove={onRemove}
+          trigger={editTrigger}
+        />
+      )}
+
+      <Popconfirm title='Remove this column?' okText='Remove' onConfirm={onRemove}>
+        <Tooltip title='Remove column'>
+          <Button type='text' size='small' danger icon={<DeleteOutlined />} style={{ padding: 0 }} />
+        </Tooltip>
+      </Popconfirm>
+    </div>
+  );
 };
 
 export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleSuccess, handleCancel }) => {
   const spreadSheetData = useMemo(() => excelData?.[0], [excelData]);
+  const { getContainer } = useDecisionTableDialog();
+  const { inputVariableType } = useDecisionTableState(({ inputVariableType }) => ({ inputVariableType }));
 
-  const [items, setItems] = useState<ItemValue[]>([]);
-  const [newItemName, setNewItemName] = useState<string>('');
-  const [selectedItems, setSelectedItems] = useState<SelectedItems | null>(null);
-
-  const [headerWrapStates, setHeaderWrapStates] = useState<Record<string, boolean>>({});
+  const [columns, setColumns] = useState<ImportColumn[]>([]);
+  const [disabledColumns, setDisabledColumns] = useState<Record<string, boolean>>({});
+  const [wrapStates, setWrapStates] = useState<Record<string, boolean>>({});
+  const [descriptionExcelId, setDescriptionExcelId] = useState<string | undefined>();
+  const [descriptionEnabled, setDescriptionEnabled] = useState(true);
 
   useEffect(() => {
     if (!spreadSheetData) {
-      setSelectedItems(null);
-      setNewItemName('');
-      setHeaderWrapStates({});
-
+      setColumns([]);
+      setDisabledColumns({});
+      setWrapStates({});
+      setDescriptionExcelId(undefined);
+      setDescriptionEnabled(true);
       return;
     }
 
-    const existingTableHeaders = spreadSheetData.existingTableData.headers
-      .map((tableHeader) => ({
-        ...tableHeader,
-        value: tableHeader.field,
-        label: tableHeader.name as string,
-        type: tableHeader.type,
-      }))
-      .filter((header) => header.value);
+    const existingTableHeaders: TableHeader[] = spreadSheetData.existingTableData.headers
+      .filter((h) => h.type !== undefined)
+      .map((h) => ({
+        id: h.id,
+        label: h.name as string,
+        value: h.field,
+        type: h.type,
+      }));
 
-    const newTableHeaders = (spreadSheetData?.headers || []).map((header) => ({
-      id: header.id || crypto.randomUUID(),
-      value: header.id === '_description' ? 'description' : header.value,
-      label: header.name as string,
-      ...(header.id !== '_description' && { type: header._type as 'input' | 'output' | undefined }),
-    }));
+    const excelHeaders: TableHeader[] = (spreadSheetData.headers || [])
+      .filter((h) => h.id !== '_description' && h.id !== '_id')
+      .map((h) => ({
+        id: h.id || crypto.randomUUID(),
+        label: h.name as string,
+        value: h.value,
+        type: h._type as 'input' | 'output' | undefined,
+      }));
 
-    const items = [
-      ...newTableHeaders.map((newTableHeader) => {
-        const existingHeader = existingTableHeaders.find((header) => isHeaderMatch(header, newTableHeader));
+    const existingSchemaItems = spreadSheetData.existingTableData.headers;
 
-        return mergeHeaders(newTableHeader, existingHeader);
-      }),
-      ...existingTableHeaders.filter(
-        (existingTableHeader) => !newTableHeaders.some((newHeader) => isHeaderMatch(newHeader, existingTableHeader)),
-      ),
-    ];
-
-    if (!items.some((item) => item.id === '_description')) {
-      items.push({
-        id: '_description',
-        label: 'DESCRIPTION',
-        value: 'description',
+    const importColumns: ImportColumn[] = existingTableHeaders
+      .filter((h) => h.type === 'input' || h.type === 'output')
+      .map((tableHeader) => {
+        const matchedExcel = excelHeaders.find((eh) => isHeaderMatch(eh, tableHeader));
+        const schemaItem = existingSchemaItems.find((s) => s.id === tableHeader.id);
+        return {
+          id: tableHeader.id,
+          name: tableHeader.label,
+          field: tableHeader.value,
+          type: tableHeader.type as 'input' | 'output',
+          excelHeaderId: matchedExcel?.id,
+          defaultValue: schemaItem?.defaultValue,
+          fieldType: schemaItem?.fieldType,
+          outputFieldType: schemaItem?.outputFieldType,
+        };
       });
+
+    // If no outputs exist, make the last input an output
+    if (!importColumns.some((c) => c.type === 'output')) {
+      const lastInput = [...importColumns].reverse().find((c) => c.type === 'input');
+      if (lastInput) {
+        lastInput.type = 'output';
+      }
     }
 
-    setItems(items);
+    setColumns(importColumns);
 
-    const matchingHeaders = items.filter((item) => {
-      return newTableHeaders.some((excelHeader) => excelHeader.id === item.id);
+    // Auto-match _description
+    const descHeader = spreadSheetData.headers.find((h) => h.id === '_description');
+    setDescriptionExcelId(descHeader?.id);
+    setDescriptionEnabled(!!descHeader);
+  }, [spreadSheetData]);
+
+  const excelHeaders = useMemo(() => {
+    if (!spreadSheetData) return [];
+    return spreadSheetData.headers.filter((h) => h.id !== '_description' && h.id !== '_id');
+  }, [spreadSheetData]);
+
+  const inputColumns = useMemo(() => columns.filter((c) => c.type === 'input'), [columns]);
+  const outputColumns = useMemo(() => columns.filter((c) => c.type === 'output'), [columns]);
+
+  const moveInputCard = useCallback((dragIndex: number, hoverIndex: number) => {
+    setColumns((prev) => {
+      const inputs = prev.filter((c) => c.type === 'input');
+      const outputs = prev.filter((c) => c.type === 'output');
+      const element = inputs.splice(dragIndex, 1)[0];
+      inputs.splice(hoverIndex, 0, element);
+      return [...inputs, ...outputs];
+    });
+  }, []);
+
+  const moveOutputCard = useCallback((dragIndex: number, hoverIndex: number) => {
+    setColumns((prev) => {
+      const inputs = prev.filter((c) => c.type === 'input');
+      const outputs = prev.filter((c) => c.type === 'output');
+      const element = outputs.splice(dragIndex, 1)[0];
+      outputs.splice(hoverIndex, 0, element);
+      return [...inputs, ...outputs];
+    });
+  }, []);
+
+  const enabledColumns = useMemo(() => columns.filter((c) => !disabledColumns[c.id]), [columns, disabledColumns]);
+  const hasEnabledOutput = useMemo(() => enabledColumns.some((c) => c.type === 'output'), [enabledColumns]);
+  const isOkDisabled = enabledColumns.length === 0 || !hasEnabledOutput;
+
+  const handleFieldChange = useCallback(
+    (colId: string, field: string, fieldType?: ColumnFieldType, outputFieldType?: OutputFieldType) => {
+      setColumns((prev) =>
+        prev.map((c) => {
+          if (c.id !== colId) return c;
+          return {
+            ...c,
+            field: field || c.field,
+            ...(fieldType !== undefined ? { fieldType } : {}),
+            ...(outputFieldType !== undefined ? { outputFieldType } : {}),
+          };
+        }),
+      );
+    },
+    [],
+  );
+
+  const handleRemoveColumn = useCallback((colId: string) => {
+    setColumns((prev) => prev.filter((c) => c.id !== colId));
+    setDisabledColumns((prev) => {
+      const updated = { ...prev };
+      delete updated[colId];
+      return updated;
+    });
+    setWrapStates((prev) => {
+      const updated = { ...prev };
+      delete updated[colId];
+      return updated;
+    });
+  }, []);
+
+  const handleAddInput = useCallback(
+    (name: string, field: string, fieldType?: ColumnFieldType) => {
+      const newCol: ImportColumn = {
+        id: crypto.randomUUID(),
+        name,
+        field,
+        type: 'input',
+        fieldType,
+      };
+      // Auto-match unmatched Excel header
+      const usedExcelIds = new Set(columns.map((c) => c.excelHeaderId).filter(Boolean));
+      const unmatchedExcel = excelHeaders.find((eh) => {
+        if (usedExcelIds.has(eh.id)) return false;
+        const ehLabel = (eh.name || eh.value || '').toLowerCase();
+        return ehLabel === name.toLowerCase() || ehLabel === field.toLowerCase();
+      });
+      if (unmatchedExcel) {
+        newCol.excelHeaderId = unmatchedExcel.id;
+      }
+      setColumns((prev) => [...prev, newCol]);
+    },
+    [columns, excelHeaders],
+  );
+
+  const handleAddOutput = useCallback(
+    (name: string, field: string, outputFieldType?: OutputFieldType) => {
+      const newCol: ImportColumn = {
+        id: crypto.randomUUID(),
+        name,
+        field,
+        type: 'output',
+        outputFieldType,
+      };
+      // Auto-match unmatched Excel header
+      const usedExcelIds = new Set(columns.map((c) => c.excelHeaderId).filter(Boolean));
+      const unmatchedExcel = excelHeaders.find((eh) => {
+        if (usedExcelIds.has(eh.id)) return false;
+        const ehLabel = (eh.name || eh.value || '').toLowerCase();
+        return ehLabel === name.toLowerCase() || ehLabel === field.toLowerCase();
+      });
+      if (unmatchedExcel) {
+        newCol.excelHeaderId = unmatchedExcel.id;
+      }
+      setColumns((prev) => [...prev, newCol]);
+    },
+    [columns, excelHeaders],
+  );
+
+  const onOk = useCallback(() => {
+    if (!spreadSheetData) return;
+
+    const enabled = columns.filter((c) => !disabledColumns[c.id]);
+    const inputItems = enabled
+      .filter((c) => c.type === 'input')
+      .map((c) => ({
+        id: c.id,
+        label: c.name,
+        value: c.field || c.name,
+        type: 'input' as const,
+        wrapInQuotes: wrapStates[c.id] || false,
+      }));
+    const outputItems = enabled
+      .filter((c) => c.type === 'output')
+      .map((c) => ({
+        id: c.id,
+        label: c.name,
+        value: c.field || c.name,
+        type: 'output' as const,
+        wrapInQuotes: wrapStates[c.id] || false,
+      }));
+    const items: ItemValue[] = [...inputItems, ...outputItems];
+
+    if (descriptionEnabled && descriptionExcelId) {
+      items.push({ id: '_description', label: 'Description', value: 'description' });
+    }
+
+    const wrapLookup = items.reduce(
+      (acc, item) => {
+        acc[item.id] = item.wrapInQuotes || false;
+        return acc;
+      },
+      {} as Record<string, boolean>,
+    );
+
+    const rules = spreadSheetData.rules.map((ruleRow) => {
+      const ruleData: RuleData[] = [];
+      for (const col of enabled) {
+        const excelRule = col.excelHeaderId ? ruleRow.find((r) => r.headerId === col.excelHeaderId) : undefined;
+        const rawValue = excelRule?.value ?? col.defaultValue ?? '';
+        const value =
+          wrapLookup[col.id] && rawValue
+            ? rawValue
+                .split(',')
+                .map((s) => `"${s.trim()}"`)
+                .join(', ')
+            : rawValue;
+        ruleData.push({ headerId: col.id, value });
+      }
+      // Add _id
+      const idRule = ruleRow.find((r) => r.headerId === '_id');
+      if (idRule) ruleData.push(idRule);
+      // Add description
+      if (descriptionEnabled && descriptionExcelId) {
+        const descRule = ruleRow.find((r) => r.headerId === descriptionExcelId);
+        ruleData.push({ headerId: '_description', value: descRule?.value ?? '' });
+      }
+      return ruleData;
     });
 
-    if (matchingHeaders.length) {
-      const selectedItemsMap = matchingHeaders.reduce((acc, tableHeader, index) => {
-        const hasDescription = matchingHeaders.some((header) => header.value === 'description');
-        const hasOutputAlready = matchingHeaders.slice(0, index).some((header) => header.type === 'output');
+    handleSuccess({ items, rules });
+  }, [spreadSheetData, columns, disabledColumns, wrapStates, descriptionEnabled, descriptionExcelId, handleSuccess]);
 
-        let shouldBeOutput;
+  const addInputTrigger = (
+    <Button type='text' size='small' icon={<PlusOutlined />}>
+      Add Input
+    </Button>
+  );
 
-        if (hasDescription) {
-          // If there's description, set second-to-last as output
-          shouldBeOutput = index === matchingHeaders.length - 2 && !hasOutputAlready;
-        } else {
-          // If no description, set last as output (excluding if it IS description)
-          shouldBeOutput =
-            index === matchingHeaders.length - 1 && tableHeader.value !== 'description' && !hasOutputAlready;
-        }
-
-        return {
-          ...acc,
-          [tableHeader.id]: {
-            id: tableHeader.id,
-            label: tableHeader.label,
-            value: tableHeader.value,
-            type: shouldBeOutput ? 'output' : tableHeader.type,
-          },
-        };
-      }, {});
-
-      setSelectedItems(selectedItemsMap);
-    }
-  }, [spreadSheetData]);
+  const addOutputTrigger = (
+    <Button type='text' size='small' icon={<PlusOutlined />}>
+      Add Output
+    </Button>
+  );
 
   return (
     <Modal
@@ -161,298 +492,195 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
       closable={{ 'aria-label': 'Custom Close Button' }}
       centered
       open={!!spreadSheetData}
-      okButtonProps={{
-        disabled: !selectedItems || Object.keys(selectedItems).length === 0,
-      }}
-      onOk={() => {
-        if (selectedItems && spreadSheetData) {
-          const items = Object.keys(selectedItems).map((key) => ({
-            ...selectedItems[key],
-            wrapInQuotes: headerWrapStates[key] || false,
-            ...(selectedItems[key].value !== 'description' && {
-              type: selectedItems[key].type ?? 'input',
-            }),
-          }));
-
-          const wrap = items.reduce(
-            (acc, item) => {
-              acc[item.id] = item.wrapInQuotes || false;
-              return acc;
-            },
-            {} as Record<string, boolean>,
-          );
-
-          const selectedHeaderIds = Object.keys(selectedItems);
-
-          const rules = spreadSheetData.rules.map((rulesData) => {
-            return rulesData
-              .filter((rule) => [...selectedHeaderIds, '_id'].includes(rule.headerId))
-              .map((rule) => ({
-                headerId: selectedItems[rule.headerId]?.id ?? rule.headerId,
-                value: wrap[selectedItems[rule.headerId]?.id ?? rule.headerId]
-                  ? rule.value
-                    ? rule.value
-                        .split(',')
-                        .map((s) => `"${s.trim()}"`)
-                        .join(', ')
-                    : ''
-                  : rule.value,
-              }));
-          });
-
-          handleSuccess({
-            items,
-            rules,
-          });
-        }
-      }}
+      okButtonProps={{ disabled: isOkDisabled }}
+      onOk={onOk}
       onCancel={handleCancel}
-      destroyOnClose={true}
-      width={1024}
+      destroyOnClose
+      width={900}
+      getContainer={getContainer}
     >
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr auto 1fr auto 0.1fr',
-          gap: '16px 24px',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '20px',
-        }}
-      >
-        <Typography.Text
-          style={{
-            fontSize: '12px',
-            fontWeight: 600,
-            color: 'var(--grl-color-text-secondary)',
-            marginBottom: '-8px',
-          }}
-        >
-          Excel columns
-        </Typography.Text>
-        {/*placeholder for grid*/}
-        <div />
-        <Typography.Text
-          style={{
-            fontSize: '12px',
-            fontWeight: 600,
-            color: 'var(--grl-color-text-secondary)',
-            marginBottom: '-8px',
-          }}
-        >
-          Decision table columns
-        </Typography.Text>
-        <Typography.Text
-          style={{
-            fontSize: '12px',
-            fontWeight: 600,
-            color: 'var(--grl-color-text-secondary)',
-            marginBottom: '-8px',
-          }}
-        >
-          Data type
-        </Typography.Text>
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '-8px' }}>
-          <Tooltip title='Wrap value in quotes'>
-            <InfoCircleOutlined style={{ color: 'var(--grl-color-text-secondary)', cursor: 'pointer' }} />
-          </Tooltip>
+      <div style={{ padding: '8px 0' }}>
+        {/* Inputs Section */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+          <Typography.Text strong style={{ fontSize: 13 }}>
+            Inputs
+          </Typography.Text>
+          <InputFieldEdit
+            mode='create'
+            variableType={inputVariableType}
+            onCreate={handleAddInput}
+            trigger={addInputTrigger}
+          />
         </div>
-        {spreadSheetData?.headers.map((header, index) => (
-          <Fragment key={index}>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                height: '30px',
-                padding: '0 12px',
-                backgroundColor: 'var(--grl-color-bg-layout)',
-                borderRadius: '8px',
-                border: '1px solid var(--grl-color-border)',
-              }}
-            >
-              <Typography.Text>{header.name || header.value}</Typography.Text>
-            </div>
-
-            <SwapOutlined
-              style={{
-                fontSize: '16px',
-                color: 'var(--grl-color-primary)',
-              }}
-            />
-
-            <Select
-              key={header.id}
-              style={{ width: '100%' }}
-              placeholder='select field'
-              optionLabelProp='display'
-              value={selectedItems?.[header.id]?.value}
-              allowClear
-              onClear={() => {
-                setSelectedItems((selectedItems) => {
-                  const updatedItems = { ...selectedItems };
-                  delete updatedItems[header.id];
-                  return updatedItems;
-                });
-
-                setHeaderWrapStates((prev) => {
+        <div
+          style={{
+            border: '1px solid var(--grl-color-border)',
+            borderRadius: 8,
+            padding: '4px 12px',
+            marginBottom: 16,
+            minHeight: 40,
+          }}
+        >
+          {/* Column headers */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '24px 36px 1fr 12px 1fr 28px 28px 28px',
+              gap: '8px',
+              padding: '6px 0 2px',
+            }}
+          >
+            <div />
+            <div />
+            <Typography.Text type='secondary' style={{ fontSize: 12, fontWeight: 600 }}>
+              Table column
+            </Typography.Text>
+            <div />
+            <Typography.Text type='secondary' style={{ fontSize: 12, fontWeight: 600 }}>
+              Excel column
+            </Typography.Text>
+            <div />
+            <div />
+            <div />
+          </div>
+          {inputColumns.length === 0 && (
+            <Typography.Text type='secondary' style={{ fontSize: 12, padding: '8px 0', display: 'block' }}>
+              No input columns
+            </Typography.Text>
+          )}
+          {inputColumns.map((col, index) => (
+            <ImportColumnRow
+              key={col.id}
+              col={col}
+              index={index}
+              section='input'
+              moveCard={moveInputCard}
+              excelHeaders={excelHeaders}
+              disabled={!!disabledColumns[col.id]}
+              wrapChecked={wrapStates[col.id] || false}
+              onToggle={(enabled) => {
+                setDisabledColumns((prev) => {
                   const updated = { ...prev };
-                  delete updated[header.id];
+                  if (enabled) {
+                    delete updated[col.id];
+                  } else {
+                    updated[col.id] = true;
+                  }
                   return updated;
                 });
               }}
-              onSelect={(_, option) => {
-                const { id, label, value, type, wrapInQuotes } = option;
+              onExcelHeaderChange={(excelHeaderId) => {
+                setColumns((prev) => prev.map((c) => (c.id === col.id ? { ...c, excelHeaderId } : c)));
+              }}
+              onWrapChange={(checked) => {
+                setWrapStates((prev) => ({ ...prev, [col.id]: checked }));
+              }}
+              onFieldChange={(field, fieldType, outputFieldType) =>
+                handleFieldChange(col.id, field, fieldType, outputFieldType)
+              }
+              onRemove={() => handleRemoveColumn(col.id)}
+            />
+          ))}
+        </div>
 
-                setSelectedItems((selectedItems) => {
-                  const updatedItems = { ...selectedItems };
-                  const clearedHeaderIds: string[] = [];
-
-                  Object.keys(updatedItems).forEach((key) => {
-                    if (key !== header.id && (updatedItems[key].value === value || updatedItems[key].label === label)) {
-                      clearedHeaderIds.push(key);
-                      delete updatedItems[key];
-                    }
-                  });
-
-                  if (clearedHeaderIds.length > 0) {
-                    setHeaderWrapStates((prev) => {
-                      const updated = { ...prev };
-                      clearedHeaderIds.forEach((id) => delete updated[id]);
-                      return updated;
-                    });
+        {/* Outputs Section */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+          <Typography.Text strong style={{ fontSize: 13 }}>
+            Outputs
+          </Typography.Text>
+          <OutputFieldEdit mode='create' onCreate={handleAddOutput} trigger={addOutputTrigger} />
+        </div>
+        <div
+          style={{
+            border: '1px solid var(--grl-color-border)',
+            borderRadius: 8,
+            padding: '4px 12px',
+            marginBottom: 16,
+            minHeight: 40,
+          }}
+        >
+          {outputColumns.length === 0 && (
+            <Typography.Text type='secondary' style={{ fontSize: 12, padding: '8px 0', display: 'block' }}>
+              No output columns
+            </Typography.Text>
+          )}
+          {outputColumns.map((col, index) => (
+            <ImportColumnRow
+              key={col.id}
+              col={col}
+              index={index}
+              section='output'
+              moveCard={moveOutputCard}
+              excelHeaders={excelHeaders}
+              disabled={!!disabledColumns[col.id]}
+              wrapChecked={wrapStates[col.id] || false}
+              onToggle={(enabled) => {
+                setDisabledColumns((prev) => {
+                  const updated = { ...prev };
+                  if (enabled) {
+                    delete updated[col.id];
+                  } else {
+                    updated[col.id] = true;
                   }
-
-                  return {
-                    ...updatedItems,
-                    [header.id]: { id, label, value, type, wrapInQuotes },
-                  };
+                  return updated;
                 });
               }}
-              dropdownRender={(menu) => (
-                <Fragment>
-                  {menu}
-                  <Divider style={{ margin: '8px 0' }} />
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '0 8px 4px' }}>
-                    <div
-                      style={{
-                        flex: 2,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '8px',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <Input
-                        placeholder='Enter field name'
-                        value={newItemName}
-                        onChange={(event) => setNewItemName(event.target.value)}
-                      />
-                    </div>
-                    <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
-                      <Button
-                        type='text'
-                        icon={<PlusOutlined />}
-                        onClick={() => {
-                          setItems([
-                            ...items,
-                            {
-                              value: newItemName,
-                              label: newItemName,
-                              id: crypto.randomUUID(),
-                            },
-                          ]);
-                          setNewItemName('');
-                        }}
-                      >
-                        Add item
-                      </Button>
-                    </div>
-                  </div>
-                </Fragment>
-              )}
-              optionRender={(option) => {
-                return (
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span>{option.data.label}</span>
-                    {option.data.type && (
-                      <Tag style={{ background: dataTypeConfig[option.data.type].color }}>
-                        {dataTypeConfig[option.data.type].label}
-                      </Tag>
-                    )}
-                  </div>
-                );
+              onExcelHeaderChange={(excelHeaderId) => {
+                setColumns((prev) => prev.map((c) => (c.id === col.id ? { ...c, excelHeaderId } : c)));
               }}
-              options={items
-                .filter((item) => item.value)
-                .map((item) => {
-                  return {
-                    id: item.id,
-                    label: item.label,
-                    value: item.value,
-                    type: item.type,
-                    wrapInQuotes: item.wrapInQuotes,
-                    display: (
-                      <div
-                        style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          width: '100%',
-                        }}
-                      >
-                        <span>{item.label}</span>
-                      </div>
-                    ),
-                  };
-                })}
+              onWrapChange={(checked) => {
+                setWrapStates((prev) => ({ ...prev, [col.id]: checked }));
+              }}
+              onFieldChange={(field, fieldType, outputFieldType) =>
+                handleFieldChange(col.id, field, fieldType, outputFieldType)
+              }
+              onRemove={() => handleRemoveColumn(col.id)}
             />
-            {selectedItems && selectedItems?.[header.id]?.value !== 'description' ? (
-              <Radio.Group
-                disabled={!selectedItems?.[header.id]}
-                value={selectedItems[header.id]?.type ?? 'input'}
-                onChange={(e) => {
-                  setSelectedItems((prev) => ({
-                    ...prev,
-                    [header.id]: {
-                      ...selectedItems[header.id],
-                      type: e.target.value,
-                    },
-                  }));
-                }}
-                buttonStyle='solid'
-                style={{ width: '100%', display: 'flex' }}
-              >
-                <Radio.Button value='input' style={{ flex: 1, textAlign: 'center' }}>
-                  Input
-                </Radio.Button>
-                <Radio.Button value='output' style={{ flex: 1, textAlign: 'center' }}>
-                  Output
-                </Radio.Button>
-              </Radio.Group>
-            ) : (
-              /** placeholder for grid */
-              <div />
-            )}
-            {selectedItems?.[header.id]?.value !== 'description' ? (
-              <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <Checkbox
-                  disabled={!selectedItems?.[header.id]}
-                  checked={headerWrapStates[header.id] || false}
-                  onChange={(e) => {
-                    setHeaderWrapStates((prev) => ({
-                      ...prev,
-                      [header.id]: e.target.checked,
-                    }));
-                  }}
-                />
-              </div>
-            ) : (
-              /** placeholder for grid */
-              <div />
-            )}
-          </Fragment>
-        ))}
+          ))}
+        </div>
+
+        {/* Description Section */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+          <Typography.Text strong style={{ fontSize: 13 }}>
+            Description
+          </Typography.Text>
+        </div>
+        <div
+          style={{
+            border: '1px solid var(--grl-color-border)',
+            borderRadius: 8,
+            padding: '8px 12px',
+          }}
+        >
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '36px 24px 1fr',
+              gap: '8px',
+              alignItems: 'center',
+            }}
+          >
+            <Switch
+              size='small'
+              checked={descriptionEnabled}
+              onChange={setDescriptionEnabled}
+              style={{ minWidth: 28 }}
+            />
+            <LeftOutlined style={{ fontSize: 12, color: 'var(--grl-color-primary)' }} />
+            <Select
+              allowClear
+              style={{ width: '100%' }}
+              placeholder='Select Excel column for description'
+              value={descriptionExcelId}
+              disabled={!descriptionEnabled}
+              onChange={(val) => setDescriptionExcelId(val ?? undefined)}
+              options={excelHeaders.map((h) => ({
+                label: h.name || h.value || h.id,
+                value: h.id,
+              }))}
+            />
+          </div>
+        </div>
       </div>
     </Modal>
   );

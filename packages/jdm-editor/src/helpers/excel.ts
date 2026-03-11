@@ -69,95 +69,35 @@ export const exportDecisionTable = async (fileName: string, decisionTableNodes: 
 
     const worksheet = workbook.addWorksheet(worksheetName);
 
-    const schemaMeta = [
-      ...decisionTableNode.inputs.map((input: any) => ({
-        title: input.name,
-        meta: { id: input.id, name: input.field, type: 'input' },
-      })),
-      ...decisionTableNode.outputs.map((output: any) => ({
-        title: output.name,
-        meta: { id: output.id, name: output.field, type: 'output' },
-      })),
-      { title: 'DESCRIPTION', meta: null },
-      { title: 'Rule ID', meta: null },
+    const columns = [
+      ...decisionTableNode.inputs.map((input: any) => ({ title: input.name, type: 'input' })),
+      ...decisionTableNode.outputs.map((output: any) => ({ title: output.name, type: 'output' })),
+      { title: 'Description', type: 'description' },
     ];
 
     const schemaItems = [...decisionTableNode.inputs, ...decisionTableNode.outputs];
     const rules = decisionTableNode.rules.map((record: any) => {
-      const newDataPoint: string[] = [];
+      const row: string[] = [];
       schemaItems.forEach((schemaItem) => {
         const val = record?.[schemaItem.id || ''];
         const formattedVal = typeof val === 'object' && val !== null ? JSON.stringify(val) : val;
-        newDataPoint.push(formattedVal || '');
+        row.push(formattedVal || '');
       });
-      newDataPoint.push(record?.['_description'] || '');
-      newDataPoint.push(record?.['_id'] || '');
-      return newDataPoint;
+      row.push(record?.['_description'] || '');
+      return row;
     });
 
-    const inputCellsLength = schemaMeta.filter((data) => data.meta?.type.toLowerCase() === 'input').length;
-    const outputCellsLength = schemaMeta.filter((data) => data.meta?.type.toLowerCase() === 'output').length;
-
-    // start row, start column, end row, end column
-    worksheet.mergeCells(1, 1, 1, inputCellsLength + outputCellsLength + 2);
-
-    const idCell = worksheet.getCell(1, 1);
-    idCell.value = decisionTableNode.id;
-    idCell.alignment = { horizontal: 'center', vertical: 'middle' };
-
-    worksheet.mergeCells(2, 1, 2, inputCellsLength);
-    const inputCell = worksheet.getCell(2, 1);
-    inputCell.value = 'Inputs';
-    inputCell.alignment = { horizontal: 'center', vertical: 'middle' };
-    inputCell.font = { bold: true, color: { argb: 'FFFFFF' } };
-    inputCell.fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: '5e6476' },
-    };
-
-    worksheet.mergeCells(2, inputCellsLength + 1, 2, inputCellsLength + outputCellsLength);
-    const outputCell = worksheet.getCell(2, inputCellsLength + 1);
-    outputCell.value = 'Outputs';
-    outputCell.alignment = { horizontal: 'center', vertical: 'middle' };
-    outputCell.font = { bold: true, color: { argb: 'FFFFFF' } };
-    outputCell.fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: '63546c' },
-    };
-
-    const descriptionCell = worksheet.getCell(2, inputCellsLength + outputCellsLength + 1);
-    descriptionCell.fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: '63546c' },
-    };
-
-    const ruleIdCell = worksheet.getCell(2, inputCellsLength + outputCellsLength + 2);
-    ruleIdCell.fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: '63546c' },
-    };
-
-    const headerRow = worksheet.addRow(schemaMeta.map((data) => data.title));
+    const headerRow = worksheet.addRow(columns.map((col) => col.title));
     headerRow.eachCell((cell, colNumber) => {
-      const meta = schemaMeta[colNumber - 1]?.meta;
-      const cellColor = meta?.type.toLowerCase() === 'input' ? '5e6476' : '63546c';
+      const col = columns[colNumber - 1];
+      const cellColor = col?.type === 'input' ? '5e6476' : '63546c';
 
       cell.font = { bold: true, color: { argb: 'FFFFFF' } };
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: cellColor } };
-
-      if (meta) {
-        cell.note = {
-          texts: [{ text: JSON.stringify(meta, undefined, 2) }],
-        };
-      }
     });
 
-    rules?.forEach((rule: any) => {
-      worksheet.addRow(Object.values(rule));
+    rules.forEach((rule) => {
+      worksheet.addRow(rule);
     });
 
     worksheet.columns.forEach((_, index) => {
@@ -177,7 +117,7 @@ export const exportDecisionTable = async (fileName: string, decisionTableNodes: 
       column.width = minLength;
     });
 
-    worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 3 }];
+    worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 1 }];
   });
 
   const buffer = await workbook.xlsx.writeBuffer();

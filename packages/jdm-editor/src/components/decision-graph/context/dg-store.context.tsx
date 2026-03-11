@@ -9,7 +9,9 @@ import { match } from 'ts-pattern';
 import type { StoreApi, UseBoundStore } from 'zustand';
 import { create } from 'zustand';
 
+import type { DictionaryMap } from '../../../theme';
 import type { CodeEditorProps } from '../../code-editor';
+import type { JdmUiMode } from '../../decision-table/context/dt-store.context';
 import type { DecisionEdge, DecisionGraphType, DecisionNode } from '../dg-types';
 import { privateSymbol } from '../dg-types';
 import { mapToGraphEdge, mapToGraphEdges, mapToGraphNode, mapToGraphNodes } from '../dg-util';
@@ -73,6 +75,9 @@ export type DecisionGraphStoreType = {
     simulate?: Simulation;
 
     compactMode?: boolean;
+
+    dictionaries?: DictionaryMap;
+    mode?: JdmUiMode;
 
     nodeTypes: Record<string, Partial<Record<NodeTypeKind, VariableType>>>;
     globalType: Record<string, VariableType>;

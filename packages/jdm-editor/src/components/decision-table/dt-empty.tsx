@@ -7,8 +7,9 @@ import { useDebouncedCallback } from 'use-debounce';
 import type { SchemaSelectProps } from '../../helpers/components';
 import type { GetNodeDataResult } from '../../helpers/node-data';
 import { isWasmAvailable } from '../../helpers/wasm';
+import { type DictionaryMap, useDictionaries } from '../../theme';
 import type { SimulationTrace, SimulationTraceDataTable } from '../decision-graph';
-import type { DecisionTableStoreType } from './context/dt-store.context';
+import type { DecisionTableStoreType, JdmUiMode } from './context/dt-store.context';
 import {
   type DecisionTableType,
   parseDecisionTable,
@@ -29,6 +30,8 @@ export type DecisionTableEmptyType = {
   inputsSchema?: SchemaSelectProps[];
   outputsSchema?: SchemaSelectProps[];
   permission?: DecisionTableStoreType['state']['permission'];
+  mode?: JdmUiMode;
+  dictionaries?: DictionaryMap;
   inputVariableType?: VariableType;
   debug?: {
     trace: SimulationTrace<SimulationTraceDataTable>;
@@ -54,15 +57,21 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
   minColWidth,
   cellRenderer,
   permission = 'edit:full',
+  mode = 'dev',
+  dictionaries,
   onChange,
   inputVariableType,
 }) => {
   const mountedRef = useRef(false);
   const { stateStore, listenerStore } = useDecisionTableRaw();
   const tableActions = useDecisionTableActions();
+  const contextDictionaries = useDictionaries();
   const { decisionTable } = useDecisionTableState(({ decisionTable }) => ({
     decisionTable,
   }));
+
+  const resolvedDictionaries =
+    dictionaries && Object.keys(dictionaries).length > 0 ? dictionaries : contextDictionaries;
 
   const innerChange = useDebouncedCallback((table: DecisionTableType) => {
     onChange?.(table);
@@ -79,8 +88,22 @@ export const DecisionTableEmpty: React.FC<DecisionTableEmptyType> = ({
       colWidth: colWidth || 200,
       minColWidth: minColWidth || 150,
       permission,
+      mode,
+      dictionaries: resolvedDictionaries,
     });
-  }, [id, name, disabled, disableHitPolicy, inputsSchema, minColWidth, colWidth, outputsSchema, permission]);
+  }, [
+    id,
+    name,
+    disabled,
+    disableHitPolicy,
+    inputsSchema,
+    minColWidth,
+    colWidth,
+    outputsSchema,
+    permission,
+    mode,
+    resolvedDictionaries,
+  ]);
 
   useEffect(() => {
     listenerStore.setState({

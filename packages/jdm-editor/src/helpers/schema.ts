@@ -3,6 +3,50 @@ import { z } from 'zod';
 export const DECISION_GRAPH_CONTENT_TYPE = 'application/vnd.gorules.decision';
 const id = z.string().default(() => crypto.randomUUID());
 
+const enumValueSchema = z.object({ label: z.string(), value: z.string() });
+
+export const columnEnumSchema = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('inline'), values: z.array(enumValueSchema), loose: z.boolean().optional() }),
+  z.object({ type: z.literal('ref'), ref: z.string(), loose: z.boolean().optional() }),
+]);
+export type ColumnEnum = z.infer<typeof columnEnumSchema>;
+
+export const columnFieldTypeSchema = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('any') }),
+  z.object({ type: z.literal('string'), enum: columnEnumSchema.optional() }),
+  z.object({ type: z.literal('number') }),
+  z.object({ type: z.literal('boolean') }),
+  z.object({ type: z.literal('date') }),
+]);
+export type ColumnFieldType = z.infer<typeof columnFieldTypeSchema>;
+
+export const COLUMN_FIELD_TYPE_OPTIONS: { value: ColumnFieldType['type']; label: string }[] = [
+  { value: 'any', label: 'Any' },
+  { value: 'string', label: 'String' },
+  { value: 'number', label: 'Number' },
+  { value: 'boolean', label: 'Boolean' },
+  { value: 'date', label: 'Date' },
+];
+
+export const outputFieldTypeSchema = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('auto') }),
+  z.object({ type: z.literal('string'), enum: columnEnumSchema.optional() }),
+  z.object({ type: z.literal('string-array'), enum: columnEnumSchema.optional() }),
+  z.object({ type: z.literal('number') }),
+  z.object({ type: z.literal('boolean') }),
+  z.object({ type: z.literal('date') }),
+]);
+export type OutputFieldType = z.infer<typeof outputFieldTypeSchema>;
+
+export const OUTPUT_FIELD_TYPE_OPTIONS: { value: OutputFieldType['type']; label: string }[] = [
+  { value: 'auto', label: 'Auto' },
+  { value: 'string', label: 'Text' },
+  { value: 'string-array', label: 'Text[]' },
+  { value: 'number', label: 'Number' },
+  { value: 'boolean', label: 'Boolean' },
+  { value: 'date', label: 'Date' },
+];
+
 export enum NodeKind {
   Input = 'inputNode',
   Output = 'outputNode',
@@ -78,6 +122,7 @@ export const decisionTableSchema = z
           name: z.string().nullish(),
           field: z.string().nullish(),
           defaultValue: z.string().nullish(),
+          fieldType: columnFieldTypeSchema.nullish(),
         }),
       ),
       outputs: z.array(
@@ -86,6 +131,7 @@ export const decisionTableSchema = z
           name: z.string(),
           field: z.string(),
           defaultValue: z.string().nullish(),
+          outputFieldType: outputFieldTypeSchema.nullish(),
         }),
       ),
       passThrough: z
