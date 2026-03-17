@@ -40,7 +40,9 @@ impl From<FunctionKind> for CompletionInfo {
                 InternalFunction::Type => m("Returns a string representing the data type of the value."),
                 InternalFunction::Keys => m("Returns an array of a given object's own enumerable property names."),
                 InternalFunction::Values => m("Returns an array of a given object's own enumerable property values."),
-                InternalFunction::Date => m("Returns a new date time instance.")
+                InternalFunction::Date => m("Returns a new date time instance."),
+                InternalFunction::Merge => m("Merges multiple objects into one."),
+                InternalFunction::MergeDeep => m("Deeply merges multiple objects into one."),
             },
             FunctionKind::Deprecated(d) => match d {
                 DeprecatedFunction::Date => m("Converts a numeric timestamp to a unix timestamp."),
@@ -110,6 +112,8 @@ impl From<FunctionKind> for CompletionParamNames {
                 InternalFunction::Keys => m(&["obj"]),
                 InternalFunction::Values => m(&["obj"]),
                 InternalFunction::Date => m(&["dateOrTimezone", "timezone"]),
+                InternalFunction::Merge => m(&["objects"]),
+                InternalFunction::MergeDeep => m(&["objects"]),
             },
             FunctionKind::Deprecated(d) => match d {
                 DeprecatedFunction::Date => m(&["timestamp"]),
