@@ -95,69 +95,6 @@ export const OutputFieldEdit: React.FC<OutputFieldEditProps> = ({
         if (items.length) enumConfig = { type: 'inline', values: items, ...(enumLoose ? { loose: true } : {}) };
       } else if (enumMode === 'ref' && enumRef) {
         enumConfig = { type: 'ref', ref: enumRef, ...(enumLoose ? { loose: true } : {}) };
-||||||| parent of d83c761 (feat: I18n supports.)
-            e.preventDefault();
-            e.stopPropagation();
-            setOpen(false);
-            if (!disabled && isSubmit && innerValue && innerValue.trim()) {
-              onChange?.(innerValue.trim());
-            }
-          }}
-        >
-          <Typography.Text style={{ fontSize: 12, display: 'block', marginBottom: 2 }}>Output Field</Typography.Text>
-          <Input ref={input} value={innerValue} onChange={(e) => setInnerValue(e.target.value)} readOnly={disabled} />
-          <div className='grl-field-edit__footer'>
-            <ConfirmAction iconOnly onConfirm={onRemove} disabled={disabled} />
-            <Stack horizontal width='auto' verticalAlign='end'>
-              <Button size='small' type='text' onClick={() => setOpen(false)}>
-                Cancel
-              </Button>
-              <Button
-                disabled={disabled}
-                size='small'
-                type='primary'
-                onClick={() => {
-                  onChange?.(innerValue ?? '');
-                  setOpen(false);
-                }}
-              >
-                Set value
-              </Button>
-            </Stack>
-          </div>
-        </div>
-=======
-            e.preventDefault();
-            e.stopPropagation();
-            setOpen(false);
-            if (!disabled && isSubmit && innerValue && innerValue.trim()) {
-              onChange?.(innerValue.trim());
-            }
-          }}
-        >
-          <Typography.Text style={{ fontSize: 12, display: 'block', marginBottom: 2 }}>{t('decisionTable.components.outputFieldEdit.OutputField')}</Typography.Text>
-          <Input ref={input} value={innerValue} onChange={(e) => setInnerValue(e.target.value)} readOnly={disabled} />
-          <div className='grl-field-edit__footer'>
-            <ConfirmAction iconOnly onConfirm={onRemove} disabled={disabled} />
-            <Stack horizontal width='auto' verticalAlign='end'>
-              <Button size='small' type='text' onClick={() => setOpen(false)}>
-                {t('decisionTable.components.outputFieldEdit.Cancel')}
-              </Button>
-              <Button
-                disabled={disabled}
-                size='small'
-                type='primary'
-                onClick={() => {
-                  onChange?.(innerValue ?? '');
-                  setOpen(false);
-                }}
-              >
-                {t('decisionTable.components.outputFieldEdit.SetValue')}
-              </Button>
-            </Stack>
-          </div>
-        </div>
->>>>>>> d83c761 (feat: I18n supports.)
       }
       return { type: innerFieldType, ...(enumConfig ? { enum: enumConfig } : {}) };
     }
