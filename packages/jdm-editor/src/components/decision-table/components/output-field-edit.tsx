@@ -53,7 +53,6 @@ export const OutputFieldEdit: React.FC<OutputFieldEditProps> = ({
   const nameInput = useRef<InputRef>(null);
   // translation
   const { t } = useTranslation();
-
   useEffect(() => {
     if (open) {
       if (mode === 'create') {

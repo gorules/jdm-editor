@@ -95,136 +95,136 @@ const ImportColumnRow: React.FC<{
   onFieldChange,
   onRemove,
 }) => {
-  const ref = useRef<HTMLDivElement>(null);
+    const ref = useRef<HTMLDivElement>(null);
 
-  const [, drop] = useDrop<DragItem, void>({
-    accept: DRAG_TYPE,
-    hover(item: DragItem, monitor) {
-      if (!ref.current) return;
-      if (item.section !== section) return;
+    const [, drop] = useDrop<DragItem, void>({
+      accept: DRAG_TYPE,
+      hover(item: DragItem, monitor) {
+        if (!ref.current) return;
+        if (item.section !== section) return;
 
-      const dragIndex = item.index;
-      const hoverIndex = index;
-      if (dragIndex === hoverIndex) return;
+        const dragIndex = item.index;
+        const hoverIndex = index;
+        if (dragIndex === hoverIndex) return;
 
-      const hoverBoundingRect = ref.current.getBoundingClientRect();
-      const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
-      const clientOffset = monitor.getClientOffset();
-      const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top;
+        const hoverBoundingRect = ref.current.getBoundingClientRect();
+        const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+        const clientOffset = monitor.getClientOffset();
+        const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top;
 
-      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) return;
-      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) return;
+        if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) return;
+        if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) return;
 
-      moveCard(dragIndex, hoverIndex);
-      item.index = hoverIndex;
-    },
-  });
+        moveCard(dragIndex, hoverIndex);
+        item.index = hoverIndex;
+      },
+    });
 
-  const [{ isDragging }, drag] = useDrag({
-    type: DRAG_TYPE,
-    item: () => ({ id: col.id, index, type: DRAG_TYPE, section }),
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  });
+    const [{ isDragging }, drag] = useDrag({
+      type: DRAG_TYPE,
+      item: () => ({ id: col.id, index, type: DRAG_TYPE, section }),
+      collect: (monitor) => ({
+        isDragging: monitor.isDragging(),
+      }),
+    });
 
-  drag(drop(ref));
+    drag(drop(ref));
 
-  const excelOptions = excelHeaders.map((h) => ({
-    label: h.name || h.value || h.id,
-    value: h.id,
-  }));
+    const excelOptions = excelHeaders.map((h) => ({
+      label: h.name || h.value || h.id,
+      value: h.id,
+    }));
 
-  const editTrigger = (
-    <Tooltip title='Edit column'>
-      <Button type='text' size='small' icon={<EditOutlined />} style={{ padding: 0 }} />
-    </Tooltip>
-  );
+    const editTrigger = (
+      <Tooltip title='Edit column'>
+        <Button type='text' size='small' icon={<EditOutlined />} style={{ padding: 0 }} />
+      </Tooltip>
+    );
 
-  return (
-    <div
-      ref={ref}
-      style={{
-        display: 'grid',
-        gridTemplateColumns: '24px 36px 1fr 12px 1fr 28px 28px 28px',
-        gap: '8px',
-        alignItems: 'center',
-        padding: '6px 0',
-        opacity: isDragging ? 0.3 : disabled ? 0.4 : 1,
-      }}
-    >
-      <div style={{ cursor: 'grab', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <HolderOutlined style={{ color: 'var(--grl-color-text-tertiary)' }} />
-      </div>
-
-      <Switch size='small' checked={!disabled} onChange={onToggle} />
-
+    return (
       <div
+        ref={ref}
         style={{
-          display: 'flex',
-          flexDirection: 'column',
-          padding: '4px 10px',
-          backgroundColor: 'var(--grl-color-bg-layout)',
-          borderRadius: '6px',
-          border: '1px solid var(--grl-color-border)',
-          minHeight: 36,
-          justifyContent: 'center',
+          display: 'grid',
+          gridTemplateColumns: '24px 36px 1fr 12px 1fr 28px 28px 28px',
+          gap: '8px',
+          alignItems: 'center',
+          padding: '6px 0',
+          opacity: isDragging ? 0.3 : disabled ? 0.4 : 1,
         }}
       >
-        <Typography.Text style={{ fontSize: 13, lineHeight: '18px' }}>{col.name}</Typography.Text>
-        {col.field && (
-          <Typography.Text type='secondary' style={{ fontSize: 11, lineHeight: '14px' }}>
-            {col.field}
-          </Typography.Text>
+        <div style={{ cursor: 'grab', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <HolderOutlined style={{ color: 'var(--grl-color-text-tertiary)' }} />
+        </div>
+
+        <Switch size='small' checked={!disabled} onChange={onToggle} />
+
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '4px 10px',
+            backgroundColor: 'var(--grl-color-bg-layout)',
+            borderRadius: '6px',
+            border: '1px solid var(--grl-color-border)',
+            minHeight: 36,
+            justifyContent: 'center',
+          }}
+        >
+          <Typography.Text style={{ fontSize: 13, lineHeight: '18px' }}>{col.name}</Typography.Text>
+          {col.field && (
+            <Typography.Text type='secondary' style={{ fontSize: 11, lineHeight: '14px' }}>
+              {col.field}
+            </Typography.Text>
+          )}
+        </div>
+
+        <LeftOutlined style={{ fontSize: 12, color: 'var(--grl-color-primary)' }} />
+
+        <Select
+          allowClear
+          style={{ width: '100%' }}
+          placeholder='Select Excel column'
+          value={col.excelHeaderId}
+          disabled={disabled}
+          onChange={(val) => onExcelHeaderChange(val ?? undefined)}
+          options={excelOptions}
+        />
+
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Tooltip title='Wrap values in quotes'>
+            <Checkbox disabled={disabled} checked={wrapChecked} onChange={(e) => onWrapChange(e.target.checked)} />
+          </Tooltip>
+        </div>
+
+        {section === 'input' ? (
+          <InputFieldEdit
+            mode='edit'
+            value={col.field}
+            fieldType={col.fieldType}
+            onChange={(field, fieldType) => onFieldChange(field, fieldType)}
+            onRemove={onRemove}
+            trigger={editTrigger}
+          />
+        ) : (
+          <OutputFieldEdit
+            mode='edit'
+            value={col.field}
+            fieldType={col.outputFieldType}
+            onChange={(field, outputFieldType) => onFieldChange(field, undefined, outputFieldType)}
+            onRemove={onRemove}
+            trigger={editTrigger}
+          />
         )}
+
+        <Popconfirm title='Remove this column?' okText='Remove' onConfirm={onRemove}>
+          <Tooltip title='Remove column'>
+            <Button type='text' size='small' danger icon={<DeleteOutlined />} style={{ padding: 0 }} />
+          </Tooltip>
+        </Popconfirm>
       </div>
-
-      <LeftOutlined style={{ fontSize: 12, color: 'var(--grl-color-primary)' }} />
-
-      <Select
-        allowClear
-        style={{ width: '100%' }}
-        placeholder='Select Excel column'
-        value={col.excelHeaderId}
-        disabled={disabled}
-        onChange={(val) => onExcelHeaderChange(val ?? undefined)}
-        options={excelOptions}
-      />
-
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <Tooltip title='Wrap values in quotes'>
-          <Checkbox disabled={disabled} checked={wrapChecked} onChange={(e) => onWrapChange(e.target.checked)} />
-        </Tooltip>
-      </div>
-
-      {section === 'input' ? (
-        <InputFieldEdit
-          mode='edit'
-          value={col.field}
-          fieldType={col.fieldType}
-          onChange={(field, fieldType) => onFieldChange(field, fieldType)}
-          onRemove={onRemove}
-          trigger={editTrigger}
-        />
-      ) : (
-        <OutputFieldEdit
-          mode='edit'
-          value={col.field}
-          fieldType={col.outputFieldType}
-          onChange={(field, outputFieldType) => onFieldChange(field, undefined, outputFieldType)}
-          onRemove={onRemove}
-          trigger={editTrigger}
-        />
-      )}
-
-      <Popconfirm title='Remove this column?' okText='Remove' onConfirm={onRemove}>
-        <Tooltip title='Remove column'>
-          <Button type='text' size='small' danger icon={<DeleteOutlined />} style={{ padding: 0 }} />
-        </Tooltip>
-      </Popconfirm>
-    </div>
-  );
-};
+    );
+  };
 
 export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleSuccess, handleCancel }) => {
   // translation
@@ -457,9 +457,9 @@ export const DtExcelDialog: React.FC<DtExcelDialogProps> = ({ excelData, handleS
         const value =
           wrapLookup[col.id] && rawValue
             ? rawValue
-                .split(',')
-                .map((s) => `"${s.trim()}"`)
-                .join(', ')
+              .split(',')
+              .map((s) => `"${s.trim()}"`)
+              .join(', ')
             : rawValue;
         ruleData.push({ headerId: col.id, value });
       }
