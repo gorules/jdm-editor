@@ -435,7 +435,9 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
               elevateEdgesOnSelect={false}
               elevateNodesOnSelect={true}
               zoomOnDoubleClick={false}
-              connectionRadius={35}
+              zoomOnScroll={disabled}
+              panOnScroll={!disabled}
+              connectionRadius={20}
               nodes={nodesState[0]}
               edges={edgesState[0]}
               onInit={(instance) => {

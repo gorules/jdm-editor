@@ -1,6 +1,7 @@
 import type { InputRef } from 'antd';
 import { Checkbox, Input, Select, Typography } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { type ColumnEnum, OUTPUT_FIELD_TYPE_OPTIONS, type OutputFieldType } from '../../../helpers/schema';
 import { AutosizeTextArea } from '../../autosize-text-area';
@@ -50,7 +51,8 @@ export const OutputFieldEdit: React.FC<OutputFieldEditProps> = ({
   const [enumLoose, setEnumLoose] = useState(ftEnum?.loose ?? false);
   const input = useRef<InputRef>(null);
   const nameInput = useRef<InputRef>(null);
-
+  // translation
+  const { t } = useTranslation();
   useEffect(() => {
     if (open) {
       if (mode === 'create') {
@@ -119,11 +121,11 @@ export const OutputFieldEdit: React.FC<OutputFieldEditProps> = ({
       mode={mode}
       trigger={trigger}
     >
-      <Typography.Text style={{ fontSize: 12, display: 'block', marginBottom: 2 }}>Output Field</Typography.Text>
+      <Typography.Text style={{ fontSize: 12, display: 'block', marginBottom: 2 }}>{t('decisionTable.components.outputFieldEdit.OutputField')}</Typography.Text>
       <Input ref={input} value={innerValue} onChange={(e) => setInnerValue(e.target.value)} readOnly={disabled} />
       {mode === 'create' && (
         <div style={{ marginTop: 12 }}>
-          <Typography.Text style={{ fontSize: 12, display: 'block', marginBottom: 2 }}>Label</Typography.Text>
+          <Typography.Text style={{ fontSize: 12, display: 'block', marginBottom: 2 }}>{t('decisionTable.components.inputFieldEdit.Label')}</Typography.Text>
           <Input
             ref={nameInput}
             value={innerName}
@@ -135,7 +137,7 @@ export const OutputFieldEdit: React.FC<OutputFieldEditProps> = ({
       )}
       {showAdvanced && (
         <div style={{ marginTop: 16 }}>
-          <Typography.Text style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>Type</Typography.Text>
+          <Typography.Text style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>{t('decisionTable.components.inputFieldEdit.Type')}</Typography.Text>
           <FieldTypeTags
             options={OUTPUT_FIELD_TYPE_OPTIONS}
             value={innerFieldType}
@@ -146,7 +148,7 @@ export const OutputFieldEdit: React.FC<OutputFieldEditProps> = ({
       )}
       {showAdvanced && supportsEnum && (
         <div style={{ marginTop: 12 }}>
-          <Typography.Text style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>Enum</Typography.Text>
+          <Typography.Text style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>{t('decisionTable.components.inputFieldEdit.Enum')}</Typography.Text>
           <FieldTypeTags
             options={
               Object.keys(dictionaries).length ? ENUM_MODE_OPTIONS : ENUM_MODE_OPTIONS.filter((o) => o.value !== 'ref')
@@ -166,7 +168,7 @@ export const OutputFieldEdit: React.FC<OutputFieldEditProps> = ({
                 style={{ fontSize: 12 }}
               />
               <Typography.Text type='secondary' style={{ fontSize: 11, display: 'block', marginTop: 2 }}>
-                One per line. Use {'"Label;value"'} format.
+                {t('decisionTable.components.inputFieldEdit.EnumTips')}
               </Typography.Text>
             </div>
           )}
@@ -175,7 +177,7 @@ export const OutputFieldEdit: React.FC<OutputFieldEditProps> = ({
               <Select
                 value={enumRef || undefined}
                 onChange={setEnumRef}
-                placeholder='Select dictionary...'
+                placeholder={t('decisionTable.components.inputFieldEdit.SelectDictionary')}
                 disabled={disabled}
                 style={{ width: '100%' }}
                 size='small'
@@ -186,7 +188,7 @@ export const OutputFieldEdit: React.FC<OutputFieldEditProps> = ({
           {enumMode !== 'none' && (
             <div style={{ marginTop: 8 }}>
               <Checkbox checked={enumLoose} onChange={(e) => setEnumLoose(e.target.checked)} disabled={disabled}>
-                <Typography.Text style={{ fontSize: 12 }}>Allow custom values</Typography.Text>
+                <Typography.Text style={{ fontSize: 12 }}>{t('decisionTable.components.inputFieldEdit.AllowCustomValues')}</Typography.Text>
               </Checkbox>
             </div>
           )}

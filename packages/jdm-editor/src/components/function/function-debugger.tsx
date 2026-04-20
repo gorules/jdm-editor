@@ -3,6 +3,7 @@ import { Button, Tabs, Tooltip, Typography } from 'antd';
 import type { editor } from 'monaco-editor';
 import React, { useMemo, useState } from 'react';
 import { match } from 'ts-pattern';
+import { useTranslation } from 'react-i18next';
 
 import typeScriptIcon from '../../assets/typescript.svg?inline';
 import type { SimulationTrace, SimulationTraceDataFunction } from '../decision-graph/simulator/simulation.types';
@@ -31,6 +32,8 @@ export const FunctionDebugger: React.FC<FunctionDebuggerProps> = ({
 }) => {
   const traceLog = trace?.traceData?.log || [];
   const [activeTab, setActiveTab] = useState<TabKey>(TabKey.Console);
+  // translation
+  const { t } = useTranslation();
 
   return (
     <div className='grl-function__debugger'>
@@ -45,7 +48,7 @@ export const FunctionDebugger: React.FC<FunctionDebuggerProps> = ({
             onChange={(t) => setActiveTab(t as TabKey)}
             tabBarExtraContent={
               <div style={{ marginRight: 8 }}>
-                <Tooltip title='Format code' placement='bottomLeft'>
+                <Tooltip title={t('function.functionDebugger.FormatCode')} placement='bottomLeft'>
                   <Button
                     size='small'
                     type='text'
@@ -113,6 +116,8 @@ const FunctionLibraryItem: React.FC<{
 
     return !editorValue.includes(`from "${lib.name}"`) && !editorValue.includes(`from '${lib.name}'`);
   }, [lib.name, editorValue]);
+  // translation
+  const { t } = useTranslation();
 
   return (
     <div key={lib.name} className='grl-function__libraries__item'>
@@ -122,7 +127,7 @@ const FunctionLibraryItem: React.FC<{
         {lib.tagline}
       </Typography.Text>
       <div className='grl-function__libraries__item__actions'>
-        <Tooltip title='Import library' placement='bottomLeft'>
+        <Tooltip title={t('function.functionDebugger.ImportLibrary')} placement='bottomLeft'>
           <Button
             type='text'
             size='small'
@@ -131,7 +136,7 @@ const FunctionLibraryItem: React.FC<{
             onClick={onImport}
           />
         </Tooltip>
-        <Tooltip title='Go to documentation' placement='bottomLeft'>
+        <Tooltip title={t('function.functionDebugger.GoToDocumentation')} placement='bottomLeft'>
           <Button
             type='text'
             size='small'
