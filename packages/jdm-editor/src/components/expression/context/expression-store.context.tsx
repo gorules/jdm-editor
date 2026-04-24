@@ -21,6 +21,7 @@ export type ExpressionEntry = {
   id: string;
   key: string;
   value: string;
+  _description?: string;
   _diff?: DiffMetadata;
 };
 
