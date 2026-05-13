@@ -2,9 +2,11 @@ import { default as default_2 } from 'react';
 import { Dispatch } from 'react';
 import { DragDropManager } from 'dnd-core';
 import { EdgeChange } from 'reactflow';
+import { editor } from 'monaco-editor';
 import { EditorState } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { Extension } from '@codemirror/state';
+import { ForwardRefExoticComponent } from 'react';
 import { HandleProps } from 'reactflow';
 import { InputProps } from 'antd';
 import { linter } from '@codemirror/lint';
@@ -17,6 +19,7 @@ import { NodeProps } from 'reactflow';
 import { ProOptions } from 'reactflow';
 import { RadioGroupProps } from 'antd';
 import { ReactFlowInstance } from 'reactflow';
+import { RefAttributes } from 'react';
 import { RefObject } from 'react';
 import { SelectProps } from 'antd';
 import { SetStateAction } from 'react';
@@ -456,9 +459,9 @@ export declare type DecisionEdge = {
     };
 };
 
-export declare const DecisionGraph: default_2.ForwardRefExoticComponent<{
+export declare const DecisionGraph: ForwardRefExoticComponent<    {
     manager?: DragDropManager;
-} & DecisionGraphWrapperProps & DecisionGraphEmptyType & default_2.RefAttributes<GraphRef>>;
+} & DecisionGraphWrapperProps & DecisionGraphEmptyType & RefAttributes<GraphRef>>;
 
 declare type DecisionGraphContextProps = {};
 
@@ -491,6 +494,11 @@ export declare type DecisionGraphProps = {
 } & DecisionGraphWrapperProps & DecisionGraphContextProps & DecisionGraphEmptyType;
 
 export declare type DecisionGraphRef = GraphRef;
+
+export declare type DecisionGraphSnapshot = {
+    graph?: Record<string, unknown>;
+    tabs?: Record<string, TabSnapshot>;
+};
 
 declare type DecisionGraphStoreType = {
     state: {
@@ -2333,6 +2341,8 @@ export declare type DecisionTableProps = {
     tableHeight: string | number;
     mountDialogsOnBody?: boolean;
     manager?: DragDropManager;
+    scrollContainerRef?: default_2.MutableRefObject<HTMLDivElement | null>;
+    scrollApiRef?: default_2.MutableRefObject<TableScrollApi | null>;
 } & DecisionTableContextProps & DecisionTableEmptyType;
 
 export declare const decisionTableSchema: z.ZodObject<z.objectUtil.extendShape<{
@@ -3531,6 +3541,7 @@ export declare type FunctionProps = {
     onChange?: (value: string) => void;
     trace?: SimulationTrace<SimulationTraceDataFunction>;
     onMonacoReady?: (monaco: Monaco) => void;
+    onEditorMount?: (editor: editor.IStandaloneCodeEditor) => void;
     libraries?: FunctionLibrary[];
     inputData?: unknown;
     permission?: FunctionPermission;
@@ -3601,6 +3612,8 @@ export declare type GraphNodeProps = {
 
 declare type GraphRef = DecisionGraphStoreType['actions'] & {
     stateStore: ExposedStore<DecisionGraphStoreType['state']>;
+    serialize: () => DecisionGraphSnapshot;
+    restore: (snapshot: DecisionGraphSnapshot) => void;
 };
 
 export declare const GraphSimulator: default_2.FC<GraphSimulatorProps>;
@@ -5344,6 +5357,11 @@ declare type SimulatorRequestPanelProps = {
     }) => void;
 };
 
+export declare type Slice<T = unknown> = {
+    serialize: () => T;
+    restore: (state: T) => void;
+};
+
 declare type SplitPath<Path extends string, Obj> = Path extends `${infer Prefix}.${infer Rest}` ? {
     [K in Prefix]: SplitPath<Rest, Obj>;
 } : {
@@ -5461,6 +5479,13 @@ export declare type TableSchemaItem = {
     _diff?: DiffMetadata;
 };
 
+export declare type TableScrollApi = {
+    getTopRowIndex: () => number;
+    scrollToRowIndex: (index: number) => void;
+};
+
+export declare type TabSnapshot = Record<string, unknown>;
+
 declare type TextInput = {
     control: 'text';
     label?: string;
@@ -5505,6 +5530,8 @@ declare const useGraphClipboard: (reactFlow: RefObject<ReactFlowInstance | null>
     pasteNodes: () => Promise<void>;
 };
 
+export declare function useGraphSerializer<T = unknown>(key: string | null | undefined, slice: Slice<T>, deps?: default_2.DependencyList): void;
+
 export declare const useNodeDiff: (id: string) => {
     diff: {
         status: DiffStatus;
@@ -5516,6 +5543,8 @@ export declare const useNodeDiff: (id: string) => {
 export declare const useNodeType: (id: string, { attachGlobals, disabled }?: NodeTypeParams) => VariableType | undefined;
 
 export declare const usePersistentState: <S>(key: string, defaultValue?: S) => [S | undefined, Dispatch<SetStateAction<S | undefined>>];
+
+export declare function useTabSerializer<T = unknown>(tabId: string | null | undefined, key: string | null | undefined, slice: Slice<T>, deps?: default_2.DependencyList): void;
 
 export declare const useWasmReady: () => boolean;
 
