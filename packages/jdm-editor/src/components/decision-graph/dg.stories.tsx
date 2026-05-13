@@ -1,12 +1,13 @@
 import { ApartmentOutlined, ApiOutlined, LeftOutlined, PlayCircleOutlined, RightOutlined } from '@ant-design/icons';
 import type { Meta, StoryObj } from '@storybook/react';
-import { Button, Select, Space } from 'antd';
+import { Button, Select, Space, Typography } from 'antd';
 import json5 from 'json5';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { P, match } from 'ts-pattern';
 
 import type { DictionaryMap } from '../../theme';
 import type { JdmUiMode } from '../decision-table/context/dt-store.context';
+import type { DecisionGraphSnapshot } from './context/serializer.context';
 import type { DecisionGraphRef } from './dg';
 import { DecisionGraph } from './dg';
 import type { DecisionGraphType } from './dg-types';
@@ -507,6 +508,186 @@ const businessModeGraph: DecisionGraphType = {
     { id: 'e1', type: 'edge', sourceId: 'input-1', targetId: 'dt-1' },
     { id: 'e2', type: 'edge', sourceId: 'dt-1', targetId: 'output-1' },
   ],
+};
+
+const buildLargeSerializeGraph = (): DecisionGraphType => {
+  const inputId = 'serialize-input';
+  const outputId = 'serialize-output';
+  const tableId = 'serialize-table';
+  const expressionId = 'serialize-expression';
+  const functionId = 'serialize-function';
+
+  const tableInputs = [
+    { id: 'in_weight', field: 'cart.weight', name: 'Cart Weight (Kg)' },
+    { id: 'in_country', field: 'customer.country', name: 'Customer Country' },
+    { id: 'in_tier', field: 'customer.tier', name: 'Customer Tier' },
+  ];
+  const tableOutputs = [{ id: 'out_fee', field: 'shippingFee', name: 'Shipping Fee' }];
+
+  const rules = Array.from({ length: 100 }, (_, i) => ({
+    _id: `rule-${i + 1}`,
+    _description: `Rule ${i + 1}: shipping fee for tier ${i % 5}`,
+    in_weight: `[${i * 2}..${i * 2 + 10}]`,
+    in_country: i % 2 === 0 ? '"US"' : '"CA"',
+    in_tier: `"tier${i % 5}"`,
+    out_fee: `${10 + i}`,
+  }));
+
+  const expressions = Array.from({ length: 50 }, (_, i) => ({
+    id: `expr-${i + 1}`,
+    key: `field_${i + 1}`,
+    value: `customer.score + ${i} * order.total / 100`,
+  }));
+
+  const functionSource = [
+    "import zen from 'zen';",
+    '',
+    '/** @type {Handler} **/',
+    'export const handler = async (input) => {',
+    '  const lines = [];',
+    ...Array.from({ length: 80 }, (_, i) => `  lines.push('line ${i + 1}: ' + JSON.stringify(input));`),
+    '',
+    '  const result = {',
+    '    received: input,',
+    '    processedAt: new Date().toISOString(),',
+    '    lineCount: lines.length,',
+    "    summary: lines.join('\\n'),",
+    '  };',
+    '',
+    '  return result;',
+    '};',
+  ].join('\n');
+
+  return {
+    nodes: [
+      { id: inputId, type: 'inputNode', position: { x: 80, y: 240 }, name: 'Request' },
+      {
+        id: tableId,
+        type: 'decisionTableNode',
+        position: { x: 360, y: 100 },
+        name: 'Big Table',
+        content: { hitPolicy: 'first', inputs: tableInputs, outputs: tableOutputs, rules },
+      },
+      {
+        id: expressionId,
+        type: 'expressionNode',
+        position: { x: 360, y: 360 },
+        name: 'Big Expression',
+        content: { expressions, passThrough: true, executionMode: 'single' },
+      },
+      {
+        id: functionId,
+        type: 'functionNode',
+        position: { x: 360, y: 600 },
+        name: 'Big Function',
+        content: { source: functionSource },
+      },
+      { id: outputId, type: 'outputNode', position: { x: 720, y: 360 }, name: 'Response' },
+    ],
+    edges: [
+      { id: 'e-in-table', type: 'edge', sourceId: inputId, targetId: tableId },
+      { id: 'e-in-expr', type: 'edge', sourceId: inputId, targetId: expressionId },
+      { id: 'e-in-func', type: 'edge', sourceId: inputId, targetId: functionId },
+      { id: 'e-table-out', type: 'edge', sourceId: tableId, targetId: outputId },
+      { id: 'e-expr-out', type: 'edge', sourceId: expressionId, targetId: outputId },
+      { id: 'e-func-out', type: 'edge', sourceId: functionId, targetId: outputId },
+    ],
+  };
+};
+
+export const Serialize: Story = {
+  render: () => <DecisionGraphSerializeTest />,
+};
+
+const DecisionGraphSerializeTest: React.FC = () => {
+  const ref = useRef<DecisionGraphRef>(null);
+  const [value, setValue] = useState<DecisionGraphType>(() => buildLargeSerializeGraph());
+  const [snapshot, setSnapshot] = useState<DecisionGraphSnapshot | null>(null);
+  const [mountKey, setMountKey] = useState(0);
+  const [showJson, setShowJson] = useState(true);
+  const pendingRestoreRef = useRef<DecisionGraphSnapshot | null>(null);
+
+  useEffect(() => {
+    if (!pendingRestoreRef.current) return;
+    const snap = pendingRestoreRef.current;
+    pendingRestoreRef.current = null;
+    requestAnimationFrame(() => ref.current?.restore(snap));
+  }, [mountKey]);
+
+  const handleSave = () => {
+    const snap = ref.current?.serialize() ?? {};
+    setSnapshot(snap);
+  };
+
+  const handleRestore = () => {
+    if (snapshot) ref.current?.restore(snapshot);
+  };
+
+  const handleRemountAndRestore = () => {
+    pendingRestoreRef.current = snapshot;
+    setMountKey((k) => k + 1);
+  };
+
+  const handleClear = () => setSnapshot(null);
+
+  return (
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ padding: 8, borderBottom: '1px solid #eee' }}>
+        <Space wrap>
+          <Button size='small' type='primary' onClick={handleSave}>
+            Serialize
+          </Button>
+          <Button size='small' disabled={!snapshot} onClick={handleRestore}>
+            Restore (live)
+          </Button>
+          <Button size='small' disabled={!snapshot} onClick={handleRemountAndRestore}>
+            Remount + Restore
+          </Button>
+          <Button size='small' disabled={!snapshot} onClick={handleClear}>
+            Clear snapshot
+          </Button>
+          <Button size='small' onClick={() => setShowJson((v) => !v)}>
+            {showJson ? 'Hide' : 'Show'} JSON
+          </Button>
+          <Typography.Text type='secondary' style={{ fontSize: 12 }}>
+            {snapshot ? 'Snapshot saved' : 'No snapshot'}
+          </Typography.Text>
+        </Space>
+      </div>
+      <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <DecisionGraph
+            key={mountKey}
+            ref={ref}
+            value={value}
+            onChange={(val) => setValue(val)}
+            components={components}
+            customNodes={customNodes}
+          />
+        </div>
+        {showJson && (
+          <div
+            style={{
+              width: 360,
+              borderLeft: '1px solid #eee',
+              padding: 8,
+              overflow: 'auto',
+              fontFamily: 'var(--mono-font-family, monospace)',
+              fontSize: 11,
+              background: '#fafafa',
+            }}
+          >
+            <Typography.Text strong style={{ display: 'block', marginBottom: 8 }}>
+              Snapshot
+            </Typography.Text>
+            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+              {snapshot ? JSON.stringify(snapshot, null, 2) : '// click "Serialize" to capture'}
+            </pre>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export const BusinessMode: Story = {

@@ -1,6 +1,7 @@
 import type { Monaco } from '@monaco-editor/react';
 import { Spin } from 'antd';
-import React, { Suspense, useEffect, useMemo, useState } from 'react';
+import type { editor } from 'monaco-editor';
+import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { P, match } from 'ts-pattern';
 
 import { useNodeType } from '../../../helpers/node-type';
@@ -11,6 +12,7 @@ import {
   useDecisionGraphState,
   useNodeDiff,
 } from '../context/dg-store.context';
+import { useTabSerializer } from '../context/serializer.context';
 import { FunctionKind, useFunctionKind } from '../nodes/specifications/function.specification';
 import type { SimulationTrace, SimulationTraceDataFunction } from '../simulator/simulation.types';
 
@@ -28,6 +30,20 @@ export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
   const graphActions = useDecisionGraphActions();
   const onFunctionReady = useDecisionGraphListeners((s) => s.onFunctionReady);
   const [monaco, setMonaco] = useState<Monaco>();
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const pendingViewStateRef = useRef<editor.ICodeEditorViewState | null>(null);
+
+  useTabSerializer<editor.ICodeEditorViewState | null>(id, 'monaco', {
+    serialize: () => editorRef.current?.saveViewState() ?? pendingViewStateRef.current ?? null,
+    restore: (state) => {
+      if (!state) return;
+      if (editorRef.current) {
+        editorRef.current.restoreViewState(state);
+      } else {
+        pendingViewStateRef.current = state;
+      }
+    },
+  });
   const nodeType = useNodeType(id);
   const { nodeTrace, disabled, content, nodeError, viewConfig } = useDecisionGraphState(
     ({ simulate, disabled, decisionGraph, viewConfig }) => ({
@@ -70,6 +86,13 @@ export const TabFunction: React.FC<TabFunctionProps> = ({ id }) => {
     <Suspense fallback={<Spin />}>
       <Function
         onMonacoReady={(monaco) => setMonaco(monaco)}
+        onEditorMount={(editor) => {
+          editorRef.current = editor;
+          if (pendingViewStateRef.current) {
+            editor.restoreViewState(pendingViewStateRef.current);
+            pendingViewStateRef.current = null;
+          }
+        }}
         value={kind === FunctionKind.Stable ? content.source : content}
         previousValue={typeof previousValue === 'string' ? previousValue : undefined}
         error={nodeError ?? undefined}

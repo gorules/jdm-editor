@@ -13,13 +13,18 @@ import { DecisionTableCommandBar } from './dt-command-bar';
 import type { DecisionTableEmptyType } from './dt-empty';
 import { DecisionTableEmpty } from './dt-empty';
 import './dt.scss';
+import type { TableScrollApi } from './table/table';
 import { Table } from './table/table';
+
+export type { TableScrollApi } from './table/table';
 
 export type DecisionTableProps = {
   id?: string;
   tableHeight: string | number;
   mountDialogsOnBody?: boolean;
   manager?: DragDropManager;
+  scrollContainerRef?: React.MutableRefObject<HTMLDivElement | null>;
+  scrollApiRef?: React.MutableRefObject<TableScrollApi | null>;
 } & DecisionTableContextProps &
   DecisionTableEmptyType;
 
@@ -28,6 +33,8 @@ export const DecisionTable: React.FC<DecisionTableProps> = ({
   tableHeight,
   mountDialogsOnBody = false,
   manager,
+  scrollContainerRef,
+  scrollApiRef,
   ...props
 }) => {
   const { token } = theme.useToken();
@@ -64,7 +71,12 @@ export const DecisionTable: React.FC<DecisionTableProps> = ({
             <DecisionTableDialogProvider getContainer={mountDialogsOnBody ? undefined : getContainer}>
               <DecisionTableCommandBar />
               <DictionaryBridge>
-                <Table id={id} maxHeight={tableHeight} />
+                <Table
+                  id={id}
+                  maxHeight={tableHeight}
+                  scrollContainerRef={scrollContainerRef}
+                  scrollApiRef={scrollApiRef}
+                />
               </DictionaryBridge>
               <DecisionTableDialogs />
               <DecisionTableEmpty {...props} />

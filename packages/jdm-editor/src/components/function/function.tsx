@@ -26,6 +26,7 @@ export type FunctionProps = {
   onChange?: (value: string) => void;
   trace?: SimulationTrace<SimulationTraceDataFunction>;
   onMonacoReady?: (monaco: Monaco) => void;
+  onEditorMount?: (editor: editor.IStandaloneCodeEditor) => void;
   libraries?: FunctionLibrary[];
   inputData?: unknown;
   permission?: FunctionPermission;
@@ -43,6 +44,7 @@ export const Function: React.FC<FunctionProps> = ({
   onChange,
   trace,
   onMonacoReady,
+  onEditorMount,
   error,
   inputData,
   previousValue,
@@ -261,7 +263,10 @@ export const Function: React.FC<FunctionProps> = ({
               loading={<Spin size='large' />}
               language={language}
               value={innerValue}
-              onMount={(editor) => setEditor(editor)}
+              onMount={(editor) => {
+                setEditor(editor);
+                onEditorMount?.(editor);
+              }}
               onChange={(value) => {
                 setInnerValue(value ?? '');
                 innerChange(value ?? '');
