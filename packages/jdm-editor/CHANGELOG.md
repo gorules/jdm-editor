@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.52.0](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.51.5...@gorules/jdm-editor@1.52.0) (2026-05-13)
+
+### Features
+
+- graph view serialization ([#239](https://github.com/gorules/jdm-editor/issues/239)) ([4d35998](https://github.com/gorules/jdm-editor/commit/4d3599823186d43a8dda7d5cd3bc61faa4100d9b))
+
 ## [1.51.5](https://github.com/gorules/jdm-editor/compare/@gorules/jdm-editor@1.51.4...@gorules/jdm-editor@1.51.5) (2026-03-17)
 
 **Note:** Version bump only for package @gorules/jdm-editor
