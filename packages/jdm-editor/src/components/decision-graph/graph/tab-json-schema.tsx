@@ -3,12 +3,13 @@ import { DiffEditor, Editor } from '@monaco-editor/react';
 import { Button, Space, Spin, Tabs, Tooltip, theme } from 'antd';
 import type { DragDropManager } from 'dnd-core';
 import { type editor } from 'monaco-editor';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { PanelGroup } from 'react-resizable-panels';
 import { match } from 'ts-pattern';
 import { useThrottledCallback } from 'use-debounce';
 
 import { useDecisionGraphActions, useDecisionGraphState, useNodeDiff } from '../context/dg-store.context';
+import { useTabSerializer } from '../context/serializer.context';
 import { JsonToJsonSchemaDialog } from './json-to-json-schema-dialog';
 
 const schemaTooltip = 'Provide JSON Schema format. If no JSON Schema is provided, validation will be skipped.';
@@ -52,8 +53,28 @@ export const TabJsonSchema: React.FC<TabJsonSchemaProps> = ({ id, type = 'input'
 
   const [editor, setEditor] = useState<editor.IStandaloneCodeEditor>();
   const [diffEditor, setDiffEditor] = useState<editor.IStandaloneDiffEditor>();
+  const pendingViewStateRef = useRef<editor.ICodeEditorViewState | null>(null);
   const resizeEditor = useThrottledCallback(() => editor?.layout(), 100, { trailing: true });
   const resizeDiffEditor = useThrottledCallback(() => diffEditor?.layout(), 100, { trailing: true });
+
+  useTabSerializer<editor.ICodeEditorViewState | null>(id, 'monaco', {
+    serialize: () => editor?.saveViewState() ?? pendingViewStateRef.current ?? null,
+    restore: (state) => {
+      if (!state) return;
+      if (editor) {
+        editor.restoreViewState(state);
+      } else {
+        pendingViewStateRef.current = state;
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (editor && pendingViewStateRef.current) {
+      editor.restoreViewState(pendingViewStateRef.current);
+      pendingViewStateRef.current = null;
+    }
+  }, [editor]);
 
   const { disabled, content } = useDecisionGraphState(({ simulate, disabled, decisionGraph }) => ({
     nodeError: match(simulate)

@@ -1,5 +1,5 @@
 import type { DragDropManager } from 'dnd-core';
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { P, match } from 'ts-pattern';
 import type { z } from 'zod';
 
@@ -11,8 +11,11 @@ import { isWasmAvailable } from '../../../helpers/wasm';
 import { Expression } from '../../expression';
 import type { ExpressionPermission } from '../../expression/context/expression-store.context';
 import { useDecisionGraphActions, useDecisionGraphState } from '../context/dg-store.context';
+import { useTabSerializer } from '../context/serializer.context';
 import type { NodeExpressionData } from '../nodes/specifications/expression.specification';
 import type { SimulationTrace, SimulationTraceDataExpression } from '../simulator/simulation.types';
+
+type ScrollPosition = { top: number; left: number };
 
 export type TabExpressionProps = {
   id: string;
@@ -21,6 +24,30 @@ export type TabExpressionProps = {
 
 export const TabExpression: React.FC<TabExpressionProps> = ({ id, manager }) => {
   const graphActions = useDecisionGraphActions();
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+
+  useTabSerializer<ScrollPosition>(id, 'scroll', {
+    serialize: () => {
+      const el = scrollContainerRef.current;
+      if (!el) return { top: 0, left: 0 };
+      return { top: el.scrollTop, left: el.scrollLeft };
+    },
+    restore: (position) => {
+      if (!position) return;
+      let attempts = 0;
+      const apply = () => {
+        const el = scrollContainerRef.current;
+        if (!el || el.scrollHeight <= el.clientHeight) {
+          if (attempts++ < 60) requestAnimationFrame(apply);
+          return;
+        }
+        el.scrollTop = position.top;
+        el.scrollLeft = position.left;
+      };
+      requestAnimationFrame(apply);
+    },
+  });
+
   const { disabled, content } = useDecisionGraphState(({ disabled, decisionGraph }) => ({
     disabled,
     content: (decisionGraph?.nodes ?? []).find((node) => node.id === id)?.content as NodeExpressionData,
@@ -75,7 +102,7 @@ export const TabExpression: React.FC<TabExpressionProps> = ({ id, manager }) => 
   }, [nodeTrace, nodeSnapshot, inputData]);
 
   return (
-    <div style={{ height: '100%', overflowY: 'auto', boxSizing: 'border-box' }}>
+    <div ref={scrollContainerRef} style={{ height: '100%', overflowY: 'auto', boxSizing: 'border-box' }}>
       <Expression
         value={content?.expressions}
         disabled={disabled}
