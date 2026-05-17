@@ -126,6 +126,18 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
           </div>
         </ExpressionItemContextMenu>
       </div>
+      <div className='expression-list-item__description'>
+        <DiffAutosizeTextArea
+          noStyle
+          placeholder='Description'
+          maxRows={10}
+          readOnly={permission !== 'edit:full' || disabled}
+          displayDiff={expression?._diff?.fields?._description?.status === 'modified'}
+          previousValue={expression?._diff?.fields?._description?.previousValue}
+          value={expression?._description || ''}
+          onChange={(e) => onChange({ _description: e.target.value })}
+        />
+      </div>
       <div className='expression-list-item__action'>
         <ConfirmAction iconOnly disabled={permission !== 'edit:full' || disabled} onConfirm={onRemove} />
         {isFocused && <LivePreview id={expression.id} value={expression.value} />}

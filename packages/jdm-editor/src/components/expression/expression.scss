@@ -16,7 +16,7 @@
     background: var(--grl-color-bg-container);
     grid-auto-flow: column;
     align-items: flex-start;
-    grid-template-columns: 40px minmax(240px, 1.1fr) 3fr 40px;
+    grid-template-columns: 40px minmax(240px, 1.1fr) 3fr minmax(280px, 1.2fr) 40px;
 
     &:focus-within {
       box-shadow: 0 0 0 1px var(--grl-color-border);
@@ -138,6 +138,25 @@
     &__code {
       position: relative;
       font-size: 13px;
+      border-right: 1px solid var(--border-color);
+    }
+
+    &__description {
+      border-right: 1px solid var(--border-color);
+
+      [contenteditable] {
+        border: 0;
+        width: 100%;
+        background-color: transparent;
+        padding: $pv $ph;
+        border-radius: 0;
+        line-height: 1.5em;
+        font-size: 13px;
+
+        &:focus {
+          box-shadow: none !important;
+        }
+      }
     }
 
     &__value {

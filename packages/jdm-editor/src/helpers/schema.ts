@@ -179,6 +179,7 @@ export const expressionNodeSchema = z
           id,
           key: z.string().default(''),
           value: z.string().default(''),
+          _description: z.string().default(''),
         }),
       ),
       passThrough: z

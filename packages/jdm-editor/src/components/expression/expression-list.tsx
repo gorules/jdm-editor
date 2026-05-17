@@ -54,6 +54,9 @@ export const ExpressionList: React.FC<ExpressionListProps> = ({}) => {
           <Typography.Text type='secondary' className={'expression-list__item__th'}>
             Expression
           </Typography.Text>
+          <Typography.Text type='secondary' className={'expression-list__item__th expression-list__item__th--desc'}>
+            Description
+          </Typography.Text>
           <div />
         </div>
         {(expressions || []).map((expression, index) => (
