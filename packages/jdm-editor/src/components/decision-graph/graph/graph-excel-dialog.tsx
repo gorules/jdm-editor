@@ -2,6 +2,7 @@ import { InfoCircleOutlined, PlusOutlined, SwapOutlined } from '@ant-design/icon
 import { Button, Checkbox, Divider, Input, Modal, Radio, Select, Steps, Tag, Tooltip, Typography } from 'antd';
 import { isEmpty } from 'lodash';
 import React, { Fragment, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { ParsedExcelData, RuleData } from '../../../helpers/excel';
 import type { NodeKind } from '../../../helpers/schema';
@@ -80,6 +81,8 @@ const mergeHeaders = (newHeader: TableHeader, existingHeader?: TableHeader) => {
 };
 
 export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, handleSuccess, handleCancel }) => {
+  // translation
+  const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState<number>(0);
   const steps = useMemo(() => excelData?.map((item) => ({ key: item.id, title: item.name })), [excelData]);
 
@@ -185,7 +188,7 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
 
   return (
     <Modal
-      title='Map Excel data'
+      title={t('decisionGraph.graph.graphExcelDialog.DialogTitle')}
       closable={{ 'aria-label': 'Custom Close Button' }}
       centered
       open={!!excelData}
@@ -194,7 +197,7 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
       width={1024}
       footer={[
         <Button key='cancel' onClick={handleCancel}>
-          Cancel
+          {t('decisionGraph.graph.graphExcelDialog.Cancel')}
         </Button>,
       ]}
     >
@@ -217,7 +220,7 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
             marginBottom: '-8px',
           }}
         >
-          Excel columns
+          {t('decisionGraph.graph.graphExcelDialog.ExcelColumns')}
         </Typography.Text>
         {/*placeholder for grid*/}
         <div />
@@ -229,7 +232,7 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
             marginBottom: '-8px',
           }}
         >
-          Decision table columns
+          {t('decisionGraph.graph.graphExcelDialog.DecisionTableColumns')}
         </Typography.Text>
         <Typography.Text
           style={{
@@ -239,11 +242,11 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
             marginBottom: '-8px',
           }}
         >
-          Data type
+          {t('decisionGraph.graph.graphExcelDialog.DataType')}
         </Typography.Text>
         {/*placeholder for grid*/}
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '-8px' }}>
-          <Tooltip title='Wrap value in quotes'>
+          <Tooltip title={t('decisionGraph.graph.graphExcelDialog.InfoTip')}>
             <InfoCircleOutlined style={{ color: 'var(--grl-color-text-secondary)', cursor: 'pointer' }} />
           </Tooltip>
         </div>
@@ -273,7 +276,7 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
             <Select
               key={header.id}
               style={{ width: '100%' }}
-              placeholder='select field'
+              placeholder={t('decisionGraph.graph.graphExcelDialog.SelectPlaceholder')}
               optionLabelProp='display'
               value={selectedItems?.[`step${currentStep}`]?.[header.id]?.value}
               allowClear
@@ -346,7 +349,7 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
                       }}
                     >
                       <Input
-                        placeholder='Enter field name'
+                        placeholder={t('decisionGraph.graph.graphExcelDialog.InputFieldPlaceholder')}
                         value={newItemName}
                         onChange={(event) => setNewItemName(event.target.value)}
                       />
@@ -367,7 +370,7 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
                           setNewItemName('');
                         }}
                       >
-                        Add item
+                        {t('decisionGraph.graph.graphExcelDialog.AddItem')}
                       </Button>
                     </div>
                   </div>
@@ -433,10 +436,10 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
                 style={{ width: '100%', display: 'flex' }}
               >
                 <Radio.Button value='input' style={{ flex: 1, textAlign: 'center' }}>
-                  Input
+                  {t('decisionGraph.graph.graphExcelDialog.Input')}
                 </Radio.Button>
                 <Radio.Button value='output' style={{ flex: 1, textAlign: 'center' }}>
-                  Output
+                  {t('decisionGraph.graph.graphExcelDialog.Output')}
                 </Radio.Button>
               </Radio.Group>
             ) : (
@@ -478,7 +481,7 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
               setCurrentStep(currentStep + 1);
             }}
           >
-            Next
+            {t('decisionGraph.graph.graphExcelDialog.Next')}
           </Button>
         )}
         {currentStep === (excelData || []).length - 1 && (
@@ -517,9 +520,9 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
                         value: wrap[stepItems[rule.headerId]?.id ?? rule.headerId]
                           ? rule.value
                             ? rule.value
-                                .split(',')
-                                .map((s) => `"${s.trim()}"`)
-                                .join(', ')
+                              .split(',')
+                              .map((s) => `"${s.trim()}"`)
+                              .join(', ')
                             : ''
                           : rule.value,
                       }));
@@ -544,7 +547,7 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
               }
             }}
           >
-            Done
+            {t('decisionGraph.graph.graphExcelDialog.Done')}
           </Button>
         )}
         {currentStep > 0 && (
@@ -554,7 +557,7 @@ export const GraphExcelDialog: React.FC<GraphExcelDialogProps> = ({ excelData, h
               setCurrentStep(currentStep - 1);
             }}
           >
-            Previous
+            {t('decisionGraph.graph.graphExcelDialog.Previous')}
           </Button>
         )}
       </div>

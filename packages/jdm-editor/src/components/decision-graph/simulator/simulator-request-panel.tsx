@@ -3,14 +3,15 @@ import { VariableType } from '@gorules/zen-engine-wasm';
 import { Button, Tooltip, Typography, notification } from 'antd';
 import json5 from 'json5';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { isWasmAvailable } from '../../../helpers/wasm';
 import { NodeTypeKind, useDecisionGraphRaw } from '../context/dg-store.context';
 import type { DecisionGraphType } from '../dg-types';
 import { SimulatorEditor } from './simulator-editor';
 
-const requestTooltip =
-  'Your business context that enters through the Request node, starting the decision process. Supply JSON or JSON5 format.';
+// const requestTooltip =
+// 'Your business context that enters through the Request node, starting the decision process. Supply JSON or JSON5 format.';
 
 export type SimulatorRequestPanelProps = {
   defaultRequest?: string;
@@ -29,6 +30,8 @@ export const SimulatorRequestPanel: React.FC<SimulatorRequestPanelProps> = ({
 }) => {
   const [requestValue, setRequestValue] = useState(defaultRequest);
   const { stateStore, actions } = useDecisionGraphRaw();
+  // translation
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!isWasmAvailable()) {
@@ -52,9 +55,9 @@ export const SimulatorRequestPanel: React.FC<SimulatorRequestPanelProps> = ({
   return (
     <>
       <div className={'grl-dg__simulator__section__bar grl-dg__simulator__section__bar--request'}>
-        <Tooltip title={requestTooltip}>
+        <Tooltip title={t('decisionGraph.simulator.simulatorRequestPanel.requestTooltip')}>
           <Typography.Text style={{ fontSize: 13, cursor: 'help' }}>
-            Request
+            {t('decisionGraph.simulator.simulatorRequestPanel.Request')}
             <InfoCircleOutlined style={{ fontSize: 10, marginLeft: 4, opacity: 0.5, verticalAlign: 'text-top' }} />
           </Typography.Text>
         </Tooltip>
@@ -63,7 +66,7 @@ export const SimulatorRequestPanel: React.FC<SimulatorRequestPanelProps> = ({
             <Tooltip
               title={
                 !hasInputNode
-                  ? 'Request node is required to run the graph. Drag-and-drop it from the Components panel.'
+                  ? t('decisionGraph.simulator.simulatorRequestPanel.inputNodeTooltip')
                   : undefined
               }
             >
@@ -79,14 +82,14 @@ export const SimulatorRequestPanel: React.FC<SimulatorRequestPanelProps> = ({
                     onRun?.({ graph: stateStore.getState().decisionGraph, context: parsed });
                   } catch {
                     notification.error({
-                      message: 'Invalid format',
-                      description: 'Unable to format request, invalid JSON format',
+                      message: t('decisionGraph.simulator.simulatorRequestPanel.invalidFormat'),
+                      description: t('decisionGraph.simulator.simulatorRequestPanel.invalidFormatDesc'),
                       placement: 'top',
                     });
                   }
                 }}
               >
-                Run
+                {t('decisionGraph.simulator.simulatorRequestPanel.Run')}
               </Button>
             </Tooltip>
           )}

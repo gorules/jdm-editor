@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { GripVerticalIcon } from 'lucide-react';
 import React, { useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
+import { useTranslation } from 'react-i18next';
 
 import { getTrace } from '../../helpers/trace';
 import { CodeEditorPreview } from '../code-editor/ce-preview';
@@ -23,6 +24,8 @@ export type ExpressionItemProps = {
 };
 
 export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, index, variableType }) => {
+  // translation
+  const { t } = useTranslation();
   const [isFocused, setIsFocused] = useState(false);
   const expressionRef = useRef<HTMLDivElement>(null);
   const { updateRow, removeRow, swapRows, disabled, permission } = useExpressionStore(
@@ -95,7 +98,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
         <ExpressionItemContextMenu index={index}>
           <DiffAutosizeTextArea
             noStyle
-            placeholder='Key'
+            placeholder={t('expression.expressionItem.Key')}
             maxRows={10}
             readOnly={permission !== 'edit:full' || disabled}
             displayDiff={expression?._diff?.fields?.key?.status === 'modified'}
@@ -110,7 +113,7 @@ export const ExpressionItem: React.FC<ExpressionItemProps> = ({ expression, inde
           <div>
             <DiffCodeEditor
               className='expression-list-item__value'
-              placeholder='Expression'
+              placeholder={t('expression.expressionItem.Expression')}
               maxRows={9}
               disabled={disabled}
               value={expression?.value}

@@ -1,6 +1,8 @@
 import type { ThemeConfig as AntThemeConfig } from 'antd';
 import { App, ConfigProvider, theme as antTheme, theme } from 'antd';
-import React, { useContext, useMemo } from 'react';
+import React, { useEffect, useContext, useMemo } from 'react';
+import { I18nextProvider } from 'react-i18next';
+import i18nInstance from './i18n';
 
 import { useWasmReady } from './helpers/wasm';
 
@@ -26,6 +28,7 @@ export const DictionaryProvider: React.FC<React.PropsWithChildren<{ value: Dicti
 }) => <DictionaryContext.Provider value={value}>{children}</DictionaryContext.Provider>;
 
 export type JdmConfigProviderProps = {
+  locale?: string,
   theme?: ThemeConfig;
   prefixCls?: string;
   dictionaries?: DictionaryMap;
@@ -33,6 +36,7 @@ export type JdmConfigProviderProps = {
 };
 
 export const JdmConfigProvider: React.FC<JdmConfigProviderProps> = ({
+  locale = 'en',
   theme: { mode = 'light' as const, token = {}, ...restTheme } = {},
   prefixCls,
   dictionaries,
@@ -52,15 +56,22 @@ export const JdmConfigProvider: React.FC<JdmConfigProviderProps> = ({
 
   const dicts = useMemo(() => dictionaries ?? {}, [dictionaries]);
 
+  // change language with locale prop
+  useEffect(() => {
+    i18nInstance.changeLanguage(locale);
+  }, [locale]);
+
   return (
-    <ConfigProvider prefixCls={prefixCls} theme={{ ...restTheme, algorithm, token: { ...token, mode, motion: false } }}>
-      <DictionaryContext.Provider value={dicts}>
-        <App style={{ height: '100%' }}>
-          <GlobalCssVariables mode={mode} />
-          {children}
-        </App>
-      </DictionaryContext.Provider>
-    </ConfigProvider>
+    <I18nextProvider i18n={i18nInstance}>
+      <ConfigProvider prefixCls={prefixCls} theme={{ ...restTheme, algorithm, token: { ...token, mode, motion: false } }}>
+        <DictionaryContext.Provider value={dicts}>
+          <App style={{ height: '100%' }}>
+            <GlobalCssVariables mode={mode} />
+            {children}
+          </App>
+        </DictionaryContext.Provider>
+      </ConfigProvider>
+    </I18nextProvider>
   );
 };
 

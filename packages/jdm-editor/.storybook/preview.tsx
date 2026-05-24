@@ -26,15 +26,30 @@ export const parameters = {
 };
 
 const preview: Preview = {
+  globalTypes: {
+    locale: {
+      name: 'Locale',
+      description: 'Internationalization locale',
+      defaultValue: 'en',
+      toolbar: {
+        icon: 'globe',
+        items: [
+          { value: 'en', right: '🇺🇸', title: 'English' },
+          { value: 'zh', right: '🇨🇳', title: '中文' },
+        ],
+      },
+    },
+  },
   parameters: {
     layout: 'fullscreen',
   },
   decorators: [
-    (Story) => {
+    (Story, context) => {
       const isDark = useDarkMode();
+      const { locale } = context.globals;
 
       return (
-        <JdmConfigProvider theme={{ mode: isDark ? 'dark' : 'light' }}>
+        <JdmConfigProvider locale={locale} theme={{ mode: isDark ? 'dark' : 'light' }}>
           <style
             dangerouslySetInnerHTML={{
               __html: `html { background-color: ${isDark ? '#1f1f1f' : 'white'} }

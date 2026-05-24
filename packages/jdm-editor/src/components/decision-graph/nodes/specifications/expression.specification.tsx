@@ -20,6 +20,7 @@ import { GraphNode } from '../graph-node';
 import type { NodeDecisionTableData } from './decision-table.specification';
 import type { NodeSpecification } from './specification-types';
 import { NodeKind } from './specification-types';
+import i18nInstance from '../../../../i18n';
 
 export type Expression = {
   id: string;
@@ -34,12 +35,15 @@ export type NodeExpressionData = Omit<InferredContent, 'expressions'> &
     expressions: (InferredContent['expressions'][0] & Diff)[];
   };
 
+// translation
+const { t } = i18nInstance;
+
 export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
   type: NodeKind.Expression,
   icon: <HashIcon size='1em' />,
-  displayName: 'Expression',
+  displayName: t('decisionGraph.nodes.expressionSpecification.displayName'),
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/expression',
-  shortDescription: 'Mapping utility',
+  shortDescription: t('decisionGraph.nodes.expressionSpecification.shortDescription'),
   renderTab: ({ id, manager }) => <TabExpression id={id} manager={manager} />,
   getDiffContent: (current, previous) => {
     const newContent = produce(current, (draft) => {
@@ -191,7 +195,7 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
         isSelected={selected}
         actions={[
           <Button key='edit-table' type='text' onClick={() => graphActions.openTab(id)}>
-            Edit Expression
+            {t('decisionGraph.nodes.expressionSpecification.editExpression')}
           </Button>,
         ]}
         helper={[executionMode === 'loop' && <SyncOutlined />, passThrough && <ArrowRightOutlined />]}
@@ -224,7 +228,7 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
 
     return (
       <div className={'settings-form'}>
-        <Form.Item label='Passthrough'>
+        <Form.Item label={t('decisionGraph.nodes.expressionSpecification.passthrough')}>
           <DiffSwitch
             disabled={disabled}
             size={'small'}
@@ -234,7 +238,7 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
             onChange={(e) => updateNode({ passThrough: e })}
           />
         </Form.Item>
-        <Form.Item label='Input field'>
+        <Form.Item label={t('decisionGraph.nodes.expressionSpecification.inputField')}>
           <DiffCodeEditor
             variableType={inputType}
             disabled={disabled}
@@ -249,7 +253,7 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
             }}
           />
         </Form.Item>
-        <Form.Item label='Output path'>
+        <Form.Item label={t('decisionGraph.nodes.expressionSpecification.outputPath')}>
           <DiffInput
             size={'small'}
             readOnly={disabled}
@@ -259,7 +263,7 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
             onChange={(e) => updateNode({ outputPath: e?.target?.value?.trim() || null })}
           />
         </Form.Item>
-        <Form.Item label='Execution mode'>
+        <Form.Item label={t('decisionGraph.nodes.expressionSpecification.executionMode')}>
           <DiffRadio
             size={'small'}
             disabled={disabled}
@@ -270,11 +274,11 @@ export const expressionSpecification: NodeSpecification<NodeExpressionData> = {
             options={[
               {
                 value: 'single',
-                label: 'Single',
+                label: t('decisionGraph.nodes.expressionSpecification.Single'),
               },
               {
                 value: 'loop',
-                label: 'Loop',
+                label: t('decisionGraph.nodes.expressionSpecification.Loop'),
               },
             ]}
           />

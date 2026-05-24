@@ -18,6 +18,7 @@ import { TabDecisionTable } from '../../graph/tab-decision-table';
 import { GraphNode } from '../graph-node';
 import { NodeKind } from './specification-types';
 import type { NodeSpecification } from './specification-types';
+import i18nInstance from '../../../../i18n';
 
 type InferredContent = z.infer<typeof decisionTableSchema>['content'];
 
@@ -28,12 +29,15 @@ export type NodeDecisionTableData = Omit<InferredContent, 'inputs' | 'outputs' |
     outputs: (InferredContent['outputs'][0] & Diff)[];
   };
 
+// translation
+const { t } = i18nInstance;
+
 export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData> = {
   type: NodeKind.DecisionTable,
   icon: <Grid3x3Icon size='1em' />,
-  displayName: 'Decision table',
+  displayName: t('decisionGraph.nodes.decisionTableSpecification.displayName'),
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions/decision-tables',
-  shortDescription: 'Rules spreadsheet',
+  shortDescription: t('decisionGraph.nodes.decisionTableSpecification.shortDescription'),
   renderTab: ({ id, manager }) => <TabDecisionTable id={id} manager={manager} />,
   getDiffContent: (current, previous) => {
     return produce(current, (draft) => {
@@ -341,7 +345,7 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
         helper={[executionMode === 'loop' && <SyncOutlined />, passThrough && <ArrowRightOutlined />]}
         actions={[
           <Button key='edit-table' type='text' onClick={() => graphActions.openTab(id)}>
-            Edit Table
+            {t('decisionGraph.nodes.decisionTableSpecification.editTable')}
           </Button>,
         ]}
       />
@@ -375,7 +379,7 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
 
     return (
       <div className={'settings-form'}>
-        <Form.Item label={'Hit Policy'}>
+        <Form.Item label={t('decisionGraph.nodes.decisionTableSpecification.hitPolicy')}>
           <Space direction={'vertical'} size={2}>
             <DiffRadio
               size={'small'}
@@ -387,17 +391,17 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
               options={[
                 {
                   value: 'first',
-                  label: 'First',
+                  label: t('decisionGraph.nodes.decisionTableSpecification.hitPolicyFirst'),
                 },
                 {
                   value: 'collect',
-                  label: 'Collect',
+                  label: t('decisionGraph.nodes.decisionTableSpecification.hitPolicyCollect'),
                 },
               ]}
             />
           </Space>
         </Form.Item>
-        <Form.Item label='Passthrough'>
+        <Form.Item label={t('decisionGraph.nodes.decisionTableSpecification.passthrough')}>
           <DiffSwitch
             disabled={disabled}
             size={'small'}
@@ -407,7 +411,7 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
             onChange={(e) => updateNode({ passThrough: e })}
           />
         </Form.Item>
-        <Form.Item label='Input field'>
+        <Form.Item label={t('decisionGraph.nodes.decisionTableSpecification.inputField')}>
           <DiffCodeEditor
             variableType={inputType}
             disabled={disabled}
@@ -420,7 +424,7 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
             onChange={(val) => updateNode({ inputField: val?.trim() || null })}
           />
         </Form.Item>
-        <Form.Item label='Output path'>
+        <Form.Item label={t('decisionGraph.nodes.decisionTableSpecification.outputPath')}>
           <DiffInput
             size={'small'}
             readOnly={disabled}
@@ -430,7 +434,7 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
             onChange={(e) => updateNode({ outputPath: e?.target?.value?.trim() || null })}
           />
         </Form.Item>
-        <Form.Item label='Execution mode'>
+        <Form.Item label={t('decisionGraph.nodes.decisionTableSpecification.executionMode')}>
           <DiffRadio
             size={'small'}
             disabled={disabled}
@@ -441,11 +445,11 @@ export const decisionTableSpecification: NodeSpecification<NodeDecisionTableData
             options={[
               {
                 value: 'single',
-                label: 'Single',
+                label: t('decisionGraph.nodes.decisionTableSpecification.Single'),
               },
               {
                 value: 'loop',
-                label: 'Loop',
+                label: t('decisionGraph.nodes.decisionTableSpecification.Loop'),
               },
             ]}
           />

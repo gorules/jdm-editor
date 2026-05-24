@@ -2,6 +2,7 @@ import { PlusOutlined, SwapOutlined } from '@ant-design/icons';
 import { Button, Tooltip, Typography } from 'antd';
 import clsx from 'clsx';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DiffIcon } from '../../diff-icon';
 import { Stack } from '../../stack';
@@ -25,6 +26,8 @@ export type TableHeadCellFieldProps = {
 };
 
 export const TableHeadCellInput: React.FC<TableHeadCellProps> = ({ permission, disabled }) => {
+  // translation
+  const { t } = useTranslation();
   const inputs = useDecisionTableState((store) => store.decisionTable?.inputs);
   const tableActions = useDecisionTableActions();
   const { setDialog } = useDecisionTableDialog();
@@ -37,12 +40,12 @@ export const TableHeadCellInput: React.FC<TableHeadCellProps> = ({ permission, d
     <div className={'head-cell'}>
       <Stack horizontal horizontalAlign='space-between' verticalAlign='center'>
         <Stack gap={0} className={'text-wrapper'} verticalAlign={'center'}>
-          <Typography.Text className={'span-overflow grl-dt-text-primary'}>Inputs</Typography.Text>
+          <Typography.Text className={'span-overflow grl-dt-text-primary'}>{t('decisionTable.table.tableHeadCell.Inputs')}</Typography.Text>
         </Stack>
         {(permission === 'edit:full' || permission === 'edit:rules') && (
           <div className={'cta-wrapper'}>
             {inputs?.length > 1 && (
-              <Tooltip title='Reorder fields'>
+              <Tooltip title={t('decisionTable.table.tableHeadCell.reorderFields')}>
                 <Button
                   className='grl-dt-text-secondary'
                   icon={<SwapOutlined />}
@@ -90,6 +93,8 @@ export const TableHeadCellInput: React.FC<TableHeadCellProps> = ({ permission, d
 };
 
 export const TableHeadCellOutput: React.FC<TableHeadCellProps> = ({ permission, disabled }) => {
+  // translation
+  const { t } = useTranslation();
   const outputs = useDecisionTableState((store) => store.decisionTable?.outputs);
   const tableActions = useDecisionTableActions();
   const { setDialog } = useDecisionTableDialog();
@@ -98,12 +103,12 @@ export const TableHeadCellOutput: React.FC<TableHeadCellProps> = ({ permission, 
     <div className={'head-cell'}>
       <Stack horizontal horizontalAlign={'space-between'} verticalAlign={'center'}>
         <Stack gap={0} className={'text-wrapper'} verticalAlign={'center'}>
-          <Typography.Text className={'span-overflow grl-dt-text-primary'}>Outputs</Typography.Text>
+          <Typography.Text className={'span-overflow grl-dt-text-primary'}>{t('decisionTable.table.tableHeadCell.Outputs')}</Typography.Text>
         </Stack>
         {permission === 'edit:full' && (
           <div className={'cta-wrapper'}>
             {outputs?.length > 1 && (
-              <Tooltip title='Reorder fields'>
+              <Tooltip title={t('decisionTable.table.tableHeadCell.reorderFields')}>
                 <Button
                   className='grl-dt-text-secondary'
                   icon={<SwapOutlined />}

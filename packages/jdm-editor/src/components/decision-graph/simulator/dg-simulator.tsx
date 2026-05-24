@@ -5,6 +5,7 @@ import json5 from 'json5';
 import React, { useMemo, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { P, match } from 'ts-pattern';
+import { useTranslation } from 'react-i18next';
 
 import '../../../helpers/monaco';
 import { usePersistentState } from '../../../helpers/use-persistent-state';
@@ -58,6 +59,8 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
   }));
 
   const [selectedNode, setSelectedNode] = useState<string>('graph');
+  // translation
+  const { t } = useTranslation();
 
   const traces = useMemo<Array<SimulationTrace & { nodeId: string }>>(() => {
     if (!simulate) {
@@ -93,13 +96,13 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
           <input
             className='grl-dg__simulator__search'
             type='text'
-            placeholder='Search nodes...'
+            placeholder={t('decisionGraph.simulator.dgSimulator.SearchNodesTip')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           <div className={'grl-dg__simulator__section__bar__actions'}>
             {onClear && (
-              <Tooltip title={'Clear'}>
+              <Tooltip title={t('decisionGraph.simulator.dgSimulator.Clear')}>
                 <Button
                   size={'small'}
                   type={'text'}
@@ -119,16 +122,16 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
             <div className={'grl-dg__simulator__nodes-list'}>
               {!simulate && (
                 <Typography.Text type='secondary' style={{ textAlign: 'center', marginTop: 60, fontSize: 13 }}>
-                  Ready to simulate!
+                  {t('decisionGraph.simulator.dgSimulator.ReadyToSimulate')}
                   <br />
-                  Run a request to see the node trace in action.
+                  {t('decisionGraph.simulator.dgSimulator.RunRequestTip')}
                   <br />
                   <Typography.Link
                     href='https://docs.gorules.io/docs/simulator'
                     target='_blank'
                     style={{ fontSize: 13, marginTop: 4, display: 'inline-block' }}
                   >
-                    Learn more
+                    {t('decisionGraph.simulator.dgSimulator.LearnMore')}
                   </Typography.Link>
                 </Typography.Text>
               )}
@@ -144,7 +147,7 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
                         .with({ result: P.nonNullable }, () => 'success' as const)
                         .otherwise(() => 'not-run' as const)}
                     />
-                    Graph
+                    {t('decisionGraph.simulator.dgSimulator.LearnMore')}
                   </Typography.Text>
                   <Typography.Text type={'secondary'} data-role='performance'>
                     {match(simulate)
@@ -186,7 +189,7 @@ export const GraphSimulator: React.FC<GraphSimulatorProps> = ({
               label: s,
             }))}
             tabBarExtraContent={
-              <Tooltip title='Close panel'>
+              <Tooltip title={t('decisionGraph.simulator.dgSimulator.ClosePanel')}>
                 <Button
                   type='text'
                   icon={<CloseOutlined style={{ fontSize: 12 }} />}

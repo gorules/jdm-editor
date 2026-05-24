@@ -1,6 +1,7 @@
 import { Dropdown, Tooltip, message, theme } from 'antd';
 import React from 'react';
 import { JSONTree } from 'react-json-tree';
+import { useTranslation } from 'react-i18next';
 
 import { copyToClipboard } from '../../helpers/utility';
 
@@ -40,6 +41,8 @@ const themes: Record<'dark' | 'light', JsonTheme> = {
 export const FunctionDebuggerLog: React.FC<FunctionDebuggerLogProps> = ({ lines, msSinceRun }) => {
   const { token } = theme.useToken();
   const jsonTheme = themes[token.mode ?? 'light'];
+  // translation
+  const { t } = useTranslation();
 
   return (
     <div className='grl-function__debugger__log'>
@@ -49,10 +52,10 @@ export const FunctionDebuggerLog: React.FC<FunctionDebuggerLogProps> = ({ lines,
           items: [
             {
               key: 'copy',
-              label: 'Copy to clipboard',
+              label: t('function.functionDebuggerLog.CopyToClipboard'),
               onClick: async () => {
                 await copyToClipboard(lines.length === 1 ? lines[0] : `[${lines.join(', ')}]`);
-                message.success('Copied to clipboard');
+                message.success(t('function.functionDebuggerLog.copiedSuccess'));
               },
             },
           ],

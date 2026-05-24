@@ -10,6 +10,7 @@ import type { DiffStatus } from '../dg-types';
 import { NodeColor } from '../nodes/specifications/colors';
 import type { NodeKind } from '../nodes/specifications/specification-types';
 import { nodeSpecification } from '../nodes/specifications/specifications';
+import { useTranslation } from 'react-i18next';
 
 export type GraphTabsProps = {
   disabled?: boolean;
@@ -39,6 +40,7 @@ export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled, tabBarExtraConte
       viewConfig,
     }),
   );
+  const { t } = useTranslation();
 
   const defaultItems = useMemo(() => {
     return [
@@ -49,7 +51,7 @@ export const GraphTabs: React.FC<GraphTabsProps> = ({ disabled, tabBarExtraConte
           <TabLabel
             total={openNodes?.length}
             icon={viewConfig?.enabled ? <UnorderedListOutlined /> : <DeploymentUnitOutlined />}
-            name={viewConfig?.enabled ? 'Nodes' : 'Graph'}
+            name={viewConfig?.enabled ? t('decisionGraph.graph.graphTabs.tabLabel.Nodes') : t('decisionGraph.graph.graphTabs.tabLabel.Graph')}
             active={!activeNodeId || activeNodeId === 'graph'}
             onContextClick={(action) => {
               graphActions.closeTab('graph', action);
@@ -112,38 +114,39 @@ const TabLabel: React.FC<{
   active?: boolean;
   onContextClick?: (action: string) => void;
 }> = ({ total = 0, index = -1, icon, name, active, diffStatus, color = NodeColor.Blue, onClose, onContextClick }) => {
+  const { t } = useTranslation();
   const items = [
     total > 0 &&
-      index !== -1 && {
-        key: 'close',
-        label: 'Close',
-        onClick: () => onContextClick?.('close'),
-      },
+    index !== -1 && {
+      key: 'close',
+      label: t('decisionGraph.graph.graphTabs.tabLabel.Close'),
+      onClick: () => onContextClick?.('close'),
+    },
     total > 0 &&
-      index !== -1 && {
-        key: 'close-all',
-        label: 'Close all Tabs',
-        onClick: () => onContextClick?.('close-all'),
-      },
+    index !== -1 && {
+      key: 'close-all',
+      label: t('decisionGraph.graph.graphTabs.tabLabel.CloseAllTabs'),
+      onClick: () => onContextClick?.('close-all'),
+    },
     total > 0 &&
-      index !== -1 && {
-        key: 'close-other',
-        label: 'Close other Tabs',
-        onClick: () => onContextClick?.('close-other'),
-      },
+    index !== -1 && {
+      key: 'close-other',
+      label: t('decisionGraph.graph.graphTabs.tabLabel.CloseOtherTabs'),
+      onClick: () => onContextClick?.('close-other'),
+    },
     total > 0 &&
-      index + 1 < total && {
-        key: 'close-right',
-        label: 'Close Tabs to the right',
-        onClick: () => onContextClick?.('close-right'),
-      },
+    index + 1 < total && {
+      key: 'close-right',
+      label: t('decisionGraph.graph.graphTabs.tabLabel.CloseRight'),
+      onClick: () => onContextClick?.('close-right'),
+    },
     total > 0 &&
-      index > 0 &&
-      index > 0 && {
-        key: 'close-left',
-        label: 'Close Tabs to the left',
-        onClick: () => onContextClick?.('close-left'),
-      },
+    index > 0 &&
+    index > 0 && {
+      key: 'close-left',
+      label: t('decisionGraph.graph.graphTabs.tabLabel.CloseLeft'),
+      onClick: () => onContextClick?.('close-left'),
+    },
   ].filter((item) => !!item);
 
   return (
