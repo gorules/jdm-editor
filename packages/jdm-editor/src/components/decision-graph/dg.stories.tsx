@@ -458,7 +458,7 @@ const businessModeGraph: DecisionGraphType = {
       id: 'input-1',
       type: 'inputNode',
       position: { x: 70, y: 250 },
-      name: 'Request',
+      name: 'Start',
     },
     {
       id: 'output-1',

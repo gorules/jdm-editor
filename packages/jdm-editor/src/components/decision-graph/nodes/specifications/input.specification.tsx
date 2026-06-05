@@ -24,7 +24,7 @@ export type NodeInputData = InferredContent & Diff;
 export const inputSpecification: NodeSpecification<NodeInputData> = {
   type: NodeKind.Input,
   icon: <ArrowRightToLineIcon size='1em' />,
-  displayName: 'Request',
+  displayName: 'Start',
   color: NodeColor.Green,
   documentationUrl: 'https://gorules.io/docs/user-manual/decision-modeling/decisions',
   shortDescription: 'Provides input context',
