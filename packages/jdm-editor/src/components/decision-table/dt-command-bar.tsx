@@ -45,11 +45,14 @@ export const DecisionTableCommandBar: React.FC = () => {
         return {
           id: newId,
           name: item.label,
-          field: item.value
-            ?.replace(/[^a-zA-Z0-9\s._]/g, '')
-            .trim()
-            .replace(/\s+/g, '.')
-            .toLowerCase(),
+          field:
+            item.value && !/\s/.test(item.value.trim())
+              ? item.value.trim()
+              : item.value
+                  ?.replace(/[^a-zA-Z0-9\s._]/g, '')
+                  .trim()
+                  .replace(/\s+/g, '.')
+                  .toLowerCase(),
           fieldType: existing?.fieldType,
           defaultValue: existing?.defaultValue,
         };
@@ -66,14 +69,17 @@ export const DecisionTableCommandBar: React.FC = () => {
         return {
           id: newId,
           name: item.label,
-          field: item.value
-            ?.replace(/[^a-zA-Z0-9\s._]/g, '')
-            .trim()
-            .split(/\s+/)
-            .map((word, index) =>
-              index === 0 ? word.toLowerCase() : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
-            )
-            .join(''),
+          field:
+            item.value && !/\s/.test(item.value.trim())
+              ? item.value.trim()
+              : item.value
+                  ?.replace(/[^a-zA-Z0-9\s._]/g, '')
+                  .trim()
+                  .split(/\s+/)
+                  .map((word, index) =>
+                    index === 0 ? word.toLowerCase() : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+                  )
+                  .join(''),
           outputFieldType: existing?.outputFieldType,
           defaultValue: existing?.defaultValue,
         };
