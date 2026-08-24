@@ -1,5 +1,5 @@
-import { CompressOutlined, LeftOutlined, RightOutlined, WarningOutlined } from '@ant-design/icons';
-import { App, Button, Typography, message, notification } from 'antd';
+import { CompressOutlined, LeftOutlined, RightOutlined, WarningOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { App, Button, Typography, message, notification, Popover } from 'antd';
 import clsx from 'clsx';
 import equal from 'fast-deep-equal';
 import React, { type MutableRefObject, forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
@@ -12,6 +12,7 @@ import ReactFlow, {
   getOutgoers,
   useEdgesState,
   useNodesState,
+  Panel,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { P, match } from 'ts-pattern';
@@ -22,7 +23,6 @@ import {
   type ExposedStore,
   useDecisionGraphActions,
   useDecisionGraphListeners,
-  useDecisionGraphRaw,
   useDecisionGraphReferences,
   useDecisionGraphState,
 } from '../context/dg-store.context';
@@ -94,7 +94,6 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
 
   const initialViewport = useRef<Viewport | undefined>(undefined);
 
-  const raw = useDecisionGraphRaw();
   const registry = useSerializerRegistry();
   const graphActions = useDecisionGraphActions();
   const graphReferences = useDecisionGraphReferences((s) => s);
@@ -396,7 +395,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
       className={clsx(['tab-content', className])}
       tabIndex={0}
       onKeyDown={(e) => {
-        if (e.key === 'v' && e.metaKey && !disabled) {
+        if (e.key === 'v' && (e.ctrlKey || e.metaKey) && !disabled) {
           graphActions.pasteNodes();
         }
       }}
@@ -416,7 +415,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
             const [nodes] = nodesState;
             const [edges] = edgesState;
 
-            if (e.key === 'c' && e.metaKey) {
+            if (e.key === 'c' && (e.ctrlKey || e.metaKey)) {
               const selectedNodeIds = nodesState[0].filter((n) => n.selected).map(({ id }) => id);
               if (selectedNodeIds.length === 0) {
                 return;
@@ -424,7 +423,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
 
               graphActions.copyNodes(selectedNodeIds);
               e.preventDefault();
-            } else if (e.key === 'd' && e.metaKey) {
+            } else if (e.key === 'd' && (e.ctrlKey || e.metaKey)) {
               if (!disabled) {
                 const selectedNodeIds = nodes.filter((n) => n.selected).map(({ id }) => id);
                 if (selectedNodeIds.length === 0) {
@@ -434,7 +433,7 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
                 graphActions.duplicateNodes(selectedNodeIds);
               }
               e.preventDefault();
-            } else if (e.key === 'Backspace') {
+            } else if (e.key === 'Backspace' || e.key === 'Delete') {
               if (!disabled) {
                 const selectedNodes = nodes.filter((n) => n.selected);
                 const selectedEdges = edges.filter((e) => e.selected);
@@ -488,13 +487,17 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
               snapGrid={[5, 5]}
               minZoom={0.25}
               selectionMode={SelectionMode.Partial}
+              selectionOnDrag={true}
+              panOnScroll={true}
+              panOnDrag={[1, 2]}
+              multiSelectionKeyCode={['Meta', 'Control', 'Shift']}
               nodeTypes={nodeTypes}
               edgeTypes={edgeTypes}
               onDrop={onDrop}
               onDragOver={onDragOver}
               onConnect={onConnect}
               isValidConnection={isValidConnection}
-              proOptions={reactFlowProOptions}
+              proOptions={{ ...reactFlowProOptions }}
               nodesConnectable={!disabled}
               nodesDraggable={!disabled}
               edgesUpdatable={!disabled}
@@ -514,6 +517,40 @@ export const Graph = forwardRef<GraphRef, GraphProps>(function GraphInner({ reac
                 </ControlButton>
               </Controls>
               <Background id={id} color='var(--grl-color-border)' gap={20} />
+              <Panel position='top-right' style={{ marginTop: 10, marginRight: 10 }}>
+                <Popover
+                  placement='bottomRight'
+                  title='Keyboard Shortcuts'
+                  content={
+                    <div style={{ fontSize: 13, lineHeight: '2' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 24 }}>
+                        <span style={{ fontWeight: 500 }}>Pan</span>
+                        <span style={{ color: 'var(--grl-color-text-secondary)' }}>
+                          <kbd>Space</kbd> + Drag <i>or</i> 2-finger scroll
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 24 }}>
+                        <span style={{ fontWeight: 500 }}>Zoom</span>
+                        <span style={{ color: 'var(--grl-color-text-secondary)' }}>
+                          <kbd>Ctrl</kbd> + Scroll <i>or</i> Pinch
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 24 }}>
+                        <span style={{ fontWeight: 500 }}>Select</span>
+                        <span style={{ color: 'var(--grl-color-text-secondary)' }}>Drag</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 24 }}>
+                        <span style={{ fontWeight: 500 }}>Multi-select</span>
+                        <span style={{ color: 'var(--grl-color-text-secondary)' }}>
+                          <kbd>Ctrl</kbd> + Click
+                        </span>
+                      </div>
+                    </div>
+                  }
+                >
+                  <Button type='text' shape='circle' icon={<QuestionCircleOutlined />} style={{ color: 'var(--grl-color-text-secondary)', backgroundColor: 'var(--grl-color-bg-container)' }} />
+                </Popover>
+              </Panel>
             </ReactFlow>
           </div>
         </div>

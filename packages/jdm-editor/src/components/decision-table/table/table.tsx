@@ -8,7 +8,11 @@ import equal from 'fast-deep-equal/es6/react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 
-import { useDecisionTableActions, useDecisionTableListeners, useDecisionTableState } from '../context/dt-store.context';
+import {
+  useDecisionTableActions,
+  useDecisionTableListeners,
+  useDecisionTableState,
+} from '../context/dt-store.context';
 import { TableContextMenu } from './table-context-menu';
 import { TableDefaultCell } from './table-default-cell';
 import {
@@ -153,9 +157,9 @@ export const Table: React.FC<TableProps> = ({ id, maxHeight, scrollContainerRef,
     ...(!id
       ? {}
       : {
-          state: { columnSizing },
-          onColumnSizingChange: setColumnSizing,
-        }),
+        state: { columnSizing },
+        onColumnSizingChange: setColumnSizing,
+      }),
   });
 
   const tableContainerRef = useRef<HTMLDivElement>(null);
@@ -309,14 +313,12 @@ const TableBody = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(
 
       if (e.code === 'ArrowUp' && (e.metaKey || e.altKey)) {
         if (cursor) tableActions.addRowAbove(cursor.y);
-      }
-      if (e.code === 'ArrowDown' && (e.metaKey || e.altKey)) {
+      } else if (e.code === 'ArrowDown' && (e.metaKey || e.altKey)) {
         if (cursor) tableActions.addRowBelow(cursor.y);
-      }
-      if (e.code === 'Backspace' && (e.metaKey || e.altKey)) {
+      } else if (e.code === 'Backspace' && (e.metaKey || e.altKey)) {
         if (cursor) tableActions.removeRow(cursor.y);
       }
-    }, []);
+    }, [cursor, tableActions, disabled]);
 
     return (
       <tbody ref={ref} {...props} onKeyDown={onKeyDown}>
