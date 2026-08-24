@@ -111,13 +111,6 @@ export const GraphNode = React.forwardRef<HTMLDivElement, GraphNodeProps>(
         className={clsx('grl-graph-node', className)}
         style={{ minWidth: 220, maxWidth: 220 }}
         ref={ref}
-        onClick={(event) => {
-          const isToggle = match(navigator.platform.includes('Mac'))
-            .with(true, () => event.metaKey)
-            .otherwise(() => event.ctrlKey);
-
-          graphActions.triggerNodeSelect(id, isToggle ? 'toggle' : 'only');
-        }}
       >
         {handleLeft && (
           <Handle
