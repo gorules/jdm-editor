@@ -5,6 +5,7 @@ import type { z } from 'zod';
 
 import type { GetNodeDataResult } from '../../../helpers/node-data';
 import { getNodeData } from '../../../helpers/node-data';
+import { useNodeType } from '../../../helpers/node-type';
 import type { expressionNodeSchema } from '../../../helpers/schema';
 import { get } from '../../../helpers/utility';
 import { isWasmAvailable } from '../../../helpers/wasm';
@@ -24,6 +25,7 @@ export type TabExpressionProps = {
 
 export const TabExpression: React.FC<TabExpressionProps> = ({ id, manager }) => {
   const graphActions = useDecisionGraphActions();
+  const nodeType = useNodeType(id);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
   useTabSerializer<ScrollPosition>(id, 'scroll', {
@@ -109,6 +111,7 @@ export const TabExpression: React.FC<TabExpressionProps> = ({ id, manager }) => 
         permission={(viewConfig?.enabled ? viewConfig?.permissions?.[id] : 'edit:full') as ExpressionPermission}
         manager={manager}
         debug={debug}
+        inputVariableType={nodeType}
         onChange={(val) => {
           graphActions.updateNode(id, (draft) => {
             draft.content.expressions = val;
