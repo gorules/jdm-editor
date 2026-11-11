@@ -3,6 +3,7 @@ import React, { useMemo, useRef } from 'react';
 import { P, match } from 'ts-pattern';
 
 import { getNodeData } from '../../../helpers/node-data';
+import { useNodeType } from '../../../helpers/node-type';
 import { get } from '../../../helpers/utility';
 import { isWasmAvailable } from '../../../helpers/wasm';
 import type { DecisionTableType, TableScrollApi } from '../../decision-table';
@@ -22,6 +23,7 @@ export type TabDecisionTableProps = {
 
 export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager }) => {
   const graphActions = useDecisionGraphActions();
+  const nodeType = useNodeType(id);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const scrollApiRef = useRef<TableScrollApi | null>(null);
 
@@ -103,6 +105,7 @@ export const TabDecisionTable: React.FC<TabDecisionTableProps> = ({ id, manager 
       dictionaries={dictionaries}
       mode={mode}
       debug={debug}
+      inputVariableType={nodeType}
       onChange={(val) => {
         graphActions.updateNode(id, (draft) => {
           Object.assign(draft.content, val);
