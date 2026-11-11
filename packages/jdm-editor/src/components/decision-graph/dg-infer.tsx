@@ -141,7 +141,7 @@ const inferNodeTypes: InferNodeTypes = ({ decisionGraph, nodeTypes, customNodes 
   const newNodeTypes = produce(nodeTypes, (draft) => {
     for (const { node, incomers } of graphWalker.walk(decisionGraph)) {
       if (node.type === 'inputNode') {
-        return;
+        continue;
       }
 
       const incomerTypes = incomers
